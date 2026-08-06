@@ -1,0 +1,8947 @@
+# Decomposição em Valores Singulares
+
+No capítulo anterior, a decomposição espectral foi utilizada para representar uma matriz simétrica real na forma
+
+$$
+\mathbf{A}
+=
+\mathbf{Q}_{\mathbf{A}}
+\boldsymbol{\Lambda}_{\mathbf{A}}
+\mathbf{Q}_{\mathbf{A}}^{\top}.
+$$
+
+Essa representação identifica uma base ortonormal de autovetores na qual a transformação atua separadamente sobre cada coordenada. A decomposição espectral ortogonal, entretanto, depende da simetria da matriz e é formulada para operadores cujo domínio e contradomínio possuem a mesma dimensão.
+
+Em Análise Multivariada, um dos objetos mais frequentes é a matriz de dados
+
+$$
+\mathbf{X}
+\in
+\mathbb{R}^{n\times p},
+$$
+
+cujas linhas representam observações e cujas colunas representam variáveis. Em geral,
+
+$$
+n\neq p,
+$$
+
+de modo que $\mathbf{X}$ é retangular. Mesmo quando uma matriz é quadrada, ela pode não ser simétrica nem possuir uma base ortonormal de autovetores.
+
+A **Decomposição em Valores Singulares**, ou SVD, fornece uma representação aplicável a qualquer matriz real. Para uma transformação
+
+$$
+T_{\mathbf{A}}:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{q},
+\qquad
+T_{\mathbf{A}}(\mathbf{x})
+=
+\mathbf{A}\mathbf{x},
+$$
+
+a SVD relaciona duas bases ortonormais:
+
+-   uma base do espaço de origem $\mathbb{R}^{p}$;
+-   uma base do espaço de chegada $\mathbb{R}^{q}$.
+
+A transformação associa determinadas direções dessas duas bases e multiplica os comprimentos por fatores não negativos denominados **valores singulares**.
+
+Essa representação permite descrever:
+
+-   o posto da matriz;
+-   os espaços das linhas e das colunas;
+-   o núcleo e o núcleo da transposta;
+-   os fatores máximos e mínimos de alteração dos comprimentos;
+-   aproximações de posto reduzido;
+-   a pseudoinversa;
+-   soluções de mínimos quadrados.
+
+A SVD também estabelece uma ligação entre os espaços das observações e das variáveis de uma matriz de dados. Essa dualidade será utilizada posteriormente na formulação de métodos de redução de dimensionalidade e de representação de estruturas matriciais.
+
+## Definição e formas da Decomposição em Valores Singulares
+
+Considere uma matriz real
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{q\times p},
+$$
+
+que representa uma transformação de $\mathbb{R}^{p}$ em $\mathbb{R}^{q}$.
+
+A matriz pode ser retangular, quadrada, simétrica ou não simétrica. Nenhuma hipótese de invertibilidade ou de posto completo é necessária para a existência da SVD.
+
+::: {#thm-existencia-svd}
+## Existência da Decomposição em Valores Singulares
+
+Para toda matriz
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{q\times p},
+$$
+
+existem matrizes ortogonais
+
+$$
+\mathbf{U}
+\in
+\mathbb{R}^{q\times q}
+$$
+
+e
+
+$$
+\mathbf{V}
+\in
+\mathbb{R}^{p\times p},
+$$
+
+e uma matriz diagonal retangular
+
+$$
+\mathbf{D}
+\in
+\mathbb{R}^{q\times p}
+$$
+
+tais que
+
+$$
+\mathbf{A}
+=
+\mathbf{U}
+\mathbf{D}
+\mathbf{V}^{\top}.
+$$
+
+As matrizes ortogonais satisfazem
+
+$$
+\mathbf{U}^{\top}\mathbf{U}
+=
+\mathbf{U}\mathbf{U}^{\top}
+=
+\mathbf{I}_q
+$$
+
+e
+
+$$
+\mathbf{V}^{\top}\mathbf{V}
+=
+\mathbf{V}\mathbf{V}^{\top}
+=
+\mathbf{I}_p.
+$$
+
+Os elementos diagonais não negativos de $\mathbf{D}$ podem ser ordenados como
+
+$$
+d_1
+\geq
+d_2
+\geq
+\cdots
+\geq
+d_{\min(q,p)}
+\geq
+0.
+$$
+
+Esses elementos são os **valores singulares** de $\mathbf{A}$. [@golub2013matrix]
+:::
+
+A matriz $\mathbf{D}$ é denominada diagonal retangular porque
+
+$$
+D_{ij}=0
+\qquad
+\text{quando }
+i\neq j.
+$$
+
+Se
+
+$$
+q>p,
+$$
+
+a matriz $\mathbf{D}$ possui linhas nulas abaixo de sua parte diagonal. Se
+
+$$
+p>q,
+$$
+
+ela possui colunas nulas à direita da parte diagonal.
+
+Por exemplo, quando $q>p$,
+
+$$
+\mathbf{D}
+=
+\begin{bmatrix}
+d_1 & 0 & \cdots & 0\\
+0 & d_2 & \cdots & 0\\
+\vdots & \vdots & \ddots & \vdots\\
+0 & 0 & \cdots & d_p\\
+0 & 0 & \cdots & 0\\
+\vdots & \vdots & & \vdots\\
+0 & 0 & \cdots & 0
+\end{bmatrix}
+\in
+\mathbb{R}^{q\times p}.
+$$
+
+Quando $p>q$,
+
+$$
+\mathbf{D}
+=
+\begin{bmatrix}
+d_1 & 0 & \cdots & 0 & 0 & \cdots & 0\\
+0 & d_2 & \cdots & 0 & 0 & \cdots & 0\\
+\vdots & \vdots & \ddots & \vdots & \vdots & & \vdots\\
+0 & 0 & \cdots & d_q & 0 & \cdots & 0
+\end{bmatrix}
+\in
+\mathbb{R}^{q\times p}.
+$$
+
+Se
+
+$$
+r
+=
+\operatorname{posto}(\mathbf{A}),
+$$
+
+então exatamente $r$ valores singulares são positivos:
+
+$$
+d_1
+\geq
+d_2
+\geq
+\cdots
+\geq
+d_r
+>
+0,
+$$
+
+enquanto os demais valores singulares são iguais a zero.
+
+### Vetores singulares
+
+Escreva as matrizes ortogonais como
+
+$$
+\mathbf{U}
+=
+\begin{bmatrix}
+\mathbf{u}_1&
+\cdots&
+\mathbf{u}_q
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{V}
+=
+\begin{bmatrix}
+\mathbf{v}_1&
+\cdots&
+\mathbf{v}_p
+\end{bmatrix}.
+$$
+
+::: {#def-vetores-valores-singulares}
+## Valores e vetores singulares
+
+Na decomposição
+
+$$
+\mathbf{A}
+=
+\mathbf{U}
+\mathbf{D}
+\mathbf{V}^{\top},
+$$
+
+os elementos diagonais não negativos
+
+$$
+d_1,\ldots,d_{\min(q,p)}
+$$
+
+de $\mathbf{D}$ são os **valores singulares** de $\mathbf{A}$.
+
+As colunas
+
+$$
+\mathbf{v}_1,\ldots,\mathbf{v}_p
+$$
+
+de $\mathbf{V}$ são os **vetores singulares à direita**. Elas formam uma base ortonormal de $\mathbb{R}^{p}$.
+
+As colunas
+
+$$
+\mathbf{u}_1,\ldots,\mathbf{u}_q
+$$
+
+de $\mathbf{U}$ são os **vetores singulares à esquerda**. Elas formam uma base ortonormal de $\mathbb{R}^{q}$.
+:::
+
+Para cada valor singular positivo,
+
+$$
+d_j>0,
+\qquad
+j=1,\ldots,r,
+$$
+
+os vetores singulares correspondentes satisfazem
+
+$$
+\mathbf{A}\mathbf{v}_j
+=
+d_j\mathbf{u}_j
+$$
+
+e
+
+$$
+\mathbf{A}^{\top}\mathbf{u}_j
+=
+d_j\mathbf{v}_j.
+$$
+
+A primeira igualdade mostra como a transformação associa uma direção no espaço de origem a uma direção no espaço de chegada:
+
+$$
+\mathbf{v}_j
+\overset{\mathbf{A}}{\longmapsto}
+d_j\mathbf{u}_j.
+$$
+
+Como
+
+$$
+\|\mathbf{v}_j\|
+=
+\|\mathbf{u}_j\|
+=
+1,
+$$
+
+tem-se
+
+$$
+\left\|
+\mathbf{A}\mathbf{v}_j
+\right\|
+=
+d_j.
+$$
+
+Portanto, $d_j$ mede o fator de alteração do comprimento na direção $\mathbf{v}_j$:
+
+-   se $d_j>1$, ocorre ampliação;
+-   se $0<d_j<1$, ocorre contração;
+-   se $d_j=1$, o comprimento é preservado;
+-   se $d_j=0$, a direção correspondente é eliminada.
+
+Os valores singulares são sempre não negativos. Diferentemente dos autovalores, eles não representam inversões de sentido. Possíveis mudanças de orientação ficam incorporadas às matrizes ortogonais $\mathbf{U}$ e $\mathbf{V}$.
+
+As colunas de $\mathbf{V}$ correspondentes às colunas nulas de $\mathbf{D}$ são transformadas no vetor nulo. Elas pertencem ao núcleo de $\mathbf{A}$. De maneira análoga, colunas de $\mathbf{U}$ que correspondem às linhas nulas de $\mathbf{D}$ pertencem ao núcleo de $\mathbf{A}^{\top}$. Essas relações serão formalizadas na seção dedicada aos espaços fundamentais.
+
+### Interpretação como composição de transformações
+
+Para qualquer
+
+$$
+\mathbf{x}
+\in
+\mathbb{R}^{p},
+$$
+
+a ação de $\mathbf{A}$ pode ser escrita como
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\mathbf{U}
+\mathbf{D}
+\mathbf{V}^{\top}
+\mathbf{x}.
+$$
+
+Essa transformação pode ser decomposta em três etapas:
+
+$$
+\mathbf{x}
+\longmapsto
+\mathbf{V}^{\top}\mathbf{x}
+\longmapsto
+\mathbf{D}\mathbf{V}^{\top}\mathbf{x}
+\longmapsto
+\mathbf{U}\mathbf{D}\mathbf{V}^{\top}\mathbf{x}.
+$$
+
+Na primeira etapa,
+
+$$
+\mathbf{V}^{\top}\mathbf{x}
+$$
+
+fornece as coordenadas de $\mathbf{x}$ na base dos vetores singulares à direita.
+
+Na segunda etapa,
+
+$$
+\mathbf{D}\mathbf{V}^{\top}\mathbf{x}
+$$
+
+multiplica separadamente as coordenadas pelos valores singulares. Como $\mathbf{D}$ pode ser retangular, essa etapa também pode alterar a dimensão do espaço.
+
+Na terceira etapa, $\mathbf{U}$ expressa o resultado na base ortonormal dos vetores singulares à esquerda.
+
+Como $\mathbf{U}$ e $\mathbf{V}$ são ortogonais, essas duas matrizes preservam normas, distâncias, ângulos e produtos internos. As alterações de comprimento e a possível redução de dimensão são determinadas por $\mathbf{D}$.
+
+### SVD completa
+
+::: {#def-svd-completa}
+## SVD completa
+
+A representação
+
+$$
+\mathbf{A}
+=
+\mathbf{U}
+\mathbf{D}
+\mathbf{V}^{\top},
+$$
+
+com
+
+$$
+\mathbf{U}
+\in
+\mathbb{R}^{q\times q},
+\qquad
+\mathbf{D}
+\in
+\mathbb{R}^{q\times p}
+$$
+
+e
+
+$$
+\mathbf{V}
+\in
+\mathbb{R}^{p\times p},
+$$
+
+é denominada **SVD completa** de $\mathbf{A}$.
+:::
+
+As dimensões e os papéis dos fatores são apresentados na @tbl-svd-completa.
+
+| Matriz       |    Dimensão | Papel                                             |
+|:-----------------------|-----------------------:|:-----------------------|
+| $\mathbf{U}$ | $q\times q$ | Base ortonormal do espaço de chegada              |
+| $\mathbf{D}$ | $q\times p$ | Matriz diagonal retangular dos valores singulares |
+| $\mathbf{V}$ | $p\times p$ | Base ortonormal do espaço de origem               |
+
+: Dimensões das matrizes na SVD completa. {#tbl-svd-completa}
+
+A SVD completa descreve bases ortonormais de todo o espaço de origem e de todo o espaço de chegada. Por isso, ela contém também as direções associadas ao núcleo de $\mathbf{A}$ e ao núcleo de $\mathbf{A}^{\top}$.
+
+### SVD compacta
+
+Quando
+
+$$
+r
+=
+\operatorname{posto}(\mathbf{A}),
+$$
+
+defina
+
+$$
+\mathbf{U}_r
+=
+\begin{bmatrix}
+\mathbf{u}_1&
+\cdots&
+\mathbf{u}_r
+\end{bmatrix}
+\in
+\mathbb{R}^{q\times r},
+$$
+
+$$
+\mathbf{V}_r
+=
+\begin{bmatrix}
+\mathbf{v}_1&
+\cdots&
+\mathbf{v}_r
+\end{bmatrix}
+\in
+\mathbb{R}^{p\times r}
+$$
+
+e
+
+$$
+\mathbf{D}_r
+=
+\operatorname{diag}
+\left(
+d_1,\ldots,d_r
+\right)
+\in
+\mathbb{R}^{r\times r}.
+$$
+
+::: {#def-svd-compacta}
+## SVD compacta
+
+A representação
+
+$$
+\mathbf{A}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top},
+$$
+
+formada somente pelos valores singulares positivos e por seus vetores singulares correspondentes, é denominada **SVD compacta** de $\mathbf{A}$.
+:::
+
+A SVD compacta reconstrói exatamente a matriz original. Ela não é uma aproximação.
+
+As colunas de $\mathbf{U}_r$ e de $\mathbf{V}_r$ são ortonormais:
+
+$$
+\mathbf{U}_r^{\top}
+\mathbf{U}_r
+=
+\mathbf{I}_r
+$$
+
+e
+
+$$
+\mathbf{V}_r^{\top}
+\mathbf{V}_r
+=
+\mathbf{I}_r.
+$$
+
+Quando $r<q$, tem-se
+
+$$
+\mathbf{U}_r
+\mathbf{U}_r^{\top}
+\neq
+\mathbf{I}_q.
+$$
+
+Quando $r<p$,
+
+$$
+\mathbf{V}_r
+\mathbf{V}_r^{\top}
+\neq
+\mathbf{I}_p.
+$$
+
+Esses produtos são projetores ortogonais sobre os subespaços gerados pelas colunas das matrizes correspondentes. Sua interpretação será retomada na seção sobre os espaços fundamentais.
+
+As dimensões da SVD compacta são apresentadas na @tbl-svd-compacta.
+
+| Matriz         |    Dimensão | Conteúdo                                                       |
+|:-----------------------|-----------------------:|:-----------------------|
+| $\mathbf{U}_r$ | $q\times r$ | Vetores singulares à esquerda associados aos valores positivos |
+| $\mathbf{D}_r$ | $r\times r$ | Valores singulares positivos                                   |
+| $\mathbf{V}_r$ | $p\times r$ | Vetores singulares à direita associados aos valores positivos  |
+
+: Dimensões das matrizes na SVD compacta. {#tbl-svd-compacta}
+
+A forma compacta contém toda a informação necessária para reconstruir $\mathbf{A}$ e utiliza somente as direções que participam efetivamente da transformação. A forma completa acrescenta bases ortonormais para os complementos dessas direções.
+
+### SVD compacta e SVD truncada
+
+A **SVD compacta** e a **SVD truncada** representam objetos diferentes.
+
+A SVD compacta conserva os $r$ valores singulares positivos e satisfaz exatamente
+
+$$
+\mathbf{A}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}.
+$$
+
+Uma SVD truncada conserva somente os $k$ maiores valores singulares, com
+
+$$
+1\leq k<r.
+$$
+
+Definindo
+
+$$
+\mathbf{U}_k
+=
+\begin{bmatrix}
+\mathbf{u}_1&
+\cdots&
+\mathbf{u}_k
+\end{bmatrix},
+$$
+
+$$
+\mathbf{D}_k
+=
+\operatorname{diag}
+\left(
+d_1,\ldots,d_k
+\right)
+$$
+
+e
+
+$$
+\mathbf{V}_k
+=
+\begin{bmatrix}
+\mathbf{v}_1&
+\cdots&
+\mathbf{v}_k
+\end{bmatrix},
+$$
+
+obtém-se
+
+$$
+\mathbf{A}_k
+=
+\mathbf{U}_k
+\mathbf{D}_k
+\mathbf{V}_k^{\top}.
+$$
+
+Quando $k<r$,
+
+$$
+\mathbf{A}_k
+\neq
+\mathbf{A}.
+$$
+
+A matriz $\mathbf{A}_k$ é uma aproximação de posto $k$. Suas propriedades de otimalidade e os erros produzidos pelo truncamento serão desenvolvidos posteriormente.
+
+Alguns textos utilizam as expressões **SVD reduzida** ou **SVD econômica** para formas que não incluem todas as colunas das matrizes ortogonais. Como essa terminologia não é uniforme, neste capítulo serão utilizadas as expressões:
+
+-   **SVD completa**, para a representação com bases ortonormais completas;
+-   **SVD compacta**, para a representação exata com os valores singulares positivos;
+-   **SVD truncada**, para a aproximação que conserva apenas os $k<r$ maiores valores singulares.
+
+### Não unicidade dos vetores singulares
+
+Os valores singulares de uma matriz são determinados de maneira única quando apresentados em ordem decrescente e consideradas suas multiplicidades. Os vetores singulares, entretanto, podem não ser únicos.
+
+Para cada par associado a um valor singular positivo, a substituição simultânea
+
+$$
+\mathbf{u}_j
+\longmapsto
+-\mathbf{u}_j
+$$
+
+e
+
+$$
+\mathbf{v}_j
+\longmapsto
+-\mathbf{v}_j
+$$
+
+não altera a parcela
+
+$$
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top},
+$$
+
+pois
+
+$$
+d_j
+\left(
+-\mathbf{u}_j
+\right)
+\left(
+-\mathbf{v}_j
+\right)^{\top}
+=
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}.
+$$
+
+Assim, cada par singular associado a um valor positivo é determinado apenas a menos de uma mudança simultânea de sinal.
+
+Considere agora um valor singular positivo $d$ com multiplicidade $m$. Se
+
+$$
+\mathbf{U}_{d}
+\in
+\mathbb{R}^{q\times m}
+$$
+
+e
+
+$$
+\mathbf{V}_{d}
+\in
+\mathbb{R}^{p\times m}
+$$
+
+contêm bases ortonormais dos subespaços singulares correspondentes, a contribuição desse valor é
+
+$$
+d
+\mathbf{U}_{d}
+\mathbf{V}_{d}^{\top}.
+$$
+
+Para qualquer matriz ortogonal
+
+$$
+\mathbf{R}
+\in
+\mathbb{R}^{m\times m},
+$$
+
+tem-se
+
+$$
+\begin{aligned}
+d
+\left(
+\mathbf{U}_{d}\mathbf{R}
+\right)
+\left(
+\mathbf{V}_{d}\mathbf{R}
+\right)^{\top}
+&=
+d
+\mathbf{U}_{d}
+\mathbf{R}
+\mathbf{R}^{\top}
+\mathbf{V}_{d}^{\top}\\
+&=
+d
+\mathbf{U}_{d}
+\mathbf{V}_{d}^{\top}.
+\end{aligned}
+$$
+
+Portanto, valores singulares positivos repetidos permitem rotações ortogonais simultâneas das bases à esquerda e à direita.
+
+A situação é diferente nos subespaços associados ao valor singular zero. As colunas de $\mathbf{V}_0$ formam uma base de
+
+$$
+\mathcal{N}(\mathbf{A}),
+$$
+
+enquanto as colunas de $\mathbf{U}_0$ formam uma base de
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
+Essas bases completam espaços diferentes e podem ser escolhidas independentemente, pois suas parcelas são multiplicadas por zero na SVD completa.
+
+Portanto:
+
+-   os valores singulares são propriedades da matriz;
+-   os subespaços singulares associados aos valores positivos são propriedades da matriz;
+-   os núcleos de $\mathbf{A}$ e de $\mathbf{A}^{\top}$ são propriedades da matriz;
+-   sinais e bases ortonormais específicas dentro desses subespaços dependem da representação escolhida.
+
+A existência da SVD e as relações entre os dois conjuntos de vetores singulares decorrem das decomposições espectrais das matrizes simétricas
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+\qquad
+\text{e}
+\qquad
+\mathbf{A}\mathbf{A}^{\top}.
+$$
+
+A próxima seção constrói essa relação e demonstra por que os quadrados dos valores singulares aparecem como autovalores dessas duas matrizes.
+
+## Construção da SVD e relação com a decomposição espectral
+
+A existência da SVD decorre das propriedades das matrizes
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+\qquad
+\text{e}
+\qquad
+\mathbf{A}\mathbf{A}^{\top}.
+$$
+
+Para
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{q\times p},
+$$
+
+tem-se
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+\in
+\mathbb{R}^{p\times p}
+$$
+
+e
+
+$$
+\mathbf{A}\mathbf{A}^{\top}
+\in
+\mathbb{R}^{q\times q}.
+$$
+
+Mesmo que $\mathbf{A}$ seja retangular ou não simétrica, essas duas matrizes são quadradas, simétricas e semidefinidas positivas.
+
+### Simetria e semidefinição positiva
+
+A simetria segue de
+
+$$
+\left(
+\mathbf{A}^{\top}\mathbf{A}
+\right)^{\top}
+=
+\mathbf{A}^{\top}\mathbf{A}
+$$
+
+e
+
+$$
+\left(
+\mathbf{A}\mathbf{A}^{\top}
+\right)^{\top}
+=
+\mathbf{A}\mathbf{A}^{\top}.
+$$
+
+Para qualquer
+
+$$
+\mathbf{x}
+\in
+\mathbb{R}^{p},
+$$
+
+tem-se
+
+$$
+\begin{aligned}
+\mathbf{x}^{\top}
+\mathbf{A}^{\top}
+\mathbf{A}
+\mathbf{x}
+&=
+\left(
+\mathbf{A}\mathbf{x}
+\right)^{\top}
+\left(
+\mathbf{A}\mathbf{x}
+\right)\\
+&=
+\left\|
+\mathbf{A}\mathbf{x}
+\right\|^2\\
+&\geq
+0.
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+\succeq
+0.
+$$
+
+De modo semelhante, para qualquer
+
+$$
+\mathbf{y}
+\in
+\mathbb{R}^{q},
+$$
+
+$$
+\begin{aligned}
+\mathbf{y}^{\top}
+\mathbf{A}\mathbf{A}^{\top}
+\mathbf{y}
+&=
+\left(
+\mathbf{A}^{\top}\mathbf{y}
+\right)^{\top}
+\left(
+\mathbf{A}^{\top}\mathbf{y}
+\right)\\
+&=
+\left\|
+\mathbf{A}^{\top}\mathbf{y}
+\right\|^2\\
+&\geq
+0.
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+\mathbf{A}\mathbf{A}^{\top}
+\succeq
+0.
+$$
+
+Pelo @thm-teorema-espectral, as duas matrizes possuem autovalores reais não negativos e bases ortonormais de autovetores.
+
+::: {#thm-espectros-gram-svd}
+## Espectros associados à SVD
+
+Seja
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{q\times p}
+$$
+
+com posto
+
+$$
+r
+=
+\operatorname{posto}(\mathbf{A}).
+$$
+
+Então:
+
+1.  as matrizes
+
+    $$
+    \mathbf{A}^{\top}\mathbf{A}
+    $$
+
+    e
+
+    $$
+    \mathbf{A}\mathbf{A}^{\top}
+    $$
+
+    possuem os mesmos $r$ autovalores positivos, incluindo suas multiplicidades;
+
+2.  esses autovalores podem ser escritos como
+
+    $$
+    d_1^2,\ldots,d_r^2,
+    $$
+
+    em que
+
+    $$
+    d_1
+    \geq
+    \cdots
+    \geq
+    d_r
+    >
+    0
+    $$
+
+    são os valores singulares positivos de $\mathbf{A}$;
+
+3.  os núcleos satisfazem
+
+    $$
+    \mathcal{N}
+    \left(
+    \mathbf{A}^{\top}\mathbf{A}
+    \right)
+    =
+    \mathcal{N}(\mathbf{A})
+    $$
+
+    e
+
+    $$
+    \mathcal{N}
+    \left(
+    \mathbf{A}\mathbf{A}^{\top}
+    \right)
+    =
+    \mathcal{N}
+    \left(
+    \mathbf{A}^{\top}
+    \right).
+    $$
+
+[@golub2013matrix]
+:::
+
+::: proof
+Considere inicialmente
+
+$$
+\mathbf{x}
+\in
+\mathcal{N}(\mathbf{A}).
+$$
+
+Então,
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\mathbf{0},
+$$
+
+e, consequentemente,
+
+$$
+\mathbf{A}^{\top}\mathbf{A}\mathbf{x}
+=
+\mathbf{0}.
+$$
+
+Logo,
+
+$$
+\mathcal{N}(\mathbf{A})
+\subseteq
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}\mathbf{A}
+\right).
+$$
+
+Reciprocamente, se
+
+$$
+\mathbf{x}
+\in
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}\mathbf{A}
+\right),
+$$
+
+então
+
+$$
+\mathbf{A}^{\top}
+\mathbf{A}\mathbf{x}
+=
+\mathbf{0}.
+$$
+
+Multiplicando à esquerda por $\mathbf{x}^{\top}$,
+
+$$
+\begin{aligned}
+0
+&=
+\mathbf{x}^{\top}
+\mathbf{A}^{\top}
+\mathbf{A}
+\mathbf{x}\\
+&=
+\left\|
+\mathbf{A}\mathbf{x}
+\right\|^2.
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\mathbf{0},
+$$
+
+e
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}\mathbf{A}
+\right)
+\subseteq
+\mathcal{N}(\mathbf{A}).
+$$
+
+Assim,
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}\mathbf{A}
+\right)
+=
+\mathcal{N}(\mathbf{A}).
+$$
+
+O mesmo argumento, aplicado a $\mathbf{A}^{\top}$, fornece
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}\mathbf{A}^{\top}
+\right)
+=
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
+Considere agora um autovalor positivo $\lambda$ de
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+$$
+
+e um autovetor unitário $\mathbf{v}$ associado:
+
+$$
+\mathbf{A}^{\top}
+\mathbf{A}\mathbf{v}
+=
+\lambda\mathbf{v}.
+$$
+
+Como $\lambda>0$, defina
+
+$$
+\mathbf{u}
+=
+\frac{
+\mathbf{A}\mathbf{v}
+}{
+\sqrt{\lambda}
+}.
+$$
+
+Esse vetor possui norma unitária, pois
+
+$$
+\begin{aligned}
+\mathbf{u}^{\top}\mathbf{u}
+&=
+\frac{
+\mathbf{v}^{\top}
+\mathbf{A}^{\top}
+\mathbf{A}\mathbf{v}
+}{
+\lambda
+}\\
+&=
+\frac{
+\lambda
+\mathbf{v}^{\top}\mathbf{v}
+}{
+\lambda
+}\\
+&=
+1.
+\end{aligned}
+$$
+
+Além disso,
+
+$$
+\begin{aligned}
+\mathbf{A}\mathbf{A}^{\top}\mathbf{u}
+&=
+\frac{
+\mathbf{A}\mathbf{A}^{\top}
+\mathbf{A}\mathbf{v}
+}{
+\sqrt{\lambda}
+}\\
+&=
+\frac{
+\mathbf{A}
+\left(
+\mathbf{A}^{\top}\mathbf{A}\mathbf{v}
+\right)
+}{
+\sqrt{\lambda}
+}\\
+&=
+\frac{
+\mathbf{A}
+\left(
+\lambda\mathbf{v}
+\right)
+}{
+\sqrt{\lambda}
+}\\
+&=
+\lambda\mathbf{u}.
+\end{aligned}
+$$
+
+Portanto, todo autovalor positivo de
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+$$
+
+também é autovalor de
+
+$$
+\mathbf{A}\mathbf{A}^{\top}.
+$$
+
+O argumento inverso é obtido começando por um autovetor de
+
+$$
+\mathbf{A}\mathbf{A}^{\top}
+$$
+
+e definindo
+
+$$
+\mathbf{v}
+=
+\frac{
+\mathbf{A}^{\top}\mathbf{u}
+}{
+\sqrt{\lambda}
+}.
+$$
+
+As transformações entre os autoespaços são inversíveis quando $\lambda>0$. Por isso, as multiplicidades dos autovalores positivos também coincidem.
+
+Como
+
+$$
+\operatorname{posto}
+\left(
+\mathbf{A}^{\top}\mathbf{A}
+\right)
+=
+\operatorname{posto}(\mathbf{A})
+=
+r,
+$$
+
+existem exatamente $r$ autovalores positivos. O mesmo ocorre para
+
+$$
+\mathbf{A}\mathbf{A}^{\top}.
+$$
+
+Definindo
+
+$$
+d_j
+=
+\sqrt{\lambda_j},
+$$
+
+obtêm-se os $r$ valores singulares positivos de $\mathbf{A}$.
+:::
+
+As duas matrizes podem possuir quantidades diferentes de autovalores nulos. A matriz
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+$$
+
+tem ordem $p$, enquanto
+
+$$
+\mathbf{A}\mathbf{A}^{\top}
+$$
+
+tem ordem $q$. Entretanto, seus espectros positivos coincidem.
+
+### Construção dos vetores singulares
+
+Considere a decomposição espectral
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+=
+\mathbf{V}
+\boldsymbol{\Lambda}_{V}
+\mathbf{V}^{\top},
+$$
+
+em que
+
+$$
+\mathbf{V}
+=
+\begin{bmatrix}
+\mathbf{v}_1&
+\cdots&
+\mathbf{v}_p
+\end{bmatrix}
+$$
+
+é ortogonal.
+
+Ordene os autovalores de modo que
+
+$$
+\lambda_1
+\geq
+\lambda_2
+\geq
+\cdots
+\geq
+\lambda_r
+>
+0
+$$
+
+e
+
+$$
+\lambda_{r+1}
+=
+\cdots
+=
+\lambda_p
+=
+0.
+$$
+
+Defina
+
+$$
+d_j
+=
+\sqrt{\lambda_j},
+\qquad
+j=1,\ldots,r.
+$$
+
+Para cada autovalor positivo, defina
+
+$$
+\mathbf{u}_j
+=
+\frac{
+\mathbf{A}\mathbf{v}_j
+}{
+d_j
+}.
+$$
+
+Os vetores assim construídos são ortonormais. Para $i,j\leq r$,
+
+$$
+\begin{aligned}
+\mathbf{u}_i^{\top}\mathbf{u}_j
+&=
+\frac{
+\mathbf{v}_i^{\top}
+\mathbf{A}^{\top}
+\mathbf{A}
+\mathbf{v}_j
+}{
+d_id_j
+}\\
+&=
+\frac{
+d_j^2
+\mathbf{v}_i^{\top}\mathbf{v}_j
+}{
+d_id_j
+}\\
+&=
+\frac{d_j}{d_i}
+\mathbf{v}_i^{\top}\mathbf{v}_j.
+\end{aligned}
+$$
+
+Como os vetores $\mathbf{v}_j$ são ortonormais,
+
+$$
+\mathbf{v}_i^{\top}\mathbf{v}_j
+=
+\begin{cases}
+1,
+&
+i=j,\\
+0,
+&
+i\neq j.
+\end{cases}
+$$
+
+Logo,
+
+$$
+\mathbf{u}_i^{\top}\mathbf{u}_j
+=
+\begin{cases}
+1,
+&
+i=j,\\
+0,
+&
+i\neq j.
+\end{cases}
+$$
+
+Portanto,
+
+$$
+\mathbf{u}_1,\ldots,\mathbf{u}_r
+$$
+
+formam um conjunto ortonormal.
+
+Além disso,
+
+$$
+\mathbf{A}\mathbf{v}_j
+=
+d_j\mathbf{u}_j
+$$
+
+e
+
+$$
+\begin{aligned}
+\mathbf{A}^{\top}\mathbf{u}_j
+&=
+\frac{
+\mathbf{A}^{\top}\mathbf{A}\mathbf{v}_j
+}{
+d_j
+}\\
+&=
+\frac{
+d_j^2\mathbf{v}_j
+}{
+d_j
+}\\
+&=
+d_j\mathbf{v}_j.
+\end{aligned}
+$$
+
+Assim, cada valor singular positivo associa um par de direções:
+
+$$
+\mathbf{v}_j
+\in
+\mathbb{R}^{p}
+\qquad
+\text{e}
+\qquad
+\mathbf{u}_j
+\in
+\mathbb{R}^{q}.
+$$
+
+Essas direções satisfazem
+
+$$
+\mathbf{A}\mathbf{v}_j
+=
+d_j\mathbf{u}_j
+$$
+
+e
+
+$$
+\mathbf{A}^{\top}\mathbf{u}_j
+=
+d_j\mathbf{v}_j.
+$$
+
+Reunindo os pares associados aos valores singulares positivos,
+
+$$
+\mathbf{U}_r
+=
+\begin{bmatrix}
+\mathbf{u}_1&
+\cdots&
+\mathbf{u}_r
+\end{bmatrix},
+$$
+
+$$
+\mathbf{D}_r
+=
+\operatorname{diag}
+\left(
+d_1,\ldots,d_r
+\right)
+$$
+
+e
+
+$$
+\mathbf{V}_r
+=
+\begin{bmatrix}
+\mathbf{v}_1&
+\cdots&
+\mathbf{v}_r
+\end{bmatrix},
+$$
+
+obtém-se
+
+$$
+\mathbf{A}\mathbf{V}_r
+=
+\mathbf{U}_r\mathbf{D}_r.
+$$
+
+Complete $\mathbf{V}_r$ com uma matriz $\mathbf{V}_0$ cujas colunas formam uma base ortonormal de $\mathcal{N}(\mathbf{A})$. Então,
+
+$$
+\mathbf{V}
+=
+\begin{bmatrix}
+\mathbf{V}_r&
+\mathbf{V}_0
+\end{bmatrix}
+$$
+
+é ortogonal e
+
+$$
+\mathbf{I}_p
+=
+\mathbf{V}_r\mathbf{V}_r^{\top}
++
+\mathbf{V}_0\mathbf{V}_0^{\top}.
+$$
+
+Como
+
+$$
+\mathbf{A}\mathbf{V}_0
+=
+\mathbf{0},
+$$
+
+tem-se
+
+$$
+\begin{aligned}
+\mathbf{A}
+&=
+\mathbf{A}\mathbf{I}_p\\
+&=
+\mathbf{A}
+\left(
+\mathbf{V}_r\mathbf{V}_r^{\top}
++
+\mathbf{V}_0\mathbf{V}_0^{\top}
+\right)\\
+&=
+\mathbf{A}\mathbf{V}_r\mathbf{V}_r^{\top}\\
+&=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}.
+\end{aligned}
+$$
+
+Essa é a SVD compacta.
+
+### Demonstração da existência da SVD completa
+
+A construção anterior também demonstra o @thm-existencia-svd.
+
+::: proof
+Os vetores
+
+$$
+\mathbf{v}_{r+1},\ldots,\mathbf{v}_p
+$$
+
+estão associados ao autovalor zero de
+
+$$
+\mathbf{A}^{\top}\mathbf{A}.
+$$
+
+Pelo @thm-espectros-gram-svd,
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}\mathbf{A}
+\right)
+=
+\mathcal{N}(\mathbf{A}).
+$$
+
+Logo,
+
+$$
+\mathbf{A}\mathbf{v}_j
+=
+\mathbf{0},
+\qquad
+j=r+1,\ldots,p.
+$$
+
+Os vetores
+
+$$
+\mathbf{u}_1,\ldots,\mathbf{u}_r
+$$
+
+formam uma base ortonormal do espaço coluna de $\mathbf{A}$. Complete esse conjunto com uma base ortonormal
+
+$$
+\mathbf{u}_{r+1},\ldots,\mathbf{u}_q
+$$
+
+de
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
+Defina
+
+$$
+\mathbf{U}
+=
+\begin{bmatrix}
+\mathbf{u}_1&
+\cdots&
+\mathbf{u}_q
+\end{bmatrix}
+$$
+
+e mantenha
+
+$$
+\mathbf{V}
+=
+\begin{bmatrix}
+\mathbf{v}_1&
+\cdots&
+\mathbf{v}_p
+\end{bmatrix}.
+$$
+
+As duas matrizes são ortogonais.
+
+Construa a matriz diagonal retangular
+
+$$
+\mathbf{D}
+\in
+\mathbb{R}^{q\times p}
+$$
+
+colocando
+
+$$
+d_1,\ldots,d_r
+$$
+
+em suas primeiras posições diagonais e zeros nas demais posições.
+
+Para $j\leq r$,
+
+$$
+\mathbf{A}\mathbf{v}_j
+=
+d_j\mathbf{u}_j.
+$$
+
+Para $j>r$,
+
+$$
+\mathbf{A}\mathbf{v}_j
+=
+\mathbf{0}.
+$$
+
+Essas relações podem ser reunidas em
+
+$$
+\mathbf{A}\mathbf{V}
+=
+\mathbf{U}\mathbf{D}.
+$$
+
+Multiplicando à direita por $\mathbf{V}^{\top}$,
+
+$$
+\mathbf{A}
+=
+\mathbf{U}
+\mathbf{D}
+\mathbf{V}^{\top}.
+$$
+
+Portanto, toda matriz real possui uma SVD completa.
+:::
+
+### Decomposições espectrais associadas
+
+A SVD compacta fornece diretamente as decomposições espectrais das duas matrizes de Gram:
+
+$$
+\begin{aligned}
+\mathbf{A}^{\top}\mathbf{A}
+&=
+\left(
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+\right)^{\top}
+\left(
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+\right)\\
+&=
+\mathbf{V}_r
+\mathbf{D}_r
+\mathbf{U}_r^{\top}
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}\\
+&=
+\mathbf{V}_r
+\mathbf{D}_r^2
+\mathbf{V}_r^{\top}.
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+=
+\mathbf{V}_r
+\mathbf{D}_r^2
+\mathbf{V}_r^{\top}.
+$$
+
+Essa expressão possui dimensão $p\times p$, pois
+
+$$
+\mathbf{V}_r
+\in
+\mathbb{R}^{p\times r},
+\qquad
+\mathbf{D}_r^2
+\in
+\mathbb{R}^{r\times r}
+$$
+
+e
+
+$$
+\mathbf{V}_r^{\top}
+\in
+\mathbb{R}^{r\times p}.
+$$
+
+De forma análoga,
+
+$$
+\begin{aligned}
+\mathbf{A}\mathbf{A}^{\top}
+&=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+\mathbf{V}_r
+\mathbf{D}_r
+\mathbf{U}_r^{\top}\\
+&=
+\mathbf{U}_r
+\mathbf{D}_r^2
+\mathbf{U}_r^{\top}.
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\mathbf{A}\mathbf{A}^{\top}
+=
+\mathbf{U}_r
+\mathbf{D}_r^2
+\mathbf{U}_r^{\top},
+$$
+
+com dimensão $q\times q$.
+
+Na forma completa, as decomposições são
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+=
+\mathbf{V}
+\operatorname{diag}
+\left(
+d_1^2,\ldots,d_r^2,
+\underbrace{
+0,\ldots,0
+}_{p-r}
+\right)
+\mathbf{V}^{\top}
+$$
+
+e
+
+$$
+\mathbf{A}\mathbf{A}^{\top}
+=
+\mathbf{U}
+\operatorname{diag}
+\left(
+d_1^2,\ldots,d_r^2,
+\underbrace{
+0,\ldots,0
+}_{q-r}
+\right)
+\mathbf{U}^{\top}.
+$$
+
+Essas expressões deixam explícito que:
+
+-   $\mathbf{A}^{\top}\mathbf{A}$ possui $p-r$ autovalores nulos;
+-   $\mathbf{A}\mathbf{A}^{\top}$ possui $q-r$ autovalores nulos;
+-   as duas matrizes possuem os mesmos $r$ autovalores positivos.
+
+Para cada $j=1,\ldots,r$,
+
+$$
+\mathbf{A}^{\top}
+\mathbf{A}\mathbf{v}_j
+=
+d_j^2\mathbf{v}_j
+$$
+
+e
+
+$$
+\mathbf{A}
+\mathbf{A}^{\top}\mathbf{u}_j
+=
+d_j^2\mathbf{u}_j.
+$$
+
+Assim, os valores singulares podem ser obtidos por
+
+$$
+d_j
+=
+\sqrt{\lambda_j},
+$$
+
+em que $\lambda_j$ é um autovalor positivo de qualquer uma das duas matrizes de Gram.
+
+### Exemplo de construção da SVD
+
+::: {#exm-construcao-svd}
+## Construção da SVD de uma matriz retangular
+
+Considere
+
+$$
+\mathbf{A}
+=
+\begin{bmatrix}
+1&1\\
+1&-1\\
+1&1
+\end{bmatrix}.
+$$
+
+A matriz possui dimensão $3\times2$. Inicialmente,
+
+$$
+\begin{aligned}
+\mathbf{A}^{\top}\mathbf{A}
+&=
+\begin{bmatrix}
+1&1&1\\
+1&-1&1
+\end{bmatrix}
+\begin{bmatrix}
+1&1\\
+1&-1\\
+1&1
+\end{bmatrix}\\
+&=
+\begin{bmatrix}
+3&1\\
+1&3
+\end{bmatrix}.
+\end{aligned}
+$$
+
+Essa é a mesma matriz utilizada como exemplo condutor no capítulo anterior. Seus autovalores são
+
+$$
+\lambda_1=4
+\qquad
+\text{e}
+\qquad
+\lambda_2=2.
+$$
+
+Os valores singulares são as raízes quadradas não negativas:
+
+$$
+d_1=2
+\qquad
+\text{e}
+\qquad
+d_2=\sqrt{2}.
+$$
+
+Autovetores unitários associados são
+
+$$
+\mathbf{v}_1
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+1
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{v}_2
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+-1
+\end{bmatrix}.
+$$
+
+Portanto,
+
+$$
+\mathbf{V}_2
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1&1\\
+1&-1
+\end{bmatrix}.
+$$
+
+O primeiro vetor singular à esquerda é
+
+$$
+\begin{aligned}
+\mathbf{u}_1
+&=
+\frac{
+\mathbf{A}\mathbf{v}_1
+}{
+d_1
+}\\
+&=
+\frac{1}{2}
+\begin{bmatrix}
+1&1\\
+1&-1\\
+1&1
+\end{bmatrix}
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+1
+\end{bmatrix}\\
+&=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+0\\
+1
+\end{bmatrix}.
+\end{aligned}
+$$
+
+O segundo é
+
+$$
+\begin{aligned}
+\mathbf{u}_2
+&=
+\frac{
+\mathbf{A}\mathbf{v}_2
+}{
+d_2
+}\\
+&=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1&1\\
+1&-1\\
+1&1
+\end{bmatrix}
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+-1
+\end{bmatrix}\\
+&=
+\begin{bmatrix}
+0\\
+1\\
+0
+\end{bmatrix}.
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\mathbf{U}_2
+=
+\begin{bmatrix}
+1/\sqrt{2}&0\\
+0&1\\
+1/\sqrt{2}&0
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{D}_2
+=
+\begin{bmatrix}
+2&0\\
+0&\sqrt{2}
+\end{bmatrix}.
+$$
+
+A SVD compacta é
+
+$$
+\mathbf{A}
+=
+\mathbf{U}_2
+\mathbf{D}_2
+\mathbf{V}_2^{\top}.
+$$
+
+Como os dois valores singulares são positivos,
+
+$$
+\operatorname{posto}(\mathbf{A})=2.
+$$
+
+Para construir a SVD completa, é necessário completar as colunas de $\mathbf{U}_2$ com um vetor unitário ortogonal a $\mathbf{u}_1$ e $\mathbf{u}_2$. Pode-se escolher
+
+$$
+\mathbf{u}_3
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+0\\
+-1
+\end{bmatrix}.
+$$
+
+Assim,
+
+$$
+\mathbf{U}
+=
+\begin{bmatrix}
+1/\sqrt{2}&0&1/\sqrt{2}\\
+0&1&0\\
+1/\sqrt{2}&0&-1/\sqrt{2}
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{D}
+=
+\begin{bmatrix}
+2&0\\
+0&\sqrt{2}\\
+0&0
+\end{bmatrix}.
+$$
+
+Como $\mathbf{V}_2$ já é uma matriz $2\times2$ ortogonal,
+
+$$
+\mathbf{V}
+=
+\mathbf{V}_2.
+$$
+
+A SVD completa é
+
+$$
+\mathbf{A}
+=
+\mathbf{U}
+\mathbf{D}
+\mathbf{V}^{\top}.
+$$
+
+Por outro lado,
+
+$$
+\mathbf{A}\mathbf{A}^{\top}
+=
+\begin{bmatrix}
+2&0&2\\
+0&2&0\\
+2&0&2
+\end{bmatrix}.
+$$
+
+Seus autovalores são
+
+$$
+4,\quad 2,\quad 0,
+$$
+
+com autovetores unitários
+
+$$
+\mathbf{u}_1,\quad
+\mathbf{u}_2,\quad
+\mathbf{u}_3,
+$$
+
+respectivamente.
+
+O exemplo mostra que:
+
+-   $\mathbf{A}^{\top}\mathbf{A}$ determina as direções singulares no espaço de origem $\mathbb{R}^2$;
+-   $\mathbf{A}\mathbf{A}^{\top}$ determina as direções singulares no espaço de chegada $\mathbb{R}^3$;
+-   os dois espaços são relacionados pelos mesmos valores singulares positivos.
+:::
+
+### Relação com a decomposição espectral de matrizes simétricas
+
+Se $\mathbf{A}$ é quadrada e simétrica, sua decomposição espectral é
+
+$$
+\mathbf{A}
+=
+\mathbf{Q}_{\mathbf{A}}
+\boldsymbol{\Lambda}_{\mathbf{A}}
+\mathbf{Q}_{\mathbf{A}}^{\top}.
+$$
+
+Quando
+
+$$
+\mathbf{A}\succeq0,
+$$
+
+todos os autovalores são não negativos. Nesse caso, após ordenar os autovalores,
+
+$$
+\mathbf{U}
+=
+\mathbf{V}
+=
+\mathbf{Q}_{\mathbf{A}}
+$$
+
+e
+
+$$
+\mathbf{D}
+=
+\boldsymbol{\Lambda}_{\mathbf{A}}.
+$$
+
+Portanto, a SVD coincide com a decomposição espectral:
+
+$$
+\mathbf{A}
+=
+\mathbf{Q}_{\mathbf{A}}
+\boldsymbol{\Lambda}_{\mathbf{A}}
+\mathbf{Q}_{\mathbf{A}}^{\top}.
+$$
+
+Se $\mathbf{A}$ é simétrica, mas indefinida, os valores singulares são os módulos dos autovalores:
+
+$$
+d_j
+=
+|\lambda_j|.
+$$
+
+Para tornar essa relação explícita, defina
+
+$$
+\operatorname{sgn}_0(t)
+=
+\begin{cases}
+1,
+&
+t\geq0,\\
+-1,
+&
+t<0.
+\end{cases}
+$$
+
+Então,
+
+$$
+\lambda_j
+=
+\operatorname{sgn}_0(\lambda_j)
+|\lambda_j|.
+$$
+
+Após ordenar os autovalores por seus módulos, uma possível SVD é obtida tomando
+
+$$
+\mathbf{V}
+=
+\mathbf{Q}_{\mathbf{A}},
+$$
+
+$$
+\mathbf{D}
+=
+\operatorname{diag}
+\left(
+|\lambda_1|,
+\ldots,
+|\lambda_p|
+\right)
+$$
+
+e
+
+$$
+\mathbf{U}
+=
+\mathbf{Q}_{\mathbf{A}}
+\operatorname{diag}
+\left(
+\operatorname{sgn}_0(\lambda_1),
+\ldots,
+\operatorname{sgn}_0(\lambda_p)
+\right).
+$$
+
+Dessa forma,
+
+$$
+\mathbf{U}
+\mathbf{D}
+\mathbf{V}^{\top}
+=
+\mathbf{Q}_{\mathbf{A}}
+\boldsymbol{\Lambda}_{\mathbf{A}}
+\mathbf{Q}_{\mathbf{A}}^{\top}
+=
+\mathbf{A}.
+$$
+
+A decomposição espectral preserva o sinal dos autovalores na matriz diagonal. A SVD mantém valores singulares não negativos e transfere as mudanças de orientação para uma das matrizes ortogonais.
+
+Para matrizes não simétricas, autovalores e valores singulares representam objetos diferentes. Os autovalores descrevem direções invariantes de um operador quadrado. Os valores singulares descrevem fatores de escalonamento entre direções ortonormais do domínio e do contradomínio e permanecem definidos para matrizes retangulares.
+
+::: {.callout-note appearance="simple"}
+## Construção teórica e cálculo numérico
+
+A decomposição espectral de
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+$$
+
+fornece uma demonstração da existência da SVD e permite realizar cálculos manuais em exemplos pequenos.
+
+Em aplicações numéricas, a SVD não costuma ser calculada formando explicitamente
+
+$$
+\mathbf{A}^{\top}\mathbf{A}.
+$$
+
+Esse produto pode ampliar diferenças entre as magnitudes dos valores singulares e aumentar os efeitos de erros de arredondamento. Programas numéricos utilizam procedimentos específicos para calcular a SVD diretamente, com maior estabilidade.
+:::
+
+A construção algébrica identifica os pares de direções associados pelos valores singulares. A interpretação geométrica mostra como essas direções transformam uma esfera unitária do domínio em uma elipse ou em um elipsoide no espaço de chegada.
+
+## Interpretação geométrica da SVD
+
+A SVD descreve uma transformação linear por meio de duas bases ortonormais e de um escalonamento entre elas. Para
+
+$$
+\mathbf{A}
+=
+\mathbf{U}
+\mathbf{D}
+\mathbf{V}^{\top},
+$$
+
+a matriz $\mathbf{V}^{\top}$ expressa os vetores nas coordenadas dos vetores singulares à direita, $\mathbf{D}$ altera separadamente essas coordenadas e $\mathbf{U}$ expressa o resultado nas direções singulares à esquerda.
+
+Considere um vetor
+
+$$
+\mathbf{x}
+\in
+\mathbb{R}^{p}.
+$$
+
+Como as colunas de $\mathbf{V}$ formam uma base ortonormal, ele pode ser escrito como
+
+$$
+\mathbf{x}
+=
+\sum_{j=1}^{p}
+\alpha_j\mathbf{v}_j,
+$$
+
+em que
+
+$$
+\alpha_j
+=
+\mathbf{v}_j^{\top}\mathbf{x}.
+$$
+
+Aplicando $\mathbf{A}$,
+
+$$
+\begin{aligned}
+\mathbf{A}\mathbf{x}
+&=
+\sum_{j=1}^{p}
+\alpha_j
+\mathbf{A}\mathbf{v}_j\\
+&=
+\sum_{j=1}^{r}
+d_j\alpha_j\mathbf{u}_j.
+\end{aligned}
+$$
+
+As parcelas associadas aos vetores
+
+$$
+\mathbf{v}_{r+1},\ldots,\mathbf{v}_p
+$$
+
+desaparecem porque pertencem ao núcleo de $\mathbf{A}$.
+
+A transformação pode, portanto, ser interpretada por meio das correspondências
+
+$$
+\mathbf{v}_j
+\longmapsto
+d_j\mathbf{u}_j,
+\qquad
+j=1,\ldots,r.
+$$
+
+Cada vetor singular à direita determina uma direção no domínio. O valor singular correspondente determina o fator de escala, enquanto o vetor singular à esquerda determina a direção resultante no contradomínio.
+
+### Imagem da bola unitária
+
+Considere a bola unitária de $\mathbb{R}^{p}$:
+
+$$
+\mathcal{B}_p
+=
+\left\{
+\mathbf{x}\in\mathbb{R}^{p}:
+\|\mathbf{x}\|\leq1
+\right\}.
+$$
+
+A SVD permite descrever geometricamente sua imagem pela transformação $\mathbf{A}$.
+
+::: {#thm-imagem-bola-svd}
+## Imagem da bola unitária pela SVD
+
+Seja
+
+$$
+\mathbf{A}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+$$
+
+a SVD compacta de uma matriz de posto $r$. A imagem da bola unitária por $\mathbf{A}$ é o elipsoide
+
+$$
+\mathbf{A}
+\left(
+\mathcal{B}_p
+\right)
+=
+\left\{
+\sum_{j=1}^{r}
+\beta_j\mathbf{u}_j:
+\sum_{j=1}^{r}
+\frac{\beta_j^2}{d_j^2}
+\leq
+1
+\right\}.
+$$
+
+As direções principais desse elipsoide são
+
+$$
+\mathbf{u}_1,\ldots,\mathbf{u}_r,
+$$
+
+e os comprimentos de seus semieixos são
+
+$$
+d_1,\ldots,d_r.
+$$
+:::
+
+::: proof
+Escreva
+
+$$
+\mathbf{x}
+=
+\sum_{j=1}^{r}
+\alpha_j\mathbf{v}_j
++
+\mathbf{x}_0,
+$$
+
+em que
+
+$$
+\mathbf{x}_0
+\in
+\mathcal{N}(\mathbf{A}).
+$$
+
+Como os vetores singulares à direita e o núcleo formam subespaços ortogonais,
+
+$$
+\|\mathbf{x}\|^2
+=
+\sum_{j=1}^{r}\alpha_j^2
++
+\|\mathbf{x}_0\|^2.
+$$
+
+Se $\mathbf{x}\in\mathcal{B}_p$, então
+
+$$
+\sum_{j=1}^{r}\alpha_j^2
+\leq
+1.
+$$
+
+Aplicando a transformação,
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\sum_{j=1}^{r}
+d_j\alpha_j\mathbf{u}_j.
+$$
+
+Definindo
+
+$$
+\beta_j
+=
+d_j\alpha_j,
+$$
+
+obtém-se
+
+$$
+\sum_{j=1}^{r}
+\frac{\beta_j^2}{d_j^2}
+=
+\sum_{j=1}^{r}\alpha_j^2
+\leq
+1.
+$$
+
+Portanto, toda imagem de um vetor da bola unitária pertence ao elipsoide apresentado.
+
+Reciprocamente, considere um vetor
+
+$$
+\mathbf{y}
+=
+\sum_{j=1}^{r}
+\beta_j\mathbf{u}_j
+$$
+
+que satisfaz
+
+$$
+\sum_{j=1}^{r}
+\frac{\beta_j^2}{d_j^2}
+\leq
+1.
+$$
+
+Defina
+
+$$
+\mathbf{x}
+=
+\sum_{j=1}^{r}
+\frac{\beta_j}{d_j}\mathbf{v}_j.
+$$
+
+Então,
+
+$$
+\|\mathbf{x}\|^2
+=
+\sum_{j=1}^{r}
+\frac{\beta_j^2}{d_j^2}
+\leq
+1,
+$$
+
+de modo que $\mathbf{x}\in\mathcal{B}_p$. Além disso,
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\sum_{j=1}^{r}
+\beta_j\mathbf{u}_j
+=
+\mathbf{y}.
+$$
+
+Logo, o conjunto apresentado coincide com a imagem da bola unitária.
+:::
+
+Quando $\mathbf{A}$ possui posto coluna completo,
+
+$$
+r=p,
+$$
+
+a imagem da esfera unitária
+
+$$
+\left\{
+\mathbf{x}:
+\|\mathbf{x}\|=1
+\right\}
+$$
+
+é a superfície do elipsoide.
+
+Quando
+
+$$
+r<p,
+$$
+
+existem direções não nulas eliminadas por $\mathbf{A}$. Nesse caso, a imagem da esfera também contém pontos do interior do elipsoide, pois parte da norma de $\mathbf{x}$ pode estar concentrada no núcleo da transformação.
+
+Se
+
+$$
+r<q,
+$$
+
+o elipsoide está contido no subespaço
+
+$$
+\mathcal{C}(\mathbf{A})
+=
+\operatorname{span}
+\left\{
+\mathbf{u}_1,\ldots,\mathbf{u}_r
+\right\}
+\subset
+\mathbb{R}^{q}.
+$$
+
+Assim, a SVD também revela a dimensão efetiva da imagem da transformação.
+
+### Alteração dos comprimentos
+
+A expansão de $\mathbf{x}$ na base dos vetores singulares fornece
+
+$$
+\|\mathbf{x}\|^2
+=
+\sum_{j=1}^{p}\alpha_j^2.
+$$
+
+Por outro lado,
+
+$$
+\begin{aligned}
+\left\|
+\mathbf{A}\mathbf{x}
+\right\|^2
+&=
+\left\|
+\sum_{j=1}^{r}
+d_j\alpha_j\mathbf{u}_j
+\right\|^2\\
+&=
+\sum_{j=1}^{r}
+d_j^2\alpha_j^2,
+\end{aligned}
+$$
+
+pois os vetores
+
+$$
+\mathbf{u}_1,\ldots,\mathbf{u}_r
+$$
+
+são ortonormais.
+
+Como
+
+$$
+d_1
+\geq
+d_j
+$$
+
+para todo $j$,
+
+$$
+\begin{aligned}
+\left\|
+\mathbf{A}\mathbf{x}
+\right\|^2
+&=
+\sum_{j=1}^{r}
+d_j^2\alpha_j^2\\
+&\leq
+d_1^2
+\sum_{j=1}^{p}
+\alpha_j^2\\
+&=
+d_1^2
+\|\mathbf{x}\|^2.
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+\left\|
+\mathbf{A}\mathbf{x}
+\right\|
+\leq
+d_1\|\mathbf{x}\|.
+$$
+
+A igualdade é atingida quando $\mathbf{x}$ pertence ao subespaço singular à direita associado ao maior valor singular.
+
+Em particular,
+
+$$
+\max_{\|\mathbf{x}\|=1}
+\left\|
+\mathbf{A}\mathbf{x}
+\right\|
+=
+d_1.
+$$
+
+O maior valor singular é o maior fator de ampliação produzido pela transformação.
+
+Se $\mathbf{A}$ possui posto coluna completo, então
+
+$$
+r=p
+$$
+
+e
+
+$$
+d_p>0.
+$$
+
+Nesse caso,
+
+$$
+\begin{aligned}
+\left\|
+\mathbf{A}\mathbf{x}
+\right\|^2
+&=
+\sum_{j=1}^{p}
+d_j^2\alpha_j^2\\
+&\geq
+d_p^2
+\sum_{j=1}^{p}
+\alpha_j^2\\
+&=
+d_p^2
+\|\mathbf{x}\|^2.
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\left\|
+\mathbf{A}\mathbf{x}
+\right\|
+\geq
+d_p\|\mathbf{x}\|
+$$
+
+e
+
+$$
+\min_{\|\mathbf{x}\|=1}
+\left\|
+\mathbf{A}\mathbf{x}
+\right\|
+=
+d_p.
+$$
+
+Se $\mathbf{A}$ não possui posto coluna completo, existe um vetor unitário no núcleo. Nesse caso,
+
+$$
+\min_{\|\mathbf{x}\|=1}
+\left\|
+\mathbf{A}\mathbf{x}
+\right\|
+=
+0.
+$$
+
+Esses extremos serão retomados na definição da norma espectral e do número de condição.
+
+### Exemplo geométrico no plano
+
+::: {#exm-geometria-svd}
+## Transformação da circunferência unitária em uma elipse
+
+Considere a matriz não simétrica
+
+$$
+\mathbf{A}
+=
+\begin{bmatrix}
+2&1\\
+0&1
+\end{bmatrix}.
+$$
+
+Sua SVD pode ser escrita como
+
+$$
+\mathbf{A}
+=
+\mathbf{U}
+\mathbf{D}
+\mathbf{V}^{\top},
+$$
+
+com valores singulares aproximadamente iguais a
+
+$$
+d_1
+\approx
+2{,}288
+$$
+
+e
+
+$$
+d_2
+\approx
+0{,}874.
+$$
+
+A circunferência unitária pode ser parametrizada por
+
+$$
+\mathbf{x}(\theta)
+=
+\begin{bmatrix}
+\cos\theta\\
+\sin\theta
+\end{bmatrix},
+\qquad
+0\leq\theta\leq2\pi.
+$$
+
+Sua imagem é
+
+$$
+\mathbf{y}(\theta)
+=
+\mathbf{A}\mathbf{x}(\theta).
+$$
+
+A SVD mostra que essa imagem é uma elipse com:
+
+-   semieixo maior de comprimento $d_1$ na direção $\mathbf{u}_1$;
+-   semieixo menor de comprimento $d_2$ na direção $\mathbf{u}_2$.
+
+No domínio, as direções correspondentes são $\mathbf{v}_1$ e $\mathbf{v}_2$.
+:::
+
+A @fig-geometria-svd mostra as direções singulares no domínio e no contradomínio. No primeiro painel, $\mathbf{v}_1$ e $\mathbf{v}_2$ formam uma base ortonormal da circunferência unitária. No segundo, essas direções são transformadas em $d_1\mathbf{u}_1$ e $d_2\mathbf{u}_2$, que determinam os semieixos da elipse.
+
+```{r}
+#| label: fig-geometria-svd
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "A SVD transforma as direções singulares à direita nos semieixos da elipse orientados pelos vetores singulares à esquerda."
+#| fig-width: 10
+#| fig-height: 5.2
+#| fig-align: center
+
+library(ggplot2)
+
+A <- matrix(
+  c(
+    2, 1,
+    0, 1
+  ),
+  nrow = 2,
+  byrow = TRUE
+)
+
+decomposicao <- svd(A)
+
+U <- decomposicao$u
+D <- decomposicao$d
+V <- decomposicao$v
+
+theta <- seq(
+  0,
+  2 * pi,
+  length.out = 361
+)
+
+circulo <- rbind(
+  cos(theta),
+  sin(theta)
+)
+
+elipse <- A %*% circulo
+
+curvas <- rbind(
+  data.frame(
+    x = circulo[1, ],
+    y = circulo[2, ],
+    painel = "Espaço de origem"
+  ),
+  data.frame(
+    x = elipse[1, ],
+    y = elipse[2, ],
+    painel = "Espaço de chegada"
+  )
+)
+
+direcoes_origem <- data.frame(
+  painel = "Espaço de origem",
+  x = 0,
+  y = 0,
+  xend = V[1, ],
+  yend = V[2, ],
+  direcao = c(
+    "Primeira direção",
+    "Segunda direção"
+  )
+)
+
+direcoes_chegada <- data.frame(
+  painel = "Espaço de chegada",
+  x = 0,
+  y = 0,
+  xend = D * U[1, ],
+  yend = D * U[2, ],
+  direcao = c(
+    "Primeira direção",
+    "Segunda direção"
+  )
+)
+
+direcoes <- rbind(
+  direcoes_origem,
+  direcoes_chegada
+)
+
+rotulos <- rbind(
+  data.frame(
+    painel = "Espaço de origem",
+    x = 1.18 * V[1, ],
+    y = 1.18 * V[2, ],
+    rotulo = c(
+      "bold(v)[1]",
+      "bold(v)[2]"
+    )
+  ),
+  data.frame(
+    painel = "Espaço de chegada",
+    x = c(
+      (D[1] + 0.22) * U[1, 1],
+      (D[2] + 0.28) * U[1, 2]
+    ),
+    y = c(
+      (D[1] + 0.22) * U[2, 1],
+      (D[2] + 0.28) * U[2, 2]
+    ),
+    rotulo = c(
+      "d[1] * bold(u)[1]",
+      "d[2] * bold(u)[2]"
+    )
+  )
+)
+
+ordem_paineis <- c(
+  "Espaço de origem",
+  "Espaço de chegada"
+)
+
+curvas$painel <- factor(
+  curvas$painel,
+  levels = ordem_paineis
+)
+
+direcoes$painel <- factor(
+  direcoes$painel,
+  levels = ordem_paineis
+)
+
+rotulos$painel <- factor(
+  rotulos$painel,
+  levels = ordem_paineis
+)
+
+ggplot() +
+  geom_hline(
+    yintercept = 0,
+    linewidth = 0.35,
+    colour = "grey70"
+  ) +
+  geom_vline(
+    xintercept = 0,
+    linewidth = 0.35,
+    colour = "grey70"
+  ) +
+  geom_path(
+    data = curvas,
+    aes(
+      x = x,
+      y = y
+    ),
+    linewidth = 1
+  ) +
+  geom_segment(
+    data = direcoes,
+    aes(
+      x = x,
+      y = y,
+      xend = xend,
+      yend = yend,
+      linetype = direcao
+    ),
+    linewidth = 0.9,
+    arrow = grid::arrow(
+      length = grid::unit(
+        0.18,
+        "cm"
+      ),
+      type = "closed"
+    )
+  ) +
+  geom_text(
+    data = rotulos,
+    aes(
+      x = x,
+      y = y,
+      label = rotulo
+    ),
+    parse = TRUE,
+    size = 4
+  ) +
+  facet_wrap(
+    ~painel,
+    nrow = 1
+  ) +
+  coord_equal(
+    xlim = c(
+      -2.7,
+      2.7
+    ),
+    ylim = c(
+      -2.7,
+      2.7
+    ),
+    expand = FALSE,
+    clip = "off"
+  ) +
+  scale_linetype_manual(
+    values = c(
+      "Primeira direção" = "solid",
+      "Segunda direção" = "dashed"
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = NULL,
+    linetype = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    strip.background = element_blank(),
+    strip.text = element_text(
+      face = "bold",
+      size = 11
+    ),
+    legend.position = "none",
+    panel.spacing = grid::unit(
+      1.2,
+      "cm"
+    )
+  )
+```
+
+A figura representa uma transformação não simétrica. Por isso, as direções singulares à direita e à esquerda não coincidem. A matriz $\mathbf{V}^{\top}$ alinha inicialmente a circunferência às direções $\mathbf{v}_1$ e $\mathbf{v}_2$. A matriz $\mathbf{D}$ altera os comprimentos segundo $d_1$ e $d_2$. A matriz $\mathbf{U}$ orienta os semieixos resultantes nas direções $\mathbf{u}_1$ e $\mathbf{u}_2$.
+
+### Transformações de posto deficiente
+
+Quando algum valor singular é zero, a transformação colapsa uma direção do domínio.
+
+Por exemplo, considere
+
+$$
+\mathbf{A}_0
+=
+\begin{bmatrix}
+2&0\\
+0&0
+\end{bmatrix}.
+$$
+
+Seus valores singulares são
+
+$$
+d_1=2
+\qquad
+\text{e}
+\qquad
+d_2=0.
+$$
+
+A bola unitária é transformada no segmento
+
+$$
+\left\{
+\begin{bmatrix}
+y_1\\
+0
+\end{bmatrix}
+:
+-2\leq y_1\leq2
+\right\}.
+$$
+
+A direção correspondente ao valor singular nulo pertence ao núcleo. O elipsoide resultante é degenerado e possui dimensão inferior à dimensão do domínio.
+
+De modo geral:
+
+-   cada valor singular positivo produz um semieixo da imagem;
+-   cada valor singular nulo elimina uma direção;
+-   o número de semieixos não nulos é o posto da matriz;
+-   o elipsoide está contido no espaço coluna de $\mathbf{A}$.
+
+A descrição geométrica da SVD também identifica bases ortonormais dos quatro espaços fundamentais associados à matriz. Essas relações permitem interpretar posto, núcleo, projetores, normas e condicionamento diretamente a partir dos vetores e valores singulares.
+
+## Espaços fundamentais, posto, normas e condicionamento
+
+A SVD fornece bases ortonormais para os quatro espaços fundamentais associados a uma matriz. Considere
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{q\times p}
+$$
+
+com posto
+
+$$
+r
+=
+\operatorname{posto}(\mathbf{A})
+$$
+
+e SVD compacta
+
+$$
+\mathbf{A}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}.
+$$
+
+As colunas de
+
+$$
+\mathbf{U}_r
+\in
+\mathbb{R}^{q\times r}
+$$
+
+são os vetores singulares à esquerda associados aos valores singulares positivos. As colunas de
+
+$$
+\mathbf{V}_r
+\in
+\mathbb{R}^{p\times r}
+$$
+
+são os vetores singulares à direita correspondentes.
+
+Complete essas matrizes com bases ortonormais dos respectivos complementos:
+
+$$
+\mathbf{U}
+=
+\begin{bmatrix}
+\mathbf{U}_r&
+\mathbf{U}_0
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{V}
+=
+\begin{bmatrix}
+\mathbf{V}_r&
+\mathbf{V}_0
+\end{bmatrix},
+$$
+
+em que
+
+$$
+\mathbf{U}_0
+\in
+\mathbb{R}^{q\times(q-r)}
+$$
+
+e
+
+$$
+\mathbf{V}_0
+\in
+\mathbb{R}^{p\times(p-r)}.
+$$
+
+Quando $r=q$, a matriz $\mathbf{U}_0$ não possui colunas. Quando $r=p$, o mesmo ocorre com $\mathbf{V}_0$.
+
+### Espaço coluna e espaço linha
+
+::: {#thm-espacos-fundamentais-svd}
+## Espaços fundamentais determinados pela SVD
+
+Se
+
+$$
+\mathbf{A}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+$$
+
+é a SVD compacta de uma matriz de posto $r$, então
+
+$$
+\mathcal{C}(\mathbf{A})
+=
+\operatorname{span}
+\left\{
+\mathbf{u}_1,\ldots,\mathbf{u}_r
+\right\}
+=
+\mathcal{C}(\mathbf{U}_r),
+$$
+
+$$
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+\operatorname{span}
+\left\{
+\mathbf{v}_1,\ldots,\mathbf{v}_r
+\right\}
+=
+\mathcal{C}(\mathbf{V}_r),
+$$
+
+$$
+\mathcal{N}(\mathbf{A})
+=
+\operatorname{span}
+\left\{
+\mathbf{v}_{r+1},\ldots,\mathbf{v}_p
+\right\}
+=
+\mathcal{C}(\mathbf{V}_0),
+$$
+
+e
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+\operatorname{span}
+\left\{
+\mathbf{u}_{r+1},\ldots,\mathbf{u}_q
+\right\}
+=
+\mathcal{C}(\mathbf{U}_0).
+$$
+
+[@golub2013matrix]
+:::
+
+::: proof
+Pela SVD compacta,
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+\mathbf{x}
+$$
+
+para todo $\mathbf{x}\in\mathbb{R}^{p}$. Logo, toda imagem de $\mathbf{A}$ é uma combinação linear das colunas de $\mathbf{U}_r$:
+
+$$
+\mathcal{C}(\mathbf{A})
+\subseteq
+\mathcal{C}(\mathbf{U}_r).
+$$
+
+Reciprocamente, para cada $j=1,\ldots,r$,
+
+$$
+\mathbf{A}\mathbf{v}_j
+=
+d_j\mathbf{u}_j.
+$$
+
+Como $d_j>0$,
+
+$$
+\mathbf{u}_j
+=
+\mathbf{A}
+\left(
+\frac{1}{d_j}\mathbf{v}_j
+\right).
+$$
+
+Portanto,
+
+$$
+\mathbf{u}_j
+\in
+\mathcal{C}(\mathbf{A}),
+$$
+
+e
+
+$$
+\mathcal{C}(\mathbf{U}_r)
+\subseteq
+\mathcal{C}(\mathbf{A}).
+$$
+
+Assim,
+
+$$
+\mathcal{C}(\mathbf{A})
+=
+\mathcal{C}(\mathbf{U}_r).
+$$
+
+Aplicando o mesmo argumento a
+
+$$
+\mathbf{A}^{\top}
+=
+\mathbf{V}_r
+\mathbf{D}_r
+\mathbf{U}_r^{\top},
+$$
+
+obtém-se
+
+$$
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+\mathcal{C}(\mathbf{V}_r).
+$$
+
+Considere agora a base ortonormal completa
+
+$$
+\mathbf{V}
+=
+\begin{bmatrix}
+\mathbf{V}_r&
+\mathbf{V}_0
+\end{bmatrix}.
+$$
+
+Todo vetor $\mathbf{x}\in\mathbb{R}^{p}$ possui uma decomposição única da forma
+
+$$
+\mathbf{x}
+=
+\mathbf{V}_r\boldsymbol{\alpha}
++
+\mathbf{V}_0\boldsymbol{\beta}.
+$$
+
+Aplicando $\mathbf{A}$,
+
+$$
+\begin{aligned}
+\mathbf{A}\mathbf{x}
+&=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+\left(
+\mathbf{V}_r\boldsymbol{\alpha}
++
+\mathbf{V}_0\boldsymbol{\beta}
+\right)\\
+&=
+\mathbf{U}_r
+\mathbf{D}_r
+\boldsymbol{\alpha},
+\end{aligned}
+$$
+
+pois
+
+$$
+\mathbf{V}_r^{\top}\mathbf{V}_r
+=
+\mathbf{I}_r
+$$
+
+e
+
+$$
+\mathbf{V}_r^{\top}\mathbf{V}_0
+=
+\mathbf{0}.
+$$
+
+Como $\mathbf{D}_r$ é invertível,
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\mathbf{0}
+$$
+
+se, e somente se,
+
+$$
+\boldsymbol{\alpha}
+=
+\mathbf{0}.
+$$
+
+Logo,
+
+$$
+\mathbf{x}
+\in
+\mathcal{N}(\mathbf{A})
+$$
+
+se, e somente se,
+
+$$
+\mathbf{x}
+=
+\mathbf{V}_0\boldsymbol{\beta}.
+$$
+
+Portanto,
+
+$$
+\mathcal{N}(\mathbf{A})
+=
+\mathcal{C}(\mathbf{V}_0).
+$$
+
+Aplicando o mesmo raciocínio a $\mathbf{A}^{\top}$,
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+\mathcal{C}(\mathbf{U}_0).
+$$
+:::
+
+As quatro bases fornecidas pela SVD podem ser organizadas como na @tbl-espacos-svd.
+
+| Espaço                                             | Subespaço de     | Base ortonormal fornecida pela SVD | Dimensão |
+|:-----------------|:-----------------|:-----------------|-----------------:|
+| Espaço coluna $\mathcal{C}(\mathbf{A})$            | $\mathbb{R}^{q}$ | Colunas de $\mathbf{U}_r$          |      $r$ |
+| Núcleo à esquerda $\mathcal{N}(\mathbf{A}^{\top})$ | $\mathbb{R}^{q}$ | Colunas de $\mathbf{U}_0$          |    $q-r$ |
+| Espaço linha $\mathcal{C}(\mathbf{A}^{\top})$      | $\mathbb{R}^{p}$ | Colunas de $\mathbf{V}_r$          |      $r$ |
+| Núcleo $\mathcal{N}(\mathbf{A})$                   | $\mathbb{R}^{p}$ | Colunas de $\mathbf{V}_0$          |    $p-r$ |
+
+: Espaços fundamentais e bases ortonormais fornecidas pela SVD. {#tbl-espacos-svd}
+
+A SVD torna explícitas as decomposições ortogonais
+
+$$
+\mathbb{R}^{q}
+=
+\mathcal{C}(\mathbf{A})
+\oplus
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right)
+$$
+
+e
+
+$$
+\mathbb{R}^{p}
+=
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right)
+\oplus
+\mathcal{N}(\mathbf{A}).
+$$
+
+O símbolo $\oplus$ indica uma soma direta ortogonal.
+
+Todo vetor
+
+$$
+\mathbf{y}
+\in
+\mathbb{R}^{q}
+$$
+
+pode ser escrito de maneira única como
+
+$$
+\mathbf{y}
+=
+\mathbf{y}_{\mathcal{C}}
++
+\mathbf{y}_{\mathcal{N}},
+$$
+
+com
+
+$$
+\mathbf{y}_{\mathcal{C}}
+\in
+\mathcal{C}(\mathbf{A})
+$$
+
+e
+
+$$
+\mathbf{y}_{\mathcal{N}}
+\in
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
+De modo análogo, todo vetor
+
+$$
+\mathbf{x}
+\in
+\mathbb{R}^{p}
+$$
+
+se decompõe em uma parcela no espaço linha e outra no núcleo de $\mathbf{A}$.
+
+### Projetores ortogonais
+
+Como as colunas de $\mathbf{U}_r$ são ortonormais, a matriz
+
+$$
+\mathbf{P}_{\mathcal{C}(\mathbf{A})}
+=
+\mathbf{U}_r
+\mathbf{U}_r^{\top}
+$$
+
+é o projetor ortogonal sobre o espaço coluna de $\mathbf{A}$.
+
+O projetor sobre o núcleo à esquerda é
+
+$$
+\mathbf{P}_{\mathcal{N}(\mathbf{A}^{\top})}
+=
+\mathbf{U}_0
+\mathbf{U}_0^{\top}.
+$$
+
+Como
+
+$$
+\mathbf{U}
+=
+\begin{bmatrix}
+\mathbf{U}_r&
+\mathbf{U}_0
+\end{bmatrix}
+$$
+
+é ortogonal,
+
+$$
+\mathbf{U}_r
+\mathbf{U}_r^{\top}
++
+\mathbf{U}_0
+\mathbf{U}_0^{\top}
+=
+\mathbf{I}_q.
+$$
+
+Portanto,
+
+$$
+\mathbf{P}_{\mathcal{N}(\mathbf{A}^{\top})}
+=
+\mathbf{I}_q
+-
+\mathbf{U}_r
+\mathbf{U}_r^{\top}.
+$$
+
+No espaço de origem,
+
+$$
+\mathbf{P}_{\mathcal{C}(\mathbf{A}^{\top})}
+=
+\mathbf{V}_r
+\mathbf{V}_r^{\top}
+$$
+
+é o projetor sobre o espaço linha, enquanto
+
+$$
+\mathbf{P}_{\mathcal{N}(\mathbf{A})}
+=
+\mathbf{V}_0
+\mathbf{V}_0^{\top}
+=
+\mathbf{I}_p
+-
+\mathbf{V}_r
+\mathbf{V}_r^{\top}
+$$
+
+projeta sobre o núcleo.
+
+As matrizes
+
+$$
+\mathbf{U}_r
+\mathbf{U}_r^{\top}
+$$
+
+e
+
+$$
+\mathbf{V}_r
+\mathbf{V}_r^{\top}
+$$
+
+são simétricas e idempotentes, conforme as propriedades dos projetores ortogonais estudadas anteriormente.
+
+::: {#exm-espacos-fundamentais-svd}
+## Espaços fundamentais do exemplo condutor
+
+Considere novamente
+
+$$
+\mathbf{A}
+=
+\begin{bmatrix}
+1&1\\
+1&-1\\
+1&1
+\end{bmatrix}.
+$$
+
+Sua SVD completa foi construída com
+
+$$
+\mathbf{u}_1
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+0\\
+1
+\end{bmatrix},
+\qquad
+\mathbf{u}_2
+=
+\begin{bmatrix}
+0\\
+1\\
+0
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{u}_3
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+0\\
+-1
+\end{bmatrix}.
+$$
+
+Os vetores singulares à direita são
+
+$$
+\mathbf{v}_1
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+1
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{v}_2
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+-1
+\end{bmatrix}.
+$$
+
+Como os dois valores singulares são positivos,
+
+$$
+r=2.
+$$
+
+Assim,
+
+$$
+\mathcal{C}(\mathbf{A})
+=
+\operatorname{span}
+\left\{
+\mathbf{u}_1,\mathbf{u}_2
+\right\},
+$$
+
+e
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+\operatorname{span}
+\left\{
+\mathbf{u}_3
+\right\}.
+$$
+
+A matriz possui posto coluna completo, pois
+
+$$
+r=p=2.
+$$
+
+Consequentemente,
+
+$$
+\mathcal{N}(\mathbf{A})
+=
+\left\{
+\mathbf{0}
+\right\}
+$$
+
+e
+
+$$
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+\mathbb{R}^{2}.
+$$
+
+O projetor sobre o espaço coluna é
+
+$$
+\begin{aligned}
+\mathbf{U}_2
+\mathbf{U}_2^{\top}
+&=
+\mathbf{u}_1\mathbf{u}_1^{\top}
++
+\mathbf{u}_2\mathbf{u}_2^{\top}\\
+&=
+\begin{bmatrix}
+1/2&0&1/2\\
+0&1&0\\
+1/2&0&1/2
+\end{bmatrix}.
+\end{aligned}
+$$
+
+O projetor sobre o núcleo à esquerda é
+
+$$
+\begin{aligned}
+\mathbf{u}_3\mathbf{u}_3^{\top}
+&=
+\begin{bmatrix}
+1/2&0&-1/2\\
+0&0&0\\
+-1/2&0&1/2
+\end{bmatrix}.
+\end{aligned}
+$$
+
+A soma dos dois projetores é
+
+$$
+\mathbf{U}_2
+\mathbf{U}_2^{\top}
++
+\mathbf{u}_3
+\mathbf{u}_3^{\top}
+=
+\mathbf{I}_3.
+$$
+:::
+
+### Posto e nulidades
+
+A quantidade de valores singulares positivos é igual ao posto:
+
+$$
+\operatorname{posto}(\mathbf{A})
+=
+r.
+$$
+
+Essa igualdade também pode ser observada a partir da SVD compacta. As matrizes
+
+$$
+\mathbf{U}_r
+\qquad\text{e}\qquad
+\mathbf{V}_r
+$$
+
+possuem posto coluna $r$, e
+
+$$
+\mathbf{D}_r
+$$
+
+é diagonal e invertível. Portanto,
+
+$$
+\operatorname{posto}
+\left(
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+\right)
+=
+r.
+$$
+
+Pelo Teorema Posto--Nulidade,
+
+$$
+\dim
+\mathcal{N}(\mathbf{A})
+=
+p-r
+$$
+
+e
+
+$$
+\dim
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+q-r.
+$$
+
+Os valores singulares nulos representam direções eliminadas pela transformação. A quantidade dessas direções depende do espaço considerado:
+
+-   no domínio, existem $p-r$ direções no núcleo de $\mathbf{A}$;
+-   no contradomínio, existem $q-r$ direções ortogonais à imagem.
+
+### Produto interno de Frobenius
+
+O estudo das aproximações matriciais exige uma geometria para o espaço das matrizes.
+
+::: {#def-produto-interno-frobenius}
+## Produto interno de Frobenius
+
+Para matrizes
+
+$$
+\mathbf{A},
+\widetilde{\mathbf{A}}
+\in
+\mathbb{R}^{q\times p},
+$$
+
+o **produto interno de Frobenius** é
+
+$$
+\left\langle
+\mathbf{A},
+\widetilde{\mathbf{A}}
+\right\rangle_F
+=
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}
+\widetilde{\mathbf{A}}
+\right).
+$$
+
+Equivalentemente,
+
+$$
+\left\langle
+\mathbf{A},
+\widetilde{\mathbf{A}}
+\right\rangle_F
+=
+\sum_{i=1}^{q}
+\sum_{j=1}^{p}
+a_{ij}\widetilde{a}_{ij}.
+$$
+:::
+
+O produto interno de Frobenius trata uma matriz como um vetor formado por todos os seus elementos. Duas matrizes são ortogonais segundo esse produto quando
+
+$$
+\left\langle
+\mathbf{A},
+\widetilde{\mathbf{A}}
+\right\rangle_F
+=
+0.
+$$
+
+A norma induzida por esse produto interno é a norma de Frobenius.
+
+::: {#def-norma-frobenius}
+## Norma de Frobenius
+
+A **norma de Frobenius** de
+
+$$
+\mathbf{A}
+=
+(a_{ij})
+\in
+\mathbb{R}^{q\times p}
+$$
+
+é
+
+$$
+\|\mathbf{A}\|_F
+=
+\sqrt{
+\left\langle
+\mathbf{A},
+\mathbf{A}
+\right\rangle_F
+}.
+$$
+
+Equivalentemente,
+
+$$
+\|\mathbf{A}\|_F
+=
+\sqrt{
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}\mathbf{A}
+\right)
+}
+$$
+
+ou
+
+$$
+\|\mathbf{A}\|_F
+=
+\sqrt{
+\sum_{i=1}^{q}
+\sum_{j=1}^{p}
+a_{ij}^2
+}.
+$$
+:::
+
+A norma de Frobenius mede a magnitude quadrática total dos elementos da matriz.
+
+### Normas e valores singulares
+
+::: {#def-norma-espectral}
+## Norma espectral
+
+A **norma espectral**, ou norma matricial induzida pela norma euclidiana, é
+
+$$
+\|\mathbf{A}\|_2
+=
+\max_{\mathbf{x}\neq\mathbf{0}}
+\frac{
+\|\mathbf{A}\mathbf{x}\|
+}{
+\|\mathbf{x}\|
+}.
+$$
+
+Equivalentemente,
+
+$$
+\|\mathbf{A}\|_2
+=
+\max_{\|\mathbf{x}\|=1}
+\|\mathbf{A}\mathbf{x}\|.
+$$
+:::
+
+A interpretação geométrica anterior mostra que a norma espectral é o maior fator de ampliação produzido pela transformação.
+
+::: {#thm-normas-valores-singulares}
+## Normas matriciais e valores singulares
+
+Se
+
+$$
+d_1
+\geq
+\cdots
+\geq
+d_r
+>
+0
+$$
+
+são os valores singulares positivos de $\mathbf{A}$, então
+
+$$
+\|\mathbf{A}\|_2
+=
+d_1
+$$
+
+e
+
+$$
+\|\mathbf{A}\|_F^2
+=
+\sum_{j=1}^{r}d_j^2.
+$$
+
+[@golub2013matrix]
+:::
+
+::: proof
+Para a norma espectral, escreva
+
+$$
+\mathbf{x}
+=
+\sum_{j=1}^{p}
+\alpha_j\mathbf{v}_j.
+$$
+
+Então,
+
+$$
+\|\mathbf{x}\|^2
+=
+\sum_{j=1}^{p}\alpha_j^2
+$$
+
+e
+
+$$
+\left\|
+\mathbf{A}\mathbf{x}
+\right\|^2
+=
+\sum_{j=1}^{r}
+d_j^2\alpha_j^2.
+$$
+
+Como $d_j\leq d_1$,
+
+$$
+\left\|
+\mathbf{A}\mathbf{x}
+\right\|^2
+\leq
+d_1^2
+\|\mathbf{x}\|^2.
+$$
+
+Logo,
+
+$$
+\frac{
+\|\mathbf{A}\mathbf{x}\|
+}{
+\|\mathbf{x}\|
+}
+\leq
+d_1.
+$$
+
+Tomando
+
+$$
+\mathbf{x}
+=
+\mathbf{v}_1,
+$$
+
+obtém-se
+
+$$
+\left\|
+\mathbf{A}\mathbf{v}_1
+\right\|
+=
+d_1.
+$$
+
+Portanto,
+
+$$
+\|\mathbf{A}\|_2
+=
+d_1.
+$$
+
+Para a norma de Frobenius,
+
+$$
+\begin{aligned}
+\|\mathbf{A}\|_F^2
+&=
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}\mathbf{A}
+\right)\\
+&=
+\operatorname{tr}
+\left(
+\mathbf{V}_r
+\mathbf{D}_r^2
+\mathbf{V}_r^{\top}
+\right)\\
+&=
+\operatorname{tr}
+\left(
+\mathbf{D}_r^2
+\mathbf{V}_r^{\top}
+\mathbf{V}_r
+\right)\\
+&=
+\operatorname{tr}
+\left(
+\mathbf{D}_r^2
+\right)\\
+&=
+\sum_{j=1}^{r}d_j^2.
+\end{aligned}
+$$
+:::
+
+As duas normas medem aspectos diferentes:
+
+-   $\|\mathbf{A}\|_2$ depende somente do maior valor singular e representa o maior fator de ampliação;
+-   $\|\mathbf{A}\|_F$ reúne as contribuições quadráticas de todos os valores singulares.
+
+Para qualquer matriz,
+
+$$
+\|\mathbf{A}\|_2
+\leq
+\|\mathbf{A}\|_F
+\leq
+\sqrt{r}
+\|\mathbf{A}\|_2.
+$$
+
+A primeira desigualdade decorre de
+
+$$
+d_1^2
+\leq
+\sum_{j=1}^{r}d_j^2.
+$$
+
+A segunda decorre de
+
+$$
+\sum_{j=1}^{r}d_j^2
+\leq
+r d_1^2.
+$$
+
+### Invariância ortogonal
+
+As normas espectral e de Frobenius são preservadas por multiplicações ortogonais.
+
+::: {#thm-invariancia-ortogonal-normas}
+## Invariância ortogonal das normas
+
+Se $\mathbf{Q}_1$ e $\mathbf{Q}_2$ são matrizes ortogonais de dimensões compatíveis, então
+
+$$
+\left\|
+\mathbf{Q}_1
+\mathbf{A}
+\mathbf{Q}_2
+\right\|_2
+=
+\|\mathbf{A}\|_2
+$$
+
+e
+
+$$
+\left\|
+\mathbf{Q}_1
+\mathbf{A}
+\mathbf{Q}_2
+\right\|_F
+=
+\|\mathbf{A}\|_F.
+$$
+
+[@golub2013matrix]
+:::
+
+A SVD pode, portanto, ser interpretada como uma representação que remove fatores ortogonais sem alterar essas normas:
+
+$$
+\|\mathbf{A}\|_2
+=
+\|\mathbf{D}\|_2
+$$
+
+e
+
+$$
+\|\mathbf{A}\|_F
+=
+\|\mathbf{D}\|_F.
+$$
+
+### Determinante e invertibilidade
+
+Quando
+
+$$
+q=p,
+$$
+
+a matriz $\mathbf{A}$ é quadrada. Pela SVD,
+
+$$
+\det(\mathbf{A})
+=
+\det(\mathbf{U})
+\det(\mathbf{D})
+\det
+\left(
+\mathbf{V}^{\top}
+\right).
+$$
+
+Como $\mathbf{U}$ e $\mathbf{V}$ são ortogonais,
+
+$$
+\left|
+\det(\mathbf{U})
+\right|
+=
+\left|
+\det(\mathbf{V})
+\right|
+=
+1.
+$$
+
+Portanto,
+
+$$
+\left|
+\det(\mathbf{A})
+\right|
+=
+\prod_{j=1}^{p}d_j.
+$$
+
+O módulo do determinante é o produto dos valores singulares.
+
+Além disso,
+
+$$
+\mathbf{A}
+\text{ é invertível}
+\iff
+d_j>0
+\quad
+\text{para todo }j.
+$$
+
+Nesse caso,
+
+$$
+r=p
+$$
+
+e a SVD compacta coincide, em dimensão, com a SVD completa.
+
+### Menor valor singular
+
+Se $\mathbf{A}$ possui posto coluna completo, isto é,
+
+$$
+r=p
+\leq
+q,
+$$
+
+seu menor valor singular é
+
+$$
+d_p>0.
+$$
+
+Ele possui a caracterização
+
+$$
+d_p
+=
+\min_{\|\mathbf{x}\|=1}
+\|\mathbf{A}\mathbf{x}\|.
+$$
+
+Portanto, $d_p$ mede o menor fator de alteração do comprimento entre os vetores unitários do domínio.
+
+Se
+
+$$
+d_p
+$$
+
+é pequeno, existe uma direção unitária cuja imagem possui comprimento pequeno. Nessa direção, a transformação aproxima-se de um colapso.
+
+Se a matriz não possui posto coluna completo, existe um vetor unitário no núcleo e
+
+$$
+\min_{\|\mathbf{x}\|=1}
+\|\mathbf{A}\mathbf{x}\|
+=
+0.
+$$
+
+### Número de condição
+
+Defina
+
+$$
+s
+=
+\min(q,p).
+$$
+
+::: {#def-numero-condicao-svd}
+## Número de condição na norma espectral
+
+Se
+
+$$
+\operatorname{posto}(\mathbf{A})
+=
+s,
+$$
+
+o número de condição espectral é
+
+$$
+\kappa_2(\mathbf{A})
+=
+\frac{d_1}{d_s}.
+$$
+
+Se
+
+$$
+\operatorname{posto}(\mathbf{A})
+<
+s,
+$$
+
+define-se
+
+$$
+\kappa_2(\mathbf{A})
+=
+\infty.
+$$
+:::
+
+Quando $\mathbf{A}$ possui posto máximo, $d_s$ é o menor valor singular positivo.
+
+Se
+
+$$
+q\geq p
+$$
+
+e
+
+$$
+r=p,
+$$
+
+a matriz possui posto coluna completo. Nesse caso,
+
+$$
+\mathcal{N}(\mathbf{A})
+=
+\left\{
+\mathbf{0}
+\right\},
+$$
+
+e
+
+$$
+d_p
+=
+\min_{\|\mathbf{x}\|=1}
+\|\mathbf{A}\mathbf{x}\|.
+$$
+
+O número de condição compara diretamente os fatores máximo e mínimo de alteração dos comprimentos no domínio inteiro.
+
+Se
+
+$$
+q<p
+$$
+
+e
+
+$$
+r=q,
+$$
+
+a matriz possui posto linha completo, mas
+
+$$
+\dim
+\mathcal{N}(\mathbf{A})
+=
+p-q.
+$$
+
+Existem, portanto, direções eliminadas pela transformação. Nesse caso, o número de condição descreve a ação de $\mathbf{A}$ restrita ao espaço linha
+
+$$
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+\mathcal{N}(\mathbf{A})^{\perp}.
+$$
+
+Nesse subespaço,
+
+$$
+d_q
+=
+\min_{
+\substack{
+\|\mathbf{x}\|=1\\
+\mathbf{x}\in
+\mathcal{C}(\mathbf{A}^{\top})
+}
+}
+\|\mathbf{A}\mathbf{x}\|.
+$$
+
+Para uma matriz quadrada invertível,
+
+$$
+r=p=q
+$$
+
+e
+
+$$
+\kappa_2(\mathbf{A})
+=
+\|\mathbf{A}\|_2
+\left\|
+\mathbf{A}^{-1}
+\right\|_2.
+$$
+
+De fato,
+
+$$
+\|\mathbf{A}\|_2
+=
+d_1,
+$$
+
+e os valores singulares de $\mathbf{A}^{-1}$ são
+
+$$
+\frac{1}{d_p},
+\ldots,
+\frac{1}{d_1}.
+$$
+
+Logo,
+
+$$
+\left\|
+\mathbf{A}^{-1}
+\right\|_2
+=
+\frac{1}{d_p}
+$$
+
+e
+
+$$
+\kappa_2(\mathbf{A})
+=
+\frac{d_1}{d_p}.
+$$
+
+A interpretação do número de condição deve considerar somente as direções associadas aos valores singulares positivos.
+
+-   Quando
+
+    $$
+    \kappa_2(\mathbf{A})
+    \approx
+    1,
+    $$
+
+    essas direções são transformadas por fatores semelhantes.
+
+-   Quando
+
+    $$
+    \kappa_2(\mathbf{A})
+    $$
+
+    é elevado, algumas direções ativas são preservadas ou ampliadas, enquanto outras são fortemente contraídas.
+
+-   Quando
+
+    $$
+    \kappa_2(\mathbf{A})
+    =
+    \infty,
+    $$
+
+    o posto é menor que o máximo possível e há valores singulares nulos adicionais além daqueles impostos pelas dimensões retangulares da matriz.
+
+Valores singulares positivos muito pequenos amplificam erros quando se tenta inverter a transformação em seu subespaço ativo. Esse efeito será retomado na seção sobre pseudoinversa e mínimos quadrados.
+
+::: {#exm-condicionamento-svd}
+## Comparação entre duas transformações
+
+Considere
+
+$$
+\mathbf{A}_1
+=
+\begin{bmatrix}
+2&0\\
+0&2
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{A}_2
+=
+\begin{bmatrix}
+2&0\\
+0&0{,}02
+\end{bmatrix}.
+$$
+
+Os valores singulares de $\mathbf{A}_1$ são
+
+$$
+2
+\qquad
+\text{e}
+\qquad
+2.
+$$
+
+Portanto,
+
+$$
+\kappa_2(\mathbf{A}_1)
+=
+1.
+$$
+
+A matriz amplia todas as direções pelo mesmo fator.
+
+Para $\mathbf{A}_2$, os valores singulares são
+
+$$
+2
+\qquad
+\text{e}
+\qquad
+0{,}02.
+$$
+
+Logo,
+
+$$
+\kappa_2(\mathbf{A}_2)
+=
+\frac{2}{0{,}02}
+=
+100.
+$$
+
+A primeira direção é ampliada por 2, enquanto a segunda é contraída por $0{,}02$. A inversão exigiria multiplicar essa segunda componente por
+
+$$
+\frac{1}{0{,}02}
+=
+50.
+$$
+
+Consequentemente, pequenas perturbações nessa direção podem produzir alterações acentuadas na solução invertida.
+:::
+
+### Posto exato e posto numérico
+
+Matematicamente, o posto é o número de valores singulares estritamente positivos:
+
+$$
+r
+=
+\#\left\{
+j:
+d_j>0
+\right\}.
+$$
+
+Em cálculos numéricos, resultados teoricamente nulos podem aparecer como números positivos muito pequenos devido a arredondamentos, ruído ou aproximações computacionais.
+
+Por isso, programas numéricos utilizam uma tolerância $\tau$ e tratam como efetivamente nulos os valores singulares que satisfazem
+
+$$
+d_j
+\leq
+\tau.
+$$
+
+O número de valores singulares acima da tolerância é denominado **posto numérico**.
+
+A tolerância não é uma propriedade puramente algébrica da matriz. Ela depende de:
+
+-   precisão numérica;
+-   escala dos dados;
+-   dimensões da matriz;
+-   finalidade da análise;
+-   nível de ruído considerado relevante.
+
+Essa distinção será útil nas aproximações de posto reduzido. Nessas aproximações, valores singulares pequenos podem ser descartados deliberadamente, mesmo quando são matematicamente positivos.
+
+A SVD fornece, assim, uma descrição integrada da estrutura da matriz:
+
+$$
+\begin{aligned}
+\text{posto}
+&\longleftrightarrow
+\text{número de valores singulares positivos},\\
+\text{imagem}
+&\longleftrightarrow
+\text{vetores singulares à esquerda},\\
+\text{espaço linha}
+&\longleftrightarrow
+\text{vetores singulares à direita},\\
+\text{núcleos}
+&\longleftrightarrow
+\text{direções associadas a valores nulos},\\
+\text{ampliação máxima}
+&\longleftrightarrow
+d_1,\\
+\text{contração mínima}
+&\longleftrightarrow
+d_r,\\
+\text{condicionamento}
+&\longleftrightarrow
+d_1/d_r.
+\end{aligned}
+$$
+
+Quando a matriz representa um conjunto de dados, as bases à esquerda e à direita descrevem, respectivamente, estruturas nos espaços das observações e das variáveis.
+
+## SVD de uma matriz de dados
+
+Considere uma matriz de dados
+
+$$
+\mathbf{X}
+\in
+\mathbb{R}^{n\times p},
+$$
+
+em que as linhas representam $n$ observações e as colunas representam $p$ variáveis.
+
+Se
+
+$$
+r
+=
+\operatorname{posto}(\mathbf{X}),
+$$
+
+a SVD compacta é
+
+$$
+\mathbf{X}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top},
+$$
+
+com
+
+$$
+\mathbf{U}_r
+\in
+\mathbb{R}^{n\times r},
+\qquad
+\mathbf{D}_r
+\in
+\mathbb{R}^{r\times r}
+$$
+
+e
+
+$$
+\mathbf{V}_r
+\in
+\mathbb{R}^{p\times r}.
+$$
+
+Nesse contexto, os dois conjuntos de vetores singulares pertencem a espaços diferentes:
+
+-   as colunas de $\mathbf{U}_r$ pertencem ao espaço das observações $\mathbb{R}^{n}$;
+-   as colunas de $\mathbf{V}_r$ pertencem ao espaço das variáveis $\mathbb{R}^{p}$.
+
+Os valores singulares conectam essas duas representações.
+
+### Coordenadas no espaço das variáveis
+
+Multiplicando a SVD à direita por $\mathbf{V}_r$,
+
+$$
+\begin{aligned}
+\mathbf{X}\mathbf{V}_r
+&=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+\mathbf{V}_r\\
+&=
+\mathbf{U}_r
+\mathbf{D}_r.
+\end{aligned}
+$$
+
+Defina
+
+$$
+\mathbf{Z}
+=
+\mathbf{X}\mathbf{V}_r.
+$$
+
+Então,
+
+$$
+\mathbf{Z}
+=
+\mathbf{U}_r
+\mathbf{D}_r.
+$$
+
+A matriz
+
+$$
+\mathbf{Z}
+\in
+\mathbb{R}^{n\times r}
+$$
+
+contém as coordenadas das observações nas direções determinadas pelos vetores singulares à direita.
+
+Sua $j$-ésima coluna é
+
+$$
+\mathbf{z}_j
+=
+\mathbf{X}\mathbf{v}_j
+=
+d_j\mathbf{u}_j.
+$$
+
+Portanto, para cada direção $\mathbf{v}_j$ no espaço das variáveis, a multiplicação
+
+$$
+\mathbf{X}\mathbf{v}_j
+$$
+
+produz um vetor de $n$ coordenadas, uma para cada observação.
+
+Se a linha $i$ de $\mathbf{X}$ é
+
+$$
+\mathbf{x}_i^{\top},
+$$
+
+então o elemento $z_{ij}$ é
+
+$$
+z_{ij}
+=
+\mathbf{x}_i^{\top}\mathbf{v}_j.
+$$
+
+Assim, $z_{ij}$ é a projeção da observação $i$ sobre a direção $\mathbf{v}_j$.
+
+Como
+
+$$
+\mathbf{z}_j
+=
+d_j\mathbf{u}_j,
+$$
+
+o vetor singular à esquerda fornece a direção das coordenadas entre as observações, enquanto o valor singular determina sua magnitude.
+
+### Coordenadas no espaço das observações
+
+A relação dual é obtida multiplicando a transposta da matriz de dados por $\mathbf{U}_r$:
+
+$$
+\begin{aligned}
+\mathbf{X}^{\top}\mathbf{U}_r
+&=
+\mathbf{V}_r
+\mathbf{D}_r
+\mathbf{U}_r^{\top}
+\mathbf{U}_r\\
+&=
+\mathbf{V}_r
+\mathbf{D}_r.
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\mathbf{X}^{\top}\mathbf{U}_r
+=
+\mathbf{V}_r\mathbf{D}_r.
+$$
+
+A $j$-ésima coluna dessa matriz é
+
+$$
+\mathbf{X}^{\top}\mathbf{u}_j
+=
+d_j\mathbf{v}_j.
+$$
+
+Essa expressão representa as variáveis nas direções determinadas pelos vetores singulares à esquerda.
+
+As duas relações
+
+$$
+\mathbf{X}\mathbf{V}_r
+=
+\mathbf{U}_r\mathbf{D}_r
+$$
+
+e
+
+$$
+\mathbf{X}^{\top}\mathbf{U}_r
+=
+\mathbf{V}_r\mathbf{D}_r
+$$
+
+expressam a dualidade entre os espaços das observações e das variáveis.
+
+::: {#thm-dualidade-svd-dados}
+## Dualidade entre observações e variáveis
+
+Se
+
+$$
+\mathbf{X}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+$$
+
+é a SVD compacta de uma matriz de dados, então, para cada $j=1,\ldots,r$,
+
+$$
+\mathbf{X}\mathbf{v}_j
+=
+d_j\mathbf{u}_j
+$$
+
+e
+
+$$
+\mathbf{X}^{\top}\mathbf{u}_j
+=
+d_j\mathbf{v}_j.
+$$
+
+Portanto, o mesmo valor singular $d_j$ relaciona uma direção no espaço das variáveis a uma direção no espaço das observações.
+:::
+
+### Matrizes de Gram
+
+As matrizes
+
+$$
+\mathbf{X}^{\top}\mathbf{X}
+$$
+
+e
+
+$$
+\mathbf{X}\mathbf{X}^{\top}
+$$
+
+descrevem produtos internos em espaços distintos.
+
+A matriz
+
+$$
+\mathbf{X}^{\top}\mathbf{X}
+\in
+\mathbb{R}^{p\times p}
+$$
+
+é a matriz de produtos cruzados entre as variáveis. Pela SVD,
+
+$$
+\mathbf{X}^{\top}\mathbf{X}
+=
+\mathbf{V}_r
+\mathbf{D}_r^2
+\mathbf{V}_r^{\top}.
+$$
+
+A matriz
+
+$$
+\mathbf{X}\mathbf{X}^{\top}
+\in
+\mathbb{R}^{n\times n}
+$$
+
+é a matriz de Gram entre as observações:
+
+$$
+\mathbf{X}\mathbf{X}^{\top}
+=
+\mathbf{U}_r
+\mathbf{D}_r^2
+\mathbf{U}_r^{\top}.
+$$
+
+As duas matrizes possuem os mesmos autovalores positivos:
+
+$$
+d_1^2,\ldots,d_r^2.
+$$
+
+Entretanto, seus autovetores pertencem a espaços diferentes:
+
+-   $\mathbf{v}_j\in\mathbb{R}^{p}$ descreve uma direção entre as variáveis;
+-   $\mathbf{u}_j\in\mathbb{R}^{n}$ descreve uma direção entre as observações.
+
+Essa relação permite escolher a menor das duas matrizes para determinadas análises teóricas. Quando
+
+$$
+n\gg p,
+$$
+
+a matriz
+
+$$
+\mathbf{X}^{\top}\mathbf{X}
+$$
+
+possui ordem menor. Quando
+
+$$
+p\gg n,
+$$
+
+a matriz
+
+$$
+\mathbf{X}\mathbf{X}^{\top}
+$$
+
+pode fornecer uma representação de menor dimensão.
+
+Essa observação não altera a SVD: as duas matrizes compartilham os mesmos valores singulares positivos e representam lados complementares da mesma estrutura.
+
+### Reconstrução das observações
+
+A SVD compacta pode ser escrita como
+
+$$
+\mathbf{X}
+=
+\left(
+\mathbf{X}\mathbf{V}_r
+\right)
+\mathbf{V}_r^{\top}.
+$$
+
+Como
+
+$$
+\mathbf{Z}
+=
+\mathbf{X}\mathbf{V}_r,
+$$
+
+tem-se
+
+$$
+\mathbf{X}
+=
+\mathbf{Z}\mathbf{V}_r^{\top}.
+$$
+
+A matriz $\mathbf{Z}$ contém as coordenadas das observações na base formada pelas colunas de $\mathbf{V}_r$. A multiplicação por $\mathbf{V}_r^{\top}$ reconstrói as observações no espaço original das variáveis.
+
+Para a observação $i$,
+
+$$
+\mathbf{x}_i
+=
+\sum_{j=1}^{r}
+z_{ij}\mathbf{v}_j.
+$$
+
+Portanto, todas as observações pertencem ao subespaço
+
+$$
+\mathcal{C}(\mathbf{V}_r)
+\subseteq
+\mathbb{R}^{p}.
+$$
+
+Se
+
+$$
+r<p,
+$$
+
+a nuvem de observações está contida em um subespaço próprio de $\mathbb{R}^{p}$. Nesse caso, existe redundância linear exata entre as variáveis.
+
+### Preservação de produtos internos
+
+Como
+
+$$
+\mathbf{Z}
+=
+\mathbf{X}\mathbf{V}_r,
+$$
+
+tem-se
+
+$$
+\begin{aligned}
+\mathbf{Z}\mathbf{Z}^{\top}
+&=
+\mathbf{X}
+\mathbf{V}_r
+\mathbf{V}_r^{\top}
+\mathbf{X}^{\top}.
+\end{aligned}
+$$
+
+Como todas as linhas de $\mathbf{X}$ pertencem ao espaço linha
+
+$$
+\mathcal{C}(\mathbf{V}_r),
+$$
+
+vale
+
+$$
+\mathbf{X}
+\mathbf{V}_r
+\mathbf{V}_r^{\top}
+=
+\mathbf{X}.
+$$
+
+Logo,
+
+$$
+\mathbf{Z}\mathbf{Z}^{\top}
+=
+\mathbf{X}\mathbf{X}^{\top}.
+$$
+
+Portanto, a representação pelas $r$ coordenadas singulares positivas preserva exatamente os produtos internos entre as observações.
+
+Para duas observações $\mathbf{x}_i$ e $\mathbf{x}_{\ell}$, com coordenadas correspondentes $\mathbf{z}_i$ e $\mathbf{z}_{\ell}$,
+
+$$
+\mathbf{x}_i^{\top}\mathbf{x}_{\ell}
+=
+\mathbf{z}_i^{\top}\mathbf{z}_{\ell}.
+$$
+
+Consequentemente,
+
+$$
+\|\mathbf{x}_i\|
+=
+\|\mathbf{z}_i\|
+$$
+
+e
+
+$$
+\left\|
+\mathbf{x}_i-\mathbf{x}_{\ell}
+\right\|
+=
+\left\|
+\mathbf{z}_i-\mathbf{z}_{\ell}
+\right\|.
+$$
+
+A representação compacta reduz a dimensão de $p$ para $r$ quando a matriz possui posto deficiente, sem alterar a geometria euclidiana da nuvem de observações.
+
+Essa redução é exata porque são mantidas todas as direções associadas a valores singulares positivos.
+
+### Centralização da matriz de dados
+
+A posição da nuvem de observações depende do vetor de médias. Para estudar sua estrutura em torno do centro, utiliza-se a matriz centralizada
+
+$$
+\mathbf{X}_c
+=
+\mathbf{H}_n\mathbf{X},
+$$
+
+em que
+
+$$
+\mathbf{H}_n
+=
+\mathbf{I}_n
+-
+\frac{1}{n}
+\mathbf{1}_n
+\mathbf{1}_n^{\top}
+$$
+
+é a matriz de centralização.
+
+A SVD compacta de $\mathbf{X}_c$ é
+
+$$
+\mathbf{X}_c
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}.
+$$
+
+Como as colunas de $\mathbf{X}_c$ possuem média zero,
+
+$$
+\mathbf{1}_n^{\top}\mathbf{X}_c
+=
+\mathbf{0}^{\top}.
+$$
+
+Substituindo a SVD,
+
+$$
+\mathbf{1}_n^{\top}
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+=
+\mathbf{0}^{\top}.
+$$
+
+Como $\mathbf{D}_r$ é invertível e $\mathbf{V}_r$ possui posto coluna completo,
+
+$$
+\mathbf{1}_n^{\top}\mathbf{U}_r
+=
+\mathbf{0}^{\top}.
+$$
+
+Portanto, cada vetor singular à esquerda associado a um valor singular positivo é ortogonal ao vetor de uns:
+
+$$
+\mathbf{1}_n^{\top}\mathbf{u}_j
+=
+0,
+\qquad
+j=1,\ldots,r.
+$$
+
+Isso significa que as coordenadas
+
+$$
+\mathbf{z}_j
+=
+d_j\mathbf{u}_j
+$$
+
+também possuem média zero.
+
+### Relação com a matriz de covariâncias amostral
+
+A matriz de covariâncias amostral pode ser escrita como
+
+$$
+\mathbf{S}
+=
+\frac{1}{n-1}
+\mathbf{X}_c^{\top}
+\mathbf{X}_c.
+$$
+
+Substituindo a SVD compacta,
+
+$$
+\begin{aligned}
+\mathbf{S}
+&=
+\frac{1}{n-1}
+\mathbf{V}_r
+\mathbf{D}_r
+\mathbf{U}_r^{\top}
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}\\
+&=
+\mathbf{V}_r
+\left(
+\frac{
+\mathbf{D}_r^2
+}{
+n-1
+}
+\right)
+\mathbf{V}_r^{\top}.
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\mathbf{S}
+=
+\mathbf{V}_r
+\frac{
+\mathbf{D}_r^2
+}{
+n-1
+}
+\mathbf{V}_r^{\top}.
+$$
+
+Essa expressão mostra que:
+
+-   os vetores singulares à direita de $\mathbf{X}_c$ são autovetores de $\mathbf{S}$;
+
+-   os autovalores positivos de $\mathbf{S}$ são
+
+    $$
+    \frac{d_j^2}{n-1};
+    $$
+
+-   o posto de $\mathbf{S}$ é igual ao posto de $\mathbf{X}_c$.
+
+Como
+
+$$
+\operatorname{posto}(\mathbf{H}_n)
+=
+n-1,
+$$
+
+tem-se
+
+$$
+\operatorname{posto}(\mathbf{X}_c)
+\leq
+\min(n-1,p).
+$$
+
+Consequentemente,
+
+$$
+\operatorname{posto}(\mathbf{S})
+\leq
+\min(n-1,p).
+$$
+
+Se
+
+$$
+p\geq n,
+$$
+
+a matriz de covariâncias amostral é necessariamente singular, pois
+
+$$
+\operatorname{posto}(\mathbf{S})
+\leq
+n-1
+<
+p.
+$$
+
+Esse resultado será retomado no capítulo de covariâncias. Neste ponto, ele mostra que a SVD da matriz centralizada descreve diretamente a estrutura espectral da covariância amostral.
+
+### Magnitude quadrática da matriz centralizada
+
+A norma de Frobenius da matriz centralizada é
+
+$$
+\begin{aligned}
+\|\mathbf{X}_c\|_F^2
+&=
+\operatorname{tr}
+\left(
+\mathbf{X}_c^{\top}\mathbf{X}_c
+\right)\\
+&=
+\sum_{j=1}^{r}d_j^2.
+\end{aligned}
+$$
+
+Como
+
+$$
+\mathbf{X}_c^{\top}\mathbf{X}_c
+=
+(n-1)\mathbf{S},
+$$
+
+tem-se
+
+$$
+\|\mathbf{X}_c\|_F^2
+=
+(n-1)
+\operatorname{tr}(\mathbf{S}).
+$$
+
+Portanto,
+
+$$
+\sum_{j=1}^{r}d_j^2
+=
+(n-1)
+\operatorname{tr}(\mathbf{S}).
+$$
+
+A soma dos quadrados dos valores singulares de $\mathbf{X}_c$ corresponde à dispersão quadrática total da nuvem em torno da média, multiplicada por $n-1$.
+
+Essa interpretação depende da centralização. Para uma matriz de dados não centralizada,
+
+$$
+\|\mathbf{X}\|_F^2
+$$
+
+mede a soma dos quadrados em relação à origem, e não a dispersão em relação ao vetor de médias.
+
+::: {#exm-svd-matriz-dados}
+## Coordenadas singulares de uma matriz de dados
+
+Considere a matriz
+
+$$
+\mathbf{X}
+=
+\begin{bmatrix}
+1&1\\
+1&-1\\
+1&1
+\end{bmatrix},
+$$
+
+cuja SVD compacta é
+
+$$
+\mathbf{X}
+=
+\mathbf{U}_2
+\mathbf{D}_2
+\mathbf{V}_2^{\top},
+$$
+
+com
+
+$$
+\mathbf{U}_2
+=
+\begin{bmatrix}
+1/\sqrt{2}&0\\
+0&1\\
+1/\sqrt{2}&0
+\end{bmatrix},
+$$
+
+$$
+\mathbf{D}_2
+=
+\begin{bmatrix}
+2&0\\
+0&\sqrt{2}
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{V}_2
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1&1\\
+1&-1
+\end{bmatrix}.
+$$
+
+As coordenadas das observações nas direções singulares à direita são
+
+$$
+\begin{aligned}
+\mathbf{Z}
+&=
+\mathbf{X}\mathbf{V}_2\\
+&=
+\mathbf{U}_2\mathbf{D}_2\\
+&=
+\begin{bmatrix}
+\sqrt{2}&0\\
+0&\sqrt{2}\\
+\sqrt{2}&0
+\end{bmatrix}.
+\end{aligned}
+$$
+
+A primeira e a terceira observações possuem as mesmas coordenadas, pois suas linhas originais são iguais.
+
+Além disso,
+
+$$
+\mathbf{Z}\mathbf{Z}^{\top}
+=
+\begin{bmatrix}
+2&0&2\\
+0&2&0\\
+2&0&2
+\end{bmatrix}
+=
+\mathbf{X}\mathbf{X}^{\top}.
+$$
+
+Portanto, os produtos internos e as distâncias entre as observações são preservados pela representação nas duas direções singulares positivas.
+
+Nesse exemplo,
+
+$$
+r=p=2.
+$$
+
+Por isso, a transformação por $\mathbf{V}_2$ representa apenas uma mudança ortogonal de coordenadas no espaço das variáveis. Não ocorre redução exata da dimensão.
+
+Se o posto fosse menor que $p$, a representação por $\mathbf{Z}$ utilizaria menos colunas que a matriz original e ainda preservaria exatamente a geometria da nuvem.
+:::
+
+### Representação exata e aproximação
+
+A SVD compacta produz a representação exata
+
+$$
+\mathbf{X}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}.
+$$
+
+Quando todas as $r$ direções associadas a valores singulares positivos são mantidas:
+
+-   a matriz é reconstruída exatamente;
+-   os produtos internos entre observações são preservados;
+-   as distâncias euclidianas entre observações são preservadas;
+-   nenhuma parcela da norma de Frobenius é descartada.
+
+Uma representação de dimensão ainda menor utiliza somente os primeiros $k$ valores singulares, com
+
+$$
+k<r.
+$$
+
+Nesse caso, a reconstrução deixa de ser exata. A forma expandida da SVD permite identificar a contribuição de cada direção e quantificar o erro produzido pelo truncamento.
+
+## Forma expandida e aproximações de posto reduzido
+
+A SVD compacta pode ser desenvolvida como uma soma de matrizes de posto 1. Se
+
+$$
+\mathbf{A}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top},
+$$
+
+então
+
+$$
+\mathbf{U}_r
+=
+\begin{bmatrix}
+\mathbf{u}_1&
+\cdots&
+\mathbf{u}_r
+\end{bmatrix},
+$$
+
+$$
+\mathbf{D}_r
+=
+\operatorname{diag}
+\left(
+d_1,\ldots,d_r
+\right)
+$$
+
+e
+
+$$
+\mathbf{V}_r
+=
+\begin{bmatrix}
+\mathbf{v}_1&
+\cdots&
+\mathbf{v}_r
+\end{bmatrix}.
+$$
+
+Efetuando o produto,
+
+$$
+\mathbf{A}
+=
+\sum_{j=1}^{r}
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}.
+$$
+
+Essa expressão é denominada **forma expandida da SVD**.
+
+Cada parcela
+
+$$
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+$$
+
+representa a contribuição do $j$-ésimo par de direções singulares.
+
+### Parcelas de posto 1
+
+Considere a matriz
+
+$$
+\mathbf{u}_j
+\mathbf{v}_j^{\top}.
+$$
+
+Suas colunas são múltiplos de $\mathbf{u}_j$:
+
+$$
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+=
+\begin{bmatrix}
+v_{1j}\mathbf{u}_j&
+\cdots&
+v_{pj}\mathbf{u}_j
+\end{bmatrix}.
+$$
+
+Como $\mathbf{u}_j$ e $\mathbf{v}_j$ são não nulos,
+
+$$
+\operatorname{posto}
+\left(
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+\right)
+=
+1.
+$$
+
+A matriz original é, portanto, construída pela soma de $r$ estruturas de posto 1:
+
+$$
+\mathbf{A}
+=
+d_1
+\mathbf{u}_1
+\mathbf{v}_1^{\top}
++
+\cdots
++
+d_r
+\mathbf{u}_r
+\mathbf{v}_r^{\top}.
+$$
+
+Os valores singulares determinam a magnitude de cada parcela. Como
+
+$$
+d_1
+\geq
+\cdots
+\geq
+d_r
+>
+0,
+$$
+
+as parcelas são organizadas em ordem decrescente segundo sua contribuição para as normas espectral e de Frobenius.
+
+### Ortogonalidade das parcelas
+
+As matrizes
+
+$$
+\mathbf{u}_i
+\mathbf{v}_i^{\top}
+$$
+
+e
+
+$$
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+$$
+
+são ortogonais segundo o produto interno de Frobenius quando $i\neq j$.
+
+De fato,
+
+$$
+\begin{aligned}
+\left\langle
+\mathbf{u}_i\mathbf{v}_i^{\top},
+\mathbf{u}_j\mathbf{v}_j^{\top}
+\right\rangle_F
+&=
+\operatorname{tr}
+\left[
+\left(
+\mathbf{u}_i\mathbf{v}_i^{\top}
+\right)^{\top}
+\left(
+\mathbf{u}_j\mathbf{v}_j^{\top}
+\right)
+\right]\\
+&=
+\operatorname{tr}
+\left(
+\mathbf{v}_i
+\mathbf{u}_i^{\top}
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+\right)\\
+&=
+\left(
+\mathbf{u}_i^{\top}\mathbf{u}_j
+\right)
+\operatorname{tr}
+\left(
+\mathbf{v}_i\mathbf{v}_j^{\top}
+\right)\\
+&=
+\left(
+\mathbf{u}_i^{\top}\mathbf{u}_j
+\right)
+\left(
+\mathbf{v}_j^{\top}\mathbf{v}_i
+\right).
+\end{aligned}
+$$
+
+Como os vetores singulares são ortonormais,
+
+$$
+\mathbf{u}_i^{\top}\mathbf{u}_j
+=
+0
+$$
+
+e
+
+$$
+\mathbf{v}_j^{\top}\mathbf{v}_i
+=
+0
+$$
+
+quando $i\neq j$. Logo,
+
+$$
+\left\langle
+\mathbf{u}_i\mathbf{v}_i^{\top},
+\mathbf{u}_j\mathbf{v}_j^{\top}
+\right\rangle_F
+=
+0.
+$$
+
+Além disso,
+
+$$
+\begin{aligned}
+\left\|
+\mathbf{u}_j\mathbf{v}_j^{\top}
+\right\|_F^2
+&=
+\left\langle
+\mathbf{u}_j\mathbf{v}_j^{\top},
+\mathbf{u}_j\mathbf{v}_j^{\top}
+\right\rangle_F\\
+&=
+\left(
+\mathbf{u}_j^{\top}\mathbf{u}_j
+\right)
+\left(
+\mathbf{v}_j^{\top}\mathbf{v}_j
+\right)\\
+&=
+1.
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+\left\|
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+\right\|_F
+=
+d_j.
+$$
+
+A identidade
+
+$$
+\|\mathbf{A}\|_F^2
+=
+\sum_{j=1}^{r}d_j^2
+$$
+
+pode ser interpretada como uma decomposição pitagórica da magnitude quadrática total da matriz.
+
+### SVD truncada
+
+A forma expandida permite construir aproximações conservando somente as primeiras parcelas.
+
+::: {#def-svd-truncada}
+## SVD truncada
+
+Seja
+
+$$
+\mathbf{A}
+=
+\sum_{j=1}^{r}
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+$$
+
+a SVD compacta expandida de uma matriz de posto $r$.
+
+Para
+
+$$
+1\leq k<r,
+$$
+
+a **SVD truncada no posto** $k$ é
+
+$$
+\mathbf{A}_k
+=
+\sum_{j=1}^{k}
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}.
+$$
+
+Equivalentemente,
+
+$$
+\mathbf{A}_k
+=
+\mathbf{U}_k
+\mathbf{D}_k
+\mathbf{V}_k^{\top}.
+$$
+:::
+
+Como as colunas de $\mathbf{U}_k$ e $\mathbf{V}_k$ são linearmente independentes e os elementos diagonais de $\mathbf{D}_k$ são positivos,
+
+$$
+\operatorname{posto}(\mathbf{A}_k)
+=
+k.
+$$
+
+A diferença entre a matriz original e sua aproximação é
+
+$$
+\mathbf{A}
+-
+\mathbf{A}_k
+=
+\sum_{j=k+1}^{r}
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}.
+$$
+
+A matriz $\mathbf{A}_k$ conserva as direções associadas aos $k$ maiores valores singulares. A diferença reúne as direções descartadas.
+
+### Ortogonalidade entre aproximação e diferença
+
+Como as parcelas singulares são ortogonais segundo o produto interno de Frobenius,
+
+$$
+\left\langle
+\mathbf{A}_k,
+\mathbf{A}
+-
+\mathbf{A}_k
+\right\rangle_F
+=
+0.
+$$
+
+Consequentemente,
+
+$$
+\|\mathbf{A}\|_F^2
+=
+\|\mathbf{A}_k\|_F^2
++
+\left\|
+\mathbf{A}
+-
+\mathbf{A}_k
+\right\|_F^2.
+$$
+
+As duas parcelas são
+
+$$
+\|\mathbf{A}_k\|_F^2
+=
+\sum_{j=1}^{k}d_j^2
+$$
+
+e
+
+$$
+\left\|
+\mathbf{A}
+-
+\mathbf{A}_k
+\right\|_F^2
+=
+\sum_{j=k+1}^{r}d_j^2.
+$$
+
+A razão
+
+$$
+\frac{
+\|\mathbf{A}_k\|_F^2
+}{
+\|\mathbf{A}\|_F^2
+}
+=
+\frac{
+\sum_{j=1}^{k}d_j^2
+}{
+\sum_{j=1}^{r}d_j^2
+}
+$$
+
+mede a proporção da magnitude quadrática da matriz preservada pela aproximação.
+
+A parcela descartada é
+
+$$
+\frac{
+\left\|
+\mathbf{A}
+-
+\mathbf{A}_k
+\right\|_F^2
+}{
+\|\mathbf{A}\|_F^2
+}
+=
+\frac{
+\sum_{j=k+1}^{r}d_j^2
+}{
+\sum_{j=1}^{r}d_j^2
+}.
+$$
+
+As duas proporções somam 1.
+
+Para uma matriz genérica, essas quantidades devem ser interpretadas em termos da norma de Frobenius. Quando $\mathbf{A}$ é uma matriz de dados centralizada, elas também podem ser relacionadas à dispersão total da nuvem de observações.
+
+### Erro na norma espectral
+
+O maior valor singular da diferença
+
+$$
+\mathbf{A}
+-
+\mathbf{A}_k
+=
+\sum_{j=k+1}^{r}
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+$$
+
+é
+
+$$
+d_{k+1}.
+$$
+
+Portanto,
+
+$$
+\left\|
+\mathbf{A}
+-
+\mathbf{A}_k
+\right\|_2
+=
+d_{k+1}.
+$$
+
+Esse erro mede a maior diferença entre a ação de $\mathbf{A}$ e a ação de $\mathbf{A}_k$ sobre um vetor unitário:
+
+$$
+\left\|
+\mathbf{A}
+-
+\mathbf{A}_k
+\right\|_2
+=
+\max_{\|\mathbf{x}\|=1}
+\left\|
+\left(
+\mathbf{A}
+-
+\mathbf{A}_k
+\right)
+\mathbf{x}
+\right\|.
+$$
+
+A direção em que o erro máximo é atingido é
+
+$$
+\mathbf{v}_{k+1},
+$$
+
+pois
+
+$$
+\left(
+\mathbf{A}
+-
+\mathbf{A}_k
+\right)
+\mathbf{v}_{k+1}
+=
+d_{k+1}\mathbf{u}_{k+1}.
+$$
+
+### Teorema de Eckart--Young--Mirsky
+
+A SVD truncada não é somente uma forma conveniente de produzir uma matriz de posto menor. Ela fornece uma aproximação ótima.
+
+::: {#thm-eckart-young-mirsky}
+## Teorema de Eckart--Young--Mirsky
+
+Seja
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{q\times p}
+$$
+
+uma matriz de posto $r$, com valores singulares
+
+$$
+d_1
+\geq
+\cdots
+\geq
+d_r
+>
+0.
+$$
+
+Para
+
+$$
+1\leq k<r,
+$$
+
+defina
+
+$$
+\mathbf{A}_k
+=
+\sum_{j=1}^{k}
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}.
+$$
+
+Então $\mathbf{A}_k$ é uma solução dos problemas
+
+$$
+\min_{
+\operatorname{posto}
+\left(
+\widetilde{\mathbf{A}}
+\right)
+\leq k
+}
+\left\|
+\mathbf{A}
+-
+\widetilde{\mathbf{A}}
+\right\|_2
+$$
+
+e
+
+$$
+\min_{
+\operatorname{posto}
+\left(
+\widetilde{\mathbf{A}}
+\right)
+\leq k
+}
+\left\|
+\mathbf{A}
+-
+\widetilde{\mathbf{A}}
+\right\|_F.
+$$
+
+Os erros mínimos são
+
+$$
+\min_{
+\operatorname{posto}
+\left(
+\widetilde{\mathbf{A}}
+\right)
+\leq k
+}
+\left\|
+\mathbf{A}
+-
+\widetilde{\mathbf{A}}
+\right\|_2
+=
+d_{k+1}
+$$
+
+e
+
+$$
+\min_{
+\operatorname{posto}
+\left(
+\widetilde{\mathbf{A}}
+\right)
+\leq k
+}
+\left\|
+\mathbf{A}
+-
+\widetilde{\mathbf{A}}
+\right\|_F
+=
+\sqrt{
+\sum_{j=k+1}^{r}d_j^2
+}.
+$$
+
+[@golub2013matrix]
+:::
+
+::: proof
+Considere inicialmente a norma espectral e uma matriz arbitrária
+
+$$
+\widetilde{\mathbf{A}}
+$$
+
+com
+
+$$
+\operatorname{posto}
+\left(
+\widetilde{\mathbf{A}}
+\right)
+\leq k.
+$$
+
+Defina o subespaço
+
+$$
+\mathcal{S}_{k+1}
+=
+\operatorname{span}
+\left\{
+\mathbf{v}_1,\ldots,\mathbf{v}_{k+1}
+\right\}.
+$$
+
+Como
+
+$$
+\dim
+\left(
+\mathcal{S}_{k+1}
+\right)
+=
+k+1
+$$
+
+e a restrição de $\widetilde{\mathbf{A}}$ a esse subespaço possui imagem de dimensão no máximo $k$, existe um vetor unitário
+
+$$
+\mathbf{x}
+\in
+\mathcal{S}_{k+1}
+$$
+
+tal que
+
+$$
+\widetilde{\mathbf{A}}\mathbf{x}
+=
+\mathbf{0}.
+$$
+
+Escreva
+
+$$
+\mathbf{x}
+=
+\sum_{j=1}^{k+1}
+\alpha_j\mathbf{v}_j,
+$$
+
+com
+
+$$
+\sum_{j=1}^{k+1}\alpha_j^2
+=
+1.
+$$
+
+Então,
+
+$$
+\begin{aligned}
+\left\|
+\left(
+\mathbf{A}
+-
+\widetilde{\mathbf{A}}
+\right)
+\mathbf{x}
+\right\|^2
+&=
+\|\mathbf{A}\mathbf{x}\|^2\\
+&=
+\sum_{j=1}^{k+1}
+d_j^2\alpha_j^2\\
+&\geq
+d_{k+1}^2
+\sum_{j=1}^{k+1}\alpha_j^2\\
+&=
+d_{k+1}^2.
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\left\|
+\mathbf{A}
+-
+\widetilde{\mathbf{A}}
+\right\|_2
+\geq
+d_{k+1}.
+$$
+
+Para a SVD truncada,
+
+$$
+\left\|
+\mathbf{A}
+-
+\mathbf{A}_k
+\right\|_2
+=
+d_{k+1}.
+$$
+
+Portanto, $\mathbf{A}_k$ atinge o limite inferior e é uma solução ótima na norma espectral.
+
+Para a norma de Frobenius, considere o projetor ortogonal
+
+$$
+\mathbf{P}
+$$
+
+sobre o espaço coluna de $\widetilde{\mathbf{A}}$. Como
+
+$$
+\operatorname{posto}
+\left(
+\widetilde{\mathbf{A}}
+\right)
+\leq k,
+$$
+
+tem-se
+
+$$
+\operatorname{posto}(\mathbf{P})
+\leq k.
+$$
+
+Além disso,
+
+$$
+\mathbf{P}
+\widetilde{\mathbf{A}}
+=
+\widetilde{\mathbf{A}}.
+$$
+
+A diferença pode ser decomposta como
+
+$$
+\mathbf{A}
+-
+\widetilde{\mathbf{A}}
+=
+\left(
+\mathbf{I}_q-\mathbf{P}
+\right)
+\mathbf{A}
++
+\left(
+\mathbf{P}\mathbf{A}
+-
+\widetilde{\mathbf{A}}
+\right).
+$$
+
+As duas parcelas são ortogonais segundo o produto interno de Frobenius, pois a primeira possui colunas no complemento ortogonal de $\mathcal{C}(\mathbf{P})$, enquanto a segunda possui colunas em $\mathcal{C}(\mathbf{P})$.
+
+Assim,
+
+$$
+\begin{aligned}
+\left\|
+\mathbf{A}
+-
+\widetilde{\mathbf{A}}
+\right\|_F^2
+&=
+\left\|
+\left(
+\mathbf{I}_q-\mathbf{P}
+\right)
+\mathbf{A}
+\right\|_F^2\\
+&\quad+
+\left\|
+\mathbf{P}\mathbf{A}
+-
+\widetilde{\mathbf{A}}
+\right\|_F^2\\
+&\geq
+\left\|
+\left(
+\mathbf{I}_q-\mathbf{P}
+\right)
+\mathbf{A}
+\right\|_F^2.
+\end{aligned}
+$$
+
+A primeira parcela pode ser escrita como
+
+$$
+\begin{aligned}
+\left\|
+\left(
+\mathbf{I}_q-\mathbf{P}
+\right)
+\mathbf{A}
+\right\|_F^2
+&=
+\|\mathbf{A}\|_F^2
+-
+\|\mathbf{P}\mathbf{A}\|_F^2.
+\end{aligned}
+$$
+
+Considere uma base ortonormal
+
+$$
+\mathbf{w}_1,\ldots,\mathbf{w}_s,
+\qquad
+s\leq k,
+$$
+
+do espaço projetado por $\mathbf{P}$. Então,
+
+$$
+\mathbf{P}
+=
+\sum_{i=1}^{s}
+\mathbf{w}_i\mathbf{w}_i^{\top}
+$$
+
+e
+
+$$
+\begin{aligned}
+\|\mathbf{P}\mathbf{A}\|_F^2
+&=
+\operatorname{tr}
+\left(
+\mathbf{P}
+\mathbf{A}\mathbf{A}^{\top}
+\right)\\
+&=
+\sum_{i=1}^{s}
+\mathbf{w}_i^{\top}
+\mathbf{A}\mathbf{A}^{\top}
+\mathbf{w}_i.
+\end{aligned}
+$$
+
+Expandindo os vetores $\mathbf{w}_i$ na base dos vetores singulares à esquerda, obtém-se
+
+$$
+\|\mathbf{P}\mathbf{A}\|_F^2
+=
+\sum_{j=1}^{r}
+c_jd_j^2,
+$$
+
+em que
+
+$$
+0\leq c_j\leq1
+$$
+
+e
+
+$$
+\sum_{j=1}^{r}c_j
+\leq k.
+$$
+
+Como os valores singulares estão ordenados,
+
+$$
+\|\mathbf{P}\mathbf{A}\|_F^2
+\leq
+\sum_{j=1}^{k}d_j^2.
+$$
+
+Portanto,
+
+$$
+\begin{aligned}
+\left\|
+\mathbf{A}
+-
+\widetilde{\mathbf{A}}
+\right\|_F^2
+&\geq
+\|\mathbf{A}\|_F^2
+-
+\sum_{j=1}^{k}d_j^2\\
+&=
+\sum_{j=k+1}^{r}d_j^2.
+\end{aligned}
+$$
+
+Para
+
+$$
+\mathbf{P}
+=
+\mathbf{U}_k\mathbf{U}_k^{\top},
+$$
+
+tem-se
+
+$$
+\mathbf{P}\mathbf{A}
+=
+\mathbf{A}_k.
+$$
+
+Além disso,
+
+$$
+\left\|
+\mathbf{A}
+-
+\mathbf{A}_k
+\right\|_F^2
+=
+\sum_{j=k+1}^{r}d_j^2.
+$$
+
+Logo, $\mathbf{A}_k$ também atinge o limite inferior na norma de Frobenius.
+:::
+
+O teorema mostra que nenhum outro procedimento pode produzir uma matriz de posto no máximo $k$ com erro menor nas duas normas consideradas.
+
+### Unicidade da aproximação
+
+A existência de uma aproximação ótima não implica sempre unicidade.
+
+Na norma de Frobenius, a aproximação de posto $k$ é única quando
+
+$$
+d_k
+>
+d_{k+1}.
+$$
+
+Se
+
+$$
+d_k
+=
+d_{k+1},
+$$
+
+o limite de truncamento atravessa um subespaço singular associado a um valor repetido. Nesse caso, diferentes escolhas de bases e subespaços dentro desse bloco podem produzir aproximações ótimas distintas.
+
+Na norma espectral, $\mathbf{A}_k$ é uma aproximação ótima, mas outras matrizes de posto no máximo $k$ também podem atingir o mesmo erro. A unicidade não deve ser presumida apenas pela existência de uma separação entre valores singulares.
+
+Quando
+
+$$
+k\geq r,
+$$
+
+a aproximação exata é
+
+$$
+\mathbf{A}_k
+=
+\mathbf{A},
+$$
+
+e o erro é zero.
+
+### Exemplo de aproximação de posto 1
+
+::: {#exm-aproximacao-posto-um}
+## Aproximação de posto 1 do exemplo condutor
+
+Considere novamente
+
+$$
+\mathbf{A}
+=
+\begin{bmatrix}
+1&1\\
+1&-1\\
+1&1
+\end{bmatrix}.
+$$
+
+Sua forma expandida é
+
+$$
+\mathbf{A}
+=
+2
+\mathbf{u}_1
+\mathbf{v}_1^{\top}
++
+\sqrt{2}
+\mathbf{u}_2
+\mathbf{v}_2^{\top},
+$$
+
+em que
+
+$$
+\mathbf{u}_1
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+0\\
+1
+\end{bmatrix},
+\qquad
+\mathbf{v}_1
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+1
+\end{bmatrix},
+$$
+
+e
+
+$$
+\mathbf{u}_2
+=
+\begin{bmatrix}
+0\\
+1\\
+0
+\end{bmatrix},
+\qquad
+\mathbf{v}_2
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+-1
+\end{bmatrix}.
+$$
+
+A aproximação de posto 1 é
+
+$$
+\begin{aligned}
+\mathbf{A}_1
+&=
+2
+\mathbf{u}_1
+\mathbf{v}_1^{\top}\\
+&=
+2
+\left(
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+0\\
+1
+\end{bmatrix}
+\right)
+\left(
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1&1
+\end{bmatrix}
+\right)\\
+&=
+\begin{bmatrix}
+1&1\\
+0&0\\
+1&1
+\end{bmatrix}.
+\end{aligned}
+$$
+
+A diferença entre a matriz original e a aproximação é
+
+$$
+\begin{aligned}
+\mathbf{A}
+-
+\mathbf{A}_1
+&=
+\begin{bmatrix}
+0&0\\
+1&-1\\
+0&0
+\end{bmatrix}.
+\end{aligned}
+$$
+
+Como
+
+$$
+d_1=2
+$$
+
+e
+
+$$
+d_2=\sqrt{2},
+$$
+
+o erro espectral é
+
+$$
+\left\|
+\mathbf{A}
+-
+\mathbf{A}_1
+\right\|_2
+=
+\sqrt{2}.
+$$
+
+O erro de Frobenius também é
+
+$$
+\left\|
+\mathbf{A}
+-
+\mathbf{A}_1
+\right\|_F
+=
+\sqrt{2},
+$$
+
+pois somente um valor singular foi descartado.
+
+A magnitude quadrática total é
+
+$$
+\|\mathbf{A}\|_F^2
+=
+2^2
++
+\left(
+\sqrt{2}
+\right)^2
+=
+6.
+$$
+
+A aproximação preserva
+
+$$
+\|\mathbf{A}_1\|_F^2
+=
+2^2
+=
+4.
+$$
+
+Portanto, a proporção preservada é
+
+$$
+\frac{
+\|\mathbf{A}_1\|_F^2
+}{
+\|\mathbf{A}\|_F^2
+}
+=
+\frac{4}{6}
+=
+\frac{2}{3}.
+$$
+
+A primeira parcela reproduz exatamente a primeira e a terceira linhas da matriz. A segunda linha está inteiramente associada à direção singular descartada.
+:::
+
+### Aproximação de uma matriz de dados
+
+Se
+
+$$
+\mathbf{X}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+$$
+
+é uma matriz de dados, sua aproximação de posto $k$ é
+
+$$
+\mathbf{X}_k
+=
+\mathbf{U}_k
+\mathbf{D}_k
+\mathbf{V}_k^{\top}.
+$$
+
+Definindo
+
+$$
+\mathbf{Z}_k
+=
+\mathbf{X}\mathbf{V}_k,
+$$
+
+tem-se
+
+$$
+\mathbf{Z}_k
+=
+\mathbf{U}_k\mathbf{D}_k
+$$
+
+e
+
+$$
+\mathbf{X}_k
+=
+\mathbf{Z}_k
+\mathbf{V}_k^{\top}.
+$$
+
+A matriz $\mathbf{Z}_k$ fornece uma representação das observações em $k$ coordenadas. A multiplicação por $\mathbf{V}_k^{\top}$ reconstrói uma aproximação das variáveis originais.
+
+Para a observação $i$,
+
+$$
+\widehat{\mathbf{x}}_{i,k}
+=
+\sum_{j=1}^{k}
+z_{ij}\mathbf{v}_j.
+$$
+
+O vetor residual é
+
+$$
+\mathbf{x}_i
+-
+\widehat{\mathbf{x}}_{i,k}
+=
+\sum_{j=k+1}^{r}
+z_{ij}\mathbf{v}_j.
+$$
+
+A SVD truncada escolhe o subespaço de dimensão $k$ que minimiza a soma dos erros quadráticos de reconstrução de todas as observações:
+
+$$
+\|\mathbf{X}-\mathbf{X}_k\|_F^2
+=
+\sum_{i=1}^{n}
+\left\|
+\mathbf{x}_i
+-
+\widehat{\mathbf{x}}_{i,k}
+\right\|^2.
+$$
+
+Quando $\mathbf{X}$ está centralizada,
+
+$$
+\frac{
+\sum_{j=1}^{k}d_j^2
+}{
+\sum_{j=1}^{r}d_j^2
+}
+$$
+
+representa a parcela da dispersão quadrática total preservada pelas primeiras $k$ direções singulares.
+
+Essa estrutura será retomada posteriormente na formulação de técnicas de redução de dimensionalidade. Neste capítulo, o resultado deve ser interpretado como uma propriedade geral da aproximação matricial de posto reduzido.
+
+A SVD truncada descarta direções associadas a valores singulares menores. A pseudoinversa realiza uma operação diferente: ela conserva as direções associadas a valores singulares positivos e inverte os respectivos fatores de escala.
+
+## Pseudoinversa e soluções de mínimos quadrados
+
+A inversa usual é definida somente para matrizes quadradas e invertíveis. A SVD permite construir uma transformação inversa generalizada para qualquer matriz real, inclusive matrizes:
+
+-   retangulares;
+-   singulares;
+-   deficientes em posto.
+
+Essa transformação é a **pseudoinversa de Moore--Penrose**.
+
+Considere
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{q\times p}
+$$
+
+com posto
+
+$$
+r
+=
+\operatorname{posto}(\mathbf{A})
+$$
+
+e SVD compacta
+
+$$
+\mathbf{A}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}.
+$$
+
+Como todos os elementos diagonais de
+
+$$
+\mathbf{D}_r
+=
+\operatorname{diag}
+\left(
+d_1,\ldots,d_r
+\right)
+$$
+
+são positivos, a matriz
+
+$$
+\mathbf{D}_r^{-1}
+=
+\operatorname{diag}
+\left(
+\frac{1}{d_1},
+\ldots,
+\frac{1}{d_r}
+\right)
+$$
+
+está bem definida.
+
+::: {#def-pseudoinversa-svd}
+## Pseudoinversa de Moore--Penrose
+
+A **pseudoinversa de Moore--Penrose** de
+
+$$
+\mathbf{A}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+$$
+
+é a matriz
+
+$$
+\mathbf{A}^{+}
+=
+\mathbf{V}_r
+\mathbf{D}_r^{-1}
+\mathbf{U}_r^{\top}.
+$$
+
+Sua dimensão é
+
+$$
+\mathbf{A}^{+}
+\in
+\mathbb{R}^{p\times q}.
+$$
+:::
+
+A pseudoinversa inverte os escalonamentos associados aos valores singulares positivos:
+
+$$
+\mathbf{A}^{+}\mathbf{u}_j
+=
+\frac{1}{d_j}\mathbf{v}_j,
+\qquad
+j=1,\ldots,r.
+$$
+
+As componentes pertencentes ao núcleo de $\mathbf{A}^{\top}$ são anuladas. Se
+
+$$
+\mathbf{u}
+\in
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right),
+$$
+
+então
+
+$$
+\mathbf{A}^{+}\mathbf{u}
+=
+\mathbf{0}.
+$$
+
+Portanto, a pseudoinversa desfaz a ação de $\mathbf{A}$ somente nas direções efetivamente representadas pela transformação.
+
+### Relação com a pseudoinversa espectral
+
+No capítulo anterior, a pseudoinversa de uma matriz simétrica foi definida por meio da decomposição espectral.
+
+Se
+
+$$
+\mathbf{A}
+=
+\mathbf{Q}_{\mathbf{A}}
+\boldsymbol{\Lambda}_{\mathbf{A}}
+\mathbf{Q}_{\mathbf{A}}^{\top}
+$$
+
+é simétrica, a definição espectral produz
+
+$$
+\mathbf{A}^{+}
+=
+\mathbf{Q}_{\mathbf{A}}
+\boldsymbol{\Lambda}_{\mathbf{A}}^{+}
+\mathbf{Q}_{\mathbf{A}}^{\top},
+$$
+
+em que cada autovalor não nulo é substituído por seu inverso.
+
+A definição pela SVD coincide com essa construção, mas permanece válida quando $\mathbf{A}$ não é simétrica ou é retangular.
+
+Se $\mathbf{A}$ é quadrada e invertível, todos os valores singulares são positivos e
+
+$$
+\mathbf{A}^{+}
+=
+\mathbf{A}^{-1}.
+$$
+
+Assim, a pseudoinversa generaliza a inversa usual.
+
+### Condições de Moore--Penrose
+
+A pseudoinversa é caracterizada por quatro identidades.
+
+::: {#thm-condicoes-moore-penrose}
+## Condições de Moore--Penrose
+
+Para toda matriz real $\mathbf{A}$, existe uma única matriz $\mathbf{A}^{+}$ que satisfaz
+
+$$
+\mathbf{A}
+\mathbf{A}^{+}
+\mathbf{A}
+=
+\mathbf{A},
+$$
+
+$$
+\mathbf{A}^{+}
+\mathbf{A}
+\mathbf{A}^{+}
+=
+\mathbf{A}^{+},
+$$
+
+$$
+\left(
+\mathbf{A}\mathbf{A}^{+}
+\right)^{\top}
+=
+\mathbf{A}\mathbf{A}^{+},
+$$
+
+e
+
+$$
+\left(
+\mathbf{A}^{+}\mathbf{A}
+\right)^{\top}
+=
+\mathbf{A}^{+}\mathbf{A}.
+$$
+
+[@golub2013matrix]
+:::
+
+::: proof
+Pela SVD compacta,
+
+$$
+\mathbf{A}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+$$
+
+e
+
+$$
+\mathbf{A}^{+}
+=
+\mathbf{V}_r
+\mathbf{D}_r^{-1}
+\mathbf{U}_r^{\top}.
+$$
+
+Então,
+
+$$
+\begin{aligned}
+\mathbf{A}
+\mathbf{A}^{+}
+\mathbf{A}
+&=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+\mathbf{V}_r
+\mathbf{D}_r^{-1}
+\mathbf{U}_r^{\top}
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}\\
+&=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}\\
+&=
+\mathbf{A}.
+\end{aligned}
+$$
+
+De modo semelhante,
+
+$$
+\begin{aligned}
+\mathbf{A}^{+}
+\mathbf{A}
+\mathbf{A}^{+}
+&=
+\mathbf{V}_r
+\mathbf{D}_r^{-1}
+\mathbf{U}_r^{\top}
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+\mathbf{V}_r
+\mathbf{D}_r^{-1}
+\mathbf{U}_r^{\top}\\
+&=
+\mathbf{V}_r
+\mathbf{D}_r^{-1}
+\mathbf{U}_r^{\top}\\
+&=
+\mathbf{A}^{+}.
+\end{aligned}
+$$
+
+Além disso,
+
+$$
+\mathbf{A}\mathbf{A}^{+}
+=
+\mathbf{U}_r
+\mathbf{U}_r^{\top}
+$$
+
+e
+
+$$
+\mathbf{A}^{+}\mathbf{A}
+=
+\mathbf{V}_r
+\mathbf{V}_r^{\top},
+$$
+
+que são matrizes simétricas. Portanto, a matriz definida pela SVD satisfaz as quatro condições de Moore--Penrose.
+
+Para demonstrar a unicidade, suponha que
+
+$$
+\mathbf{G}
+\in
+\mathbb{R}^{p\times q}
+$$
+
+também satisfaça as quatro condições.
+
+A matriz $\mathbf{A}\mathbf{G}$ é simétrica e
+
+$$
+\begin{aligned}
+\left(
+\mathbf{A}\mathbf{G}
+\right)^2
+&=
+\mathbf{A}\mathbf{G}
+\mathbf{A}\mathbf{G}\\
+&=
+\left(
+\mathbf{A}\mathbf{G}\mathbf{A}
+\right)
+\mathbf{G}\\
+&=
+\mathbf{A}\mathbf{G}.
+\end{aligned}
+$$
+
+Logo, $\mathbf{A}\mathbf{G}$ é um projetor ortogonal.
+
+Sua imagem está contida em $\mathcal{C}(\mathbf{A})$. Além disso, se
+
+$$
+\mathbf{y}
+=
+\mathbf{A}\mathbf{x}
+\in
+\mathcal{C}(\mathbf{A}),
+$$
+
+então
+
+$$
+\mathbf{A}\mathbf{G}\mathbf{y}
+=
+\mathbf{A}\mathbf{G}\mathbf{A}\mathbf{x}
+=
+\mathbf{A}\mathbf{x}
+=
+\mathbf{y}.
+$$
+
+Portanto,
+
+$$
+\mathbf{A}\mathbf{G}
+=
+\mathbf{P}_{\mathcal{C}(\mathbf{A})}
+=
+\mathbf{U}_r\mathbf{U}_r^{\top}.
+$$
+
+De maneira análoga, $\mathbf{G}\mathbf{A}$ é simétrica e idempotente.
+
+Se
+
+$$
+\mathbf{x}
+\in
+\mathcal{N}(\mathbf{A}),
+$$
+
+então
+
+$$
+\mathbf{G}\mathbf{A}\mathbf{x}
+=
+\mathbf{0}.
+$$
+
+Reciprocamente, se
+
+$$
+\mathbf{G}\mathbf{A}\mathbf{x}
+=
+\mathbf{0},
+$$
+
+então
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\mathbf{A}\mathbf{G}\mathbf{A}\mathbf{x}
+=
+\mathbf{0}.
+$$
+
+Logo,
+
+$$
+\mathcal{N}
+\left(
+\mathbf{G}\mathbf{A}
+\right)
+=
+\mathcal{N}(\mathbf{A}).
+$$
+
+Como $\mathbf{G}\mathbf{A}$ é um projetor ortogonal,
+
+$$
+\mathbf{G}\mathbf{A}
+=
+\mathbf{P}_{\mathcal{N}(\mathbf{A})^{\perp}}
+=
+\mathbf{P}_{\mathcal{C}(\mathbf{A}^{\top})}
+=
+\mathbf{V}_r\mathbf{V}_r^{\top}.
+$$
+
+Da condição
+
+$$
+\mathbf{G}\mathbf{A}\mathbf{G}
+=
+\mathbf{G},
+$$
+
+segue que
+
+$$
+\mathcal{C}(\mathbf{G})
+\subseteq
+\mathcal{C}
+\left(
+\mathbf{G}\mathbf{A}
+\right)
+=
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
+Considere agora um vetor singular à esquerda $\mathbf{u}_j$, com $j\leq r$. Como
+
+$$
+\mathbf{u}_j
+\in
+\mathcal{C}(\mathbf{A}),
+$$
+
+tem-se
+
+$$
+\mathbf{A}\mathbf{G}\mathbf{u}_j
+=
+\mathbf{u}_j.
+$$
+
+Como
+
+$$
+\mathbf{G}\mathbf{u}_j
+\in
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right),
+$$
+
+esse vetor pode ser escrito como
+
+$$
+\mathbf{G}\mathbf{u}_j
+=
+\sum_{\ell=1}^{r}
+c_{\ell}\mathbf{v}_{\ell}.
+$$
+
+Aplicando $\mathbf{A}$,
+
+$$
+\mathbf{u}_j
+=
+\sum_{\ell=1}^{r}
+c_{\ell}d_{\ell}\mathbf{u}_{\ell}.
+$$
+
+Pela unicidade das coordenadas na base ortonormal,
+
+$$
+c_{\ell}
+=
+\begin{cases}
+1/d_j,
+&
+\ell=j,\\
+0,
+&
+\ell\neq j.
+\end{cases}
+$$
+
+Portanto,
+
+$$
+\mathbf{G}\mathbf{u}_j
+=
+\frac{1}{d_j}\mathbf{v}_j.
+$$
+
+Considere, por fim,
+
+$$
+\mathbf{u}
+\in
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
+Como $\mathbf{A}\mathbf{G}$ projeta sobre $\mathcal{C}(\mathbf{A})$,
+
+$$
+\mathbf{A}\mathbf{G}\mathbf{u}
+=
+\mathbf{0}.
+$$
+
+Além disso,
+
+$$
+\mathbf{G}\mathbf{u}
+\in
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
+Como
+
+$$
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right)
+\cap
+\mathcal{N}(\mathbf{A})
+=
+\left\{
+\mathbf{0}
+\right\},
+$$
+
+segue que
+
+$$
+\mathbf{G}\mathbf{u}
+=
+\mathbf{0}.
+$$
+
+Assim, $\mathbf{G}$ atua sobre a base ortonormal formada pelas colunas de $\mathbf{U}_r$ e de $\mathbf{U}_0$ exatamente como
+
+$$
+\mathbf{V}_r
+\mathbf{D}_r^{-1}
+\mathbf{U}_r^{\top}.
+$$
+
+Logo,
+
+$$
+\mathbf{G}
+=
+\mathbf{V}_r
+\mathbf{D}_r^{-1}
+\mathbf{U}_r^{\top}
+=
+\mathbf{A}^{+}.
+$$
+
+Portanto, a pseudoinversa de Moore--Penrose existe e é única.
+:::
+
+### Pseudoinversa e projetores
+
+Os produtos
+
+$$
+\mathbf{A}\mathbf{A}^{+}
+$$
+
+e
+
+$$
+\mathbf{A}^{+}\mathbf{A}
+$$
+
+possuem interpretações geométricas distintas.
+
+Pela SVD,
+
+$$
+\begin{aligned}
+\mathbf{A}\mathbf{A}^{+}
+&=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}
+\mathbf{V}_r
+\mathbf{D}_r^{-1}
+\mathbf{U}_r^{\top}\\
+&=
+\mathbf{U}_r
+\mathbf{U}_r^{\top}.
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+\mathbf{A}\mathbf{A}^{+}
+=
+\mathbf{P}_{\mathcal{C}(\mathbf{A})},
+$$
+
+o projetor ortogonal sobre o espaço coluna de $\mathbf{A}$.
+
+De modo semelhante,
+
+$$
+\begin{aligned}
+\mathbf{A}^{+}\mathbf{A}
+&=
+\mathbf{V}_r
+\mathbf{D}_r^{-1}
+\mathbf{U}_r^{\top}
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top}\\
+&=
+\mathbf{V}_r
+\mathbf{V}_r^{\top}.
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\mathbf{A}^{+}\mathbf{A}
+=
+\mathbf{P}_{\mathcal{C}(\mathbf{A}^{\top})},
+$$
+
+o projetor ortogonal sobre o espaço linha de $\mathbf{A}$.
+
+Os complementos são
+
+$$
+\mathbf{I}_q
+-
+\mathbf{A}\mathbf{A}^{+}
+=
+\mathbf{P}_{\mathcal{N}(\mathbf{A}^{\top})}
+$$
+
+e
+
+$$
+\mathbf{I}_p
+-
+\mathbf{A}^{+}\mathbf{A}
+=
+\mathbf{P}_{\mathcal{N}(\mathbf{A})}.
+$$
+
+A @tbl-projetores-pseudoinversa resume essas relações.
+
+| Matriz                                  | Espaço projetado                 |
+|:-----------------------------------|:-----------------------------------|
+| $\mathbf{A}\mathbf{A}^{+}$              | $\mathcal{C}(\mathbf{A})$        |
+| $\mathbf{I}_q-\mathbf{A}\mathbf{A}^{+}$ | $\mathcal{N}(\mathbf{A}^{\top})$ |
+| $\mathbf{A}^{+}\mathbf{A}$              | $\mathcal{C}(\mathbf{A}^{\top})$ |
+| $\mathbf{I}_p-\mathbf{A}^{+}\mathbf{A}$ | $\mathcal{N}(\mathbf{A})$        |
+
+: Projetores ortogonais determinados pela pseudoinversa. {#tbl-projetores-pseudoinversa}
+
+### Sistemas lineares compatíveis
+
+Considere o sistema
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\mathbf{b},
+$$
+
+em que
+
+$$
+\mathbf{b}
+\in
+\mathbb{R}^{q}.
+$$
+
+O sistema é compatível quando
+
+$$
+\mathbf{b}
+\in
+\mathcal{C}(\mathbf{A}).
+$$
+
+Como
+
+$$
+\mathbf{A}\mathbf{A}^{+}
+$$
+
+é o projetor sobre esse espaço,
+
+$$
+\mathbf{b}
+\in
+\mathcal{C}(\mathbf{A})
+\iff
+\mathbf{A}\mathbf{A}^{+}\mathbf{b}
+=
+\mathbf{b}.
+$$
+
+Se o sistema é compatível, então
+
+$$
+\mathbf{x}_0
+=
+\mathbf{A}^{+}\mathbf{b}
+$$
+
+é uma solução, pois
+
+$$
+\mathbf{A}\mathbf{x}_0
+=
+\mathbf{A}\mathbf{A}^{+}\mathbf{b}
+=
+\mathbf{b}.
+$$
+
+As demais soluções são obtidas acrescentando qualquer vetor do núcleo:
+
+$$
+\mathbf{x}
+=
+\mathbf{A}^{+}\mathbf{b}
++
+\mathbf{x}_{\mathcal{N}},
+$$
+
+com
+
+$$
+\mathbf{x}_{\mathcal{N}}
+\in
+\mathcal{N}(\mathbf{A}).
+$$
+
+Utilizando a base fornecida pela SVD,
+
+$$
+\mathbf{x}_{\mathcal{N}}
+=
+\mathbf{V}_0\boldsymbol{\gamma},
+$$
+
+em que
+
+$$
+\boldsymbol{\gamma}
+\in
+\mathbb{R}^{p-r}.
+$$
+
+Portanto, o conjunto de soluções pode ser escrito como
+
+$$
+\mathbf{x}
+=
+\mathbf{A}^{+}\mathbf{b}
++
+\mathbf{V}_0\boldsymbol{\gamma}.
+$$
+
+Se
+
+$$
+r=p,
+$$
+
+então
+
+$$
+\mathcal{N}(\mathbf{A})
+=
+\left\{
+\mathbf{0}
+\right\},
+$$
+
+e a solução é única:
+
+$$
+\mathbf{x}
+=
+\mathbf{A}^{+}\mathbf{b}.
+$$
+
+### Solução de menor norma
+
+Quando um sistema compatível possui várias soluções, a pseudoinversa seleciona a solução de menor norma euclidiana.
+
+::: {#thm-solucao-compativel-menor-norma}
+## Solução compatível de menor norma
+
+Se
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\mathbf{b}
+$$
+
+é compatível, então
+
+$$
+\mathbf{x}^{\star}
+=
+\mathbf{A}^{+}\mathbf{b}
+$$
+
+é a única solução de menor norma euclidiana. [@golub2013matrix]
+:::
+
+::: proof
+Toda solução possui a forma
+
+$$
+\mathbf{x}
+=
+\mathbf{A}^{+}\mathbf{b}
++
+\mathbf{x}_{\mathcal{N}},
+$$
+
+com
+
+$$
+\mathbf{x}_{\mathcal{N}}
+\in
+\mathcal{N}(\mathbf{A}).
+$$
+
+A pseudoinversa produz um vetor no espaço linha:
+
+$$
+\mathbf{A}^{+}\mathbf{b}
+\in
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
+Como
+
+$$
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right)
+\perp
+\mathcal{N}(\mathbf{A}),
+$$
+
+tem-se
+
+$$
+\left(
+\mathbf{A}^{+}\mathbf{b}
+\right)^{\top}
+\mathbf{x}_{\mathcal{N}}
+=
+0.
+$$
+
+Pelo Teorema de Pitágoras,
+
+$$
+\|\mathbf{x}\|^2
+=
+\left\|
+\mathbf{A}^{+}\mathbf{b}
+\right\|^2
++
+\left\|
+\mathbf{x}_{\mathcal{N}}
+\right\|^2.
+$$
+
+Logo,
+
+$$
+\|\mathbf{x}\|
+\geq
+\left\|
+\mathbf{A}^{+}\mathbf{b}
+\right\|,
+$$
+
+com igualdade somente quando
+
+$$
+\mathbf{x}_{\mathcal{N}}
+=
+\mathbf{0}.
+$$
+
+Portanto,
+
+$$
+\mathbf{x}^{\star}
+=
+\mathbf{A}^{+}\mathbf{b}
+$$
+
+é a única solução de menor norma.
+:::
+
+### Sistemas incompatíveis e mínimos quadrados
+
+Quando
+
+$$
+\mathbf{b}
+\notin
+\mathcal{C}(\mathbf{A}),
+$$
+
+o sistema
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\mathbf{b}
+$$
+
+não possui solução exata.
+
+Nesse caso, procura-se um vetor $\mathbf{x}$ que minimize a distância entre $\mathbf{A}\mathbf{x}$ e $\mathbf{b}$:
+
+$$
+\min_{\mathbf{x}\in\mathbb{R}^{p}}
+\left\|
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\right\|^2.
+$$
+
+Esse é o problema de **mínimos quadrados**.
+
+::: {#def-solucao-minimos-quadrados}
+## Solução de mínimos quadrados
+
+Um vetor
+
+$$
+\widehat{\mathbf{x}}
+\in
+\mathbb{R}^{p}
+$$
+
+é uma solução de mínimos quadrados do sistema
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\mathbf{b}
+$$
+
+quando
+
+$$
+\left\|
+\mathbf{b}
+-
+\mathbf{A}\widehat{\mathbf{x}}
+\right\|
+=
+\min_{\mathbf{x}\in\mathbb{R}^{p}}
+\left\|
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\right\|.
+$$
+:::
+
+O vetor ajustado é a projeção ortogonal de $\mathbf{b}$ sobre o espaço coluna:
+
+$$
+\widehat{\mathbf{b}}
+=
+\mathbf{P}_{\mathcal{C}(\mathbf{A})}
+\mathbf{b}.
+$$
+
+Pela pseudoinversa,
+
+$$
+\widehat{\mathbf{b}}
+=
+\mathbf{A}\mathbf{A}^{+}\mathbf{b}.
+$$
+
+Uma solução de mínimos quadrados é
+
+$$
+\widehat{\mathbf{x}}
+=
+\mathbf{A}^{+}\mathbf{b},
+$$
+
+pois
+
+$$
+\mathbf{A}\widehat{\mathbf{x}}
+=
+\mathbf{A}\mathbf{A}^{+}\mathbf{b}
+=
+\widehat{\mathbf{b}}.
+$$
+
+### Resíduo de mínimos quadrados
+
+O vetor residual é
+
+$$
+\mathbf{r}
+=
+\mathbf{b}
+-
+\widehat{\mathbf{b}}.
+$$
+
+Substituindo a expressão do vetor ajustado,
+
+$$
+\mathbf{r}
+=
+\left(
+\mathbf{I}_q
+-
+\mathbf{A}\mathbf{A}^{+}
+\right)
+\mathbf{b}.
+$$
+
+Como
+
+$$
+\mathbf{I}_q
+-
+\mathbf{A}\mathbf{A}^{+}
+$$
+
+projeta sobre
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right),
+$$
+
+tem-se
+
+$$
+\mathbf{r}
+\in
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
+Portanto,
+
+$$
+\mathbf{A}^{\top}\mathbf{r}
+=
+\mathbf{0}.
+$$
+
+Como
+
+$$
+\mathbf{r}
+=
+\mathbf{b}
+-
+\mathbf{A}\widehat{\mathbf{x}},
+$$
+
+segue que
+
+$$
+\mathbf{A}^{\top}
+\left(
+\mathbf{b}
+-
+\mathbf{A}\widehat{\mathbf{x}}
+\right)
+=
+\mathbf{0}.
+$$
+
+Reorganizando,
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+\widehat{\mathbf{x}}
+=
+\mathbf{A}^{\top}\mathbf{b}.
+$$
+
+Essas são as **equações normais** do problema de mínimos quadrados.
+
+A interpretação geométrica é:
+
+$$
+\mathbf{b}
+=
+\widehat{\mathbf{b}}
++
+\mathbf{r},
+$$
+
+com
+
+$$
+\widehat{\mathbf{b}}
+\in
+\mathcal{C}(\mathbf{A})
+$$
+
+e
+
+$$
+\mathbf{r}
+\in
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
+As duas parcelas são ortogonais:
+
+$$
+\widehat{\mathbf{b}}^{\top}\mathbf{r}
+=
+0.
+$$
+
+Assim,
+
+$$
+\|\mathbf{b}\|^2
+=
+\left\|
+\widehat{\mathbf{b}}
+\right\|^2
++
+\|\mathbf{r}\|^2.
+$$
+
+### Conjunto das soluções de mínimos quadrados
+
+As equações normais podem possuir várias soluções quando $\mathbf{A}$ é deficiente em posto.
+
+::: {#thm-solucoes-minimos-quadrados}
+## Soluções de mínimos quadrados pela SVD
+
+O conjunto de todas as soluções do problema
+
+$$
+\min_{\mathbf{x}}
+\left\|
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\right\|^2
+$$
+
+é
+
+$$
+\widehat{\mathbf{x}}
+=
+\mathbf{A}^{+}\mathbf{b}
++
+\mathbf{V}_0\boldsymbol{\gamma},
+$$
+
+em que
+
+$$
+\boldsymbol{\gamma}
+\in
+\mathbb{R}^{p-r}.
+$$
+
+Entre essas soluções,
+
+$$
+\widehat{\mathbf{x}}^{\star}
+=
+\mathbf{A}^{+}\mathbf{b}
+$$
+
+é a única de menor norma. [@golub2013matrix]
+:::
+
+::: proof
+Todos os vetores da forma
+
+$$
+\widehat{\mathbf{x}}
+=
+\mathbf{A}^{+}\mathbf{b}
++
+\mathbf{V}_0\boldsymbol{\gamma}
+$$
+
+produzem o mesmo vetor ajustado, pois
+
+$$
+\mathbf{A}\mathbf{V}_0
+=
+\mathbf{0}.
+$$
+
+Assim,
+
+$$
+\begin{aligned}
+\mathbf{A}\widehat{\mathbf{x}}
+&=
+\mathbf{A}\mathbf{A}^{+}\mathbf{b}
++
+\mathbf{A}\mathbf{V}_0\boldsymbol{\gamma}\\
+&=
+\mathbf{A}\mathbf{A}^{+}\mathbf{b}.
+\end{aligned}
+$$
+
+Logo, todos esses vetores minimizam o mesmo resíduo.
+
+Reciprocamente, duas soluções de mínimos quadrados produzem o mesmo vetor ajustado, que é a projeção de $\mathbf{b}$ sobre $\mathcal{C}(\mathbf{A})$. Portanto, a diferença entre elas pertence ao núcleo de $\mathbf{A}$ e pode ser escrita como
+
+$$
+\mathbf{V}_0\boldsymbol{\gamma}.
+$$
+
+A propriedade de menor norma segue da ortogonalidade entre
+
+$$
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right)
+$$
+
+e
+
+$$
+\mathcal{N}(\mathbf{A}),
+$$
+
+pelo mesmo argumento utilizado no caso compatível.
+:::
+
+Quando
+
+$$
+r=p,
+$$
+
+a matriz possui posto coluna completo e a solução de mínimos quadrados é única:
+
+$$
+\widehat{\mathbf{x}}
+=
+\mathbf{A}^{+}\mathbf{b}.
+$$
+
+Nesse caso,
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+$$
+
+é positiva definida e invertível. A pseudoinversa assume a forma
+
+$$
+\mathbf{A}^{+}
+=
+\left(
+\mathbf{A}^{\top}\mathbf{A}
+\right)^{-1}
+\mathbf{A}^{\top}.
+$$
+
+Logo,
+
+$$
+\widehat{\mathbf{x}}
+=
+\left(
+\mathbf{A}^{\top}\mathbf{A}
+\right)^{-1}
+\mathbf{A}^{\top}\mathbf{b}.
+$$
+
+Se $\mathbf{A}$ possui posto linha completo,
+
+$$
+r=q\leq p,
+$$
+
+então
+
+$$
+\mathbf{A}\mathbf{A}^{\top}
+$$
+
+é invertível e
+
+$$
+\mathbf{A}^{+}
+=
+\mathbf{A}^{\top}
+\left(
+\mathbf{A}\mathbf{A}^{\top}
+\right)^{-1}.
+$$
+
+Essa expressão fornece a solução de menor norma dos sistemas compatíveis subdeterminados.
+
+### Expressão espectral da solução
+
+A pseudoinversa permite decompor a solução nas direções singulares.
+
+Como
+
+$$
+\mathbf{A}^{+}
+=
+\sum_{j=1}^{r}
+\frac{1}{d_j}
+\mathbf{v}_j
+\mathbf{u}_j^{\top},
+$$
+
+tem-se
+
+$$
+\widehat{\mathbf{x}}^{\star}
+=
+\mathbf{A}^{+}\mathbf{b}
+=
+\sum_{j=1}^{r}
+\frac{
+\mathbf{u}_j^{\top}\mathbf{b}
+}{
+d_j
+}
+\mathbf{v}_j.
+$$
+
+A solução é construída em três etapas:
+
+1.  calcula-se a componente de $\mathbf{b}$ na direção $\mathbf{u}_j$:
+
+    $$
+    \mathbf{u}_j^{\top}\mathbf{b};
+    $$
+
+2.  divide-se essa componente pelo valor singular:
+
+    $$
+    \frac{
+    \mathbf{u}_j^{\top}\mathbf{b}
+    }{
+    d_j
+    };
+    $$
+
+3.  expressa-se o resultado na direção $\mathbf{v}_j$.
+
+A componente de $\mathbf{b}$ no núcleo de $\mathbf{A}^{\top}$ não aparece na solução, pois não pode ser reproduzida por nenhum vetor da forma $\mathbf{A}\mathbf{x}$.
+
+O vetor ajustado é
+
+$$
+\widehat{\mathbf{b}}
+=
+\sum_{j=1}^{r}
+\left(
+\mathbf{u}_j^{\top}\mathbf{b}
+\right)
+\mathbf{u}_j,
+$$
+
+enquanto o resíduo é
+
+$$
+\mathbf{r}
+=
+\sum_{j=r+1}^{q}
+\left(
+\mathbf{u}_j^{\top}\mathbf{b}
+\right)
+\mathbf{u}_j.
+$$
+
+### Valores singulares pequenos e instabilidade
+
+A expressão
+
+$$
+\widehat{\mathbf{x}}^{\star}
+=
+\sum_{j=1}^{r}
+\frac{
+\mathbf{u}_j^{\top}\mathbf{b}
+}{
+d_j
+}
+\mathbf{v}_j
+$$
+
+mostra que valores singulares pequenos podem produzir coeficientes elevados.
+
+Considere uma perturbação
+
+$$
+\mathbf{b}
+\longmapsto
+\mathbf{b}
++
+\boldsymbol{\varepsilon}.
+$$
+
+A alteração na solução de menor norma é
+
+$$
+\begin{aligned}
+\Delta\widehat{\mathbf{x}}
+&=
+\mathbf{A}^{+}\boldsymbol{\varepsilon}\\
+&=
+\sum_{j=1}^{r}
+\frac{
+\mathbf{u}_j^{\top}
+\boldsymbol{\varepsilon}
+}{
+d_j
+}
+\mathbf{v}_j.
+\end{aligned}
+$$
+
+Se $d_j$ é pequeno, uma pequena componente de $\boldsymbol{\varepsilon}$ na direção $\mathbf{u}_j$ pode ser ampliada por
+
+$$
+\frac{1}{d_j}.
+$$
+
+Esse comportamento relaciona:
+
+-   valores singulares pequenos;
+-   número de condição elevado;
+-   sensibilidade a perturbações;
+-   instabilidade de soluções inversas.
+
+Descartar ou modificar a inversão de valores singulares pequenos pode reduzir essa instabilidade. Esses procedimentos pertencem ao estudo da regularização e não serão desenvolvidos neste capítulo.
+
+### Pseudoinversa truncada
+
+A SVD truncada sugere uma inversão aproximada que conserva somente os $k$ maiores valores singulares:
+
+$$
+\mathbf{A}_k^{+}
+=
+\mathbf{V}_k
+\mathbf{D}_k^{-1}
+\mathbf{U}_k^{\top}.
+$$
+
+A solução correspondente é
+
+$$
+\widehat{\mathbf{x}}_k
+=
+\mathbf{A}_k^{+}\mathbf{b}
+=
+\sum_{j=1}^{k}
+\frac{
+\mathbf{u}_j^{\top}\mathbf{b}
+}{
+d_j
+}
+\mathbf{v}_j.
+$$
+
+Essa expressão elimina as contribuições associadas às direções singulares descartadas.
+
+A pseudoinversa truncada pode produzir uma solução menos sensível a componentes ligadas a valores singulares pequenos, mas também introduz erro por omitir parte da estrutura da matriz. A escolha de $k$ depende do problema e não será tratada como um procedimento geral neste módulo.
+
+### Exemplo com o sistema condutor
+
+::: {#exm-pseudoinversa-minimos-quadrados}
+## Pseudoinversa e mínimos quadrados no exemplo condutor
+
+Considere
+
+$$
+\mathbf{A}
+=
+\begin{bmatrix}
+1&1\\
+1&-1\\
+1&1
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{b}
+=
+\begin{bmatrix}
+1\\
+2\\
+0
+\end{bmatrix}.
+$$
+
+A SVD compacta de $\mathbf{A}$ possui
+
+$$
+\mathbf{U}_2
+=
+\begin{bmatrix}
+1/\sqrt{2}&0\\
+0&1\\
+1/\sqrt{2}&0
+\end{bmatrix},
+$$
+
+$$
+\mathbf{D}_2
+=
+\begin{bmatrix}
+2&0\\
+0&\sqrt{2}
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{V}_2
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1&1\\
+1&-1
+\end{bmatrix}.
+$$
+
+A pseudoinversa é
+
+$$
+\mathbf{A}^{+}
+=
+\mathbf{V}_2
+\mathbf{D}_2^{-1}
+\mathbf{U}_2^{\top}.
+$$
+
+Efetuando os produtos,
+
+$$
+\mathbf{A}^{+}
+=
+\begin{bmatrix}
+1/4&1/2&1/4\\
+1/4&-1/2&1/4
+\end{bmatrix}.
+$$
+
+A solução de mínimos quadrados é
+
+$$
+\begin{aligned}
+\widehat{\mathbf{x}}
+&=
+\mathbf{A}^{+}\mathbf{b}\\
+&=
+\begin{bmatrix}
+1/4&1/2&1/4\\
+1/4&-1/2&1/4
+\end{bmatrix}
+\begin{bmatrix}
+1\\
+2\\
+0
+\end{bmatrix}\\
+&=
+\begin{bmatrix}
+5/4\\
+-3/4
+\end{bmatrix}.
+\end{aligned}
+$$
+
+O vetor ajustado é
+
+$$
+\begin{aligned}
+\widehat{\mathbf{b}}
+&=
+\mathbf{A}\widehat{\mathbf{x}}\\
+&=
+\begin{bmatrix}
+1&1\\
+1&-1\\
+1&1
+\end{bmatrix}
+\begin{bmatrix}
+5/4\\
+-3/4
+\end{bmatrix}\\
+&=
+\begin{bmatrix}
+1/2\\
+2\\
+1/2
+\end{bmatrix}.
+\end{aligned}
+$$
+
+O resíduo é
+
+$$
+\begin{aligned}
+\mathbf{r}
+&=
+\mathbf{b}
+-
+\widehat{\mathbf{b}}\\
+&=
+\begin{bmatrix}
+1/2\\
+0\\
+-1/2
+\end{bmatrix}.
+\end{aligned}
+$$
+
+O vetor
+
+$$
+\mathbf{u}_3
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+0\\
+-1
+\end{bmatrix}
+$$
+
+forma uma base do núcleo de $\mathbf{A}^{\top}$. De fato,
+
+$$
+\mathbf{r}
+=
+\frac{1}{\sqrt{2}}
+\mathbf{u}_3.
+$$
+
+Consequentemente,
+
+$$
+\mathbf{A}^{\top}\mathbf{r}
+=
+\mathbf{0}.
+$$
+
+O sistema original é incompatível porque a primeira e a terceira equações exigiriam simultaneamente
+
+$$
+x_1+x_2=1
+$$
+
+e
+
+$$
+x_1+x_2=0.
+$$
+
+A solução de mínimos quadrados substitui esses dois valores pela projeção comum
+
+$$
+x_1+x_2
+=
+\frac{1}{2}.
+$$
+
+Como $\mathbf{A}$ possui posto coluna completo, a solução de mínimos quadrados é única.
+:::
+
+A pseudoinversa reúne, em uma única construção:
+
+-   inversão nas direções associadas a valores singulares positivos;
+-   projeção sobre os espaços fundamentais;
+-   solução de sistemas compatíveis;
+-   seleção da solução de menor norma;
+-   solução de mínimos quadrados para sistemas incompatíveis.
+
+Essas relações encerram a estrutura algébrica da SVD. A síntese do capítulo organiza as formas da decomposição, suas interpretações e suas principais consequências.
+
+## Síntese do capítulo
+
+A Decomposição em Valores Singulares representa qualquer matriz real
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{q\times p}
+$$
+
+na forma
+
+$$
+\mathbf{A}
+=
+\mathbf{U}
+\mathbf{D}
+\mathbf{V}^{\top},
+$$
+
+em que $\mathbf{U}$ e $\mathbf{V}$ são ortogonais e $\mathbf{D}$ contém os valores singulares não negativos.
+
+Para cada valor singular positivo,
+
+$$
+\mathbf{A}\mathbf{v}_j
+=
+d_j\mathbf{u}_j
+$$
+
+e
+
+$$
+\mathbf{A}^{\top}\mathbf{u}_j
+=
+d_j\mathbf{v}_j.
+$$
+
+Assim, $\mathbf{v}_j$ determina uma direção no domínio, $d_j$ determina o fator de escala e $\mathbf{u}_j$ determina a direção correspondente no contradomínio.
+
+A SVD completa utiliza bases ortonormais de todo o domínio e de todo o contradomínio. A SVD compacta,
+
+$$
+\mathbf{A}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top},
+$$
+
+conserva somente os $r$ valores singulares positivos e reconstrói exatamente a matriz. A SVD truncada,
+
+$$
+\mathbf{A}_k
+=
+\mathbf{U}_k
+\mathbf{D}_k
+\mathbf{V}_k^{\top},
+\qquad
+k<r,
+$$
+
+produz uma aproximação de posto reduzido.
+
+Os valores singulares são obtidos pelas decomposições espectrais
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+=
+\mathbf{V}_r
+\mathbf{D}_r^2
+\mathbf{V}_r^{\top}
+$$
+
+e
+
+$$
+\mathbf{A}\mathbf{A}^{\top}
+=
+\mathbf{U}_r
+\mathbf{D}_r^2
+\mathbf{U}_r^{\top}.
+$$
+
+As duas matrizes possuem os mesmos autovalores positivos,
+
+$$
+d_1^2,\ldots,d_r^2,
+$$
+
+mas seus autovetores pertencem a espaços diferentes.
+
+A interpretação geométrica mostra que a SVD transforma a bola unitária em um elipsoide. Suas direções principais são os vetores singulares à esquerda, e os comprimentos dos semieixos são os valores singulares. O maior valor singular satisfaz
+
+$$
+\|\mathbf{A}\|_2
+=
+d_1
+$$
+
+e representa o maior fator de ampliação da transformação.
+
+A SVD fornece bases ortonormais para os quatro espaços fundamentais:
+
+$$
+\mathcal{C}(\mathbf{A})
+=
+\mathcal{C}(\mathbf{U}_r),
+\qquad
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+\mathcal{C}(\mathbf{U}_0),
+$$
+
+$$
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+\mathcal{C}(\mathbf{V}_r),
+\qquad
+\mathcal{N}(\mathbf{A})
+=
+\mathcal{C}(\mathbf{V}_0).
+$$
+
+O posto é o número de valores singulares positivos:
+
+$$
+\operatorname{posto}(\mathbf{A})
+=
+r.
+$$
+
+A norma de Frobenius é
+
+$$
+\|\mathbf{A}\|_F^2
+=
+\sum_{j=1}^{r}d_j^2.
+$$
+
+Quando
+
+$$
+r
+=
+\min(q,p),
+$$
+
+o número de condição espectral é
+
+$$
+\kappa_2(\mathbf{A})
+=
+\frac{
+d_1
+}{
+d_{\min(q,p)}
+}.
+$$
+
+Se o posto é menor que o máximo possível, adota-se
+
+$$
+\kappa_2(\mathbf{A})
+=
+\infty.
+$$
+
+Para matrizes largas com posto linha completo, esse número descreve a ação da transformação no complemento ortogonal de seu núcleo.
+
+Quando $\mathbf{X}$ é uma matriz de dados,
+
+$$
+\mathbf{X}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top},
+$$
+
+as coordenadas das observações nas direções singulares à direita são
+
+$$
+\mathbf{Z}
+=
+\mathbf{X}\mathbf{V}_r
+=
+\mathbf{U}_r\mathbf{D}_r.
+$$
+
+Se $\mathbf{X}_c$ está centralizada,
+
+$$
+\mathbf{S}
+=
+\frac{1}{n-1}
+\mathbf{X}_c^{\top}\mathbf{X}_c
+=
+\mathbf{V}_r
+\frac{
+\mathbf{D}_r^2
+}{
+n-1
+}
+\mathbf{V}_r^{\top}.
+$$
+
+Portanto, os vetores singulares à direita são autovetores da matriz de covariâncias amostral, e seus autovalores positivos são $d_j^2/(n-1)$.
+
+A forma expandida,
+
+$$
+\mathbf{A}
+=
+\sum_{j=1}^{r}
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top},
+$$
+
+decompõe a matriz em parcelas ortogonais de posto 1. Pelo Teorema de Eckart--Young--Mirsky, a SVD truncada fornece uma aproximação ótima:
+
+$$
+\left\|
+\mathbf{A}
+-
+\mathbf{A}_k
+\right\|_2
+=
+d_{k+1}
+$$
+
+e
+
+$$
+\left\|
+\mathbf{A}
+-
+\mathbf{A}_k
+\right\|_F^2
+=
+\sum_{j=k+1}^{r}d_j^2.
+$$
+
+A pseudoinversa é
+
+$$
+\mathbf{A}^{+}
+=
+\mathbf{V}_r
+\mathbf{D}_r^{-1}
+\mathbf{U}_r^{\top}.
+$$
+
+Ela determina os projetores
+
+$$
+\mathbf{A}\mathbf{A}^{+}
+=
+\mathbf{U}_r\mathbf{U}_r^{\top}
+$$
+
+e
+
+$$
+\mathbf{A}^{+}\mathbf{A}
+=
+\mathbf{V}_r\mathbf{V}_r^{\top},
+$$
+
+e fornece a solução de mínimos quadrados de menor norma:
+
+$$
+\widehat{\mathbf{x}}^{\star}
+=
+\mathbf{A}^{+}\mathbf{b}.
+$$
+
+A @tbl-sintese-svd reúne as relações principais.
+
+| Objeto            | Expressão                                                         | Interpretação                              |
+|:-----------------------|:-----------------------|:-----------------------|
+| SVD completa      | $\mathbf{A}=\mathbf{U}\mathbf{D}\mathbf{V}^{\top}$                | Bases ortonormais completas                |
+| SVD compacta      | $\mathbf{A}=\mathbf{U}_r\mathbf{D}_r\mathbf{V}_r^{\top}$          | Representação exata com valores positivos  |
+| Pares singulares  | $\mathbf{A}\mathbf{v}_j=d_j\mathbf{u}_j$                          | Associação entre domínio e contradomínio   |
+| Matrizes de Gram  | $\mathbf{A}^{\top}\mathbf{A}$ e $\mathbf{A}\mathbf{A}^{\top}$     | Determinam $d_j^2$ e os vetores singulares |
+| Posto             | $r=\#\{j:d_j>0\}$                                                 | Dimensão efetiva da transformação          |
+| Normas            | $\|\mathbf{A}\|_2=d_1$ e $\|\mathbf{A}\|_F^2=\sum_jd_j^2$         | Ampliação máxima e magnitude quadrática    |
+| Forma expandida   | $\mathbf{A}=\sum_jd_j\mathbf{u}_j\mathbf{v}_j^{\top}$             | Soma de parcelas de posto 1                |
+| SVD truncada      | $\mathbf{A}_k=\mathbf{U}_k\mathbf{D}_k\mathbf{V}_k^{\top}$        | Aproximação de posto reduzido              |
+| Pseudoinversa     | $\mathbf{A}^{+}=\mathbf{V}_r\mathbf{D}_r^{-1}\mathbf{U}_r^{\top}$ | Inversão nas direções ativas               |
+| Mínimos quadrados | $\widehat{\mathbf{x}}^{\star}=\mathbf{A}^{+}\mathbf{b}$           | Solução de menor norma                     |
+
+: Síntese das principais relações da Decomposição em Valores Singulares. {#tbl-sintese-svd}
+
+Ao concluir o capítulo, o estudante deverá ser capaz de:
+
+1.  distinguir as formas completa, compacta e truncada da SVD;
+2.  obter valores e vetores singulares a partir das matrizes de Gram;
+3.  interpretar geometricamente os valores singulares;
+4.  identificar os quatro espaços fundamentais;
+5.  relacionar valores singulares a posto, normas e condicionamento;
+6.  construir aproximações de posto reduzido;
+7.  utilizar a pseudoinversa em sistemas lineares e mínimos quadrados.
+
+O próximo capítulo desenvolve cálculo diferencial, integral e matricial aplicado à Estatística Multivariada. As normas, formas quadráticas, projeções e problemas de mínimos quadrados estudados até aqui serão retomados na formulação de gradientes, Hessianas, funções objetivo, condições de otimalidade e procedimentos de estimação.

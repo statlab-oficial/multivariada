@@ -1,0 +1,7401 @@
+# Estatísticas Amostrais e Estimação
+
+Os Capítulos 8 e 9 apresentaram o vetor de médias e a matriz de covariâncias como características da distribuição populacional. Em uma aplicação, esses parâmetros geralmente são desconhecidos e precisam ser estimados a partir de uma amostra.
+
+O objetivo deste capítulo é construir os principais estimadores utilizados no contexto multivariado e examinar suas propriedades estatísticas e algébricas. Serão estudados o vetor de médias amostrais, a matriz de somas de quadrados e produtos cruzados, os estimadores da matriz de covariâncias, a matriz de correlações e as covariâncias cruzadas entre blocos de variáveis.
+
+A distinção entre objetos populacionais, estatísticas aleatórias e valores observados será mantida ao longo do capítulo. Em particular,
+
+- $\boldsymbol{\mu}$ e $\boldsymbol{\Sigma}$ representam parâmetros populacionais;
+- $\bar{\boldsymbol{\mathsf X}}$ e $\boldsymbol{\mathsf S}$ representam estatísticas aleatórias;
+- $\bar{\mathbf x}$ e $\mathbf S$ representam os valores calculados após a observação da amostra.
+
+Os métodos dos momentos e da máxima verossimilhança serão utilizados para obter estimadores específicos. A diferenciação matricial e as propriedades gerais da verossimilhança desenvolvidas no Capítulo 7 serão aplicadas sem nova exposição de sua teoria.
+
+As distribuições amostrais exatas, a distribuição de Wishart, a independência entre o vetor de médias e a matriz de covariâncias amostrais e os procedimentos de inferência serão desenvolvidos no Capítulo 12. Neste capítulo, a atenção estará voltada à construção dos estimadores, às suas propriedades e às limitações impostas pela dimensão da amostra.
+
+## Da população à amostra
+
+Considere um vetor aleatório
+
+$$
+\boldsymbol{\mathsf X}
+=
+\begin{bmatrix}
+X_1\\
+\vdots\\
+X_p
+\end{bmatrix}
+\in
+\mathbb R^p
+$$
+
+com distribuição pertencente a uma família
+
+$$
+\left\{
+F_{\boldsymbol{\theta}}:
+\boldsymbol{\theta}\in\Theta
+\right\},
+$$
+
+em que $\boldsymbol{\theta}$ representa o conjunto de parâmetros desconhecidos e $\Theta$ é o espaço paramétrico.
+
+Quando existem momentos de primeira e segunda ordens, a distribuição possui vetor de médias
+
+$$
+\boldsymbol{\mu}
+=
+E
+\left(
+\boldsymbol{\mathsf X}
+\right)
+\in
+\mathbb R^p
+$$
+
+e matriz de covariâncias
+
+$$
+\boldsymbol{\Sigma}
+=
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}
+\right)
+\in
+\mathbb R^{p\times p}.
+$$
+
+Esses parâmetros são características fixas da população. A variabilidade entre possíveis amostras pertence às estatísticas utilizadas para estimá-los.
+
+### Amostra aleatória multivariada
+
+A unidade amostral de um estudo multivariado é um vetor. Cada unidade fornece simultaneamente os valores das $p$ variáveis que compõem $\boldsymbol{\mathsf X}$.
+
+::: {#def-amostra-aleatoria-multivariada}
+## Amostra aleatória multivariada
+
+Uma amostra aleatória multivariada de tamanho $n$ proveniente de $F_{\boldsymbol{\theta}}$ é uma coleção de vetores aleatórios
+
+$$
+\boldsymbol{\mathsf X}_1,
+\ldots,
+\boldsymbol{\mathsf X}_n
+\in
+\mathbb R^p
+$$
+
+independentes e com a mesma distribuição:
+
+$$
+\boldsymbol{\mathsf X}_1,
+\ldots,
+\boldsymbol{\mathsf X}_n
+\overset{\mathrm{iid}}{\sim}
+F_{\boldsymbol{\theta}}.
+$$ {#eq-amostra-aleatoria-multivariada}
+:::
+
+A notação `iid` reúne duas condições. A distribuição idêntica estabelece que todos os vetores são provenientes da mesma população. A independência estabelece que o resultado observado em uma unidade não altera a distribuição dos resultados das demais unidades.
+
+A independência entre os vetores da amostra implica que sua função de distribuição conjunta pode ser escrita como
+
+$$
+F_{\boldsymbol{\theta}}^{(n)}
+\left(
+\mathbf x_1,\ldots,\mathbf x_n
+\right)
+=
+\prod_{i=1}^n
+F_{\boldsymbol{\theta}}
+\left(
+\mathbf x_i
+\right).
+$$ {#eq-distribuicao-conjunta-amostra}
+
+Quando a distribuição possui densidade em relação a uma medida comum, a densidade conjunta da amostra é
+
+$$
+f_{\boldsymbol{\theta}}^{(n)}
+\left(
+\mathbf x_1,\ldots,\mathbf x_n
+\right)
+=
+\prod_{i=1}^n
+f_{\boldsymbol{\theta}}
+\left(
+\mathbf x_i
+\right).
+$$ {#eq-densidade-conjunta-amostra-iid}
+
+As duas fatorações decorrem da independência entre as unidades amostrais. A dependência entre as componentes de cada vetor permanece representada pela distribuição multivariada $F_{\boldsymbol{\theta}}$ ou por sua densidade $f_{\boldsymbol{\theta}}$.
+
+Cada vetor da amostra possui a forma
+
+$$
+\boldsymbol{\mathsf X}_i
+=
+\begin{bmatrix}
+X_{i1}\\
+X_{i2}\\
+\vdots\\
+X_{ip}
+\end{bmatrix},
+\qquad
+i=1,\ldots,n,
+$$
+
+em que $X_{ij}$ representa a variável $j$ observada na unidade $i$.
+
+A independência entre os vetores
+
+$$
+\boldsymbol{\mathsf X}_1,\ldots,\boldsymbol{\mathsf X}_n
+$$
+
+não implica independência entre as componentes de um mesmo vetor. As variáveis
+
+$$
+X_{i1},\ldots,X_{ip}
+$$
+
+podem apresentar covariâncias e outras formas de dependência dentro da unidade $i$.
+
+Quando os momentos de segunda ordem existem,
+
+$$
+E
+\left(
+\boldsymbol{\mathsf X}_i
+\right)
+=
+\boldsymbol{\mu}
+$$
+
+e
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}_i
+\right)
+=
+\boldsymbol{\Sigma}
+$$
+
+para todo $i$. Para duas unidades distintas,
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}_i,
+\boldsymbol{\mathsf X}_\ell
+\right)
+=
+\mathbf 0,
+\qquad
+i\neq\ell,
+$$
+
+como consequência da independência.
+
+No caso normal multivariado, a especificação amostral é
+
+$$
+\boldsymbol{\mathsf X}_1,
+\ldots,
+\boldsymbol{\mathsf X}_n
+\overset{\mathrm{iid}}{\sim}
+N_p
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right).
+$$ {#eq-amostra-normal-multivariada}
+
+A normalidade não é necessária para definir médias, covariâncias ou correlações amostrais. Ela será necessária para a obtenção dos estimadores de máxima verossimilhança apresentados neste capítulo e para os resultados exatos desenvolvidos no Capítulo 12.
+
+### Matriz aleatória da amostra e matriz observada
+
+Os vetores da amostra podem ser organizados nas linhas de uma matriz aleatória.
+
+::: {#def-matriz-aleatoria-amostra}
+## Matriz aleatória da amostra
+
+A matriz aleatória associada à amostra é
+
+$$
+\boldsymbol{\mathcal X}
+=
+\begin{bmatrix}
+\boldsymbol{\mathsf X}_1^\top\\
+\boldsymbol{\mathsf X}_2^\top\\
+\vdots\\
+\boldsymbol{\mathsf X}_n^\top
+\end{bmatrix}
+=
+\begin{bmatrix}
+X_{11} & X_{12} & \cdots & X_{1p}\\
+X_{21} & X_{22} & \cdots & X_{2p}\\
+\vdots & \vdots & \ddots & \vdots\\
+X_{n1} & X_{n2} & \cdots & X_{np}
+\end{bmatrix}
+\in
+\mathbb R^{n\times p}.
+$$ {#eq-matriz-aleatoria-amostra}
+:::
+
+Antes da coleta dos dados, os elementos de $\boldsymbol{\mathcal X}$ são variáveis aleatórias. Cada possível resultado do processo amostral corresponde a uma matriz numérica.
+
+Após a observação da amostra,
+
+$$
+\boldsymbol{\mathcal X}
+=
+\mathbf X,
+$$
+
+em que
+
+$$
+\mathbf X
+=
+\begin{bmatrix}
+\mathbf x_1^\top\\
+\mathbf x_2^\top\\
+\vdots\\
+\mathbf x_n^\top
+\end{bmatrix}
+=
+\begin{bmatrix}
+x_{11} & x_{12} & \cdots & x_{1p}\\
+x_{21} & x_{22} & \cdots & x_{2p}\\
+\vdots & \vdots & \ddots & \vdots\\
+x_{n1} & x_{n2} & \cdots & x_{np}
+\end{bmatrix}
+\in
+\mathbb R^{n\times p}
+$$ {#eq-matriz-observada-amostra}
+
+é a matriz de dados observada.
+
+A diferença tipográfica registra a natureza dos objetos:
+
+- $\boldsymbol{\mathcal X}$ é uma matriz aleatória;
+- $\mathbf X$ é uma realização da matriz aleatória;
+- $\boldsymbol{\mathsf X}_i$ é o vetor aleatório correspondente à unidade $i$;
+- $\mathbf x_i$ é o vetor observado para essa unidade;
+- $X_{ij}$ é uma variável aleatória;
+- $x_{ij}$ é seu valor observado.
+
+O espaço amostral pode ser representado por
+
+$$
+\left(
+\mathbb R^p
+\right)^n,
+$$
+
+ou, de forma equivalente, pelo conjunto das matrizes reais de dimensão $n\times p$.
+
+Uma estatística associa a cada possível matriz da amostra um valor escalar, vetorial ou matricial. Antes da observação, esse resultado é aleatório. Depois da observação, torna-se uma quantidade calculada a partir de $\mathbf X$.
+
+### Parâmetros, estatísticas, estimadores e estimativas
+
+Um parâmetro é uma característica fixa da distribuição populacional. Ele pode ser escalar, vetorial ou matricial.
+
+No contexto deste capítulo, os principais parâmetros são
+
+$$
+\boldsymbol{\mu},
+\qquad
+\boldsymbol{\Sigma}
+\qquad
+\text{e}
+\qquad
+\boldsymbol{\mathcal R}.
+$$
+
+No modelo normal multivariado não singular, o parâmetro completo pode ser representado por
+
+$$
+\boldsymbol{\theta}
+=
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right),
+$$
+
+com espaço paramétrico
+
+$$
+\Theta
+=
+\left\{
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right):
+\boldsymbol{\mu}\in\mathbb R^p,
+\;
+\boldsymbol{\Sigma}\succ\mathbf 0
+\right\}.
+$$
+
+::: {#def-estatistica-amostral}
+## Estatística amostral
+
+Uma estatística é uma função da amostra que não contém parâmetros desconhecidos em sua expressão:
+
+$$
+\boldsymbol{\mathsf T}
+=
+T
+\left(
+\boldsymbol{\mathcal X}
+\right).
+$$ {#eq-estatistica-amostral}
+
+A estatística pode assumir valores escalares, vetoriais ou matriciais.
+:::
+
+Embora sua fórmula não dependa de parâmetros desconhecidos, a distribuição de uma estatística geralmente depende da distribuição populacional e de seus parâmetros.
+
+O vetor de médias amostrais é um exemplo de estatística vetorial:
+
+$$
+\bar{\boldsymbol{\mathsf X}}
+=
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i.
+$$ {#eq-media-amostral-aleatoria}
+
+Após a observação da amostra, obtém-se
+
+$$
+\bar{\mathbf x}
+=
+\frac{1}{n}
+\sum_{i=1}^n
+\mathbf x_i.
+$$ {#eq-media-amostral-observada}
+
+A distribuição de probabilidade de uma estatística é denominada **distribuição amostral**. Ela descreve como a estatística varia entre todas as possíveis amostras de tamanho $n$ provenientes da mesma população.
+
+::: {.callout-caution appearance="minimal" icon="false"}
+## Distribuição populacional e distribuição amostral
+
+A distribuição
+
+$$
+\boldsymbol{\mathsf X}
+\sim
+F_{\boldsymbol{\theta}}
+$$
+
+descreve a variabilidade de uma unidade populacional.
+
+A distribuição de
+
+$$
+\boldsymbol{\mathsf T}
+=
+T
+\left(
+\boldsymbol{\mathcal X}
+\right)
+$$
+
+descreve a variabilidade de uma função calculada sobre uma amostra inteira. As duas distribuições representam objetos distintos.
+:::
+
+Uma estatística torna-se um estimador quando é utilizada para aproximar um parâmetro desconhecido.
+
+::: {#def-estimador-estimativa}
+## Estimador e estimativa
+
+Um estimador de um parâmetro $\boldsymbol{\theta}$ é uma estatística
+
+$$
+\widehat{\boldsymbol{\theta}}
+=
+T
+\left(
+\boldsymbol{\mathcal X}
+\right)
+$$ {#eq-estimador-parametro}
+
+utilizada para inferir o valor de $\boldsymbol{\theta}$.
+
+A estimativa é o valor assumido pelo estimador após a observação da amostra:
+
+$$
+\widehat{\boldsymbol{\theta}}_{\mathrm{obs}}
+=
+T
+\left(
+\mathbf X
+\right).
+$$ {#eq-estimativa-observada}
+:::
+
+Assim,
+
+$$
+\bar{\boldsymbol{\mathsf X}}
+$$
+
+é um estimador de $\boldsymbol{\mu}$, enquanto
+
+$$
+\bar{\mathbf x}
+$$
+
+é a estimativa obtida para uma amostra específica.
+
+De modo semelhante,
+
+$$
+\boldsymbol{\mathsf S}
+$$
+
+representará um estimador matricial de $\boldsymbol{\Sigma}$, e
+
+$$
+\mathbf S
+$$
+
+representará seu valor observado.
+
+O erro de estimação é a diferença entre o estimador e o parâmetro:
+
+$$
+\widehat{\boldsymbol{\theta}}
+-
+\boldsymbol{\theta}.
+$$ {#eq-erro-estimacao}
+
+Antes da observação da amostra, esse erro é aleatório. Sua distribuição permite avaliar o desempenho do estimador.
+
+Um mesmo parâmetro pode possuir diferentes estimadores. Para a matriz de covariâncias, por exemplo, serão estudados um estimador não viesado e o estimador de máxima verossimilhança sob normalidade. A escolha entre eles depende das propriedades consideradas e do modelo probabilístico adotado.
+
+A estimação pontual produz um único valor vetorial ou matricial como aproximação do parâmetro. A estimação por regiões produz um conjunto de valores plausíveis, associado a um nível de confiança. Neste capítulo será desenvolvida a estimação pontual. As regiões de confiança serão construídas no Capítulo 12.
+
+A comparação entre diferentes estimadores exige critérios que descrevam seu comportamento ao longo das possíveis amostras. Viés, variabilidade, erro quadrático médio, consistência, eficiência, suficiência, equivariância e robustez serão examinados na seção seguinte.
+
+## Propriedades dos estimadores multivariados
+
+A existência de um estimador não determina sua adequação. Diferentes estatísticas podem ser utilizadas para estimar o mesmo parâmetro e apresentar comportamentos distintos entre as possíveis amostras.
+
+Considere um parâmetro vetorial
+
+$$
+\boldsymbol{\theta}
+\in
+\Theta
+\subseteq
+\mathbb R^r
+$$
+
+e um estimador
+
+$$
+\widehat{\boldsymbol{\theta}}
+=
+T
+\left(
+\boldsymbol{\mathcal X}
+\right)
+\in
+\mathbb R^r.
+$$
+
+A avaliação de $\widehat{\boldsymbol{\theta}}$ depende de sua distribuição amostral. Viés, variabilidade e erro quadrático médio descrevem seu comportamento para um tamanho amostral fixo. Consistência e eficiência assintótica descrevem seu comportamento quando o tamanho da amostra aumenta. Suficiência, equivariância e robustez examinam outros aspectos da informação utilizada e da estabilidade do procedimento.
+
+### Viés e variabilidade
+
+O viés mede a diferença entre o valor esperado do estimador e o parâmetro que se deseja estimar.
+
+::: {#def-vies-estimador}
+## Viés de um estimador
+
+Se $E(\widehat{\boldsymbol{\theta}})$ existe, o viés de $\widehat{\boldsymbol{\theta}}$ na estimação de $\boldsymbol{\theta}$ é
+
+$$
+\operatorname{Bias}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+=
+E
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+-
+\boldsymbol{\theta}.
+$$ {#eq-vies-estimador-vetorial}
+
+O estimador é não viesado quando
+
+$$
+E
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+=
+\boldsymbol{\theta},
+$$
+
+ou, equivalentemente,
+
+$$
+\operatorname{Bias}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+=
+\mathbf 0.
+$$
+:::
+
+O viés é um vetor em $\mathbb R^r$. Sua componente $j$ é o viés do estimador de $\theta_j$:
+
+$$
+\left[
+\operatorname{Bias}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right]_j
+=
+E
+\left(
+\widehat{\theta}_j
+\right)
+-
+\theta_j.
+$$
+
+A ausência de viés significa que o estimador não apresenta afastamento sistemático quando considerado sobre todas as possíveis amostras. Essa propriedade não garante que a estimativa obtida em uma amostra específica esteja próxima do parâmetro.
+
+Para um parâmetro matricial
+
+$$
+\boldsymbol{\Theta}
+\in
+\mathbb R^{a\times b}
+$$
+
+e um estimador
+
+$$
+\widehat{\boldsymbol{\Theta}}
+\in
+\mathbb R^{a\times b},
+$$
+
+o viés é definido elemento a elemento:
+
+$$
+\operatorname{Bias}
+\left(
+\widehat{\boldsymbol{\Theta}}
+\right)
+=
+E
+\left(
+\widehat{\boldsymbol{\Theta}}
+\right)
+-
+\boldsymbol{\Theta}.
+$$ {#eq-vies-estimador-matricial}
+
+O estimador matricial é não viesado quando
+
+$$
+E
+\left(
+\widehat{\boldsymbol{\Theta}}
+\right)
+=
+\boldsymbol{\Theta}.
+$$
+
+A variabilidade de um estimador vetorial é descrita por sua matriz de covariâncias:
+
+$$
+\begin{aligned}
+\operatorname{Cov}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+=
+E
+\Bigg[
+&
+\left\{
+\widehat{\boldsymbol{\theta}}
+-
+E
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right\}
+\\
+&
+\left\{
+\widehat{\boldsymbol{\theta}}
+-
+E
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right\}^{\top}
+\Bigg].
+\end{aligned}
+$$ {#eq-covariancia-estimador-vetorial}
+
+Os elementos diagonais são as variâncias dos estimadores dos componentes:
+
+$$
+\left[
+\operatorname{Cov}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right]_{jj}
+=
+\operatorname{Var}
+\left(
+\widehat{\theta}_j
+\right).
+$$
+
+Os elementos fora da diagonal são as covariâncias entre os erros de estimação:
+
+$$
+\left[
+\operatorname{Cov}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right]_{jk}
+=
+\operatorname{Cov}
+\left(
+\widehat{\theta}_j,
+\widehat{\theta}_k
+\right).
+$$
+
+A matriz de covariâncias descreve simultaneamente a precisão dos componentes e a forma como seus erros variam em conjunto. Para qualquer vetor $\mathbf a\in\mathbb R^r$,
+
+$$
+\operatorname{Var}
+\left(
+\mathbf a^\top
+\widehat{\boldsymbol{\theta}}
+\right)
+=
+\mathbf a^\top
+\operatorname{Cov}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\mathbf a.
+$$
+
+Uma medida escalar da variabilidade total é
+
+$$
+\operatorname{tr}
+\left[
+\operatorname{Cov}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right]
+=
+\sum_{j=1}^r
+\operatorname{Var}
+\left(
+\widehat{\theta}_j
+\right).
+$$
+
+Essa medida depende da escala e da parametrização adotadas. Ela reúne as variâncias marginais, mas não substitui a matriz de covariâncias quando a dependência entre os componentes é relevante.
+
+Para um estimador matricial, a variabilidade pode ser representada por
+
+$$
+\operatorname{Cov}
+\left[
+\operatorname{vec}
+\left(
+\widehat{\boldsymbol{\Theta}}
+\right)
+\right],
+$$
+
+em que o operador $\operatorname{vec}$ organiza os elementos da matriz em um vetor.
+
+### Erro quadrático médio e funções de perda
+
+A comparação entre estimadores exige a especificação do que se considera um erro relevante. Essa escolha é formalizada por uma função de perda.
+
+Para um estimador vetorial, uma possibilidade é a perda quadrática euclidiana:
+
+$$
+L
+\left(
+\widehat{\boldsymbol{\theta}},
+\boldsymbol{\theta}
+\right)
+=
+\left\|
+\widehat{\boldsymbol{\theta}}
+-
+\boldsymbol{\theta}
+\right\|^2.
+$$ {#eq-perda-quadratica-vetorial}
+
+Essa perda atribui o mesmo peso a todas as coordenadas do parâmetro. Outros problemas podem exigir ponderações ou perdas diferentes.
+
+::: {#def-eqm-vetorial}
+## Erro quadrático médio vetorial
+
+Sob a perda quadrática euclidiana, o erro quadrático médio de $\widehat{\boldsymbol{\theta}}$ é
+
+$$
+\operatorname{EQM}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+=
+E
+\left[
+\left\|
+\widehat{\boldsymbol{\theta}}
+-
+\boldsymbol{\theta}
+\right\|^2
+\right].
+$$ {#eq-eqm-vetorial}
+:::
+
+A diferença entre o estimador e o parâmetro pode ser decomposta como
+
+$$
+\begin{aligned}
+\widehat{\boldsymbol{\theta}}
+-
+\boldsymbol{\theta}
+&=
+\widehat{\boldsymbol{\theta}}
+-
+E
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\\
+&\quad+
+E
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+-
+\boldsymbol{\theta}.
+\end{aligned}
+$$
+
+O primeiro termo é aleatório e possui média zero. O segundo é o vetor de viés.
+
+::: {#thm-decomposicao-eqm-vetorial}
+## Decomposição do erro quadrático médio
+
+Se $\widehat{\boldsymbol{\theta}}$ possui segundos momentos finitos, então
+
+$$
+\operatorname{EQM}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+=
+\operatorname{tr}
+\left[
+\operatorname{Cov}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right]
++
+\left\|
+\operatorname{Bias}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right\|^2.
+$$ {#eq-decomposicao-eqm-vetorial}
+:::
+
+::: proof
+Defina
+
+$$
+\boldsymbol{\mathsf U}
+=
+\widehat{\boldsymbol{\theta}}
+-
+E
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+$$
+
+e
+
+$$
+\mathbf b
+=
+E
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+-
+\boldsymbol{\theta}.
+$$
+
+Então,
+
+$$
+E
+\left(
+\boldsymbol{\mathsf U}
+\right)
+=
+\mathbf 0
+$$
+
+e
+
+$$
+\widehat{\boldsymbol{\theta}}
+-
+\boldsymbol{\theta}
+=
+\boldsymbol{\mathsf U}
++
+\mathbf b.
+$$
+
+Consequentemente,
+
+$$
+\begin{aligned}
+E
+\left[
+\left\|
+\widehat{\boldsymbol{\theta}}
+-
+\boldsymbol{\theta}
+\right\|^2
+\right]
+&=
+E
+\left[
+\left(
+\boldsymbol{\mathsf U}
++
+\mathbf b
+\right)^\top
+\left(
+\boldsymbol{\mathsf U}
++
+\mathbf b
+\right)
+\right]
+\\
+&=
+E
+\left(
+\boldsymbol{\mathsf U}^\top
+\boldsymbol{\mathsf U}
+\right)
++
+2\mathbf b^\top
+E
+\left(
+\boldsymbol{\mathsf U}
+\right)
++
+\mathbf b^\top
+\mathbf b
+\\
+&=
+\operatorname{tr}
+\left[
+\operatorname{Cov}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right]
++
+\left\|
+\mathbf b
+\right\|^2.
+\end{aligned}
+$$
+
+Como $\mathbf b$ é o vetor de viés, obtém-se o resultado.
+:::
+
+Quando o estimador é não viesado,
+
+$$
+\operatorname{EQM}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+=
+\operatorname{tr}
+\left[
+\operatorname{Cov}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right].
+$$
+
+A ausência de viés não implica erro quadrático médio mínimo. Um estimador com pequeno viés pode apresentar menor EQM se a redução de sua variabilidade compensar o aumento produzido pelo viés. Essa possibilidade será retomada na discussão sobre regularização.
+
+Para um estimador matricial, uma escolha correspondente é a perda quadrática de Frobenius:
+
+$$
+L_F
+\left(
+\widehat{\boldsymbol{\Theta}},
+\boldsymbol{\Theta}
+\right)
+=
+\left\|
+\widehat{\boldsymbol{\Theta}}
+-
+\boldsymbol{\Theta}
+\right\|_F^2.
+$$
+
+O erro quadrático médio matricial é
+
+$$
+\operatorname{EQM}_F
+\left(
+\widehat{\boldsymbol{\Theta}}
+\right)
+=
+E
+\left[
+\left\|
+\widehat{\boldsymbol{\Theta}}
+-
+\boldsymbol{\Theta}
+\right\|_F^2
+\right].
+$$ {#eq-eqm-matricial}
+
+Como
+
+$$
+\left\|
+\widehat{\boldsymbol{\Theta}}
+-
+\boldsymbol{\Theta}
+\right\|_F
+=
+\left\|
+\operatorname{vec}
+\left(
+\widehat{\boldsymbol{\Theta}}
+-
+\boldsymbol{\Theta}
+\right)
+\right\|,
+$$
+
+tem-se
+
+$$
+\begin{aligned}
+\operatorname{EQM}_F
+\left(
+\widehat{\boldsymbol{\Theta}}
+\right)
+&=
+\operatorname{tr}
+\left\{
+\operatorname{Cov}
+\left[
+\operatorname{vec}
+\left(
+\widehat{\boldsymbol{\Theta}}
+\right)
+\right]
+\right\}
+\\
+&\quad+
+\left\|
+\operatorname{Bias}
+\left(
+\widehat{\boldsymbol{\Theta}}
+\right)
+\right\|_F^2.
+\end{aligned}
+$$ {#eq-decomposicao-eqm-matricial}
+
+A escolha da norma de Frobenius também representa uma decisão sobre a perda. Em problemas que envolvem matrizes de covariâncias, outras funções podem atribuir pesos diferentes aos autovalores, às direções ou ao erro de inversão.
+
+### Consistência
+
+A consistência descreve o comportamento de uma sequência de estimadores quando o tamanho da amostra aumenta.
+
+::: {#def-consistencia-estimador}
+## Consistência
+
+Uma sequência de estimadores
+
+$$
+\widehat{\boldsymbol{\theta}}_n
+$$
+
+é consistente para $\boldsymbol{\theta}$ quando
+
+$$
+\widehat{\boldsymbol{\theta}}_n
+\xrightarrow{P}
+\boldsymbol{\theta}
+$$ {#eq-consistencia-estimador}
+
+à medida que $n\to\infty$.
+:::
+
+A convergência em probabilidade significa que, para todo $\varepsilon>0$,
+
+$$
+P
+\left(
+\left\|
+\widehat{\boldsymbol{\theta}}_n
+-
+\boldsymbol{\theta}
+\right\|
+>
+\varepsilon
+\right)
+\longrightarrow
+0.
+$$ {#eq-consistencia-estimador-probabilidade}
+
+A consistência é uma propriedade assintótica. Ela não garante pequena imprecisão para um tamanho amostral específico. O resultado estabelece que a probabilidade de um afastamento superior a qualquer valor fixado tende a zero.
+
+Para estimadores matriciais, pode-se utilizar a norma de Frobenius:
+
+$$
+\widehat{\boldsymbol{\Theta}}_n
+\xrightarrow{P}
+\boldsymbol{\Theta}
+$$
+
+quando, para todo $\varepsilon>0$,
+
+$$
+P
+\left(
+\left\|
+\widehat{\boldsymbol{\Theta}}_n
+-
+\boldsymbol{\Theta}
+\right\|_F
+>
+\varepsilon
+\right)
+\longrightarrow
+0.
+$$ {#eq-consistencia-estimador-matricial}
+
+Se
+
+$$
+\widehat{\boldsymbol{\theta}}_n
+\xrightarrow{P}
+\boldsymbol{\theta}
+$$
+
+e $g$ é contínua em $\boldsymbol{\theta}$, então
+
+$$
+g
+\left(
+\widehat{\boldsymbol{\theta}}_n
+\right)
+\xrightarrow{P}
+g
+\left(
+\boldsymbol{\theta}
+\right).
+$$ {#eq-mapeamento-continuo-consistencia}
+
+Esse resultado permite obter a consistência de estimadores construídos como funções contínuas de outros estimadores consistentes. Por exemplo, se as variâncias populacionais são positivas, a consistência de um estimador da matriz de covariâncias implica a consistência da matriz de correlações obtida por padronização.
+
+As definições anteriores consideram que a dimensão do parâmetro permanece fixa enquanto $n$ aumenta. Quando a dimensão também cresce com o tamanho amostral, a norma utilizada e a taxa de crescimento passam a fazer parte da formulação da consistência. Essa distinção será retomada na seção sobre dimensão e estabilidade.
+
+### Eficiência
+
+Dois estimadores podem ser não viesados e consistentes, mas apresentar diferentes matrizes de covariâncias.
+
+Considere dois estimadores não viesados de $\boldsymbol{\theta}$:
+
+$$
+\widehat{\boldsymbol{\theta}}_1
+\qquad
+\text{e}
+\qquad
+\widehat{\boldsymbol{\theta}}_2.
+$$
+
+O estimador $\widehat{\boldsymbol{\theta}}_1$ é uniformemente pelo menos tão eficiente quanto $\widehat{\boldsymbol{\theta}}_2$, segundo a ordem de Loewner, quando
+
+$$
+\operatorname{Cov}_{\boldsymbol{\theta}}
+\left(
+\widehat{\boldsymbol{\theta}}_1
+\right)
+\preceq
+\operatorname{Cov}_{\boldsymbol{\theta}}
+\left(
+\widehat{\boldsymbol{\theta}}_2
+\right)
+\qquad
+\text{para todo }
+\boldsymbol{\theta}\in\Theta.
+$$ {#eq-eficiencia-loewner}
+
+Essa condição equivale a
+
+$$
+\operatorname{Cov}_{\boldsymbol{\theta}}
+\left(
+\widehat{\boldsymbol{\theta}}_2
+\right)
+-
+\operatorname{Cov}_{\boldsymbol{\theta}}
+\left(
+\widehat{\boldsymbol{\theta}}_1
+\right)
+\succeq
+\mathbf 0
+\qquad
+\text{para todo }
+\boldsymbol{\theta}\in\Theta.
+$$
+
+Consequentemente, para todo $\boldsymbol{\theta}\in\Theta$ e toda combinação linear definida por $\mathbf a\in\mathbb R^r$,
+
+$$
+\operatorname{Var}_{\boldsymbol{\theta}}
+\left(
+\mathbf a^\top
+\widehat{\boldsymbol{\theta}}_1
+\right)
+\leq
+\operatorname{Var}_{\boldsymbol{\theta}}
+\left(
+\mathbf a^\top
+\widehat{\boldsymbol{\theta}}_2
+\right).
+$$
+
+A ordem de Loewner é parcial. Duas matrizes de covariâncias podem não ser comparáveis, pois sua diferença pode ser indefinida. Nessa situação, um estimador pode ser mais preciso em determinadas direções e menos preciso em outras.
+
+Uma comparação escalar pode utilizar, por exemplo,
+
+$$
+\operatorname{tr}
+\left[
+\operatorname{Cov}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right].
+$$
+
+Esse critério corresponde à perda quadrática euclidiana para estimadores não viesados. Outro critério pode produzir uma ordenação diferente.
+
+Quando os estimadores são viesados, a comparação baseada somente nas matrizes de covariâncias é insuficiente. Deve-se considerar o risco associado a uma função de perda, como o erro quadrático médio.
+
+A eficiência assintótica compara as matrizes que aparecem nas distribuições-limite. Sob condições regulares, a máxima verossimilhança pode alcançar o limite associado à informação de Fisher. A teoria correspondente foi desenvolvida no Capítulo 7 e será utilizada apenas quando as condições do modelo forem declaradas.
+
+### Suficiência
+
+Uma estatística suficiente concentra toda a informação da amostra sobre o parâmetro, no sentido de que a distribuição condicional da amostra, dado o valor da estatística, não depende do parâmetro.
+
+::: {#def-estatistica-suficiente}
+## Estatística suficiente
+
+Uma estatística
+
+$$
+\boldsymbol{\mathsf T}
+=
+T
+\left(
+\boldsymbol{\mathcal X}
+\right)
+$$
+
+é suficiente para $\boldsymbol{\theta}$ quando a distribuição condicional da amostra dado $\boldsymbol{\mathsf T}$ não depende de $\boldsymbol{\theta}$.
+:::
+
+O Teorema da Fatoração de Neyman–Fisher fornece um critério para verificar essa propriedade.
+
+::: {#thm-fatoracao-neyman-fisher}
+## Teorema da Fatoração de Neyman–Fisher
+
+Considere uma família de distribuições dominada por uma medida comum, com densidade ou função de probabilidade conjunta
+
+$$
+f_{\boldsymbol{\theta}}
+\left(
+\mathbf x
+\right),
+\qquad
+\boldsymbol{\theta}\in\Theta.
+$$
+
+A estatística
+
+$$
+T
+\left(
+\mathbf x
+\right)
+$$
+
+é suficiente para $\boldsymbol{\theta}$ se, e somente se, existem funções não negativas $g_{\boldsymbol{\theta}}$ e $h$ tais que
+
+$$
+f_{\boldsymbol{\theta}}
+\left(
+\mathbf x
+\right)
+=
+g_{\boldsymbol{\theta}}
+\left[
+T
+\left(
+\mathbf x
+\right)
+\right]
+h
+\left(
+\mathbf x
+\right),
+$$ {#eq-fatoracao-neyman-fisher}
+
+em que $h$ não depende de $\boldsymbol{\theta}$.
+:::
+
+A fatoração mostra que toda a dependência da distribuição conjunta em relação ao parâmetro ocorre por meio da estatística.
+
+No modelo normal multivariado, o vetor de médias amostrais e a matriz de somas de quadrados e produtos cruzados formam uma estatística suficiente.
+
+::: {#thm-suficiencia-normal-multivariada}
+## Suficiência no modelo normal multivariado
+
+Considere
+
+$$
+\boldsymbol{\mathsf X}_1,
+\ldots,
+\boldsymbol{\mathsf X}_n
+\overset{\mathrm{iid}}{\sim}
+N_p
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right),
+$$
+
+com $\boldsymbol{\Sigma}\succ\mathbf 0$. Defina
+
+$$
+\bar{\boldsymbol{\mathsf X}}
+=
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i
+$$
+
+e
+
+$$
+\boldsymbol{\mathsf A}
+=
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)^\top.
+$$ {#eq-sscp-suficiencia-normal}
+
+Então,
+
+$$
+\left(
+\bar{\boldsymbol{\mathsf X}},
+\boldsymbol{\mathsf A}
+\right)
+$$
+
+é suficiente para
+
+$$
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right).
+$$
+:::
+
+::: proof
+Para uma realização $\mathbf x_1,\ldots,\mathbf x_n$, a densidade conjunta é
+
+$$
+\begin{aligned}
+f_{\boldsymbol{\mu},\boldsymbol{\Sigma}}
+\left(
+\mathbf x_1,\ldots,\mathbf x_n
+\right)
+&=
+(2\pi)^{-np/2}
+\det
+\left(
+\boldsymbol{\Sigma}
+\right)^{-n/2}
+\\
+&\quad\times
+\exp
+\left\{
+-\frac{1}{2}
+\sum_{i=1}^n
+\left(
+\mathbf x_i-\boldsymbol{\mu}
+\right)^\top
+\boldsymbol{\Sigma}^{-1}
+\left(
+\mathbf x_i-\boldsymbol{\mu}
+\right)
+\right\}.
+\end{aligned}
+$$
+
+A soma das formas quadráticas pode ser escrita como
+
+$$
+\begin{aligned}
+&
+\sum_{i=1}^n
+\left(
+\mathbf x_i-\boldsymbol{\mu}
+\right)
+\left(
+\mathbf x_i-\boldsymbol{\mu}
+\right)^\top
+\\
+&=
+\mathbf A
++
+n
+\left(
+\bar{\mathbf x}-\boldsymbol{\mu}
+\right)
+\left(
+\bar{\mathbf x}-\boldsymbol{\mu}
+\right)^\top,
+\end{aligned}
+$$
+
+em que
+
+$$
+\mathbf A
+=
+\sum_{i=1}^n
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)^\top.
+$$
+
+Logo, a densidade conjunta pode ser escrita como uma função de
+
+$$
+\left(
+\bar{\mathbf x},
+\mathbf A
+\right)
+$$
+
+e dos parâmetros, multiplicada por uma função que não depende dos parâmetros. Pelo Teorema da Fatoração de Neyman–Fisher, o par é suficiente.
+:::
+
+A suficiência não implica, isoladamente, ausência de viés, consistência ou eficiência. Ela afirma que nenhuma informação sobre os parâmetros, contida na amostra sob o modelo adotado, é perdida quando a amostra é reduzida à estatística suficiente.
+
+### Equivariância e robustez
+
+**Equivariância.** Uma transformação dos dados geralmente induz uma transformação correspondente no parâmetro. A equivariância exige que o procedimento de estimação respeite essa relação.
+
+::: {#def-equivariancia-estimador}
+## Equivariância de um estimador
+
+Considere uma transformação $h$ aplicada à amostra e uma transformação $g$ aplicada ao parâmetro. Um estimador $T$ é equivariante em relação a essas transformações quando
+
+$$
+T
+\left[
+h
+\left(
+\boldsymbol{\mathcal X}
+\right)
+\right]
+=
+g
+\left[
+T
+\left(
+\boldsymbol{\mathcal X}
+\right)
+\right].
+$$ {#eq-equivariancia-estimador}
+:::
+
+A expressão afirma que transformar os dados e depois estimar produz o mesmo resultado que estimar primeiro e aplicar a transformação correspondente ao estimador.
+
+Considere, por exemplo,
+
+$$
+\boldsymbol{\mathsf Y}_i
+=
+\mathbf C
+\boldsymbol{\mathsf X}_i
++
+\mathbf d,
+\qquad
+i=1,\ldots,n,
+$$
+
+com
+
+$$
+\mathbf C
+\in
+\mathbb R^{q\times p}
+\qquad
+\text{e}
+\qquad
+\mathbf d
+\in
+\mathbb R^q.
+$$
+
+Os parâmetros transformados são
+
+$$
+\boldsymbol{\mu}_Y
+=
+\mathbf C
+\boldsymbol{\mu}
++
+\mathbf d
+$$
+
+e
+
+$$
+\boldsymbol{\Sigma}_Y
+=
+\mathbf C
+\boldsymbol{\Sigma}
+\mathbf C^\top.
+$$
+
+Os estimadores usuais da média e da covariância satisfarão relações da forma
+
+$$
+\bar{\boldsymbol{\mathsf Y}}
+=
+\mathbf C
+\bar{\boldsymbol{\mathsf X}}
++
+\mathbf d
+$$
+
+e
+
+$$
+\boldsymbol{\mathsf S}_Y
+=
+\mathbf C
+\boldsymbol{\mathsf S}_X
+\mathbf C^\top.
+$$
+
+Essas propriedades serão demonstradas nas seções dedicadas aos respectivos estimadores.
+
+A equivariância é uma propriedade do procedimento em relação a um grupo ou classe de transformações. Ela deve ser distinguida da invariância da máxima verossimilhança, que trata da estimação de uma função do parâmetro depois que o estimador de máxima verossimilhança foi obtido.
+
+**Robustez.** As propriedades anteriores são definidas em relação a um modelo ou a uma classe de distribuições. A robustez examina a estabilidade do estimador quando os dados ou o modelo sofrem perturbações.
+
+A caracterização de robustez exige especificar:
+
+- a classe de perturbações considerada;
+- o aspecto do estimador que deve permanecer estável;
+- a medida utilizada para quantificar a alteração.
+
+Por isso, não existe uma única propriedade denominada robustez que ordene todos os estimadores.
+
+O vetor de médias amostrais e a matriz de covariâncias amostral podem ser fortemente alterados por observações extremas. Como várias técnicas multivariadas utilizam esses objetos, a alteração pode se propagar para distâncias, autovalores, direções, regiões e regras de classificação.
+
+Estimadores robustos de localização e dispersão procuram reduzir essa sensibilidade. Essa estabilidade pode envolver perda de eficiência quando o modelo ideal é válido, maior custo computacional ou estimação de um funcional populacional diferente daquele associado aos estimadores clássicos.
+
+Robustez também deve ser distinguida de consistência. Um estimador pode ser consistente sob o modelo especificado e apresentar alta sensibilidade a pequenas contaminações. Outro pode ser estável diante de determinadas perturbações sem ser consistente para o parâmetro originalmente definido.
+
+As propriedades apresentadas não formam uma hierarquia universal. A escolha de um estimador depende do parâmetro, da função de perda, do modelo probabilístico, do tamanho amostral, da dimensão e do objetivo da análise. Os métodos dos momentos e da máxima verossimilhança fornecem dois princípios gerais para construir os estimadores examinados neste capítulo.
+
+## Métodos de estimação
+
+Um estimador pode ser construído a partir de diferentes princípios. O método dos momentos procura reproduzir, na amostra, características da distribuição populacional. A máxima verossimilhança escolhe os valores dos parâmetros que tornam os dados observados mais compatíveis com o modelo probabilístico especificado.
+
+Os dois métodos podem produzir o mesmo estimador em determinados modelos. Essa coincidência não ocorre em geral. Também não garante, por si só, ausência de viés, consistência ou eficiência, pois essas propriedades precisam ser analisadas separadamente.
+
+### Método dos momentos
+
+Considere um parâmetro
+
+$$
+\boldsymbol{\theta}
+\in
+\Theta
+\subseteq
+\mathbb R^r
+$$
+
+e uma função vetorial
+
+$$
+\mathbf q
+\left(
+\boldsymbol{\mathsf X}
+\right)
+\in
+\mathbb R^r
+$$
+
+cuja esperança depende de $\boldsymbol{\theta}$:
+
+$$
+\mathbf m
+\left(
+\boldsymbol{\theta}
+\right)
+=
+E_{\boldsymbol{\theta}}
+\left[
+\mathbf q
+\left(
+\boldsymbol{\mathsf X}
+\right)
+\right].
+$$ {#eq-momentos-populacionais-parametro}
+
+O correspondente amostral é
+
+$$
+\widehat{\mathbf m}
+=
+\frac{1}{n}
+\sum_{i=1}^n
+\mathbf q
+\left(
+\boldsymbol{\mathsf X}_i
+\right).
+$$ {#eq-momentos-amostrais-parametro}
+
+::: {#def-estimador-metodo-momentos}
+## Estimador pelo método dos momentos
+
+Um estimador de momentos de $\boldsymbol{\theta}$ é uma solução de
+
+$$
+\mathbf m
+\left(
+\widehat{\boldsymbol{\theta}}_{\mathrm{MM}}
+\right)
+=
+\widehat{\mathbf m}.
+$$ {#eq-estimador-metodo-momentos}
+:::
+
+A construção exige que os momentos escolhidos existam e forneçam informação suficiente para determinar o parâmetro. O sistema em @eq-estimador-metodo-momentos pode não possuir solução, apresentar mais de uma solução ou produzir valores fora do espaço paramétrico.
+
+Considere uma população multivariada com
+
+$$
+E
+\left(
+\boldsymbol{\mathsf X}
+\right)
+=
+\boldsymbol{\mu}.
+$$
+
+O primeiro momento amostral é
+
+$$
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i
+=
+\bar{\boldsymbol{\mathsf X}}.
+$$
+
+Consequentemente,
+
+$$
+\widehat{\boldsymbol{\mu}}_{\mathrm{MM}}
+=
+\bar{\boldsymbol{\mathsf X}}.
+$$ {#eq-estimador-momentos-media}
+
+Para construir um estimador de $\boldsymbol{\Sigma}$, considere o segundo momento não central:
+
+$$
+\mathbf M_2
+=
+E
+\left(
+\boldsymbol{\mathsf X}
+\boldsymbol{\mathsf X}^{\top}
+\right).
+$$
+
+A relação entre o segundo momento, a média e a covariância é
+
+$$
+\boldsymbol{\Sigma}
+=
+\mathbf M_2
+-
+\boldsymbol{\mu}
+\boldsymbol{\mu}^{\top}.
+$$ {#eq-covariancia-segundo-momento-estimacao}
+
+O correspondente momento amostral é
+
+$$
+\widehat{\mathbf M}_2
+=
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i
+\boldsymbol{\mathsf X}_i^{\top}.
+$$
+
+Substituindo os momentos populacionais por seus correspondentes amostrais,
+
+$$
+\begin{aligned}
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MM}}
+&=
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i
+\boldsymbol{\mathsf X}_i^{\top}
+-
+\bar{\boldsymbol{\mathsf X}}
+\bar{\boldsymbol{\mathsf X}}^{\top}
+\\
+&=
+\frac{1}{n}
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)^{\top}.
+\end{aligned}
+$$ {#eq-estimador-momentos-covariancia}
+
+O estimador de momentos utiliza o divisor $n$. Sua construção exige somente a existência dos momentos de segunda ordem e não depende da normalidade multivariada.
+
+O estimador em @eq-estimador-momentos-covariancia é semidefinido positivo, pois, para todo $\mathbf a\in\mathbb R^p$,
+
+$$
+\begin{aligned}
+\mathbf a^{\top}
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MM}}
+\mathbf a
+&=
+\frac{1}{n}
+\sum_{i=1}^n
+\left[
+\mathbf a^{\top}
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\right]^2
+\\
+&\geq
+0.
+\end{aligned}
+$$
+
+Ele pode ser singular quando os vetores centralizados não geram todo o espaço $\mathbb R^p$.
+
+::: {.callout-caution appearance="minimal" icon="false"}
+## Existência e admissibilidade da solução
+
+O método dos momentos não garante que a solução pertença ao espaço paramétrico. Em modelos com restrições de positividade, ordem ou identificabilidade, os momentos amostrais podem produzir uma solução inadmissível.
+
+A existência e a unicidade do estimador precisam ser verificadas para o modelo considerado.
+:::
+
+### Verossimilhança e máxima verossimilhança
+
+Considere uma família de distribuições dominada por uma medida comum, com densidade ou função de probabilidade
+
+$$
+f
+\left(
+\mathbf x;
+\boldsymbol{\theta}
+\right),
+\qquad
+\boldsymbol{\theta}\in\Theta.
+$$
+
+Para uma amostra aleatória independente e identicamente distribuída,
+
+$$
+\boldsymbol{\mathsf X}_1,
+\ldots,
+\boldsymbol{\mathsf X}_n
+\overset{\mathrm{iid}}{\sim}
+f
+\left(
+\mathbf x;
+\boldsymbol{\theta}
+\right),
+$$
+
+a densidade conjunta é o produto das contribuições individuais.
+
+::: {#def-funcao-verossimilhanca}
+## Função de verossimilhança
+
+Para uma amostra observada
+
+$$
+\mathbf x_1,\ldots,\mathbf x_n,
+$$
+
+a função de verossimilhança é
+
+$$
+L
+\left(
+\boldsymbol{\theta};
+\mathbf x_1,\ldots,\mathbf x_n
+\right)
+=
+\prod_{i=1}^n
+f
+\left(
+\mathbf x_i;
+\boldsymbol{\theta}
+\right).
+$$ {#eq-funcao-verossimilhanca}
+:::
+
+Na função de verossimilhança, os dados observados são mantidos fixos e $\boldsymbol{\theta}$ varia no espaço paramétrico. A verossimilhança não é, em geral, uma distribuição de probabilidade sobre os parâmetros.
+
+A log-verossimilhança é
+
+$$
+\ell
+\left(
+\boldsymbol{\theta}
+\right)
+=
+\log
+L
+\left(
+\boldsymbol{\theta}
+\right).
+$$
+
+Sob independência,
+
+$$
+\ell
+\left(
+\boldsymbol{\theta};
+\mathbf x_1,\ldots,\mathbf x_n
+\right)
+=
+\sum_{i=1}^n
+\log
+f
+\left(
+\mathbf x_i;
+\boldsymbol{\theta}
+\right).
+$$ {#eq-log-verossimilhanca-amostra-iid}
+
+Como o logaritmo é estritamente crescente, os máximos da verossimilhança e da log-verossimilhança coincidem.
+
+::: {#def-estimador-maxima-verossimilhanca}
+## Estimador de máxima verossimilhança
+
+Um estimador de máxima verossimilhança de $\boldsymbol{\theta}$ é uma estatística
+
+$$
+\widehat{\boldsymbol{\theta}}_{\mathrm{MV}}
+$$
+
+que satisfaz
+
+$$
+\widehat{\boldsymbol{\theta}}_{\mathrm{MV}}
+\in
+\underset{
+\boldsymbol{\theta}\in\Theta
+}{
+\operatorname*{arg\,max}
+}
+\;
+L
+\left(
+\boldsymbol{\theta};
+\boldsymbol{\mathcal X}
+\right).
+$$ {#eq-estimador-maxima-verossimilhanca}
+
+Após a observação da amostra,
+
+$$
+\widehat{\boldsymbol{\theta}}_{\mathrm{MV,obs}}
+\in
+\underset{
+\boldsymbol{\theta}\in\Theta
+}{
+\operatorname*{arg\,max}
+}
+\;
+L
+\left(
+\boldsymbol{\theta};
+\mathbf x_1,\ldots,\mathbf x_n
+\right).
+$$
+:::
+
+A notação de conjunto em @eq-estimador-maxima-verossimilhanca permite a existência de mais de um máximo. Em aplicações regulares, procura-se uma solução única e interior, mas essas propriedades não decorrem da definição.
+
+As equações obtidas pela anulação do vetor escore fornecem candidatos a máximos interiores:
+
+$$
+\nabla_{\boldsymbol{\theta}}
+\ell
+\left(
+\boldsymbol{\theta}
+\right)
+=
+\mathbf 0.
+$$
+
+Essas equações não garantem a existência nem a natureza do ponto encontrado. A solução precisa ser confrontada com:
+
+- o espaço paramétrico;
+- as condições de segunda ordem;
+- possíveis máximos na fronteira;
+- identificabilidade;
+- existência e unicidade do máximo.
+
+As ferramentas de diferenciação e otimização utilizadas nessa análise foram desenvolvidas no Capítulo 7.
+
+#### Máxima verossimilhança no modelo normal multivariado
+
+Considere
+
+$$
+\boldsymbol{\mathsf X}_1,
+\ldots,
+\boldsymbol{\mathsf X}_n
+\overset{\mathrm{iid}}{\sim}
+N_p
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right),
+$$
+
+com
+
+$$
+\boldsymbol{\mu}\in\mathbb R^p
+\qquad
+\text{e}
+\qquad
+\boldsymbol{\Sigma}\succ\mathbf 0.
+$$
+
+Para uma amostra observada, a verossimilhança é
+
+$$
+\begin{aligned}
+L
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right)
+&=
+(2\pi)^{-np/2}
+\det
+\left(
+\boldsymbol{\Sigma}
+\right)^{-n/2}
+\\
+&\quad\times
+\exp
+\left\{
+-\frac{1}{2}
+\sum_{i=1}^n
+\left(
+\mathbf x_i-\boldsymbol{\mu}
+\right)^{\top}
+\boldsymbol{\Sigma}^{-1}
+\left(
+\mathbf x_i-\boldsymbol{\mu}
+\right)
+\right\}.
+\end{aligned}
+$$ {#eq-verossimilhanca-normal-amostral}
+
+A log-verossimilhança é
+
+$$
+\begin{aligned}
+\ell
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right)
+&=
+-\frac{np}{2}
+\log
+\left(
+2\pi
+\right)
+-
+\frac{n}{2}
+\log
+\det
+\left(
+\boldsymbol{\Sigma}
+\right)
+\\
+&\quad-
+\frac{1}{2}
+\sum_{i=1}^n
+\left(
+\mathbf x_i-\boldsymbol{\mu}
+\right)^{\top}
+\boldsymbol{\Sigma}^{-1}
+\left(
+\mathbf x_i-\boldsymbol{\mu}
+\right).
+\end{aligned}
+$$ {#eq-log-verossimilhanca-normal-amostral}
+
+Defina
+
+$$
+\mathbf A
+=
+\sum_{i=1}^n
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)^{\top}.
+$$ {#eq-sscp-verossimilhanca-normal}
+
+A decomposição em torno da média amostral fornece
+
+$$
+\begin{aligned}
+&
+\sum_{i=1}^n
+\left(
+\mathbf x_i-\boldsymbol{\mu}
+\right)
+\left(
+\mathbf x_i-\boldsymbol{\mu}
+\right)^{\top}
+\\
+&=
+\mathbf A
++
+n
+\left(
+\bar{\mathbf x}-\boldsymbol{\mu}
+\right)
+\left(
+\bar{\mathbf x}-\boldsymbol{\mu}
+\right)^{\top}.
+\end{aligned}
+$$ {#eq-decomposicao-verossimilhanca-normal}
+
+Consequentemente,
+
+$$
+\begin{aligned}
+\ell
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right)
+&=
+-\frac{np}{2}
+\log
+\left(
+2\pi
+\right)
+-
+\frac{n}{2}
+\log
+\det
+\left(
+\boldsymbol{\Sigma}
+\right)
+\\
+&\quad-
+\frac{1}{2}
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}^{-1}
+\mathbf A
+\right)
+\\
+&\quad-
+\frac{n}{2}
+\left(
+\bar{\mathbf x}-\boldsymbol{\mu}
+\right)^{\top}
+\boldsymbol{\Sigma}^{-1}
+\left(
+\bar{\mathbf x}-\boldsymbol{\mu}
+\right).
+\end{aligned}
+$$ {#eq-log-verossimilhanca-normal-decomposta}
+
+Para uma matriz $\boldsymbol{\Sigma}\succ\mathbf 0$ fixa, o último termo é maximizado quando
+
+$$
+\boldsymbol{\mu}
+=
+\bar{\mathbf x}.
+$$
+
+Substituindo esse valor, a log-verossimilhança perfilada para $\boldsymbol{\Sigma}$ torna-se
+
+$$
+\ell_p
+\left(
+\boldsymbol{\Sigma}
+\right)
+=
+C
+-
+\frac{n}{2}
+\left\{
+\log
+\det
+\left(
+\boldsymbol{\Sigma}
+\right)
++
+\operatorname{tr}
+\left[
+\boldsymbol{\Sigma}^{-1}
+\left(
+\frac{\mathbf A}{n}
+\right)
+\right]
+\right\},
+$$ {#eq-log-verossimilhanca-perfil-covariancia}
+
+em que $C$ não depende de $\boldsymbol{\Sigma}$.
+
+::: {#thm-estimadores-normais-mv}
+## Estimadores de máxima verossimilhança no modelo normal
+
+Considere
+
+$$
+\boldsymbol{\mathsf X}_1,
+\ldots,
+\boldsymbol{\mathsf X}_n
+\overset{\mathrm{iid}}{\sim}
+N_p
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right),
+$$
+
+com
+
+$$
+\boldsymbol{\mu}\in\mathbb R^p
+\qquad
+\text{e}
+\qquad
+\boldsymbol{\Sigma}\succ\mathbf 0.
+$$
+
+Para uma amostra observada, defina
+
+$$
+\mathbf A
+=
+\sum_{i=1}^n
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)^\top.
+$$
+
+Se
+
+$$
+\operatorname{posto}
+\left(
+\mathbf A
+\right)
+=
+p,
+$$
+
+a função de verossimilhança possui máximo único no espaço paramétrico, dado por
+
+$$
+\widehat{\boldsymbol{\mu}}_{\mathrm{MV,obs}}
+=
+\bar{\mathbf x}
+$$
+
+e
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV,obs}}
+=
+\frac{\mathbf A}{n}.
+$$
+
+No conjunto dos resultados amostrais em que essa condição de posto se verifica, as regras de estimação correspondentes são
+
+$$
+\widehat{\boldsymbol{\mu}}_{\mathrm{MV}}
+=
+\bar{\boldsymbol{\mathsf X}}
+$$ {#eq-mv-media-normal}
+
+e
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+=
+\frac{1}{n}
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)^\top.
+$$ {#eq-mv-covariancia-normal}
+:::
+
+::: proof
+A maximização em relação a $\boldsymbol{\mu}$ decorre de @eq-log-verossimilhanca-normal-decomposta. Como $\boldsymbol{\Sigma}^{-1}\succ\mathbf 0$,
+
+$$
+\left(
+\bar{\mathbf x}-\boldsymbol{\mu}
+\right)^{\top}
+\boldsymbol{\Sigma}^{-1}
+\left(
+\bar{\mathbf x}-\boldsymbol{\mu}
+\right)
+\geq
+0,
+$$
+
+com igualdade somente quando
+
+$$
+\boldsymbol{\mu}
+=
+\bar{\mathbf x}.
+$$
+
+Para maximizar em relação a $\boldsymbol{\Sigma}$, defina
+
+$$
+\mathbf C
+=
+\frac{\mathbf A}{n}.
+$$
+
+Pela hipótese de posto completo,
+
+$$
+\mathbf C\succ\mathbf 0.
+$$
+
+A maximização da log-verossimilhança equivale à minimização de
+
+$$
+\log
+\det
+\left(
+\boldsymbol{\Sigma}
+\right)
++
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}^{-1}
+\mathbf C
+\right).
+$$
+
+Defina
+
+$$
+\mathbf M
+=
+\mathbf C^{-1/2}
+\boldsymbol{\Sigma}
+\mathbf C^{-1/2}.
+$$
+
+Então,
+
+$$
+\log
+\det
+\left(
+\boldsymbol{\Sigma}
+\right)
+=
+\log
+\det
+\left(
+\mathbf C
+\right)
++
+\log
+\det
+\left(
+\mathbf M
+\right)
+$$
+
+e
+
+$$
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}^{-1}
+\mathbf C
+\right)
+=
+\operatorname{tr}
+\left(
+\mathbf M^{-1}
+\right).
+$$
+
+Se $m_1,\ldots,m_p$ são os autovalores positivos de $\mathbf M$, a parcela que depende de $\mathbf M$ é
+
+$$
+\sum_{j=1}^p
+\left(
+\log m_j
++
+\frac{1}{m_j}
+\right).
+$$
+
+Para $m>0$, a função
+
+$$
+\log m+\frac{1}{m}
+$$
+
+assume seu mínimo em $m=1$. Portanto,
+
+$$
+\mathbf M
+=
+\mathbf I_p,
+$$
+
+o que implica
+
+$$
+\boldsymbol{\Sigma}
+=
+\mathbf C
+=
+\frac{\mathbf A}{n}.
+$$
+:::
+
+A condição
+
+$$
+\operatorname{posto}
+\left(
+\mathbf A
+\right)
+=
+p
+$$
+
+exige que os vetores observados após a centralização gerem $\mathbb R^p$. Como
+
+$$
+\operatorname{posto}
+\left(
+\mathbf A
+\right)
+\leq
+\min
+\left(
+p,n-1
+\right),
+$$
+
+uma condição necessária para que $\mathbf A$ tenha posto completo é
+
+$$
+n\geq p+1.
+$$
+
+Essa desigualdade não é suficiente para uma amostra arbitrária, pois as colunas da matriz de dados centralizada ainda podem apresentar dependência linear. Sob uma distribuição normal multivariada não singular e com $n\geq p+1$, a condição de posto completo ocorre com probabilidade 1.
+
+Quando $\mathbf A$ é singular, existe uma direção não nula pertencente ao seu núcleo. É possível fazer um autovalor de $\boldsymbol{\Sigma}$ tender a zero nessa direção sem aumentar o termo
+
+$$
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}^{-1}\mathbf A
+\right),
+$$
+
+enquanto
+
+$$
+-\frac{n}{2}
+\log
+\det
+\left(
+\boldsymbol{\Sigma}
+\right)
+$$
+
+tende a $+\infty$. Portanto, a verossimilhança é ilimitada superiormente quando $\boldsymbol{\Sigma}$ se aproxima da fronteira do cone positivo definido.
+
+Nesse caso, não existe estimador de máxima verossimilhança de $\boldsymbol{\Sigma}$ no espaço
+
+$$
+\left\{
+\boldsymbol{\Sigma}\in\mathbb R^{p\times p}:
+\boldsymbol{\Sigma}\succ\mathbf 0
+\right\}.
+$$
+
+A matriz
+
+$$
+\frac{\mathbf A}{n}
+$$
+
+continua sendo uma matriz semidefinida positiva calculável e corresponde ao estimador de momentos, mas não é um estimador de máxima verossimilhança no modelo normal multivariado não singular.
+
+O estimador de $\boldsymbol{\Sigma}$ em @eq-mv-covariancia-normal coincide com o estimador obtido pelo método dos momentos. Ele utiliza o divisor $n$ e, como será demonstrado posteriormente, é viesado para $\boldsymbol{\Sigma}$.
+
+### Invariância da máxima verossimilhança
+
+A máxima verossimilhança possui uma propriedade que permite estimar funções do parâmetro sem realizar uma nova maximização desde o início.
+
+Considere
+
+$$
+\boldsymbol{\psi}
+=
+g
+\left(
+\boldsymbol{\theta}
+\right).
+$$
+
+Quando $g$ não é injetiva, diferentes valores de $\boldsymbol{\theta}$ podem produzir o mesmo valor de $\boldsymbol{\psi}$. A verossimilhança perfilada de $\boldsymbol{\psi}$ é definida por
+
+$$
+L_g
+\left(
+\boldsymbol{\psi}
+\right)
+=
+\sup_{
+\boldsymbol{\theta}\in\Theta:
+g(\boldsymbol{\theta})=\boldsymbol{\psi}
+}
+L
+\left(
+\boldsymbol{\theta}
+\right).
+$$ {#eq-verossimilhanca-perfil-transformacao}
+
+::: {#thm-invariancia-maxima-verossimilhanca}
+## Invariância da máxima verossimilhança
+
+Se
+
+$$
+\widehat{\boldsymbol{\theta}}_{\mathrm{MV}}
+$$
+
+é um estimador de máxima verossimilhança de $\boldsymbol{\theta}$ e
+
+$$
+\boldsymbol{\psi}
+=
+g
+\left(
+\boldsymbol{\theta}
+\right),
+$$
+
+então
+
+$$
+g
+\left(
+\widehat{\boldsymbol{\theta}}_{\mathrm{MV}}
+\right)
+$$
+
+é um estimador de máxima verossimilhança de $\boldsymbol{\psi}$, em relação à verossimilhança perfilada definida em @eq-verossimilhanca-perfil-transformacao.
+:::
+
+::: proof
+Como
+
+$$
+\widehat{\boldsymbol{\theta}}_{\mathrm{MV}}
+\in
+\operatorname*{arg\,max}_{\boldsymbol{\theta}\in\Theta}
+L
+\left(
+\boldsymbol{\theta}
+\right),
+$$
+
+tem-se
+
+$$
+L
+\left(
+\widehat{\boldsymbol{\theta}}_{\mathrm{MV}}
+\right)
+\geq
+L
+\left(
+\boldsymbol{\theta}
+\right)
+$$
+
+para todo $\boldsymbol{\theta}\in\Theta$.
+
+Defina
+
+$$
+\widehat{\boldsymbol{\psi}}
+=
+g
+\left(
+\widehat{\boldsymbol{\theta}}_{\mathrm{MV}}
+\right).
+$$
+
+A fibra correspondente a $\widehat{\boldsymbol{\psi}}$ contém $\widehat{\boldsymbol{\theta}}_{\mathrm{MV}}$. Portanto,
+
+$$
+L_g
+\left(
+\widehat{\boldsymbol{\psi}}
+\right)
+=
+L
+\left(
+\widehat{\boldsymbol{\theta}}_{\mathrm{MV}}
+\right).
+$$
+
+Nenhum outro valor de $\boldsymbol{\psi}$ pode produzir uma verossimilhança perfilada maior, pois isso exigiria um valor de $\boldsymbol{\theta}$ com verossimilhança superior ao máximo global. Logo,
+
+$$
+\widehat{\boldsymbol{\psi}}
+=
+g
+\left(
+\widehat{\boldsymbol{\theta}}_{\mathrm{MV}}
+\right)
+$$
+
+é um estimador de máxima verossimilhança de $\boldsymbol{\psi}$.
+:::
+
+A invariância da máxima verossimilhança não é a mesma propriedade que a equivariância de um estimador.
+
+- **Equivariância** compara o efeito de uma transformação aplicada aos dados com a transformação correspondente do estimador.
+- **Invariância da máxima verossimilhança** permite estimar uma função do parâmetro aplicando essa função ao estimador de máxima verossimilhança.
+
+Considere a matriz de correlações populacional
+
+$$
+\boldsymbol{\mathcal R}
+=
+\mathbf D_{\sigma}^{-1}
+\boldsymbol{\Sigma}
+\mathbf D_{\sigma}^{-1},
+$$
+
+em que
+
+$$
+\mathbf D_{\sigma}
+=
+\operatorname{diag}
+\left(
+\sqrt{\sigma_{11}},
+\ldots,
+\sqrt{\sigma_{pp}}
+\right).
+$$
+
+Quando o estimador normal de máxima verossimilhança de $\boldsymbol{\Sigma}$ existe, a invariância fornece
+
+$$
+\widehat{\boldsymbol{\mathcal R}}_{\mathrm{MV}}
+=
+\widehat{\mathbf D}_{\sigma,\mathrm{MV}}^{-1}
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+\widehat{\mathbf D}_{\sigma,\mathrm{MV}}^{-1}.
+$$ {#eq-mv-matriz-correlacoes}
+
+Como a multiplicação de uma matriz de covariâncias por uma constante positiva comum não altera suas correlações, a matriz em @eq-mv-matriz-correlacoes coincide com a matriz de correlações obtida a partir do estimador de covariâncias com divisor $n-1$.
+
+A propriedade também permite construir estimadores de máxima verossimilhança para funções como
+
+$$
+\det
+\left(
+\boldsymbol{\Sigma}
+\right),
+\qquad
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}
+\right),
+\qquad
+\boldsymbol{\Sigma}^{-1}
+$$
+
+e os autovalores de $\boldsymbol{\Sigma}$, desde que as funções estejam definidas no estimador obtido.
+
+A invariância é uma propriedade de otimização. Ela não garante ausência de viés nem estabilidade numérica. Por exemplo,
+
+$$
+\left(
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+\right)^{-1}
+$$
+
+pode existir e ser um estimador de máxima verossimilhança de $\boldsymbol{\Sigma}^{-1}$ sem ser não viesado. Quando a matriz estimada é mal condicionada, sua inversão também pode ser numericamente instável.
+
+Os métodos apresentados produzem, no modelo normal, o vetor de médias amostrais e uma matriz de covariâncias com divisor $n$. A seção seguinte examina primeiro o estimador de $\boldsymbol{\mu}$, suas propriedades e sua interpretação geométrica.
+
+## Estimação do vetor de médias
+
+O vetor de médias populacional
+
+$$
+\boldsymbol{\mu}
+=
+E
+\left(
+\boldsymbol{\mathsf X}
+\right)
+$$
+
+descreve a localização da distribuição em $\mathbb R^p$. Sua estimação é realizada a partir do centro das observações que compõem a amostra.
+
+Considere
+
+$$
+\boldsymbol{\mathsf X}_1,
+\ldots,
+\boldsymbol{\mathsf X}_n
+\overset{\mathrm{iid}}{\sim}
+F_{\boldsymbol{\theta}},
+$$
+
+com
+
+$$
+E
+\left(
+\boldsymbol{\mathsf X}_i
+\right)
+=
+\boldsymbol{\mu}
+$$
+
+e
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}_i
+\right)
+=
+\boldsymbol{\Sigma},
+\qquad
+i=1,\ldots,n.
+$$
+
+A normalidade multivariada não é necessária para definir o estimador nem para obter suas propriedades de primeira e segunda ordens.
+
+### Vetor de médias amostrais
+
+O vetor de médias amostrais foi definido em @eq-media-amostral-aleatoria por
+
+$$
+\bar{\boldsymbol{\mathsf X}}
+=
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i.
+$$
+
+Componente a componente,
+
+$$
+\bar{\boldsymbol{\mathsf X}}
+=
+\begin{bmatrix}
+\bar X_1\\
+\bar X_2\\
+\vdots\\
+\bar X_p
+\end{bmatrix},
+$$
+
+em que
+
+$$
+\bar X_j
+=
+\frac{1}{n}
+\sum_{i=1}^n
+X_{ij},
+\qquad
+j=1,\ldots,p.
+$$ {#eq-componentes-media-amostral}
+
+Portanto, cada componente de $\bar{\boldsymbol{\mathsf X}}$ é a média amostral da variável correspondente.
+
+Utilizando a matriz aleatória da amostra,
+
+$$
+\boldsymbol{\mathcal X}
+\in
+\mathbb R^{n\times p},
+$$
+
+o vetor pode ser escrito como
+
+$$
+\bar{\boldsymbol{\mathsf X}}
+=
+\frac{1}{n}
+\boldsymbol{\mathcal X}^{\top}
+\mathbf 1_n,
+$$ {#eq-media-amostral-forma-matricial}
+
+em que $\mathbf 1_n$ é o vetor de dimensão $n$ cujos elementos são iguais a 1.
+
+Após a observação da amostra,
+
+$$
+\bar{\mathbf x}
+=
+\frac{1}{n}
+\sum_{i=1}^n
+\mathbf x_i
+=
+\frac{1}{n}
+\mathbf X^\top
+\mathbf 1_n.
+$$ {#eq-media-observada-forma-matricial}
+
+O vetor de médias amostrais é obtido tanto pelo método dos momentos quanto pela máxima verossimilhança sob o modelo normal:
+
+$$
+\widehat{\boldsymbol{\mu}}_{\mathrm{MM}}
+=
+\widehat{\boldsymbol{\mu}}_{\mathrm{MV}}
+=
+\bar{\boldsymbol{\mathsf X}}.
+$$ {#eq-estimadores-media-coincidentes}
+
+A coincidência dos estimadores decorre das estruturas específicas dos momentos e da verossimilhança normal. As propriedades examinadas a seguir dependem somente da amostragem aleatória e da existência dos momentos indicados.
+
+O vetor observado $\bar{\mathbf x}$ também possui uma interpretação geométrica: ele é o centroide da nuvem de pontos formada pelas observações.
+
+::: {#thm-centroide-media-amostral}
+## Caracterização da média amostral como centroide
+
+Para observações
+
+$$
+\mathbf x_1,\ldots,\mathbf x_n
+\in
+\mathbb R^p,
+$$
+
+o vetor de médias amostrais é o único minimizador de
+
+$$
+Q
+\left(
+\mathbf m
+\right)
+=
+\sum_{i=1}^n
+\left\|
+\mathbf x_i-\mathbf m
+\right\|^2,
+\qquad
+\mathbf m\in\mathbb R^p.
+$$
+
+Portanto,
+
+$$
+\bar{\mathbf x}
+=
+\underset{
+\mathbf m\in\mathbb R^p
+}{
+\operatorname*{arg\,min}
+}
+\;
+\sum_{i=1}^n
+\left\|
+\mathbf x_i-\mathbf m
+\right\|^2.
+$$ {#eq-media-centroide-minimos-quadrados}
+:::
+
+::: proof
+Para qualquer $\mathbf m\in\mathbb R^p$,
+
+$$
+\mathbf x_i-\mathbf m
+=
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)
++
+\left(
+\bar{\mathbf x}-\mathbf m
+\right).
+$$
+
+Consequentemente,
+
+$$
+\begin{aligned}
+\sum_{i=1}^n
+\left\|
+\mathbf x_i-\mathbf m
+\right\|^2
+&=
+\sum_{i=1}^n
+\left\|
+\mathbf x_i-\bar{\mathbf x}
+\right\|^2
+\\
+&\quad+
+2
+\left(
+\bar{\mathbf x}-\mathbf m
+\right)^\top
+\sum_{i=1}^n
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)
+\\
+&\quad+
+n
+\left\|
+\bar{\mathbf x}-\mathbf m
+\right\|^2.
+\end{aligned}
+$$
+
+Como
+
+$$
+\sum_{i=1}^n
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)
+=
+\mathbf 0,
+$$
+
+obtém-se
+
+$$
+\begin{aligned}
+\sum_{i=1}^n
+\left\|
+\mathbf x_i-\mathbf m
+\right\|^2
+&=
+\sum_{i=1}^n
+\left\|
+\mathbf x_i-\bar{\mathbf x}
+\right\|^2
+\\
+&\quad+
+n
+\left\|
+\bar{\mathbf x}-\mathbf m
+\right\|^2.
+\end{aligned}
+$$ {#eq-decomposicao-centroide-media}
+
+A primeira parcela não depende de $\mathbf m$. A segunda é não negativa e assume valor zero somente quando
+
+$$
+\mathbf m
+=
+\bar{\mathbf x}.
+$$
+
+Logo, $\bar{\mathbf x}$ é o único minimizador.
+:::
+
+A identidade em @eq-decomposicao-centroide-media separa a dispersão em torno de um ponto arbitrário em duas parcelas: a dispersão em torno do centroide e o afastamento entre esse ponto e o centroide. Sua forma matricial será retomada na construção da matriz de somas de quadrados e produtos cruzados.
+
+### Esperança e matriz de covariâncias
+
+As propriedades de primeira e segunda ordens do vetor de médias amostrais podem ser obtidas diretamente da independência entre as unidades amostrais.
+
+::: {#thm-media-amostral-momentos}
+## Esperança e covariância do vetor de médias amostrais
+
+Considere uma amostra aleatória multivariada com
+
+$$
+E
+\left(
+\boldsymbol{\mathsf X}_i
+\right)
+=
+\boldsymbol{\mu}
+$$
+
+e
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}_i
+\right)
+=
+\boldsymbol{\Sigma}.
+$$
+
+Então,
+
+$$
+E
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+=
+\boldsymbol{\mu}
+$$ {#eq-esperanca-media-amostral}
+
+e
+
+$$
+\operatorname{Cov}
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+=
+\frac{\boldsymbol{\Sigma}}{n}.
+$$ {#eq-covariancia-media-amostral}
+:::
+
+::: proof
+Pela linearidade da esperança,
+
+$$
+\begin{aligned}
+E
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+&=
+E
+\left(
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i
+\right)
+\\
+&=
+\frac{1}{n}
+\sum_{i=1}^n
+E
+\left(
+\boldsymbol{\mathsf X}_i
+\right)
+\\
+&=
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mu}
+\\
+&=
+\boldsymbol{\mu}.
+\end{aligned}
+$$
+
+Para a matriz de covariâncias,
+
+$$
+\begin{aligned}
+\operatorname{Cov}
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+&=
+\operatorname{Cov}
+\left(
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i
+\right)
+\\
+&=
+\frac{1}{n^2}
+\operatorname{Cov}
+\left(
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i
+\right).
+\end{aligned}
+$$
+
+Como os vetores da amostra são independentes,
+
+$$
+\operatorname{Cov}
+\left(
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i
+\right)
+=
+\sum_{i=1}^n
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}_i
+\right)
+=
+n\boldsymbol{\Sigma}.
+$$
+
+Portanto,
+
+$$
+\operatorname{Cov}
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+=
+\frac{\boldsymbol{\Sigma}}{n}.
+$$
+:::
+
+O resultado @eq-esperanca-media-amostral mostra que
+
+$$
+\operatorname{Bias}
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+=
+\mathbf 0.
+$$
+
+Assim, $\bar{\boldsymbol{\mathsf X}}$ é um estimador não viesado de $\boldsymbol{\mu}$.
+
+Os elementos da matriz em @eq-covariancia-media-amostral são
+
+$$
+\operatorname{Var}
+\left(
+\bar X_j
+\right)
+=
+\frac{\sigma_{jj}}{n}
+$$
+
+e
+
+$$
+\operatorname{Cov}
+\left(
+\bar X_j,
+\bar X_k
+\right)
+=
+\frac{\sigma_{jk}}{n}.
+$$
+
+O tamanho amostral reduz pelo mesmo fator as variâncias das médias individuais e as covariâncias entre seus erros de estimação. A estrutura de orientação e dependência permanece determinada por $\boldsymbol{\Sigma}$.
+
+Sob a perda quadrática euclidiana, o estimador é não viesado e, portanto,
+
+$$
+\begin{aligned}
+\operatorname{EQM}
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+&=
+\operatorname{tr}
+\left[
+\operatorname{Cov}
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\right]
+\\
+&=
+\frac{1}{n}
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}
+\right).
+\end{aligned}
+$$ {#eq-eqm-media-amostral}
+
+A variância total da população determina a magnitude global do erro de estimação segundo essa perda, enquanto o aumento de $n$ reduz o erro na razão $1/n$.
+
+### Combinações lineares
+
+Considere o parâmetro escalar
+
+$$
+\mathbf a^\top
+\boldsymbol{\mu},
+\qquad
+\mathbf a\in\mathbb R^p.
+$$
+
+A invariância da máxima verossimilhança e a linearidade do método dos momentos conduzem ao estimador
+
+$$
+\mathbf a^\top
+\bar{\boldsymbol{\mathsf X}}.
+$$
+
+Pela linearidade da esperança,
+
+$$
+E
+\left(
+\mathbf a^\top
+\bar{\boldsymbol{\mathsf X}}
+\right)
+=
+\mathbf a^\top
+\boldsymbol{\mu}.
+$$
+
+Logo, o estimador é não viesado para a combinação linear populacional.
+
+Sua variância é
+
+$$
+\begin{aligned}
+\operatorname{Var}
+\left(
+\mathbf a^\top
+\bar{\boldsymbol{\mathsf X}}
+\right)
+&=
+\mathbf a^\top
+\operatorname{Cov}
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\mathbf a
+\\
+&=
+\frac{1}{n}
+\mathbf a^\top
+\boldsymbol{\Sigma}
+\mathbf a.
+\end{aligned}
+$$ {#eq-variancia-combinacao-media-amostral}
+
+A precisão depende da direção definida por $\mathbf a$. Combinações lineares com maior variabilidade populacional também apresentam maior variabilidade entre amostras.
+
+Quando
+
+$$
+\mathbf a
+=
+\mathbf e_j,
+$$
+
+em que $\mathbf e_j$ é o $j$-ésimo vetor da base canônica, recupera-se
+
+$$
+\operatorname{Var}
+\left(
+\bar X_j
+\right)
+=
+\frac{\sigma_{jj}}{n}.
+$$
+
+Para uma matriz constante
+
+$$
+\mathbf C
+\in
+\mathbb R^{q\times p},
+$$
+
+o estimador de
+
+$$
+\mathbf C\boldsymbol{\mu}
+$$
+
+é
+
+$$
+\mathbf C
+\bar{\boldsymbol{\mathsf X}},
+$$
+
+com
+
+$$
+E
+\left(
+\mathbf C
+\bar{\boldsymbol{\mathsf X}}
+\right)
+=
+\mathbf C
+\boldsymbol{\mu}
+$$
+
+e
+
+$$
+\operatorname{Cov}
+\left(
+\mathbf C
+\bar{\boldsymbol{\mathsf X}}
+\right)
+=
+\frac{1}{n}
+\mathbf C
+\boldsymbol{\Sigma}
+\mathbf C^\top.
+$$ {#eq-covariancia-transformacao-media-amostral}
+
+Essas expressões serão utilizadas posteriormente na estimação de contrastes e combinações lineares de vetores de médias.
+
+### Consistência e equivariância
+
+A redução da matriz de covariâncias pelo fator $1/n$ implica a concentração do estimador em torno de $\boldsymbol{\mu}$ quando a dimensão $p$ é fixa.
+
+::: {#thm-consistencia-media-amostral}
+## Consistência do vetor de médias amostrais
+
+Se
+
+$$
+E
+\left(
+\left\|
+\boldsymbol{\mathsf X}
+\right\|^2
+\right)
+<
+\infty,
+$$
+
+então
+
+$$
+\bar{\boldsymbol{\mathsf X}}
+\xrightarrow{P}
+\boldsymbol{\mu}
+$$ {#eq-consistencia-media-amostral}
+
+quando $n\to\infty$.
+:::
+
+::: proof
+Por @eq-eqm-media-amostral,
+
+$$
+E
+\left[
+\left\|
+\bar{\boldsymbol{\mathsf X}}
+-
+\boldsymbol{\mu}
+\right\|^2
+\right]
+=
+\frac{
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}
+\right)
+}{n}.
+$$
+
+Para qualquer $\varepsilon>0$, a desigualdade de Markov aplicada à variável não negativa
+
+$$
+\left\|
+\bar{\boldsymbol{\mathsf X}}
+-
+\boldsymbol{\mu}
+\right\|^2
+$$
+
+fornece
+
+$$
+\begin{aligned}
+P
+\left(
+\left\|
+\bar{\boldsymbol{\mathsf X}}
+-
+\boldsymbol{\mu}
+\right\|
+>
+\varepsilon
+\right)
+&\leq
+\frac{
+E
+\left[
+\left\|
+\bar{\boldsymbol{\mathsf X}}
+-
+\boldsymbol{\mu}
+\right\|^2
+\right]
+}{
+\varepsilon^2
+}
+\\
+&=
+\frac{
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}
+\right)
+}{
+n\varepsilon^2
+}.
+\end{aligned}
+$$
+
+O último termo converge para zero quando $n\to\infty$, o que estabelece a convergência em probabilidade.
+:::
+
+A prova utiliza segundos momentos finitos. A consistência também pode ser obtida pela Lei dos Grandes Números sob condições mais gerais de integrabilidade, aplicada componente a componente quando $p$ é fixo.
+
+O vetor de médias amostrais também respeita transformações afins dos dados.
+
+::: {#thm-equivariancia-media-amostral}
+## Equivariância afim do vetor de médias amostrais
+
+Considere
+
+$$
+\boldsymbol{\mathsf Y}_i
+=
+\mathbf C
+\boldsymbol{\mathsf X}_i
++
+\mathbf d,
+\qquad
+i=1,\ldots,n,
+$$
+
+em que
+
+$$
+\mathbf C
+\in
+\mathbb R^{q\times p}
+$$
+
+e
+
+$$
+\mathbf d
+\in
+\mathbb R^q.
+$$
+
+Então,
+
+$$
+\bar{\boldsymbol{\mathsf Y}}
+=
+\mathbf C
+\bar{\boldsymbol{\mathsf X}}
++
+\mathbf d.
+$$ {#eq-equivariancia-media-amostral}
+:::
+
+::: proof
+Pela definição do vetor de médias amostrais,
+
+$$
+\begin{aligned}
+\bar{\boldsymbol{\mathsf Y}}
+&=
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf Y}_i
+\\
+&=
+\frac{1}{n}
+\sum_{i=1}^n
+\left(
+\mathbf C
+\boldsymbol{\mathsf X}_i
++
+\mathbf d
+\right)
+\\
+&=
+\mathbf C
+\left(
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i
+\right)
++
+\mathbf d
+\\
+&=
+\mathbf C
+\bar{\boldsymbol{\mathsf X}}
++
+\mathbf d.
+\end{aligned}
+$$
+:::
+
+A média da população transformada é
+
+$$
+\boldsymbol{\mu}_Y
+=
+\mathbf C
+\boldsymbol{\mu}
++
+\mathbf d.
+$$
+
+Portanto, a transformação que relaciona os parâmetros populacionais também relaciona seus estimadores. Essa propriedade garante coerência diante de translações, mudanças de unidade, rotações, seleção de variáveis e construção de combinações lineares.
+
+### Variabilidade entre amostras
+
+A estimativa $\bar{\mathbf x}$ depende da amostra observada. Diferentes amostras da mesma população produzem diferentes centroides.
+
+A Figura @fig-variabilidade-media-amostral apresenta os vetores de médias obtidos em amostras bivariadas de tamanhos 5 e 50, todas provenientes da mesma distribuição. O símbolo em forma de cruz indica o vetor de médias populacional.
+
+```{r}
+#| label: fig-variabilidade-media-amostral
+#| fig-cap: "Vetores de médias amostrais em amostras bivariadas de tamanhos 5 e 50."
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 9
+#| fig-height: 4.5
+#| fig-align: center
+
+set.seed(510)
+
+mu_medias <- c(2, 4)
+
+Sigma_medias <- matrix(
+  c(
+    4.0, 1.6,
+    1.6, 2.0
+  ),
+  nrow = 2,
+  byrow = TRUE
+)
+
+tamanhos_amostrais <- c(5, 50)
+numero_repeticoes <- 250
+
+dados_medias <- do.call(
+  rbind,
+  lapply(
+    tamanhos_amostrais,
+    function(n_atual) {
+      medias_simuladas <- t(
+        replicate(
+          numero_repeticoes,
+          colMeans(
+            MASS::mvrnorm(
+              n = n_atual,
+              mu = mu_medias,
+              Sigma = Sigma_medias
+            )
+          )
+        )
+      )
+
+      data.frame(
+        Media1 = medias_simuladas[, 1],
+        Media2 = medias_simuladas[, 2],
+        Tamanho = factor(
+          paste0(
+            "n = ",
+            n_atual
+          ),
+          levels = paste0(
+            "n = ",
+            tamanhos_amostrais
+          )
+        )
+      )
+    }
+  )
+)
+
+dados_centro <- data.frame(
+  Media1 = rep(
+    mu_medias[1],
+    length(
+      tamanhos_amostrais
+    )
+  ),
+  Media2 = rep(
+    mu_medias[2],
+    length(
+      tamanhos_amostrais
+    )
+  ),
+  Tamanho = factor(
+    paste0(
+      "n = ",
+      tamanhos_amostrais
+    ),
+    levels = paste0(
+      "n = ",
+      tamanhos_amostrais
+    )
+  )
+)
+
+ggplot2::ggplot(
+  dados_medias,
+  ggplot2::aes(
+    x = Media1,
+    y = Media2
+  )
+) +
+  ggplot2::geom_point(
+    alpha = 0.35,
+    size = 1.5
+  ) +
+  ggplot2::geom_point(
+    data = dados_centro,
+    ggplot2::aes(
+      x = Media1,
+      y = Media2
+    ),
+    inherit.aes = FALSE,
+    shape = 4,
+    size = 4,
+    stroke = 1.2
+  ) +
+  ggplot2::facet_wrap(
+    ~Tamanho
+  ) +
+  ggplot2::coord_equal(
+    xlim = c(-1.5, 5.5),
+    ylim = c(1.0, 7.0)
+  ) +
+  ggplot2::labs(
+    x = expression(
+      bar(X)[1]
+    ),
+    y = expression(
+      bar(X)[2]
+    )
+  ) +
+  ggplot2::theme_minimal(
+    base_size = 12
+  ) +
+  ggplot2::theme(
+    panel.grid.minor = ggplot2::element_blank(),
+    strip.text = ggplot2::element_text(
+      face = "bold"
+    )
+  )
+```
+
+Nos dois painéis, os vetores de médias amostrais se distribuem ao redor de $\boldsymbol{\mu}$. Quando o tamanho da amostra aumenta de 5 para 50, a nuvem torna-se mais concentrada.
+
+Esse comportamento decorre de
+
+$$
+\operatorname{Cov}
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+=
+\frac{\boldsymbol{\Sigma}}{n}.
+$$
+
+A forma da dispersão entre as médias amostrais permanece determinada por $\boldsymbol{\Sigma}$, enquanto sua magnitude diminui com o crescimento de $n$.
+
+O vetor de médias amostrais estima a localização da população. A estimação da dispersão exige considerar os desvios das observações em relação a esse centro. Esses desvios conduzem à matriz de somas de quadrados e produtos cruzados e aos estimadores da matriz de covariâncias.
+
+## SSCP e estimação da matriz de covariâncias
+
+O vetor de médias amostrais estima a localização da população. A estimação da matriz de covariâncias utiliza os desvios das observações em relação a esse centro.
+
+Considere uma amostra aleatória multivariada com segundos momentos finitos:
+
+$$
+\boldsymbol{\mathsf X}_1,
+\ldots,
+\boldsymbol{\mathsf X}_n
+\overset{\mathrm{iid}}{\sim}
+F_{\boldsymbol{\theta}},
+$$
+
+com
+
+$$
+E
+\left(
+\boldsymbol{\mathsf X}_i
+\right)
+=
+\boldsymbol{\mu}
+$$
+
+e
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}_i
+\right)
+=
+\boldsymbol{\Sigma}.
+$$
+
+A matriz de covariâncias populacional pode ser escrita como
+
+$$
+\boldsymbol{\Sigma}
+=
+E
+\left[
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}
+\right)
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}
+\right)^\top
+\right].
+$$
+
+A construção amostral substitui o centro populacional desconhecido pelo vetor de médias amostrais.
+
+### Matriz amostral centralizada e SSCP
+
+A matriz de centralização é
+
+$$
+\mathbf H_n
+=
+\mathbf I_n
+-
+\frac{1}{n}
+\mathbf 1_n
+\mathbf 1_n^\top.
+$$ {#eq-matriz-centralizacao-estimacao}
+
+Ela é simétrica e idempotente:
+
+$$
+\mathbf H_n^\top
+=
+\mathbf H_n
+$$
+
+e
+
+$$
+\mathbf H_n^2
+=
+\mathbf H_n.
+$$
+
+Além disso,
+
+$$
+\mathbf H_n
+\mathbf 1_n
+=
+\mathbf 0
+$$
+
+e
+
+$$
+\operatorname{posto}
+\left(
+\mathbf H_n
+\right)
+=
+n-1.
+$$
+
+Aplicando essa matriz à matriz aleatória da amostra, obtém-se
+
+$$
+\boldsymbol{\mathcal X}_c
+=
+\mathbf H_n
+\boldsymbol{\mathcal X}
+=
+\begin{bmatrix}
+\left(
+\boldsymbol{\mathsf X}_1
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)^\top\\
+\vdots\\
+\left(
+\boldsymbol{\mathsf X}_n
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)^\top
+\end{bmatrix}.
+$$ {#eq-matriz-amostral-centralizada}
+
+Após a observação dos dados,
+
+$$
+\mathbf X_c
+=
+\mathbf H_n
+\mathbf X.
+$$
+
+As colunas de $\boldsymbol{\mathcal X}_c$ possuem soma igual a zero:
+
+$$
+\mathbf 1_n^\top
+\boldsymbol{\mathcal X}_c
+=
+\mathbf 0^\top.
+$$
+
+::: {#def-sscp-amostral}
+## Matriz de somas de quadrados e produtos cruzados
+
+A matriz aleatória de somas de quadrados e produtos cruzados, denominada **SSCP amostral**, é
+
+$$
+\boldsymbol{\mathsf A}
+=
+\boldsymbol{\mathcal X}_c^\top
+\boldsymbol{\mathcal X}_c.
+$$ {#eq-sscp-amostral-matricial}
+
+Equivalentemente,
+
+$$
+\boldsymbol{\mathsf A}
+=
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)^\top.
+$$ {#eq-sscp-amostral-somatorio}
+:::
+
+Para a amostra observada,
+
+$$
+\mathbf A
+=
+\mathbf X_c^\top
+\mathbf X_c
+=
+\sum_{i=1}^n
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)^\top.
+$$ {#eq-sscp-observada}
+
+O elemento $(j,k)$ de $\boldsymbol{\mathsf A}$ é
+
+$$
+a_{jk}
+=
+\sum_{i=1}^n
+\left(
+X_{ij}-\bar X_j
+\right)
+\left(
+X_{ik}-\bar X_k
+\right).
+$$ {#eq-elemento-sscp-amostral}
+
+Na diagonal aparecem as somas de quadrados:
+
+$$
+a_{jj}
+=
+\sum_{i=1}^n
+\left(
+X_{ij}-\bar X_j
+\right)^2.
+$$
+
+Fora da diagonal aparecem os produtos cruzados entre pares de variáveis.
+
+A matriz $\boldsymbol{\mathsf A}$ é simétrica e semidefinida positiva. Para qualquer vetor $\mathbf a\in\mathbb R^p$,
+
+$$
+\begin{aligned}
+\mathbf a^\top
+\boldsymbol{\mathsf A}
+\mathbf a
+&=
+\mathbf a^\top
+\boldsymbol{\mathcal X}_c^\top
+\boldsymbol{\mathcal X}_c
+\mathbf a
+\\
+&=
+\left\|
+\boldsymbol{\mathcal X}_c
+\mathbf a
+\right\|^2
+\\
+&=
+\sum_{i=1}^n
+\left[
+\mathbf a^\top
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\right]^2
+\\
+&\geq
+0.
+\end{aligned}
+$$ {#eq-semidefinicao-sscp-amostral}
+
+A forma quadrática representa a soma de quadrados da combinação linear definida por $\mathbf a$, após sua centralização amostral.
+
+### Decomposição em torno de um centro arbitrário
+
+A média amostral possui uma propriedade de decomposição que será utilizada na obtenção da esperança da SSCP e na estimação por máxima verossimilhança.
+
+::: {#thm-decomposicao-centro-arbitrario}
+## Decomposição em torno de um centro arbitrário
+
+Para qualquer vetor constante
+
+$$
+\mathbf c\in\mathbb R^p,
+$$
+
+tem-se
+
+$$
+\begin{aligned}
+&
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i-\mathbf c
+\right)
+\left(
+\boldsymbol{\mathsf X}_i-\mathbf c
+\right)^\top
+\\
+&=
+\boldsymbol{\mathsf A}
++
+n
+\left(
+\bar{\boldsymbol{\mathsf X}}-\mathbf c
+\right)
+\left(
+\bar{\boldsymbol{\mathsf X}}-\mathbf c
+\right)^\top.
+\end{aligned}
+$$ {#eq-decomposicao-sscp-centro-arbitrario}
+:::
+
+::: proof
+Para cada unidade,
+
+$$
+\boldsymbol{\mathsf X}_i-\mathbf c
+=
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
++
+\left(
+\bar{\boldsymbol{\mathsf X}}-\mathbf c
+\right).
+$$
+
+Substituindo essa expressão no produto exterior e somando sobre $i$, obtêm-se quatro parcelas. As duas parcelas cruzadas desaparecem porque
+
+$$
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
+=
+\mathbf 0.
+$$
+
+A parcela formada pelos desvios em relação à média é $\boldsymbol{\mathsf A}$, enquanto a parcela constante aparece $n$ vezes. Logo,
+
+$$
+\begin{aligned}
+&
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i-\mathbf c
+\right)
+\left(
+\boldsymbol{\mathsf X}_i-\mathbf c
+\right)^\top
+\\
+&=
+\boldsymbol{\mathsf A}
++
+n
+\left(
+\bar{\boldsymbol{\mathsf X}}-\mathbf c
+\right)
+\left(
+\bar{\boldsymbol{\mathsf X}}-\mathbf c
+\right)^\top.
+\end{aligned}
+$$
+:::
+
+A segunda parcela é semidefinida positiva. Portanto,
+
+$$
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i-\mathbf c
+\right)
+\left(
+\boldsymbol{\mathsf X}_i-\mathbf c
+\right)^\top
+\succeq
+\boldsymbol{\mathsf A}.
+$$ {#eq-minimizacao-loewner-media-amostral}
+
+A média amostral minimiza, segundo a ordem de Loewner, a matriz de dispersão calculada em torno de um centro comum. Tomando o traço, recupera-se a caracterização da média como minimizadora da soma das distâncias euclidianas quadráticas.
+
+Para
+
+$$
+\mathbf c
+=
+\boldsymbol{\mu},
+$$
+
+a identidade torna-se
+
+$$
+\begin{aligned}
+&
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i-\boldsymbol{\mu}
+\right)
+\left(
+\boldsymbol{\mathsf X}_i-\boldsymbol{\mu}
+\right)^\top
+\\
+&=
+\boldsymbol{\mathsf A}
++
+n
+\left(
+\bar{\boldsymbol{\mathsf X}}-\boldsymbol{\mu}
+\right)
+\left(
+\bar{\boldsymbol{\mathsf X}}-\boldsymbol{\mu}
+\right)^\top.
+\end{aligned}
+$$ {#eq-decomposicao-sscp-media-populacional}
+
+Essa expressão separa a dispersão em torno da média populacional em:
+
+- dispersão das observações em torno da média amostral;
+- dispersão da média amostral em torno da média populacional.
+
+### Esperança da SSCP
+
+A utilização da média amostral consome uma direção do espaço das observações. Essa perda aparece no valor esperado da SSCP.
+
+::: {#thm-esperanca-sscp}
+## Esperança da matriz SSCP
+
+Se
+
+$$
+E
+\left(
+\left\|
+\boldsymbol{\mathsf X}
+\right\|^2
+\right)
+<
+\infty,
+$$
+
+então
+
+$$
+E
+\left(
+\boldsymbol{\mathsf A}
+\right)
+=
+(n-1)
+\boldsymbol{\Sigma}.
+$$ {#eq-esperanca-sscp}
+:::
+
+::: proof
+Tomando a esperança em @eq-decomposicao-sscp-media-populacional, a parcela do lado esquerdo satisfaz
+
+$$
+\begin{aligned}
+E
+\left[
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i-\boldsymbol{\mu}
+\right)
+\left(
+\boldsymbol{\mathsf X}_i-\boldsymbol{\mu}
+\right)^\top
+\right]
+&=
+\sum_{i=1}^n
+\boldsymbol{\Sigma}
+\\
+&=
+n\boldsymbol{\Sigma}.
+\end{aligned}
+$$
+
+Como
+
+$$
+E
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+=
+\boldsymbol{\mu},
+$$
+
+tem-se
+
+$$
+\begin{aligned}
+E
+\Big[
+&
+n
+\left(
+\bar{\boldsymbol{\mathsf X}}-\boldsymbol{\mu}
+\right)
+\left(
+\bar{\boldsymbol{\mathsf X}}-\boldsymbol{\mu}
+\right)^\top
+\Big]
+\\
+&=
+n
+\operatorname{Cov}
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\\
+&=
+n
+\frac{\boldsymbol{\Sigma}}{n}
+\\
+&=
+\boldsymbol{\Sigma}.
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+n\boldsymbol{\Sigma}
+=
+E
+\left(
+\boldsymbol{\mathsf A}
+\right)
++
+\boldsymbol{\Sigma},
+$$
+
+o que implica
+
+$$
+E
+\left(
+\boldsymbol{\mathsf A}
+\right)
+=
+(n-1)
+\boldsymbol{\Sigma}.
+$$
+:::
+
+O fator $n-1$ decorre da estimação do vetor de médias a partir da mesma amostra. Após a centralização, os $n$ vetores de desvios satisfazem a restrição
+
+$$
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
+=
+\mathbf 0.
+$$
+
+Assim, somente $n-1$ desses vetores podem variar livremente.
+
+### Estimador não viesado
+
+O resultado @eq-esperanca-sscp determina o divisor necessário para obter um estimador não viesado da matriz de covariâncias.
+
+::: {#def-covariancia-amostral-aleatoria}
+## Matriz de covariâncias amostral
+
+Para $n\geq2$, a matriz de covariâncias amostral é
+
+$$
+\boldsymbol{\mathsf S}
+=
+\frac{1}{n-1}
+\boldsymbol{\mathsf A}.
+$$ {#eq-covariancia-amostral-aleatoria}
+
+Equivalentemente,
+
+$$
+\boldsymbol{\mathsf S}
+=
+\frac{1}{n-1}
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)^\top.
+$$ {#eq-covariancia-amostral-somatorio}
+:::
+
+Para a amostra observada,
+
+$$
+\mathbf S
+=
+\frac{1}{n-1}
+\mathbf A
+=
+\frac{1}{n-1}
+\mathbf X_c^\top
+\mathbf X_c.
+$$ {#eq-covariancia-amostral-observada}
+
+O elemento $(j,k)$ de $\boldsymbol{\mathsf S}$ é
+
+$$
+S_{jk}
+=
+\frac{1}{n-1}
+\sum_{i=1}^n
+\left(
+X_{ij}-\bar X_j
+\right)
+\left(
+X_{ik}-\bar X_k
+\right).
+$$ {#eq-elemento-covariancia-amostral}
+
+Na diagonal,
+
+$$
+S_{jj}
+=
+\frac{1}{n-1}
+\sum_{i=1}^n
+\left(
+X_{ij}-\bar X_j
+\right)^2
+$$
+
+é a variância amostral da variável $j$.
+
+Para $j\neq k$,
+
+$$
+S_{jk}
+=
+\frac{1}{n-1}
+\sum_{i=1}^n
+\left(
+X_{ij}-\bar X_j
+\right)
+\left(
+X_{ik}-\bar X_k
+\right)
+$$
+
+é a covariância amostral entre as variáveis $j$ e $k$.
+
+::: {#thm-nao-vies-covariancia-amostral}
+## Ausência de viés da matriz de covariâncias amostral
+
+Se a população possui segundos momentos finitos, então
+
+$$
+E
+\left(
+\boldsymbol{\mathsf S}
+\right)
+=
+\boldsymbol{\Sigma}.
+$$ {#eq-esperanca-covariancia-amostral}
+:::
+
+::: proof
+Pela definição de $\boldsymbol{\mathsf S}$ e pelo resultado @eq-esperanca-sscp,
+
+$$
+\begin{aligned}
+E
+\left(
+\boldsymbol{\mathsf S}
+\right)
+&=
+\frac{1}{n-1}
+E
+\left(
+\boldsymbol{\mathsf A}
+\right)
+\\
+&=
+\frac{1}{n-1}
+(n-1)
+\boldsymbol{\Sigma}
+\\
+&=
+\boldsymbol{\Sigma}.
+\end{aligned}
+$$
+:::
+
+A ausência de viés é uma propriedade matricial. Em particular,
+
+$$
+E
+\left(
+S_{jk}
+\right)
+=
+\sigma_{jk}
+$$
+
+para todos os pares $(j,k)$.
+
+### Estimador de máxima verossimilhança
+
+Sob o modelo normal multivariado não singular e quando a SSCP observada possui posto completo, o estimador de máxima verossimilhança é
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+=
+\frac{1}{n}
+\boldsymbol{\mathsf A}.
+$$
+
+A relação entre os dois estimadores é
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+=
+\frac{n-1}{n}
+\boldsymbol{\mathsf S}.
+$$ {#eq-relacao-covariancias-n-menos-um}
+
+O valor esperado do estimador de máxima verossimilhança é
+
+$$
+\begin{aligned}
+E
+\left(
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+\right)
+&=
+\frac{1}{n}
+E
+\left(
+\boldsymbol{\mathsf A}
+\right)
+\\
+&=
+\frac{n-1}{n}
+\boldsymbol{\Sigma}.
+\end{aligned}
+$$ {#eq-esperanca-mv-covariancia}
+
+Logo,
+
+$$
+\operatorname{Bias}
+\left(
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+\right)
+=
+-\frac{1}{n}
+\boldsymbol{\Sigma}.
+$$ {#eq-vies-mv-covariancia}
+
+O viés converge para a matriz nula quando $n$ aumenta.
+
+Os divisores $n$ e $n-1$ correspondem a critérios diferentes:
+
+- o divisor $n$ decorre do método dos momentos e da maximização da verossimilhança normal;
+- o divisor $n-1$ corrige o valor esperado e produz um estimador não viesado.
+
+A propriedade de máxima verossimilhança depende da especificação normal. A ausência de viés de $\boldsymbol{\mathsf S}$ exige somente independência, distribuição idêntica e segundos momentos finitos.
+
+### Consistência dos estimadores de covariância
+
+A matriz de covariâncias amostral também é consistente quando a dimensão permanece fixa.
+
+::: {#thm-consistencia-covariancia-amostral}
+## Consistência da matriz de covariâncias amostral
+
+Considere uma amostra aleatória multivariada com dimensão fixa $p$ e segundos momentos finitos. Então,
+
+$$
+\boldsymbol{\mathsf S}
+\xrightarrow{P}
+\boldsymbol{\Sigma}
+$$ {#eq-consistencia-covariancia-amostral}
+
+quando $n\to\infty$.
+
+Além disso,
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+\xrightarrow{P}
+\boldsymbol{\Sigma}.
+$$ {#eq-consistencia-mv-covariancia}
+:::
+
+::: proof
+A matriz de covariâncias com divisor $n$ pode ser escrita como
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+=
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i
+\boldsymbol{\mathsf X}_i^\top
+-
+\bar{\boldsymbol{\mathsf X}}
+\bar{\boldsymbol{\mathsf X}}^\top.
+$$
+
+Pela Lei dos Grandes Números, aplicada elemento a elemento,
+
+$$
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i
+\boldsymbol{\mathsf X}_i^\top
+\xrightarrow{P}
+E
+\left(
+\boldsymbol{\mathsf X}
+\boldsymbol{\mathsf X}^\top
+\right).
+$$
+
+Os segundos momentos finitos garantem a integrabilidade dos produtos $X_jX_k$. Também,
+
+$$
+\bar{\boldsymbol{\mathsf X}}
+\xrightarrow{P}
+\boldsymbol{\mu}.
+$$
+
+Pelo teorema do mapeamento contínuo,
+
+$$
+\bar{\boldsymbol{\mathsf X}}
+\bar{\boldsymbol{\mathsf X}}^\top
+\xrightarrow{P}
+\boldsymbol{\mu}
+\boldsymbol{\mu}^\top.
+$$
+
+Portanto,
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+\xrightarrow{P}
+E
+\left(
+\boldsymbol{\mathsf X}
+\boldsymbol{\mathsf X}^\top
+\right)
+-
+\boldsymbol{\mu}
+\boldsymbol{\mu}^\top
+=
+\boldsymbol{\Sigma}.
+$$
+
+Como
+
+$$
+\boldsymbol{\mathsf S}
+=
+\frac{n}{n-1}
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+$$
+
+e
+
+$$
+\frac{n}{n-1}
+\longrightarrow
+1,
+$$
+
+conclui-se que
+
+$$
+\boldsymbol{\mathsf S}
+\xrightarrow{P}
+\boldsymbol{\Sigma}.
+$$
+:::
+
+A consistência apresentada é formulada para $p$ fixo. Quando $p$ cresce com $n$, a convergência elemento a elemento pode não garantir estabilidade espectral, precisão da inversa ou proximidade em norma matricial. Esses aspectos serão tratados na seção sobre dimensão e estabilidade.
+
+### Transformações, posto e singularidade
+
+Considere uma transformação afim das observações:
+
+$$
+\boldsymbol{\mathsf Y}_i
+=
+\mathbf C
+\boldsymbol{\mathsf X}_i
++
+\mathbf d,
+\qquad
+i=1,\ldots,n,
+$$
+
+com
+
+$$
+\mathbf C
+\in
+\mathbb R^{q\times p}
+$$
+
+e
+
+$$
+\mathbf d
+\in
+\mathbb R^q.
+$$
+
+Pela equivariância da média,
+
+$$
+\bar{\boldsymbol{\mathsf Y}}
+=
+\mathbf C
+\bar{\boldsymbol{\mathsf X}}
++
+\mathbf d.
+$$
+
+Logo,
+
+$$
+\boldsymbol{\mathsf Y}_i
+-
+\bar{\boldsymbol{\mathsf Y}}
+=
+\mathbf C
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right).
+$$
+
+Consequentemente,
+
+$$
+\boldsymbol{\mathsf A}_Y
+=
+\mathbf C
+\boldsymbol{\mathsf A}_X
+\mathbf C^\top
+$$ {#eq-transformacao-sscp-amostral}
+
+e
+
+$$
+\boldsymbol{\mathsf S}_Y
+=
+\mathbf C
+\boldsymbol{\mathsf S}_X
+\mathbf C^\top.
+$$ {#eq-equivariancia-covariancia-amostral}
+
+A translação $\mathbf d$ não altera a matriz de covariâncias. A transformação linear $\mathbf C$ atua sobre a estimativa da mesma forma que atua sobre a matriz de covariâncias populacional:
+
+$$
+\boldsymbol{\Sigma}_Y
+=
+\mathbf C
+\boldsymbol{\Sigma}_X
+\mathbf C^\top.
+$$
+
+Portanto, $\boldsymbol{\mathsf S}$ é equivariante sob transformações afins.
+
+A estrutura de posto da matriz de covariâncias amostral decorre de sua representação como matriz de Gram.
+
+::: {#thm-posto-covariancia-amostral}
+## Posto da matriz de covariâncias amostral
+
+Para uma amostra com $n$ observações e $p$ variáveis,
+
+$$
+\operatorname{posto}
+\left(
+\boldsymbol{\mathsf S}
+\right)
+=
+\operatorname{posto}
+\left(
+\boldsymbol{\mathcal X}_c
+\right)
+\leq
+\min
+\left(
+p,n-1
+\right).
+$$ {#eq-posto-covariancia-amostral}
+
+A matriz $\boldsymbol{\mathsf S}$ é positiva definida se, e somente se,
+
+$$
+\operatorname{posto}
+\left(
+\boldsymbol{\mathcal X}_c
+\right)
+=
+p.
+$$ {#eq-condicao-definicao-positiva-s}
+:::
+
+::: proof
+Como
+
+$$
+\boldsymbol{\mathsf S}
+=
+\frac{1}{n-1}
+\boldsymbol{\mathcal X}_c^\top
+\boldsymbol{\mathcal X}_c,
+$$
+
+a multiplicação pelo escalar positivo $(n-1)^{-1}$ não altera o posto. Além disso,
+
+$$
+\operatorname{posto}
+\left(
+\boldsymbol{\mathcal X}_c^\top
+\boldsymbol{\mathcal X}_c
+\right)
+=
+\operatorname{posto}
+\left(
+\boldsymbol{\mathcal X}_c
+\right).
+$$
+
+Como
+
+$$
+\boldsymbol{\mathcal X}_c
+=
+\mathbf H_n
+\boldsymbol{\mathcal X},
+$$
+
+tem-se
+
+$$
+\operatorname{posto}
+\left(
+\boldsymbol{\mathcal X}_c
+\right)
+\leq
+\min
+\left\{
+\operatorname{posto}
+\left(
+\mathbf H_n
+\right),
+p
+\right\}
+=
+\min
+\left(
+n-1,p
+\right).
+$$
+
+Finalmente, $\boldsymbol{\mathsf S}$ é positiva definida se, e somente se,
+
+$$
+\mathbf a^\top
+\boldsymbol{\mathsf S}
+\mathbf a
+>
+0
+$$
+
+para todo $\mathbf a\neq\mathbf 0$. Pela representação de Gram, isso ocorre exatamente quando
+
+$$
+\boldsymbol{\mathcal X}_c
+\mathbf a
+\neq
+\mathbf 0
+$$
+
+para todo $\mathbf a\neq\mathbf 0$, isto é, quando $\boldsymbol{\mathcal X}_c$ possui posto coluna completo.
+:::
+
+Uma condição necessária para a definição positiva é
+
+$$
+n-1
+\geq
+p,
+$$
+
+ou seja,
+
+$$
+n
+\geq
+p+1.
+$$
+
+Se
+
+$$
+p\geq n,
+$$
+
+então
+
+$$
+\operatorname{posto}
+\left(
+\boldsymbol{\mathsf S}
+\right)
+\leq
+n-1
+<
+p,
+$$
+
+e a matriz é necessariamente singular.
+
+Mesmo quando $n\geq p+1$, a matriz pode ser singular se existir dependência linear exata entre as variáveis centralizadas. Assim, a relação entre $n$ e $p$ fornece uma condição necessária, mas a definição positiva depende também da configuração observada.
+
+A singularidade impede o cálculo da inversa ordinária de $\mathbf S$ e afeta procedimentos que utilizam a matriz de precisão, distâncias de Mahalanobis estimadas ou problemas de autovalores generalizados. A pseudoinversa pode fornecer uma solução no suporte amostral, mas não produz o mesmo objeto que uma estimativa regularizada positiva definida.
+
+A seção seguinte utiliza os mesmos princípios para estimar covariâncias entre dois blocos de variáveis e construir a matriz de correlações amostral.
+
+## Estimação de covariâncias cruzadas e correlações
+
+Alguns problemas multivariados organizam as variáveis em dois blocos observados sobre as mesmas unidades. Um bloco pode conter características físicas e o outro resultados laboratoriais, ou os dois blocos podem representar conjuntos distintos de respostas.
+
+As covariâncias cruzadas descrevem a dependência linear entre os blocos em suas unidades originais. As correlações padronizam essas relações e permitem comparar variáveis medidas em escalas diferentes.
+
+### Covariâncias cruzadas entre blocos
+
+Considere os vetores aleatórios
+
+$$
+\boldsymbol{\mathsf X}
+\in
+\mathbb R^p
+\qquad
+\text{e}
+\qquad
+\boldsymbol{\mathsf Y}
+\in
+\mathbb R^q,
+$$
+
+com vetores de médias
+
+$$
+\boldsymbol{\mu}_X
+=
+E
+\left(
+\boldsymbol{\mathsf X}
+\right)
+$$
+
+e
+
+$$
+\boldsymbol{\mu}_Y
+=
+E
+\left(
+\boldsymbol{\mathsf Y}
+\right).
+$$
+
+A matriz de covariâncias cruzadas populacional é
+
+$$
+\boldsymbol{\Sigma}_{XY}
+=
+E
+\left[
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_X
+\right)
+\left(
+\boldsymbol{\mathsf Y}
+-
+\boldsymbol{\mu}_Y
+\right)^\top
+\right]
+\in
+\mathbb R^{p\times q}.
+$$ {#eq-covariancia-cruzada-populacional}
+
+Seu elemento $(j,k)$ é
+
+$$
+\left[
+\boldsymbol{\Sigma}_{XY}
+\right]_{jk}
+=
+\operatorname{Cov}
+\left(
+X_j,
+Y_k
+\right).
+$$
+
+Em geral, $\boldsymbol{\Sigma}_{XY}$ não é quadrada nem simétrica. A inversão da ordem dos blocos produz
+
+$$
+\boldsymbol{\Sigma}_{YX}
+=
+\boldsymbol{\Sigma}_{XY}^\top.
+$$ {#eq-transposta-covariancia-cruzada-populacional}
+
+A matriz de covariâncias do vetor conjunto
+
+$$
+\boldsymbol{\mathsf Z}
+=
+\begin{bmatrix}
+\boldsymbol{\mathsf X}\\
+\boldsymbol{\mathsf Y}
+\end{bmatrix}
+\in
+\mathbb R^{p+q}
+$$
+
+é particionada como
+
+$$
+\boldsymbol{\Sigma}_Z
+=
+\begin{bmatrix}
+\boldsymbol{\Sigma}_{XX}
+&
+\boldsymbol{\Sigma}_{XY}
+\\
+\boldsymbol{\Sigma}_{YX}
+&
+\boldsymbol{\Sigma}_{YY}
+\end{bmatrix}.
+$$ {#eq-covariancia-populacional-vetor-conjunto}
+
+Os blocos diagonais descrevem a dispersão interna de cada conjunto. Os blocos fora da diagonal descrevem as relações lineares entre os dois conjuntos.
+
+Para estimar $\boldsymbol{\Sigma}_{XY}$, é necessária uma amostra pareada:
+
+$$
+\left(
+\boldsymbol{\mathsf X}_1,
+\boldsymbol{\mathsf Y}_1
+\right),
+\ldots,
+\left(
+\boldsymbol{\mathsf X}_n,
+\boldsymbol{\mathsf Y}_n
+\right),
+$$
+
+independente e identicamente distribuída segundo a distribuição conjunta de
+
+$$
+\left(
+\boldsymbol{\mathsf X},
+\boldsymbol{\mathsf Y}
+\right).
+$$
+
+O pareamento significa que $\boldsymbol{\mathsf X}_i$ e $\boldsymbol{\mathsf Y}_i$ pertencem à mesma unidade amostral. Permutar as linhas de apenas um dos blocos altera as covariâncias estimadas.
+
+Organize os blocos nas matrizes aleatórias
+
+$$
+\boldsymbol{\mathcal X}
+=
+\begin{bmatrix}
+\boldsymbol{\mathsf X}_1^\top\\
+\vdots\\
+\boldsymbol{\mathsf X}_n^\top
+\end{bmatrix}
+\in
+\mathbb R^{n\times p}
+$$
+
+e
+
+$$
+\boldsymbol{\mathcal Y}
+=
+\begin{bmatrix}
+\boldsymbol{\mathsf Y}_1^\top\\
+\vdots\\
+\boldsymbol{\mathsf Y}_n^\top
+\end{bmatrix}
+\in
+\mathbb R^{n\times q}.
+$$
+
+As matrizes centralizadas são
+
+$$
+\boldsymbol{\mathcal X}_c
+=
+\mathbf H_n
+\boldsymbol{\mathcal X}
+$$
+
+e
+
+$$
+\boldsymbol{\mathcal Y}_c
+=
+\mathbf H_n
+\boldsymbol{\mathcal Y}.
+$$
+
+::: {#def-sscp-cruzada-amostral}
+## Matriz de produtos cruzados entre blocos
+
+A matriz de produtos cruzados entre os dois blocos é
+
+$$
+\boldsymbol{\mathsf A}_{XY}
+=
+\boldsymbol{\mathcal X}_c^\top
+\boldsymbol{\mathcal Y}_c.
+$$ {#eq-sscp-cruzada-forma-matricial}
+
+Equivalentemente,
+
+$$
+\boldsymbol{\mathsf A}_{XY}
+=
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\left(
+\boldsymbol{\mathsf Y}_i
+-
+\bar{\boldsymbol{\mathsf Y}}
+\right)^\top.
+$$ {#eq-sscp-cruzada-somatorio}
+:::
+
+Após a observação da amostra,
+
+$$
+\mathbf A_{XY}
+=
+\mathbf X_c^\top
+\mathbf Y_c.
+$$ {#eq-sscp-cruzada-estimada}
+
+A inversão da ordem dos blocos fornece
+
+$$
+\boldsymbol{\mathsf A}_{YX}
+=
+\boldsymbol{\mathsf A}_{XY}^\top.
+$$
+
+::: {#def-covariancia-cruzada-amostral}
+## Matriz de covariâncias cruzadas amostral
+
+Para $n\geq2$, a matriz de covariâncias cruzadas amostral é
+
+$$
+\boldsymbol{\mathsf S}_{XY}
+=
+\frac{1}{n-1}
+\boldsymbol{\mathsf A}_{XY}.
+$$ {#eq-covariancia-cruzada-amostral}
+
+Para a amostra observada,
+
+$$
+\mathbf S_{XY}
+=
+\frac{1}{n-1}
+\mathbf X_c^\top
+\mathbf Y_c.
+$$ {#eq-covariancia-cruzada-estimada}
+:::
+
+O elemento $(j,k)$ de $\boldsymbol{\mathsf S}_{XY}$ é
+
+$$
+S_{X_jY_k}
+=
+\frac{1}{n-1}
+\sum_{i=1}^n
+\left(
+X_{ij}-\bar X_j
+\right)
+\left(
+Y_{ik}-\bar Y_k
+\right).
+$$ {#eq-elemento-covariancia-cruzada}
+
+Esse elemento estima
+
+$$
+\operatorname{Cov}
+\left(
+X_j,
+Y_k
+\right).
+$$
+
+::: {#thm-nao-vies-covariancia-cruzada}
+## Ausência de viés da covariância cruzada amostral
+
+Se o vetor conjunto
+
+$$
+\begin{bmatrix}
+\boldsymbol{\mathsf X}\\
+\boldsymbol{\mathsf Y}
+\end{bmatrix}
+$$
+
+possui segundos momentos finitos, então
+
+$$
+E
+\left(
+\boldsymbol{\mathsf S}_{XY}
+\right)
+=
+\boldsymbol{\Sigma}_{XY}.
+$$ {#eq-esperanca-covariancia-cruzada}
+:::
+
+::: proof
+A matriz de covariâncias amostral do vetor conjunto pode ser particionada como
+
+$$
+\boldsymbol{\mathsf S}_Z
+=
+\begin{bmatrix}
+\boldsymbol{\mathsf S}_{XX}
+&
+\boldsymbol{\mathsf S}_{XY}
+\\
+\boldsymbol{\mathsf S}_{YX}
+&
+\boldsymbol{\mathsf S}_{YY}
+\end{bmatrix}.
+$$
+
+Pela ausência de viés da matriz de covariâncias amostral,
+
+$$
+E
+\left(
+\boldsymbol{\mathsf S}_Z
+\right)
+=
+\boldsymbol{\Sigma}_Z.
+$$
+
+A igualdade entre os blocos superiores direitos das duas matrizes fornece
+
+$$
+E
+\left(
+\boldsymbol{\mathsf S}_{XY}
+\right)
+=
+\boldsymbol{\Sigma}_{XY}.
+$$
+:::
+
+Sob normalidade conjunta,
+
+$$
+\begin{bmatrix}
+\boldsymbol{\mathsf X}_i\\
+\boldsymbol{\mathsf Y}_i
+\end{bmatrix}
+\overset{\mathrm{iid}}{\sim}
+N_{p+q}
+\left(
+\begin{bmatrix}
+\boldsymbol{\mu}_X\\
+\boldsymbol{\mu}_Y
+\end{bmatrix},
+\boldsymbol{\Sigma}_Z
+\right),
+$$
+
+o estimador de máxima verossimilhança do bloco cruzado, quando o estimador positivo definido de $\boldsymbol{\Sigma}_Z$ existe, é
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{XY,\mathrm{MV}}
+=
+\frac{1}{n}
+\boldsymbol{\mathsf A}_{XY}.
+$$ {#eq-mv-covariancia-cruzada}
+
+Sua relação com o estimador não viesado é
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{XY,\mathrm{MV}}
+=
+\frac{n-1}{n}
+\boldsymbol{\mathsf S}_{XY}.
+$$
+
+Consequentemente,
+
+$$
+E
+\left(
+\widehat{\boldsymbol{\Sigma}}_{XY,\mathrm{MV}}
+\right)
+=
+\frac{n-1}{n}
+\boldsymbol{\Sigma}_{XY}.
+$$
+
+A matriz de covariâncias cruzadas também respeita transformações lineares. Considere
+
+$$
+\boldsymbol{\mathsf U}
+=
+\mathbf C
+\boldsymbol{\mathsf X}
++
+\mathbf c
+$$
+
+e
+
+$$
+\boldsymbol{\mathsf V}
+=
+\mathbf D
+\boldsymbol{\mathsf Y}
++
+\mathbf d,
+$$
+
+com
+
+$$
+\mathbf C
+\in
+\mathbb R^{r\times p}
+\qquad
+\text{e}
+\qquad
+\mathbf D
+\in
+\mathbb R^{s\times q}.
+$$
+
+Então,
+
+$$
+\boldsymbol{\mathsf S}_{UV}
+=
+\mathbf C
+\boldsymbol{\mathsf S}_{XY}
+\mathbf D^\top.
+$$ {#eq-transformacao-covariancia-cruzada-amostral}
+
+Para combinações lineares escalares,
+
+$$
+U
+=
+\mathbf a^\top
+\boldsymbol{\mathsf X}
+\qquad
+\text{e}
+\qquad
+V
+=
+\mathbf b^\top
+\boldsymbol{\mathsf Y},
+$$
+
+a covariância amostral correspondente é
+
+$$
+S_{UV}
+=
+\mathbf a^\top
+\boldsymbol{\mathsf S}_{XY}
+\mathbf b.
+$$ {#eq-combinacoes-covariancia-cruzada}
+
+Assim, $\boldsymbol{\mathsf S}_{XY}$ reúne as covariâncias amostrais entre todas as combinações lineares dos dois blocos.
+
+O posto dessa matriz satisfaz
+
+$$
+\operatorname{posto}
+\left(
+\boldsymbol{\mathsf S}_{XY}
+\right)
+\leq
+\min
+\left(
+p,q,n-1
+\right).
+$$ {#eq-posto-covariancia-cruzada}
+
+A limitação decorre da centralização e das dimensões dos dois blocos. A matriz cruzada pode apresentar posto reduzido quando existem redundâncias lineares em qualquer um dos conjuntos de variáveis.
+
+### Matriz de correlações amostral
+
+A matriz de covariâncias preserva as unidades de medida. A padronização de cada covariância pelos respectivos desvios-padrão produz uma medida adimensional de associação linear.
+
+Considere a matriz de covariâncias amostral
+
+$$
+\boldsymbol{\mathsf S}
+=
+\left(
+S_{jk}
+\right)
+\in
+\mathbb R^{p\times p}.
+$$
+
+Defina a matriz diagonal aleatória
+
+$$
+\boldsymbol{\mathsf D}_S
+=
+\operatorname{diag}
+\left(
+S_{11},
+\ldots,
+S_{pp}
+\right).
+$$
+
+A construção da matriz de correlações exige
+
+$$
+S_{jj}>0,
+\qquad
+j=1,\ldots,p.
+$$
+
+::: {#def-matriz-correlacoes-amostral}
+## Matriz de correlações amostral
+
+Quando todas as variâncias amostrais são positivas, a matriz de correlações amostral é
+
+$$
+\boldsymbol{\mathsf R}
+=
+\boldsymbol{\mathsf D}_S^{-1/2}
+\boldsymbol{\mathsf S}
+\boldsymbol{\mathsf D}_S^{-1/2}.
+$$ {#eq-matriz-correlacoes-amostral}
+
+Após a observação da amostra,
+
+$$
+\mathbf R
+=
+\mathbf D_S^{-1/2}
+\mathbf S
+\mathbf D_S^{-1/2},
+$$ {#eq-matriz-correlacoes-estimada}
+
+em que
+
+$$
+\mathbf D_S
+=
+\operatorname{diag}
+\left(
+s_{11},
+\ldots,
+s_{pp}
+\right).
+$$
+:::
+
+O elemento $(j,k)$ de $\mathbf R$ é
+
+$$
+r_{jk}
+=
+\frac{
+s_{jk}
+}{
+\sqrt{
+s_{jj}s_{kk}
+}
+}.
+$$ {#eq-correlacao-amostral}
+
+A diagonal é unitária:
+
+$$
+r_{jj}=1,
+\qquad
+j=1,\ldots,p.
+$$
+
+A matriz de correlações também pode ser obtida a partir da matriz de dados padronizados. Defina
+
+$$
+\mathbf Z
+=
+\mathbf X_c
+\mathbf D_S^{-1/2}.
+$$ {#eq-matriz-dados-padronizados-amostral}
+
+Cada coluna de $\mathbf Z$ possui média zero e variância amostral igual a 1. Como
+
+$$
+\mathbf S
+=
+\frac{1}{n-1}
+\mathbf X_c^\top
+\mathbf X_c,
+$$
+
+segue que
+
+$$
+\mathbf R
+=
+\frac{1}{n-1}
+\mathbf Z^\top
+\mathbf Z.
+$$ {#eq-correlacao-como-gram-padronizada}
+
+Portanto, $\mathbf R$ é a matriz de covariâncias das variáveis padronizadas.
+
+Além disso,
+
+$$
+r_{jk}
+=
+\frac{
+\mathbf z_{\cdot j}^\top
+\mathbf z_{\cdot k}
+}{
+\left\|
+\mathbf z_{\cdot j}
+\right\|
+\left\|
+\mathbf z_{\cdot k}
+\right\|
+}.
+$$
+
+Assim, $r_{jk}$ é o cosseno do ângulo entre as colunas centralizadas e padronizadas:
+
+$$
+r_{jk}
+=
+\cos
+\left(
+\theta_{jk}
+\right).
+$$ {#eq-correlacao-cosseno-amostral}
+
+Essa interpretação implica
+
+$$
+-1
+\leq
+r_{jk}
+\leq
+1.
+$$
+
+Os valores extremos correspondem a dependência linear exata entre as duas colunas padronizadas.
+
+::: {.callout-caution appearance="minimal" icon="false"}
+## Existência da correlação amostral
+
+A correlação envolvendo uma variável não está definida quando sua variância amostral é zero.
+
+Uma coluna constante não pode ser padronizada porque
+
+$$
+s_{jj}=0
+$$
+
+e, consequentemente, $s_{jj}^{-1/2}$ não existe.
+:::
+
+### Propriedades estruturais
+
+A matriz de correlações amostral herda propriedades da matriz de covariâncias.
+
+::: {#thm-propriedades-matriz-correlacoes-amostral}
+## Propriedades da matriz de correlações amostral
+
+Quando todas as variâncias amostrais são positivas, a matriz $\boldsymbol{\mathsf R}$ é:
+
+1. simétrica;
+2. semidefinida positiva;
+3. unitária na diagonal.
+
+Além disso,
+
+$$
+\operatorname{posto}
+\left(
+\boldsymbol{\mathsf R}
+\right)
+=
+\operatorname{posto}
+\left(
+\boldsymbol{\mathsf S}
+\right).
+$$ {#eq-posto-correlacao-covariancia}
+
+Consequentemente,
+
+$$
+\boldsymbol{\mathsf R}
+\succ
+\mathbf 0
+\quad\Longleftrightarrow\quad
+\boldsymbol{\mathsf S}
+\succ
+\mathbf 0.
+$$ {#eq-definicao-positiva-correlacao-covariancia}
+:::
+
+::: proof
+A simetria decorre de
+
+$$
+\boldsymbol{\mathsf S}^\top
+=
+\boldsymbol{\mathsf S}
+$$
+
+e da diagonalidade de $\boldsymbol{\mathsf D}_S^{-1/2}$.
+
+Para qualquer $\mathbf a\in\mathbb R^p$,
+
+$$
+\begin{aligned}
+\mathbf a^\top
+\boldsymbol{\mathsf R}
+\mathbf a
+&=
+\mathbf a^\top
+\boldsymbol{\mathsf D}_S^{-1/2}
+\boldsymbol{\mathsf S}
+\boldsymbol{\mathsf D}_S^{-1/2}
+\mathbf a
+\\
+&=
+\left(
+\boldsymbol{\mathsf D}_S^{-1/2}
+\mathbf a
+\right)^\top
+\boldsymbol{\mathsf S}
+\left(
+\boldsymbol{\mathsf D}_S^{-1/2}
+\mathbf a
+\right)
+\\
+&\geq
+0.
+\end{aligned}
+$$
+
+Logo, $\boldsymbol{\mathsf R}$ é semidefinida positiva.
+
+A diagonal unitária decorre diretamente da padronização:
+
+$$
+R_{jj}
+=
+\frac{S_{jj}}{S_{jj}}
+=
+1.
+$$
+
+Como $\boldsymbol{\mathsf D}_S^{-1/2}$ é invertível, a transformação por congruência preserva o posto e a definição positiva.
+:::
+
+Uma matriz simétrica com diagonal unitária e elementos no intervalo $[-1,1]$ não é necessariamente uma matriz de correlações válida. A semidefinição positiva também é necessária.
+
+A condição de definição positiva pode ser expressa como
+
+$$
+\operatorname{posto}
+\left(
+\mathbf Z
+\right)
+=
+p.
+$$
+
+Portanto, são necessárias:
+
+- variâncias amostrais positivas;
+- ausência de dependência linear entre as variáveis centralizadas;
+- dimensão suficiente para que $n-1\geq p$.
+
+A desigualdade
+
+$$
+n\geq p+1
+$$
+
+é necessária, mas não garante isoladamente a definição positiva. Quando
+
+$$
+p\geq n,
+$$
+
+tem-se
+
+$$
+\operatorname{posto}
+\left(
+\mathbf R
+\right)
+\leq
+n-1
+<
+p,
+$$
+
+e a matriz é necessariamente singular.
+
+O determinante satisfaz
+
+$$
+\det
+\left(
+\mathbf R
+\right)
+=
+\frac{
+\det
+\left(
+\mathbf S
+\right)
+}{
+\prod_{j=1}^p s_{jj}
+}.
+$$ {#eq-determinante-correlacao-amostral}
+
+A padronização remove as escalas marginais, mas não altera o posto nem elimina dependências lineares.
+
+A matriz de correlações obtida a partir do estimador de máxima verossimilhança normal da covariância coincide com $\mathbf R$. De fato,
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+=
+\frac{n-1}{n}
+\boldsymbol{\mathsf S}.
+$$
+
+O fator comum $(n-1)/n$ aparece nas covariâncias e nas variâncias e desaparece na padronização. Pela invariância da máxima verossimilhança,
+
+$$
+\widehat{\boldsymbol{\mathcal R}}_{\mathrm{MV}}
+=
+\boldsymbol{\mathsf R},
+$$ {#eq-mv-correlacao-amostral}
+
+quando o estimador normal de máxima verossimilhança da matriz de covariâncias existe.
+
+Essa igualdade não implica ausência de viés. Em geral,
+
+$$
+E
+\left(
+R_{jk}
+\right)
+\neq
+\rho_{jk}.
+$$
+
+A correlação amostral é uma razão de estatísticas aleatórias, e sua esperança não é obtida pela razão entre as respectivas esperanças.
+
+Quando $\boldsymbol{\mathsf S}$ é consistente para $\boldsymbol{\Sigma}$ e todas as variâncias populacionais são positivas, o teorema do mapeamento contínuo fornece
+
+$$
+\boldsymbol{\mathsf R}
+\xrightarrow{P}
+\boldsymbol{\mathcal R}.
+$$ {#eq-consistencia-matriz-correlacoes}
+
+### Transformações de localização e escala
+
+Considere transformações individuais das variáveis:
+
+$$
+Y_j
+=
+a_j
++
+b_jX_j,
+\qquad
+b_j\neq0.
+$$
+
+As constantes de localização $a_j$ desaparecem após a centralização. Para duas variáveis transformadas,
+
+$$
+r_{Y_jY_k}
+=
+\operatorname{sgn}
+\left(
+b_j
+\right)
+\operatorname{sgn}
+\left(
+b_k
+\right)
+r_{X_jX_k}.
+$$ {#eq-transformacao-correlacao-amostral}
+
+Se os dois fatores de escala são positivos, a correlação permanece inalterada. Se o sinal de apenas uma variável é invertido, o sinal da correlação também é invertido.
+
+Em forma matricial, considere
+
+$$
+\mathbf Y
+=
+\mathbf X\mathbf B
++
+\mathbf 1_n\mathbf a^\top,
+$$
+
+em que
+
+$$
+\mathbf B
+=
+\operatorname{diag}
+\left(
+b_1,\ldots,b_p
+\right)
+$$
+
+possui elementos diagonais não nulos. Defina
+
+$$
+\mathbf D_{\operatorname{sgn}}
+=
+\operatorname{diag}
+\left[
+\operatorname{sgn}
+\left(
+b_1
+\right),
+\ldots,
+\operatorname{sgn}
+\left(
+b_p
+\right)
+\right].
+$$
+
+Então,
+
+$$
+\mathbf R_Y
+=
+\mathbf D_{\operatorname{sgn}}
+\mathbf R_X
+\mathbf D_{\operatorname{sgn}}.
+$$ {#eq-transformacao-matricial-correlacoes}
+
+Quando todos os fatores de escala são positivos,
+
+$$
+\mathbf R_Y
+=
+\mathbf R_X.
+$$
+
+A matriz de correlações cruzadas entre dois blocos é obtida pela padronização de $\mathbf S_{XY}$. Defina
+
+$$
+\mathbf D_X
+=
+\operatorname{diag}
+\left(
+s_{X_1X_1},
+\ldots,
+s_{X_pX_p}
+\right)
+$$
+
+e
+
+$$
+\mathbf D_Y
+=
+\operatorname{diag}
+\left(
+s_{Y_1Y_1},
+\ldots,
+s_{Y_qY_q}
+\right).
+$$
+
+Quando todas as variâncias são positivas,
+
+$$
+\mathbf R_{XY}
+=
+\mathbf D_X^{-1/2}
+\mathbf S_{XY}
+\mathbf D_Y^{-1/2}.
+$$ {#eq-correlacao-cruzada-amostral}
+
+Seu elemento $(j,k)$ é
+
+$$
+r_{X_jY_k}
+=
+\frac{
+s_{X_jY_k}
+}{
+\sqrt{
+s_{X_jX_j}
+s_{Y_kY_k}
+}
+}.
+$$
+
+Além disso,
+
+$$
+\mathbf R_{YX}
+=
+\mathbf R_{XY}^\top.
+$$
+
+A matriz de correlações do vetor conjunto possui a forma
+
+$$
+\mathbf R_Z
+=
+\begin{bmatrix}
+\mathbf R_{XX}
+&
+\mathbf R_{XY}
+\\
+\mathbf R_{YX}
+&
+\mathbf R_{YY}
+\end{bmatrix}.
+$$ {#eq-correlacao-vetor-conjunto}
+
+Os blocos cruzados serão utilizados posteriormente para estudar associações entre dois conjuntos de variáveis. Antes disso, é necessário examinar as limitações dos estimadores clássicos quando a dimensão é elevada, as variáveis são fortemente redundantes ou a amostra contém observações de grande influência.
+
+## Dimensão, estabilidade e extensões da estimação
+
+A matriz de covariâncias de um vetor com $p$ componentes possui
+
+$$
+\frac{p(p+1)}{2}
+$$
+
+parâmetros distintos. O número de quantidades a estimar cresce quadraticamente com a dimensão, enquanto o número de unidades amostrais permanece igual a $n$.
+
+Essa relação afeta o posto, a estabilidade espectral e a possibilidade de inverter a matriz de covariâncias amostral. Uma matriz pode ser invertível e, ainda assim, produzir estimativas instáveis quando alguns de seus autovalores são muito pequenos.
+
+Regularização e estimação robusta respondem a problemas diferentes:
+
+- a regularização procura reduzir instabilidade causada pela dimensão, redundância ou pequeno tamanho amostral;
+- a estimação robusta procura reduzir sensibilidade a observações extremas e desvios do modelo.
+
+As duas abordagens podem ser combinadas, mas não devem ser tratadas como equivalentes.
+
+### Relação entre $p$ e $n$
+
+O limite de posto obtido em @eq-posto-covariancia-amostral é
+
+$$
+\operatorname{posto}
+\left(
+\boldsymbol{\mathsf S}
+\right)
+\leq
+\min
+\left(
+p,n-1
+\right).
+$$
+
+Essa desigualdade permite distinguir três situações conceituais.
+
+#### Dimensão fixa e crescimento do tamanho amostral
+
+No regime clássico, $p$ permanece fixo enquanto
+
+$$
+n\longrightarrow\infty.
+$$
+
+Nesse caso, a quantidade de parâmetros da matriz de covariâncias permanece fixa, e cada covariância é estimada com um número crescente de observações.
+
+Sob segundos momentos finitos,
+
+$$
+\boldsymbol{\mathsf S}
+\xrightarrow{P}
+\boldsymbol{\Sigma}
+$$
+
+elemento a elemento e em qualquer norma matricial equivalente em dimensão fixa.
+
+Se
+
+$$
+\boldsymbol{\Sigma}\succ\mathbf 0,
+$$
+
+então, com probabilidade tendendo a 1,
+
+$$
+\boldsymbol{\mathsf S}\succ\mathbf 0
+$$
+
+para amostras suficientemente grandes.
+
+#### Dimensão não desprezível em relação ao tamanho amostral
+
+Quando $p$ cresce com $n$ e a razão
+
+$$
+\frac{p}{n}
+$$
+
+não é pequena, a matriz de covariâncias amostral pode possuir posto completo e ainda apresentar elevada variabilidade.
+
+Nesse regime, a convergência de cada elemento de $\boldsymbol{\mathsf S}$ não garante, isoladamente, que:
+
+- os autovalores estejam próximos dos autovalores populacionais;
+- os autovetores estejam bem estimados;
+- a inversa seja estável;
+- o determinante seja estimado com precisão;
+- as distâncias construídas com $\boldsymbol{\mathsf S}^{-1}$ sejam estáveis.
+
+O aumento de $p$ também amplia o número de covariâncias fora da diagonal:
+
+$$
+\frac{p(p-1)}{2}.
+$$
+
+Essas quantidades são estimadas a partir das mesmas $n$ unidades. O crescimento da dimensão aumenta a quantidade de relações que precisam ser determinadas, mas não acrescenta novas observações.
+
+Não existe um valor universal da razão $p/n$ que separe matrizes estáveis e instáveis. O comportamento também depende:
+
+- da estrutura de $\boldsymbol{\Sigma}$;
+- da separação entre seus autovalores;
+- do grau de correlação entre as variáveis;
+- da distribuição populacional;
+- da função da matriz utilizada na análise.
+
+#### Dimensão maior ou igual ao tamanho amostral
+
+Quando
+
+$$
+p\geq n,
+$$
+
+tem-se necessariamente
+
+$$
+\operatorname{posto}
+\left(
+\boldsymbol{\mathsf S}
+\right)
+\leq
+n-1
+<
+p.
+$$
+
+Portanto,
+
+$$
+\boldsymbol{\mathsf S}
+$$
+
+é singular.
+
+A singularidade não significa ausência de informação na amostra. Ela indica que os vetores centralizados pertencem a um subespaço de dimensão não superior a $n-1$.
+
+Existem, nesse caso, vetores não nulos $\mathbf a\in\mathbb R^p$ tais que
+
+$$
+\boldsymbol{\mathcal X}_c
+\mathbf a
+=
+\mathbf 0.
+$$
+
+Consequentemente,
+
+$$
+\mathbf a^\top
+\boldsymbol{\mathsf S}
+\mathbf a
+=
+0.
+$$
+
+A combinação linear definida por $\mathbf a$ apresenta variância amostral nula, mesmo que a variância populacional correspondente seja positiva.
+
+::: {.callout-caution appearance="minimal" icon="false"}
+## Posto amostral e posto populacional
+
+A singularidade de $\boldsymbol{\mathsf S}$ não implica necessariamente singularidade de $\boldsymbol{\Sigma}$.
+
+Quando $p\geq n$, a singularidade amostral decorre da quantidade insuficiente de direções independentes disponíveis após a centralização, mesmo que a matriz de covariâncias populacional seja positiva definida.
+:::
+
+### Condicionamento e inversão
+
+Considere a decomposição espectral de uma matriz de covariâncias observada positiva definida:
+
+$$
+\mathbf S
+=
+\mathbf Q
+\boldsymbol{\Lambda}
+\mathbf Q^\top,
+$$
+
+em que
+
+$$
+\boldsymbol{\Lambda}
+=
+\operatorname{diag}
+\left(
+\ell_1,\ldots,\ell_p
+\right)
+$$
+
+e
+
+$$
+\ell_1
+\geq
+\cdots
+\geq
+\ell_p
+>
+0.
+$$
+
+Sua inversa é
+
+$$
+\mathbf S^{-1}
+=
+\mathbf Q
+\boldsymbol{\Lambda}^{-1}
+\mathbf Q^\top,
+$$
+
+com
+
+$$
+\boldsymbol{\Lambda}^{-1}
+=
+\operatorname{diag}
+\left(
+\frac{1}{\ell_1},
+\ldots,
+\frac{1}{\ell_p}
+\right).
+$$
+
+Autovalores pequenos tornam-se autovalores grandes na matriz inversa. Assim, erros de estimação em direções de pequena variabilidade podem ser amplificados pela inversão.
+
+::: {#def-numero-condicao-covariancia}
+## Número de condição espectral
+
+Para uma matriz simétrica positiva definida $\mathbf S$, o número de condição espectral é
+
+$$
+\kappa_2
+\left(
+\mathbf S
+\right)
+=
+\frac{
+\ell_{\max}
+\left(
+\mathbf S
+\right)
+}{
+\ell_{\min}
+\left(
+\mathbf S
+\right)
+}.
+$$ {#eq-numero-condicao-covariancia}
+:::
+
+Quando os autovalores possuem magnitudes semelhantes,
+
+$$
+\kappa_2
+\left(
+\mathbf S
+\right)
+$$
+
+fica próximo de 1. Quando o menor autovalor se aproxima de zero, o número de condição aumenta.
+
+Para uma matriz singular,
+
+$$
+\ell_{\min}
+\left(
+\mathbf S
+\right)
+=
+0,
+$$
+
+e o número de condição é considerado infinito.
+
+Uma matriz com número de condição elevado é denominada mal condicionada. Pequenas perturbações nos dados ou nos elementos de $\mathbf S$ podem produzir alterações relevantes em:
+
+$$
+\mathbf S^{-1},
+$$
+
+$$
+\det
+\left(
+\mathbf S
+\right),
+$$
+
+nos autovalores e nos autovetores associados a autovalores próximos.
+
+A existência algébrica da inversa não garante sua estabilidade estatística. Quando
+
+$$
+\ell_{\min}
+\left(
+\mathbf S
+\right)
+$$
+
+é positivo, mas muito pequeno, a matriz é invertível e pode produzir resultados altamente sensíveis à amostra.
+
+Considere, por exemplo, a distância construída com a covariância estimada:
+
+$$
+d_{\mathbf S}^2
+\left(
+\mathbf x,
+\bar{\mathbf x}
+\right)
+=
+\left(
+\mathbf x-\bar{\mathbf x}
+\right)^\top
+\mathbf S^{-1}
+\left(
+\mathbf x-\bar{\mathbf x}
+\right).
+$$
+
+Em coordenadas espectrais,
+
+$$
+d_{\mathbf S}^2
+\left(
+\mathbf x,
+\bar{\mathbf x}
+\right)
+=
+\sum_{j=1}^p
+\frac{
+z_j^2
+}{
+\ell_j
+}.
+$$
+
+Direções associadas a autovalores pequenos recebem pesos elevados. Se esses autovalores forem estimados com grande erro, a distância também poderá ser instável.
+
+### Regularização
+
+A regularização modifica o estimador amostral para reduzir sua variabilidade ou melhorar seu condicionamento. Essa modificação geralmente introduz viés e ilustra o compromisso apresentado em @eq-decomposicao-eqm-matricial.
+
+Uma forma de regularização combina a matriz de covariâncias amostral com uma matriz-alvo de estrutura mais simples.
+
+::: {#def-estimador-contracao-covariancia}
+## Estimador de covariância por contração
+
+Considere uma matriz-alvo simétrica
+
+$$
+\boldsymbol{\Gamma}
+\in
+\mathbb R^{p\times p}
+$$
+
+e um peso
+
+$$
+0\leq\lambda\leq1.
+$$
+
+O estimador por contração é
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\lambda}
+=
+(1-\lambda)
+\boldsymbol{\mathsf S}
++
+\lambda
+\boldsymbol{\Gamma}.
+$$ {#eq-estimador-contracao-covariancia}
+:::
+
+Na definição anterior, $\boldsymbol{\Gamma}$ e $\lambda$ são quantidades fixadas. Em aplicações, a matriz-alvo, o peso de contração ou ambos podem ser escolhidos a partir da própria amostra.
+
+Quando o alvo é estimado, utiliza-se a notação
+
+$$
+\widehat{\boldsymbol{\Gamma}}
+$$
+
+e o estimador assume a forma
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\widehat{\lambda}}
+=
+\left(
+1-\widehat{\lambda}
+\right)
+\boldsymbol{\mathsf S}
++
+\widehat{\lambda}
+\widehat{\boldsymbol{\Gamma}}.
+$$ {#eq-contracao-alvo-estimado}
+
+Nesse caso, a aleatoriedade de $\widehat{\boldsymbol{\Gamma}}$ e de $\widehat{\lambda}$ também contribui para o viés e para a variabilidade do estimador. As propriedades de risco não podem ser obtidas tratando essas quantidades como constantes.
+
+Os resultados algébricos sobre semidefinição ou definição positiva continuam válidos para cada amostra sempre que o alvo estimado satisfizer as condições matriciais correspondentes.
+
+Quando
+
+$$
+\lambda=0,
+$$
+
+recupera-se a matriz de covariâncias amostral:
+
+$$
+\widehat{\boldsymbol{\Sigma}}_0
+=
+\boldsymbol{\mathsf S}.
+$$
+
+Quando
+
+$$
+\lambda=1,
+$$
+
+o estimador coincide com o alvo:
+
+$$
+\widehat{\boldsymbol{\Sigma}}_1
+=
+\boldsymbol{\Gamma}.
+$$
+
+Para valores intermediários, o estimador combina a informação da amostra com a estrutura imposta pelo alvo.
+
+A matriz-alvo precisa possuir as mesmas dimensões e ser compatível com a escala das variáveis. Entre as possibilidades conceituais estão:
+
+- uma matriz diagonal, que preserva estimativas das variâncias e reduz as covariâncias;
+- uma matriz esférica $\tau\mathbf I_p$, quando as variáveis são comparáveis em escala;
+- a identidade $\mathbf I_p$ para a regularização de uma matriz de correlações;
+- uma estrutura definida por conhecimento substantivo.
+
+A utilização direta de
+
+$$
+\boldsymbol{\Gamma}
+=
+\mathbf I_p
+$$
+
+como alvo de uma matriz de covariâncias pressupõe variáveis adimensionais ou medidas em escalas comparáveis. Caso contrário, o valor 1 não possui o mesmo significado para todas as variâncias.
+
+Uma alternativa esférica baseada na escala média observada é
+
+$$
+\widehat{\tau}
+=
+\frac{1}{p}
+\operatorname{tr}
+\left(
+\boldsymbol{\mathsf S}
+\right)
+$$ {#eq-variancia-media-alvo-contracao}
+
+e
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\lambda}
+=
+(1-\lambda)
+\boldsymbol{\mathsf S}
++
+\lambda
+\widehat{\tau}
+\mathbf I_p.
+$$ {#eq-contracao-alvo-esferico}
+
+Essa escolha é adequada somente quando uma variância média comum possui interpretação para o conjunto de variáveis. Quando as unidades são distintas, pode-se trabalhar com a matriz de correlações ou utilizar um alvo que preserve as escalas marginais.
+
+Um alvo diagonal é
+
+$$
+\widehat{\boldsymbol{\Gamma}}_{\mathrm{diag}}
+=
+\operatorname{diag}
+\left(
+S_{11},
+\ldots,
+S_{pp}
+\right).
+$$
+
+Nesse caso,
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\lambda,\mathrm{diag}}
+=
+(1-\lambda)
+\boldsymbol{\mathsf S}
++
+\lambda
+\widehat{\boldsymbol{\Gamma}}_{\mathrm{diag}}.
+$$ {#eq-contracao-alvo-diagonal}
+
+As variâncias amostrais permanecem inalteradas, enquanto as covariâncias são multiplicadas por $1-\lambda$.
+
+::: {#thm-definicao-positiva-contracao}
+## Definição positiva do estimador por contração
+
+Se
+
+$$
+\boldsymbol{\mathsf S}
+\succeq
+\mathbf 0,
+$$
+
+$$
+\boldsymbol{\Gamma}
+\succ
+\mathbf 0
+$$
+
+e
+
+$$
+0<\lambda\leq1,
+$$
+
+então
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\lambda}
+\succ
+\mathbf 0.
+$$ {#eq-definicao-positiva-contracao}
+:::
+
+::: proof
+Para qualquer vetor não nulo $\mathbf a\in\mathbb R^p$,
+
+$$
+\begin{aligned}
+\mathbf a^\top
+\widehat{\boldsymbol{\Sigma}}_{\lambda}
+\mathbf a
+&=
+(1-\lambda)
+\mathbf a^\top
+\boldsymbol{\mathsf S}
+\mathbf a
++
+\lambda
+\mathbf a^\top
+\boldsymbol{\Gamma}
+\mathbf a.
+\end{aligned}
+$$
+
+A primeira parcela é não negativa. Como $\boldsymbol{\Gamma}\succ\mathbf 0$, a segunda é estritamente positiva. Portanto,
+
+$$
+\mathbf a^\top
+\widehat{\boldsymbol{\Sigma}}_{\lambda}
+\mathbf a
+>
+0
+$$
+
+para todo $\mathbf a\neq\mathbf 0$.
+:::
+
+Esse resultado permite obter uma matriz invertível mesmo quando
+
+$$
+p\geq n
+$$
+
+ou quando existem dependências lineares exatas na amostra.
+
+Considere o alvo
+
+$$
+\boldsymbol{\Gamma}
+=
+\tau\mathbf I_p,
+\qquad
+\tau>0.
+$$
+
+Se
+
+$$
+\boldsymbol{\mathsf S}
+=
+\mathbf Q
+\operatorname{diag}
+\left(
+L_1,\ldots,L_p
+\right)
+\mathbf Q^\top,
+$$
+
+então
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\lambda}
+=
+\mathbf Q
+\operatorname{diag}
+\left[
+(1-\lambda)L_1+\lambda\tau,
+\ldots,
+(1-\lambda)L_p+\lambda\tau
+\right]
+\mathbf Q^\top.
+$$ {#eq-autovalores-contracao-esferica}
+
+Os autovetores permanecem os mesmos, enquanto cada autovalor é deslocado na direção de $\tau$:
+
+$$
+L_{j,\lambda}
+=
+(1-\lambda)L_j+\lambda\tau.
+$$ {#eq-transformacao-autovalores-contracao}
+
+Em particular, se $L_j=0$ e $\lambda>0$,
+
+$$
+L_{j,\lambda}
+=
+\lambda\tau
+>
+0.
+$$
+
+A contração reduz a dispersão entre os autovalores e melhora o condicionamento quando o alvo esférico é adequadamente escolhido.
+
+A Figura @fig-espectro-regularizacao-covariancia compara os autovalores de matrizes de covariâncias amostrais e de suas versões regularizadas em dois regimes dimensionais.
+
+```{r}
+#| label: fig-espectro-regularizacao-covariancia
+#| fig-cap: "Espectros da matriz de covariâncias amostral e de sua versão regularizada em dois regimes dimensionais."
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 9
+#| fig-height: 6
+#| fig-align: center
+
+set.seed(610)
+
+gerar_espectro <- function(
+  n,
+  p,
+  regime,
+  lambda = 0.25
+) {
+  variancias <- seq(
+    2.0,
+    0.3,
+    length.out = p
+  )
+
+  matriz_dados <- matrix(
+    stats::rnorm(
+      n * p
+    ),
+    nrow = n,
+    ncol = p
+  ) %*%
+    diag(
+      sqrt(
+        variancias
+      ),
+      nrow = p
+    )
+
+  matriz_covariancias <- stats::cov(
+    matriz_dados
+  )
+
+  tau <- mean(
+    diag(
+      matriz_covariancias
+    )
+  )
+
+  matriz_regularizada <-
+    (1 - lambda) *
+    matriz_covariancias +
+    lambda *
+    tau *
+    diag(
+      p
+    )
+
+  autovalores_amostrais <- pmax(
+    eigen(
+      matriz_covariancias,
+      symmetric = TRUE,
+      only.values = TRUE
+    )$values,
+    0
+  )
+
+  autovalores_regularizados <- eigen(
+    matriz_regularizada,
+    symmetric = TRUE,
+    only.values = TRUE
+  )$values
+
+  rbind(
+    data.frame(
+      Indice = seq_len(
+        p
+      ),
+      Autovalor = autovalores_amostrais,
+      Matriz = "Amostral",
+      Regime = regime
+    ),
+    data.frame(
+      Indice = seq_len(
+        p
+      ),
+      Autovalor = autovalores_regularizados,
+      Matriz = "Regularizada",
+      Regime = regime
+    )
+  )
+}
+
+dados_espectros <- rbind(
+  gerar_espectro(
+    n = 80,
+    p = 10,
+    regime = "p < n"
+  ),
+  gerar_espectro(
+    n = 25,
+    p = 40,
+    regime = "p >= n"
+  )
+)
+
+dados_espectros$Matriz <- factor(
+  dados_espectros$Matriz,
+  levels = c(
+    "Amostral",
+    "Regularizada"
+  )
+)
+
+dados_espectros$Regime <- factor(
+  dados_espectros$Regime,
+  levels = c(
+    "p < n",
+    "p >= n"
+  )
+)
+
+ggplot2::ggplot(
+  dados_espectros,
+  ggplot2::aes(
+    x = Indice,
+    y = Autovalor
+  )
+) +
+  ggplot2::geom_hline(
+    yintercept = 0,
+    linewidth = 0.3
+  ) +
+  ggplot2::geom_line(
+    linewidth = 0.6
+  ) +
+  ggplot2::geom_point(
+    size = 1.4
+  ) +
+  ggplot2::facet_grid(
+    Regime ~ Matriz,
+    scales = "free_x"
+  ) +
+  ggplot2::labs(
+    x = "Índice do autovalor",
+    y = "Autovalor"
+  ) +
+  ggplot2::theme_minimal(
+    base_size = 12
+  ) +
+  ggplot2::theme(
+    panel.grid.minor = ggplot2::element_blank(),
+    strip.text = ggplot2::element_text(
+      face = "bold"
+    )
+  )
+```
+
+No regime $p<n$, a matriz amostral simulada possui posto completo, mas seus menores autovalores são mais sensíveis. A regularização desloca o espectro na direção do alvo.
+
+No regime $p\geq n$, a matriz amostral apresenta autovalores nulos em decorrência do limite de posto. A versão regularizada substitui esses valores por autovalores positivos e produz uma matriz invertível.
+
+A figura ilustra um efeito algébrico da regularização. A escolha de $\lambda$ e da matriz-alvo é um problema estatístico e não pode ser determinada apenas pela exigência de invertibilidade.
+
+Um valor elevado de $\lambda$ reduz a influência da amostra e aumenta a influência do alvo. Um valor pequeno preserva mais da estrutura empírica, mas pode produzir menor ganho de estabilidade.
+
+Os procedimentos específicos para selecionar $\lambda$ não serão desenvolvidos neste capítulo. A escolha deve considerar o critério de perda, a estrutura assumida para $\boldsymbol{\Sigma}$ e o objetivo da estimação.
+
+### Pseudoinversa e regularização
+
+Quando $\mathbf S$ é singular, sua pseudoinversa de Moore–Penrose pode ser obtida pela decomposição espectral.
+
+Considere
+
+$$
+\mathbf S
+=
+\mathbf Q_r
+\boldsymbol{\Lambda}_r
+\mathbf Q_r^\top,
+$$
+
+em que
+
+$$
+\boldsymbol{\Lambda}_r
+=
+\operatorname{diag}
+\left(
+\ell_1,\ldots,\ell_r
+\right)
+$$
+
+contém os $r$ autovalores positivos. A pseudoinversa é
+
+$$
+\mathbf S^+
+=
+\mathbf Q_r
+\boldsymbol{\Lambda}_r^{-1}
+\mathbf Q_r^\top.
+$$ {#eq-pseudoinversa-covariancia-amostral}
+
+A pseudoinversa atua como a inversa ordinária na imagem de $\mathbf S$ e atribui valor zero às direções pertencentes ao núcleo.
+
+Se
+
+$$
+\mathbf a
+\in
+\mathcal N
+\left(
+\mathbf S
+\right),
+$$
+
+então
+
+$$
+\mathbf S^+
+\mathbf a
+=
+\mathbf 0.
+$$
+
+Uma matriz regularizada positiva definida produz um comportamento diferente. Para o alvo esférico,
+
+$$
+\mathbf S_\lambda
+=
+(1-\lambda)
+\mathbf S
++
+\lambda\tau\mathbf I_p,
+$$
+
+tem-se
+
+$$
+\mathbf S_\lambda^{-1}
+=
+\mathbf Q
+\operatorname{diag}
+\left[
+\frac{1}{
+(1-\lambda)\ell_j+\lambda\tau
+}
+\right]
+\mathbf Q^\top.
+$$ {#eq-inversa-covariancia-regularizada}
+
+Nas direções em que
+
+$$
+\ell_j=0,
+$$
+
+a inversa regularizada atribui peso
+
+$$
+\frac{1}{\lambda\tau},
+$$
+
+enquanto a pseudoinversa atribui peso zero.
+
+Assim:
+
+- a pseudoinversa restringe a operação ao suporte observado;
+- a regularização introduz variabilidade positiva em todas as direções;
+- a pseudoinversa preserva os autovalores positivos originais;
+- a regularização modifica o espectro;
+- a pseudoinversa não resolve o mau condicionamento causado por autovalores positivos muito pequenos;
+- a regularização pode limitar a amplificação produzida pela inversão.
+
+A escolha entre os dois objetos depende da interpretação do problema. A pseudoinversa é uma extensão algébrica da inversa para uma matriz singular. A regularização corresponde à adoção de um novo estimador da matriz de covariâncias.
+
+::: {.callout-caution appearance="minimal" icon="false"}
+## Invertibilidade não implica validade inferencial
+
+Substituir $\mathbf S^{-1}$ por uma pseudoinversa ou por uma inversa regularizada altera o procedimento estatístico.
+
+Distribuições amostrais e calibrações inferenciais derivadas para a inversa clássica de $\mathbf S$ não podem ser transferidas automaticamente para essas substituições.
+:::
+
+### Sensibilidade e robustez
+
+O vetor de médias e a matriz de covariâncias amostral utilizam diretamente os valores e os produtos dos desvios. Por isso, observações extremas podem exercer grande influência sobre ambos.
+
+Considere uma amostra observada
+
+$$
+\mathbf x_1,\ldots,\mathbf x_n
+$$
+
+e substitua a observação $\mathbf x_k$ por $\mathbf x_k^\ast$. A nova média é
+
+$$
+\bar{\mathbf x}^{\ast}
+=
+\bar{\mathbf x}
++
+\frac{1}{n}
+\left(
+\mathbf x_k^\ast-\mathbf x_k
+\right).
+$$ {#eq-efeito-substituicao-media}
+
+Portanto,
+
+$$
+\bar{\mathbf x}^{\ast}
+-
+\bar{\mathbf x}
+=
+\frac{1}{n}
+\left(
+\mathbf x_k^\ast-\mathbf x_k
+\right).
+$$
+
+O efeito pode assumir magnitude arbitrariamente grande quando $\mathbf x_k^\ast$ se afasta da nuvem de dados.
+
+Na matriz de covariâncias, a influência pode ser ainda maior porque aparecem produtos quadráticos dos desvios:
+
+$$
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)^\top.
+$$
+
+Uma observação afastada pode alterar simultaneamente:
+
+- o vetor de médias;
+- as variâncias;
+- as covariâncias;
+- as correlações;
+- os autovalores;
+- os autovetores;
+- o determinante;
+- a inversa;
+- as distâncias construídas a partir da matriz estimada.
+
+A presença de uma observação influente não implica automaticamente erro de medição. Ela pode representar:
+
+- uma unidade válida de uma região pouco frequente da população;
+- uma observação proveniente de outra população;
+- uma falha de registro;
+- uma distribuição com caudas mais pesadas;
+- assimetria ou heterogeneidade não representada pelo modelo.
+
+A decisão de manter, corrigir ou retirar uma observação exige informação sobre o processo de coleta e o contexto substantivo.
+
+Estimadores robustos de localização e dispersão procuram reduzir alterações excessivas diante de determinadas perturbações. Sua avaliação pode considerar:
+
+- sensibilidade local;
+- proporção de contaminação tolerada;
+- equivariância sob transformações;
+- eficiência no modelo de referência;
+- existência em relação a $n$ e $p$;
+- custo computacional;
+- parâmetro ou funcional populacional estimado.
+
+Não existe um estimador robusto superior segundo todos esses critérios.
+
+Um estimador de localização pode ser resistente a observações extremas e não respeitar transformações afins gerais. Um estimador de dispersão pode ser robusto em baixa dimensão e deixar de existir quando $p$ é grande em relação a $n$. Outro procedimento pode preservar equivariância afim e exigir amostras maiores.
+
+Também é necessário distinguir três problemas:
+
+1. **observações extremas**, relacionadas à sensibilidade dos estimadores;
+2. **alta dimensão**, relacionada à quantidade de parâmetros e ao posto;
+3. **má especificação do modelo**, relacionada à inadequação da família probabilística adotada.
+
+Um mesmo conjunto de dados pode apresentar mais de um desses problemas, mas cada um exige uma análise própria.
+
+A inspeção da estimação de uma matriz de covariâncias deve considerar, de forma conjunta:
+
+- tamanho amostral e dimensão;
+- posto;
+- autovalores;
+- número de condição;
+- estabilidade da inversa;
+- sensibilidade a observações;
+- coerência das unidades;
+- necessidade de regularização;
+- objetivo da utilização posterior da matriz.
+
+O exemplo seguinte reúne a estimação da média, da covariância, das correlações e das covariâncias cruzadas em uma única amostra, preservando a distinção entre parâmetros, estimadores e estimativas.
+
+## Exemplo integrado
+
+O exemplo reúne a estimação da localização, da dispersão e das relações entre dois blocos de variáveis. Os cálculos são apresentados para uma amostra observada; portanto, os resultados são estimativas, representadas por letras em negrito sem fonte de aleatoriedade.
+
+::: {#exm-estimacao-integrada}
+## Estimação em dois blocos de variáveis
+
+Considere seis unidades amostrais nas quais foram observados dois blocos de variáveis. O primeiro bloco contém três variáveis:
+
+$$
+\mathbf X
+=
+\begin{bmatrix}
+2 & 4 & 1\\
+3 & 5 & 3\\
+5 & 6 & 4\\
+6 & 8 & 6\\
+4 & 7 & 2\\
+7 & 9 & 7
+\end{bmatrix}
+\in
+\mathbb R^{6\times3}.
+$$
+
+O segundo bloco contém duas variáveis observadas nas mesmas unidades:
+
+$$
+\mathbf Y
+=
+\begin{bmatrix}
+1 & 3\\
+3 & 2\\
+4 & 5\\
+5 & 7\\
+3 & 4\\
+8 & 6
+\end{bmatrix}
+\in
+\mathbb R^{6\times2}.
+$$
+
+A correspondência entre as linhas de $\mathbf X$ e $\mathbf Y$ é necessária para estimar as covariâncias cruzadas entre os dois blocos.
+
+Os vetores de médias observados são
+
+$$
+\bar{\mathbf x}
+=
+\frac{1}{6}
+\mathbf X^\top
+\mathbf 1_6
+=
+\begin{bmatrix}
+4.5\\
+6.5\\
+3.833
+\end{bmatrix}
+$$
+
+e
+
+$$
+\bar{\mathbf y}
+=
+\frac{1}{6}
+\mathbf Y^\top
+\mathbf 1_6
+=
+\begin{bmatrix}
+4.0\\
+4.5
+\end{bmatrix}.
+$$
+
+Para o primeiro bloco, a matriz de somas de quadrados e produtos cruzados é
+
+$$
+\begin{aligned}
+\mathbf A_X
+&=
+\mathbf X_c^\top
+\mathbf X_c
+\\
+&=
+\begin{bmatrix}
+17.5 & 16.5 & 20.5\\
+16.5 & 17.5 & 18.5\\
+20.5 & 18.5 & 26.833
+\end{bmatrix}.
+\end{aligned}
+$$
+
+A matriz de covariâncias amostral, com divisor $n-1=5$, é
+
+$$
+\begin{aligned}
+\mathbf S_X
+&=
+\frac{1}{5}
+\mathbf A_X
+\\
+&=
+\begin{bmatrix}
+3.500 & 3.300 & 4.100\\
+3.300 & 3.500 & 3.700\\
+4.100 & 3.700 & 5.367
+\end{bmatrix}.
+\end{aligned}
+$$ {#eq-exemplo-covariancia-primeiro-bloco}
+
+Essa matriz é a estimativa não viesada de $\boldsymbol{\Sigma}_{XX}$ sob amostragem aleatória e existência de segundos momentos.
+
+Se for adotado o modelo normal multivariado, o estimador de máxima verossimilhança é
+
+$$
+\begin{aligned}
+\widehat{\boldsymbol{\Sigma}}_{XX,\mathrm{MV}}
+&=
+\frac{1}{6}
+\mathbf A_X
+\\
+&=
+\begin{bmatrix}
+2.917 & 2.750 & 3.417\\
+2.750 & 2.917 & 3.083\\
+3.417 & 3.083 & 4.472
+\end{bmatrix}.
+\end{aligned}
+$$ {#eq-exemplo-mv-covariancia-primeiro-bloco}
+
+Os dois estimadores estão relacionados por
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{XX,\mathrm{MV}}
+=
+\frac{5}{6}
+\mathbf S_X.
+$$
+
+Portanto, possuem os mesmos autovetores, o mesmo posto e o mesmo número de condição. Seus autovalores diferem pelo fator $5/6$.
+
+A matriz de correlações do primeiro bloco é
+
+$$
+\mathbf R_X
+=
+\begin{bmatrix}
+1.000 & 0.943 & 0.946\\
+0.943 & 1.000 & 0.854\\
+0.946 & 0.854 & 1.000
+\end{bmatrix}.
+$$ {#eq-exemplo-correlacao-primeiro-bloco}
+
+As três correlações são positivas e elevadas. A maior associação linear amostral ocorre entre as variáveis $X_1$ e $X_3$:
+
+$$
+r_{13}
+\approx
+0.946.
+$$
+
+A menor ocorre entre $X_2$ e $X_3$:
+
+$$
+r_{23}
+\approx
+0.854.
+$$
+
+Os autovalores de $\mathbf S_X$, em ordem decrescente, são aproximadamente
+
+$$
+\ell_1
+=
+11.648,
+\qquad
+\ell_2
+=
+0.627
+\qquad
+\text{e}
+\qquad
+\ell_3
+=
+0.092.
+$$
+
+Como todos são positivos,
+
+$$
+\operatorname{posto}
+\left(
+\mathbf S_X
+\right)
+=
+3,
+$$
+
+e a matriz é positiva definida.
+
+Seu número de condição espectral é
+
+$$
+\begin{aligned}
+\kappa_2
+\left(
+\mathbf S_X
+\right)
+&=
+\frac{\ell_1}{\ell_3}
+\\
+&\approx
+126.8.
+\end{aligned}
+$$
+
+A matriz é invertível, mas o menor autovalor é muito inferior ao maior. Assim, a amostra apresenta uma direção com variabilidade reduzida e a inversão de $\mathbf S_X$ pode ser sensível a pequenas alterações nos dados.
+
+Para estimar as relações entre os dois blocos, utiliza-se
+
+$$
+\mathbf S_{XY}
+=
+\frac{1}{5}
+\mathbf X_c^\top
+\mathbf Y_c.
+$$
+
+O resultado é
+
+$$
+\mathbf S_{XY}
+=
+\begin{bmatrix}
+4.2 & 3.1\\
+4.0 & 2.9\\
+5.2 & 3.5
+\end{bmatrix}.
+$$ {#eq-exemplo-covariancia-cruzada}
+
+Por exemplo,
+
+$$
+s_{X_3Y_1}
+=
+5.2
+$$
+
+é a covariância amostral entre a terceira variável do primeiro bloco e a primeira variável do segundo bloco.
+
+A mudança da ordem dos blocos produz
+
+$$
+\mathbf S_{YX}
+=
+\mathbf S_{XY}^\top
+=
+\begin{bmatrix}
+4.2 & 4.0 & 5.2\\
+3.1 & 2.9 & 3.5
+\end{bmatrix}.
+$$
+
+A matriz de covariâncias do segundo bloco é
+
+$$
+\mathbf S_Y
+=
+\begin{bmatrix}
+5.6 & 3.2\\
+3.2 & 3.5
+\end{bmatrix}.
+$$
+
+Reunindo as cinco variáveis na matriz
+
+$$
+\mathbf Z
+=
+\begin{bmatrix}
+\mathbf X & \mathbf Y
+\end{bmatrix}
+\in
+\mathbb R^{6\times5},
+$$
+
+obtém-se a matriz de covariâncias conjunta
+
+$$
+\mathbf S_Z
+=
+\begin{bmatrix}
+\mathbf S_X & \mathbf S_{XY}\\
+\mathbf S_{YX} & \mathbf S_Y
+\end{bmatrix}.
+$$
+
+Numericamente,
+
+$$
+\mathbf S_Z
+=
+\begin{bmatrix}
+3.500 & 3.300 & 4.100 & 4.200 & 3.100\\
+3.300 & 3.500 & 3.700 & 4.000 & 2.900\\
+4.100 & 3.700 & 5.367 & 5.200 & 3.500\\
+4.200 & 4.000 & 5.200 & 5.600 & 3.200\\
+3.100 & 2.900 & 3.500 & 3.200 & 3.500
+\end{bmatrix}.
+$$ {#eq-exemplo-covariancia-conjunta}
+
+Como existem seis observações e cinco variáveis,
+
+$$
+\operatorname{posto}
+\left(
+\mathbf S_Z
+\right)
+\leq
+\min
+\left(
+5,6-1
+\right)
+=
+5.
+$$
+
+Neste exemplo,
+
+$$
+\operatorname{posto}
+\left(
+\mathbf S_Z
+\right)
+=
+5.
+$$
+
+A matriz conjunta é positiva definida, embora esse seja o menor tamanho amostral que permite posto completo para cinco variáveis centralizadas.
+
+O exemplo mostra que:
+
+1. $\bar{\mathbf x}$ e $\bar{\mathbf y}$ estimam as localizações dos dois blocos;
+2. $\mathbf A_X$ reúne as somas de quadrados e os produtos cruzados;
+3. os divisores $n-1$ e $n$ produzem estimadores com propriedades diferentes;
+4. $\mathbf R_X$ remove as escalas marginais das covariâncias;
+5. posto completo não garante bom condicionamento;
+6. $\mathbf S_{XY}$ depende do pareamento entre os blocos;
+7. a matriz conjunta reúne dispersões internas e relações cruzadas em uma única estrutura.
+
+A estimação produz, portanto, uma representação integrada da localização e da variabilidade conjunta da amostra. Esses objetos serão utilizados nos capítulos seguintes para construir modelos, formular hipóteses e obter procedimentos de inferência.
+:::
+
+## Síntese do capítulo
+
+Uma amostra aleatória multivariada é formada por vetores independentes e com a mesma distribuição:
+
+$$
+\boldsymbol{\mathsf X}_1,
+\ldots,
+\boldsymbol{\mathsf X}_n
+\overset{\mathrm{iid}}{\sim}
+F_{\boldsymbol{\theta}}.
+$$
+
+Antes da observação dos dados, esses vetores compõem a matriz aleatória $\boldsymbol{\mathcal X}$. Depois da coleta, obtém-se a matriz observada $\mathbf X$. Essa distinção permite separar parâmetros populacionais, estatísticas aleatórias, estimadores e estimativas.
+
+A avaliação de um estimador exige a definição do critério empregado. Viés e matriz de covariâncias descrevem, respectivamente, o afastamento sistemático e a variabilidade entre amostras. Sob perda quadrática euclidiana,
+
+$$
+\operatorname{EQM}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+=
+\operatorname{tr}
+\left[
+\operatorname{Cov}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right]
++
+\left\|
+\operatorname{Bias}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right\|^2.
+$$
+
+A consistência descreve o comportamento quando o tamanho amostral aumenta. A eficiência depende de uma ordem matricial ou de uma função de perda. A suficiência trata da informação preservada por uma estatística. A equivariância examina a coerência sob transformações dos dados, enquanto a robustez avalia a estabilidade diante de perturbações e desvios do modelo.
+
+O método dos momentos e a máxima verossimilhança fornecem princípios gerais de estimação. No modelo normal multivariado, quando a SSCP observada possui posto completo,
+
+$$
+\widehat{\boldsymbol{\mu}}_{\mathrm{MV}}
+=
+\bar{\boldsymbol{\mathsf X}}
+$$
+
+e
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{MV}}
+=
+\frac{1}{n}
+\boldsymbol{\mathsf A}.
+$$
+
+O vetor de médias amostrais
+
+$$
+\bar{\boldsymbol{\mathsf X}}
+=
+\frac{1}{n}
+\sum_{i=1}^n
+\boldsymbol{\mathsf X}_i
+$$
+
+é não viesado para $\boldsymbol{\mu}$ e possui matriz de covariâncias
+
+$$
+\operatorname{Cov}
+\left(
+\bar{\boldsymbol{\mathsf X}}
+\right)
+=
+\frac{\boldsymbol{\Sigma}}{n}.
+$$
+
+Ele também é consistente, equivariante sob transformações afins e, para a amostra observada, corresponde ao centroide da nuvem de pontos.
+
+A matriz de somas de quadrados e produtos cruzados é
+
+$$
+\boldsymbol{\mathsf A}
+=
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)^\top.
+$$
+
+Como
+
+$$
+E
+\left(
+\boldsymbol{\mathsf A}
+\right)
+=
+(n-1)
+\boldsymbol{\Sigma},
+$$
+
+a matriz
+
+$$
+\boldsymbol{\mathsf S}
+=
+\frac{1}{n-1}
+\boldsymbol{\mathsf A}
+$$
+
+é um estimador não viesado de $\boldsymbol{\Sigma}$. O estimador normal de máxima verossimilhança utiliza o divisor $n$. Ambos são consistentes no regime em que $p$ permanece fixo e os segundos momentos existem.
+
+Para dois blocos de variáveis observados sobre as mesmas unidades,
+
+$$
+\boldsymbol{\mathsf S}_{XY}
+=
+\frac{1}{n-1}
+\sum_{i=1}^n
+\left(
+\boldsymbol{\mathsf X}_i
+-
+\bar{\boldsymbol{\mathsf X}}
+\right)
+\left(
+\boldsymbol{\mathsf Y}_i
+-
+\bar{\boldsymbol{\mathsf Y}}
+\right)^\top
+$$
+
+estima a matriz de covariâncias cruzadas. A construção exige preservar o pareamento entre as linhas dos dois blocos.
+
+Quando todas as variâncias amostrais são positivas, a matriz de correlações é
+
+$$
+\boldsymbol{\mathsf R}
+=
+\boldsymbol{\mathsf D}_S^{-1/2}
+\boldsymbol{\mathsf S}
+\boldsymbol{\mathsf D}_S^{-1/2}.
+$$
+
+Ela é simétrica, semidefinida positiva, possui diagonal unitária e tem o mesmo posto de $\boldsymbol{\mathsf S}$.
+
+A estrutura de posto satisfaz
+
+$$
+\operatorname{posto}
+\left(
+\boldsymbol{\mathsf S}
+\right)
+\leq
+\min
+\left(
+p,n-1
+\right).
+$$
+
+Por isso, a matriz de covariâncias amostral é necessariamente singular quando $p\geq n$. Mesmo quando é invertível, autovalores pequenos podem tornar sua inversa instável.
+
+A regularização modifica o estimador para reduzir variabilidade ou melhorar o condicionamento. Um estimador por contração possui a forma
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\lambda}
+=
+(1-\lambda)
+\boldsymbol{\mathsf S}
++
+\lambda
+\boldsymbol{\Gamma}.
+$$
+
+A regularização deve ser distinguida da pseudoinversa. A pseudoinversa opera no suporte amostral e atribui peso zero ao núcleo, enquanto a regularização altera o espectro e pode produzir uma matriz positiva definida. Nenhuma dessas substituições preserva automaticamente as distribuições inferenciais derivadas para a inversa clássica.
+
+Ao término do capítulo, deve-se ser capaz de:
+
+- distinguir parâmetros, estatísticas, estimadores e estimativas;
+- avaliar estimadores por viés, variabilidade, erro quadrático médio e consistência;
+- diferenciar suficiência, equivariância, invariância da máxima verossimilhança e robustez;
+- obter os estimadores da média e da matriz de covariâncias;
+- explicar a diferença entre os divisores $n$ e $n-1$;
+- construir covariâncias cruzadas e correlações amostrais;
+- determinar as condições de posto e definição positiva;
+- reconhecer problemas de mau condicionamento e alta dimensão;
+- distinguir pseudoinversa e regularização.
+
+Os estimadores construídos neste capítulo fornecem a base amostral para o modelo linear multivariado. No próximo capítulo, várias variáveis-resposta serão relacionadas simultaneamente a uma matriz de delineamento, e as hipóteses sobre os parâmetros serão expressas por meio de restrições matriciais.

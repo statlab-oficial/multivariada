@@ -1,0 +1,10728 @@
+# Cálculo Diferencial, Integral e Matricial Aplicado à Estatística Multivariada
+
+Os capítulos anteriores desenvolveram a representação vetorial dos dados, a álgebra matricial, os espaços vetoriais, as transformações lineares e as principais decomposições matriciais. Este capítulo estuda funções cujos argumentos e resultados podem ser escalares, vetores ou matrizes.
+
+O cálculo diferencial descreve como essas funções variam localmente. Gradientes, Jacobianas e Hessianas permitem construir aproximações, identificar direções de variação e formular condições de otimização. O cálculo matricial permite diferenciar expressões que envolvem traços, produtos, inversas e determinantes.
+
+O cálculo integral será utilizado para representar probabilidades, esperanças, distribuições marginais e transformações de vetores aleatórios. Nessas transformações, o determinante Jacobiano descreve a alteração local de volume.
+
+O objetivo é reunir as ferramentas de cálculo utilizadas nos capítulos probabilísticos e inferenciais, sem desenvolver antecipadamente os modelos e procedimentos específicos desses capítulos.
+
+## Funções, variações e diferenciais
+
+### Tipos de funções
+
+Uma função real de uma variável real possui a forma
+
+$$
+f:
+\mathbb{R}
+\longrightarrow
+\mathbb{R}.
+$$
+
+Em problemas multivariados, o domínio ou o contradomínio pode ter dimensão maior que um. A natureza desses espaços determina a forma da derivada.
+
+Uma função escalar de um vetor é representada por
+
+$$
+f:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}.
+$$
+
+Para
+
+$$
+\mathbf{x}
+=
+\begin{bmatrix}
+x_1\\
+\vdots\\
+x_p
+\end{bmatrix},
+$$
+
+escreve-se
+
+$$
+f(\mathbf{x})
+=
+f(x_1,\ldots,x_p).
+$$
+
+São exemplos:
+
+$$
+f(\mathbf{x})
+=
+\mathbf{a}^{\top}\mathbf{x},
+$$
+
+$$
+f(\mathbf{x})
+=
+\mathbf{x}^{\top}\mathbf{x},
+$$
+
+$$
+f(\mathbf{x})
+=
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+$$
+
+e
+
+$$
+f(\mathbf{x})
+=
+\left\|
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\right\|^2.
+$$
+
+Essas funções associam um escalar a cada vetor do domínio.
+
+Uma função vetorial de um vetor possui a forma
+
+$$
+\mathbf{g}:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{q}.
+$$
+
+Ela pode ser escrita como
+
+$$
+\mathbf{g}(\mathbf{x})
+=
+\begin{bmatrix}
+g_1(\mathbf{x})\\
+\vdots\\
+g_q(\mathbf{x})
+\end{bmatrix},
+$$
+
+em que cada componente
+
+$$
+g_i:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}
+$$
+
+é uma função escalar.
+
+Uma transformação linear é um caso particular:
+
+$$
+\mathbf{g}(\mathbf{x})
+=
+\mathbf{A}\mathbf{x},
+\qquad
+\mathbf{A}
+\in
+\mathbb{R}^{q\times p}.
+$$
+
+Também são utilizadas funções escalares de matrizes:
+
+$$
+\phi:
+\mathbb{R}^{m\times n}
+\longrightarrow
+\mathbb{R}.
+$$
+
+São exemplos:
+
+$$
+\phi(\mathbf{X})
+=
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}\mathbf{X}
+\right)
+$$
+
+e
+
+$$
+\phi(\mathbf{X})
+=
+\|\mathbf{X}\|_F^2.
+$$
+
+Uma função matricial de uma matriz possui a forma
+
+$$
+\mathcal{G}:
+\mathbb{R}^{m\times n}
+\longrightarrow
+\mathbb{R}^{r\times s}.
+$$
+
+São exemplos:
+
+$$
+\mathcal{G}(\mathbf{X})
+=
+\mathbf{X}^{\top}\mathbf{X},
+$$
+
+$$
+\mathcal{G}(\mathbf{X})
+=
+\mathbf{A}\mathbf{X}\mathbf{B}
+$$
+
+e, para matrizes quadradas invertíveis,
+
+$$
+\mathcal{G}(\mathbf{X})
+=
+\mathbf{X}^{-1}.
+$$
+
+A @tbl-tipos-funcoes-calculo resume os tipos de funções utilizados no capítulo.
+
+| Função                    | Domínio                  | Contradomínio            | Objeto diferencial   |
+|:-----------------|:-----------------|:-----------------|:-----------------|
+| $f(x)$                    | $\mathbb{R}$             | $\mathbb{R}$             | Derivada escalar     |
+| $f(\mathbf{x})$           | $\mathbb{R}^{p}$         | $\mathbb{R}$             | Gradiente            |
+| $\mathbf{g}(\mathbf{x})$  | $\mathbb{R}^{p}$         | $\mathbb{R}^{q}$         | Jacobiana            |
+| $\phi(\mathbf{X})$        | $\mathbb{R}^{m\times n}$ | $\mathbb{R}$             | Gradiente matricial  |
+| $\mathcal{G}(\mathbf{X})$ | $\mathbb{R}^{m\times n}$ | $\mathbb{R}^{r\times s}$ | Operador diferencial |
+
+: Tipos de funções e objetos diferenciais correspondentes. {#tbl-tipos-funcoes-calculo}
+
+As dimensões do domínio e do contradomínio devem ser identificadas antes da diferenciação. Elas determinam a dimensão do gradiente, da Jacobiana ou do operador diferencial.
+
+### Convenções de derivação
+
+Neste capítulo, o gradiente de uma função escalar de um vetor será um vetor-coluna:
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+\begin{bmatrix}
+\dfrac{\partial f}{\partial x_1}\\
+\vdots\\
+\dfrac{\partial f}{\partial x_p}
+\end{bmatrix}
+\in
+\mathbb{R}^{p}.
+$$
+
+Para uma função vetorial
+
+$$
+\mathbf{g}:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{q},
+$$
+
+a Jacobiana será definida por
+
+$$
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+=
+\begin{bmatrix}
+\dfrac{\partial g_1}{\partial x_1}
+&
+\cdots
+&
+\dfrac{\partial g_1}{\partial x_p}
+\\
+\vdots
+&
+\ddots
+&
+\vdots
+\\
+\dfrac{\partial g_q}{\partial x_1}
+&
+\cdots
+&
+\dfrac{\partial g_q}{\partial x_p}
+\end{bmatrix}
+\in
+\mathbb{R}^{q\times p}.
+$$
+
+A Hessiana de uma função escalar será representada por
+
+$$
+\nabla_{\mathbf{x}}^2 f(\mathbf{x})
+\in
+\mathbb{R}^{p\times p}.
+$$
+
+Para uma função escalar de uma matriz,
+
+$$
+\phi:
+\mathbb{R}^{m\times n}
+\longrightarrow
+\mathbb{R},
+$$
+
+o gradiente matricial terá a mesma dimensão do argumento:
+
+$$
+\nabla_{\mathbf{X}}\phi(\mathbf{X})
+\in
+\mathbb{R}^{m\times n}.
+$$
+
+Ele será identificado pela relação
+
+$$
+d\phi
+=
+\operatorname{tr}
+\left[
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)^{\top}
+d\mathbf{X}
+\right].
+$$
+
+Essa convenção utiliza o produto interno de Frobenius entre o gradiente e a perturbação da matriz.
+
+### Variação de uma função
+
+Considere uma função
+
+$$
+f:
+\mathcal{U}
+\subseteq
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R},
+$$
+
+um ponto interior
+
+$$
+\mathbf{x}
+\in
+\mathcal{U}
+$$
+
+e uma perturbação
+
+$$
+\mathbf{h}
+\in
+\mathbb{R}^{p}
+$$
+
+tal que $\mathbf{x}+\mathbf{h}\in\mathcal{U}$.
+
+A variação exata da função é
+
+$$
+\Delta f
+=
+f(\mathbf{x}+\mathbf{h})
+-
+f(\mathbf{x}).
+$$
+
+Essa diferença mede a alteração total no valor da função. Para perturbações pequenas, procura-se representar sua parcela dominante por uma função linear de $\mathbf{h}$.
+
+::: {#def-diferenciabilidade-escalar}
+## Diferenciabilidade de uma função escalar
+
+A função
+
+$$
+f:
+\mathcal{U}
+\subseteq
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}
+$$
+
+é diferenciável em $\mathbf{x}$ quando existe uma transformação linear
+
+$$
+L_{\mathbf{x}}:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}
+$$
+
+tal que
+
+$$
+f(\mathbf{x}+\mathbf{h})
+-
+f(\mathbf{x})
+=
+L_{\mathbf{x}}(\mathbf{h})
++
+r_{\mathbf{x}}(\mathbf{h}),
+$$
+
+com
+
+$$
+\frac{
+r_{\mathbf{x}}(\mathbf{h})
+}{
+\|\mathbf{h}\|
+}
+\longrightarrow
+0
+\qquad
+\text{quando}
+\qquad
+\|\mathbf{h}\|
+\longrightarrow
+0.
+$$
+:::
+
+A função linear $L_{\mathbf{x}}$ fornece a aproximação de primeira ordem da variação. No espaço euclidiano, existe um único vetor
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+\in
+\mathbb{R}^{p}
+$$
+
+tal que
+
+$$
+L_{\mathbf{x}}(\mathbf{h})
+=
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}\mathbf{h}.
+$$
+
+Portanto,
+
+$$
+f(\mathbf{x}+\mathbf{h})
+=
+f(\mathbf{x})
++
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}\mathbf{h}
++
+r_{\mathbf{x}}(\mathbf{h}),
+$$
+
+em que o termo residual é pequeno em relação a $\|\mathbf{h}\|$.
+
+Utilizando a notação de ordem,
+
+$$
+f(\mathbf{x}+\mathbf{h})
+=
+f(\mathbf{x})
++
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}\mathbf{h}
++
+o(\|\mathbf{h}\|).
+$$
+
+A aproximação linear é
+
+$$
+f(\mathbf{x}+\mathbf{h})
+\approx
+f(\mathbf{x})
++
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}\mathbf{h}.
+$$
+
+### Diferencial
+
+O diferencial de $f$ em $\mathbf{x}$ é a parte linear de sua variação:
+
+$$
+df
+=
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}
+d\mathbf{x}.
+$$
+
+Em coordenadas,
+
+$$
+df
+=
+\sum_{j=1}^{p}
+\frac{
+\partial f
+}{
+\partial x_j
+}
+dx_j.
+$$
+
+O vetor
+
+$$
+d\mathbf{x}
+=
+\begin{bmatrix}
+dx_1\\
+\vdots\\
+dx_p
+\end{bmatrix}
+$$
+
+representa uma perturbação infinitesimal do argumento. O diferencial é linear em relação a essa perturbação.
+
+::: {#exm-diferencial-funcao-linear}
+## Diferencial de uma função linear
+
+Considere
+
+$$
+f(\mathbf{x})
+=
+\mathbf{a}^{\top}\mathbf{x},
+$$
+
+em que $\mathbf{a}\in\mathbb{R}^{p}$ é constante.
+
+A variação é
+
+$$
+\begin{aligned}
+f(\mathbf{x}+\mathbf{h})
+-
+f(\mathbf{x})
+&=
+\mathbf{a}^{\top}
+\left(
+\mathbf{x}+\mathbf{h}
+\right)
+-
+\mathbf{a}^{\top}\mathbf{x}\\
+&=
+\mathbf{a}^{\top}\mathbf{h}.
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+\mathbf{a}
+$$
+
+e
+
+$$
+df
+=
+\mathbf{a}^{\top}d\mathbf{x}.
+$$
+
+Como a função é linear, a aproximação de primeira ordem coincide com a variação exata.
+:::
+
+::: {#exm-diferencial-norma-quadratica}
+## Diferencial do quadrado da norma
+
+Considere
+
+$$
+f(\mathbf{x})
+=
+\mathbf{x}^{\top}\mathbf{x}
+=
+\|\mathbf{x}\|^2.
+$$
+
+A variação exata é
+
+$$
+\begin{aligned}
+f(\mathbf{x}+\mathbf{h})
+-
+f(\mathbf{x})
+&=
+\left(
+\mathbf{x}+\mathbf{h}
+\right)^{\top}
+\left(
+\mathbf{x}+\mathbf{h}
+\right)
+-
+\mathbf{x}^{\top}\mathbf{x}\\
+&=
+2\mathbf{x}^{\top}\mathbf{h}
++
+\mathbf{h}^{\top}\mathbf{h}.
+\end{aligned}
+$$
+
+O termo
+
+$$
+2\mathbf{x}^{\top}\mathbf{h}
+$$
+
+é linear em $\mathbf{h}$, enquanto
+
+$$
+\mathbf{h}^{\top}\mathbf{h}
+=
+\|\mathbf{h}\|^2
+$$
+
+é de segunda ordem.
+
+Portanto,
+
+$$
+df
+=
+2\mathbf{x}^{\top}d\mathbf{x}
+$$
+
+e
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+2\mathbf{x}.
+$$
+:::
+
+### Aproximação ao longo de uma direção
+
+Considere
+
+$$
+f(x_1,x_2)
+=
+x_1^2
++
+2x_2^2,
+$$
+
+o ponto
+
+$$
+\mathbf{x}_0
+=
+\begin{bmatrix}
+1\\
+1/2
+\end{bmatrix}
+$$
+
+e o vetor unitário
+
+$$
+\mathbf{h}
+=
+\begin{bmatrix}
+-4/5\\
+3/5
+\end{bmatrix}.
+$$
+
+A restrição da função à reta que passa por $\mathbf{x}_0$ na direção $\mathbf{h}$ é
+
+$$
+\varphi(t)
+=
+f
+\left(
+\mathbf{x}_0+t\mathbf{h}
+\right).
+$$
+
+Em torno de $t=0$,
+
+$$
+\varphi(t)
+\approx
+\varphi(0)
++
+\varphi'(0)t.
+$$
+
+A @fig-aproximacao-linear-direcional compara a função exata ao longo dessa reta com sua aproximação linear.
+
+```{r}
+#| label: fig-aproximacao-linear-direcional
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Função exata ao longo de uma direção e aproximação linear no ponto $t=0$."
+#| fig-width: 8
+#| fig-height: 5
+#| fig-align: center
+
+library(ggplot2)
+
+x0 <- c(
+  1,
+  0.5
+)
+
+h <- c(
+  -0.8,
+  0.6
+)
+
+f_valor <- function(x1, x2) {
+  x1^2 + 2 * x2^2
+}
+
+gradiente_f <- function(x1, x2) {
+  c(
+    2 * x1,
+    4 * x2
+  )
+}
+
+t <- seq(
+  -0.8,
+  0.8,
+  length.out = 400
+)
+
+valor_exato <- vapply(
+  t,
+  function(tt) {
+    ponto <- x0 + tt * h
+
+    f_valor(
+      ponto[1],
+      ponto[2]
+    )
+  },
+  numeric(1)
+)
+
+valor_inicial <- f_valor(
+  x0[1],
+  x0[2]
+)
+
+inclinacao_inicial <- sum(
+  gradiente_f(
+    x0[1],
+    x0[2]
+  ) * h
+)
+
+valor_linear <- valor_inicial + inclinacao_inicial * t
+
+dados_aproximacao <- rbind(
+  data.frame(
+    t = t,
+    valor = valor_exato,
+    representacao = "Função exata"
+  ),
+  data.frame(
+    t = t,
+    valor = valor_linear,
+    representacao = "Aproximação linear"
+  )
+)
+
+ggplot(
+  dados_aproximacao,
+  aes(
+    x = t,
+    y = valor,
+    linetype = representacao
+  )
+) +
+  geom_line(
+    linewidth = 1
+  ) +
+  geom_point(
+    data = data.frame(
+      t = 0,
+      valor = valor_inicial
+    ),
+    aes(
+      x = t,
+      y = valor
+    ),
+    inherit.aes = FALSE,
+    size = 2.8
+  ) +
+  geom_vline(
+    xintercept = 0,
+    linetype = "dotted",
+    linewidth = 0.6
+  ) +
+  labs(
+    x = expression(t),
+    y = expression(
+      varphi(t) == f(x[0] + t * h)
+    ),
+    linetype = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.minor = element_blank(),
+    legend.position = "bottom"
+  )
+```
+
+No ponto $t=0$, a função e sua aproximação linear possuem o mesmo valor e a mesma inclinação. À medida que $|t|$ aumenta, os termos de segunda ordem passam a contribuir mais para a variação.
+
+### Diferenciabilidade de funções vetoriais
+
+Para uma função
+
+$$
+\mathbf{g}:
+\mathcal{U}
+\subseteq
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{q},
+$$
+
+a aproximação de primeira ordem é uma transformação linear de $\mathbb{R}^{p}$ em $\mathbb{R}^{q}$.
+
+::: {#def-diferenciabilidade-vetorial}
+## Diferenciabilidade de uma função vetorial
+
+A função $\mathbf{g}$ é diferenciável em $\mathbf{x}$ quando existe uma matriz
+
+$$
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+\in
+\mathbb{R}^{q\times p}
+$$
+
+tal que
+
+$$
+\mathbf{g}(\mathbf{x}+\mathbf{h})
+-
+\mathbf{g}(\mathbf{x})
+=
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+\mathbf{h}
++
+\mathbf{r}_{\mathbf{x}}(\mathbf{h}),
+$$
+
+com
+
+$$
+\frac{
+\left\|
+\mathbf{r}_{\mathbf{x}}(\mathbf{h})
+\right\|
+}{
+\|\mathbf{h}\|
+}
+\longrightarrow
+0
+\qquad
+\text{quando}
+\qquad
+\|\mathbf{h}\|
+\longrightarrow
+0.
+$$
+:::
+
+Assim,
+
+$$
+\mathbf{g}(\mathbf{x}+\mathbf{h})
+\approx
+\mathbf{g}(\mathbf{x})
++
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+\mathbf{h},
+$$
+
+e o diferencial é
+
+$$
+d\mathbf{g}
+=
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+d\mathbf{x}.
+$$
+
+Para a transformação linear
+
+$$
+\mathbf{g}(\mathbf{x})
+=
+\mathbf{A}\mathbf{x},
+$$
+
+tem-se
+
+$$
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+=
+\mathbf{A}
+$$
+
+em todos os pontos. Portanto,
+
+$$
+d\mathbf{g}
+=
+\mathbf{A}\,d\mathbf{x},
+$$
+
+e a aproximação linear é exata.
+
+Gradiente e Jacobiana representam a mesma ideia em contradomínios diferentes. O gradiente representa a parte linear da variação de uma função escalar. A Jacobiana representa a parte linear da variação de uma função vetorial.
+
+## Gradiente, derivada direcional, Jacobiana e Hessiana
+
+### Gradiente e derivada direcional
+
+Para uma função diferenciável
+
+$$
+f:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R},
+$$
+
+o gradiente reúne as derivadas parciais:
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+\begin{bmatrix}
+\dfrac{\partial f}{\partial x_1}\\
+\vdots\\
+\dfrac{\partial f}{\partial x_p}
+\end{bmatrix}.
+$$
+
+A derivada parcial em relação a $x_j$ mede a variação da função na direção do vetor canônico $\mathbf{e}_j$. A variação em uma direção arbitrária é descrita pela derivada direcional.
+
+::: {#def-derivada-direcional}
+## Derivada direcional
+
+Seja
+
+$$
+\mathbf{u}
+\in
+\mathbb{R}^{p}.
+$$
+
+A derivada direcional de $f$ no ponto $\mathbf{x}$ na direção de $\mathbf{u}$ é
+
+$$
+D_{\mathbf{u}}f(\mathbf{x})
+=
+\lim_{t\to0}
+\frac{
+f(\mathbf{x}+t\mathbf{u})
+-
+f(\mathbf{x})
+}{
+t
+},
+$$
+
+quando esse limite existe.
+:::
+
+Considere a função de uma variável
+
+$$
+\varphi(t)
+=
+f(\mathbf{x}+t\mathbf{u}).
+$$
+
+Pela regra da cadeia,
+
+$$
+\begin{aligned}
+\varphi'(0)
+&=
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}
+\frac{d}{dt}
+\left(
+\mathbf{x}+t\mathbf{u}
+\right)
+\bigg|_{t=0}\\
+&=
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}
+\mathbf{u}.
+\end{aligned}
+$$
+
+Portanto, se $f$ é diferenciável,
+
+$$
+D_{\mathbf{u}}f(\mathbf{x})
+=
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}
+\mathbf{u}.
+$$
+
+Quando $\mathbf{u}$ é unitário, a derivada direcional mede a taxa de variação por unidade de deslocamento.
+
+Se $\theta$ é o ângulo entre $\nabla_{\mathbf{x}}f(\mathbf{x})$ e $\mathbf{u}$, então
+
+$$
+D_{\mathbf{u}}f(\mathbf{x})
+=
+\left\|
+\nabla_{\mathbf{x}}f(\mathbf{x})
+\right\|
+\|\mathbf{u}\|
+\cos\theta.
+$$
+
+Para $\|\mathbf{u}\|=1$,
+
+$$
+D_{\mathbf{u}}f(\mathbf{x})
+=
+\left\|
+\nabla_{\mathbf{x}}f(\mathbf{x})
+\right\|
+\cos\theta.
+$$
+
+::: {#thm-gradiente-crescimento}
+## Direções de maior crescimento e redução
+
+Se
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+\neq
+\mathbf{0},
+$$
+
+então, entre todas as direções unitárias,
+
+$$
+\max_{\|\mathbf{u}\|=1}
+D_{\mathbf{u}}f(\mathbf{x})
+=
+\left\|
+\nabla_{\mathbf{x}}f(\mathbf{x})
+\right\|,
+$$
+
+e o máximo é atingido na direção
+
+$$
+\mathbf{u}_{\max}
+=
+\frac{
+\nabla_{\mathbf{x}}f(\mathbf{x})
+}{
+\left\|
+\nabla_{\mathbf{x}}f(\mathbf{x})
+\right\|
+}.
+$$
+
+A maior redução ocorre na direção oposta:
+
+$$
+\mathbf{u}_{\min}
+=
+-
+\frac{
+\nabla_{\mathbf{x}}f(\mathbf{x})
+}{
+\left\|
+\nabla_{\mathbf{x}}f(\mathbf{x})
+\right\|
+},
+$$
+
+com
+
+$$
+\min_{\|\mathbf{u}\|=1}
+D_{\mathbf{u}}f(\mathbf{x})
+=
+-
+\left\|
+\nabla_{\mathbf{x}}f(\mathbf{x})
+\right\|.
+$$
+
+[@apostol1969calculus2]
+:::
+
+::: proof
+Pela desigualdade de Cauchy--Schwarz,
+
+$$
+\begin{aligned}
+D_{\mathbf{u}}f(\mathbf{x})
+&=
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}
+\mathbf{u}\\
+&\leq
+\left\|
+\nabla_{\mathbf{x}}f(\mathbf{x})
+\right\|
+\|\mathbf{u}\|.
+\end{aligned}
+$$
+
+Para $\|\mathbf{u}\|=1$,
+
+$$
+D_{\mathbf{u}}f(\mathbf{x})
+\leq
+\left\|
+\nabla_{\mathbf{x}}f(\mathbf{x})
+\right\|.
+$$
+
+A igualdade ocorre quando $\mathbf{u}$ possui a mesma direção e o mesmo sentido do gradiente. A aplicação do mesmo argumento a $-\mathbf{u}$ fornece o resultado para a maior redução.
+:::
+
+Se
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+\mathbf{0},
+$$
+
+todas as derivadas direcionais de primeira ordem são nulas. Nesse caso, a aproximação linear não indica crescimento ou redução local.
+
+### Gradiente e conjuntos de nível
+
+Um conjunto de nível de $f$ é definido por
+
+$$
+\mathcal{S}_c
+=
+\left\{
+\mathbf{x}\in\mathbb{R}^{p}:
+f(\mathbf{x})=c
+\right\},
+$$
+
+em que $c$ é constante.
+
+Considere uma curva diferenciável
+
+$$
+\boldsymbol{\gamma}(t)
+$$
+
+contida em $\mathcal{S}_c$. Então,
+
+$$
+f
+\left(
+\boldsymbol{\gamma}(t)
+\right)
+=
+c.
+$$
+
+Derivando,
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\boldsymbol{\gamma}(t)
+\right)^{\top}
+\boldsymbol{\gamma}'(t)
+=
+0.
+$$
+
+O vetor $\boldsymbol{\gamma}'(t)$ é tangente ao conjunto de nível. Portanto, o gradiente é ortogonal a todas as direções tangentes.
+
+Quando
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+\neq
+\mathbf{0},
+$$
+
+o gradiente é um vetor normal ao conjunto de nível no ponto $\mathbf{x}$.
+
+::: {#exm-gradiente-curva-nivel}
+## Gradiente de uma função quadrática
+
+Considere
+
+$$
+f(x_1,x_2)
+=
+x_1^2
++
+2x_2^2.
+$$
+
+O gradiente é
+
+$$
+\nabla_{\mathbf{x}}f(x_1,x_2)
+=
+\begin{bmatrix}
+2x_1\\
+4x_2
+\end{bmatrix}.
+$$
+
+No ponto
+
+$$
+\mathbf{x}_0
+=
+\begin{bmatrix}
+1\\
+1/2
+\end{bmatrix},
+$$
+
+tem-se
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x}_0)
+=
+\begin{bmatrix}
+2\\
+2
+\end{bmatrix}
+$$
+
+e
+
+$$
+\left\|
+\nabla_{\mathbf{x}}f(\mathbf{x}_0)
+\right\|
+=
+2\sqrt{2}.
+$$
+
+A direção de maior crescimento é
+
+$$
+\mathbf{u}_{\max}
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1\\
+1
+\end{bmatrix}.
+$$
+
+Uma direção tangente à curva de nível é
+
+$$
+\mathbf{u}_{\mathrm{tan}}
+=
+\frac{1}{\sqrt{2}}
+\begin{bmatrix}
+-1\\
+1
+\end{bmatrix}.
+$$
+
+Como
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x}_0)^{\top}
+\mathbf{u}_{\mathrm{tan}}
+=
+0,
+$$
+
+a derivada direcional nessa direção é nula.
+:::
+
+A @fig-gradiente-curvas-nivel representa as curvas de nível da função, o gradiente e uma direção tangente no ponto $\mathbf{x}_0$.
+
+```{r}
+#| label: fig-gradiente-curvas-nivel
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "O gradiente é perpendicular à curva de nível e aponta na direção de maior crescimento local."
+#| fig-width: 7
+#| fig-height: 6
+#| fig-align: center
+
+library(ggplot2)
+
+grade <- expand.grid(
+  x1 = seq(
+    -2,
+    2,
+    length.out = 250
+  ),
+  x2 = seq(
+    -1.5,
+    1.5,
+    length.out = 250
+  )
+)
+
+grade$valor <- with(
+  grade,
+  x1^2 + 2 * x2^2
+)
+
+x0 <- c(
+  1,
+  0.5
+)
+
+gradiente <- c(
+  2 * x0[1],
+  4 * x0[2]
+)
+
+direcao_gradiente <- gradiente / sqrt(
+  sum(
+    gradiente^2
+  )
+)
+
+direcao_tangente <- c(
+  -direcao_gradiente[2],
+  direcao_gradiente[1]
+)
+
+escala_gradiente <- 0.9
+escala_tangente <- 0.75
+
+seta_gradiente <- data.frame(
+  x = x0[1],
+  y = x0[2],
+  xend = x0[1] +
+    escala_gradiente *
+    direcao_gradiente[1],
+  yend = x0[2] +
+    escala_gradiente *
+    direcao_gradiente[2]
+)
+
+reta_tangente <- data.frame(
+  x = x0[1] -
+    escala_tangente *
+    direcao_tangente[1],
+  y = x0[2] -
+    escala_tangente *
+    direcao_tangente[2],
+  xend = x0[1] +
+    escala_tangente *
+    direcao_tangente[1],
+  yend = x0[2] +
+    escala_tangente *
+    direcao_tangente[2]
+)
+
+ggplot(
+  grade,
+  aes(
+    x = x1,
+    y = x2,
+    z = valor
+  )
+) +
+  geom_contour(
+    breaks = seq(
+      0.5,
+      8,
+      by = 0.75
+    ),
+    linewidth = 0.6
+  ) +
+  geom_segment(
+    data = reta_tangente,
+    aes(
+      x = x,
+      y = y,
+      xend = xend,
+      yend = yend
+    ),
+    inherit.aes = FALSE,
+    linetype = "dashed",
+    linewidth = 0.9
+  ) +
+  geom_segment(
+    data = seta_gradiente,
+    aes(
+      x = x,
+      y = y,
+      xend = xend,
+      yend = yend
+    ),
+    inherit.aes = FALSE,
+    linewidth = 1,
+    arrow = grid::arrow(
+      length = grid::unit(
+        0.22,
+        "cm"
+      )
+    )
+  ) +
+  geom_point(
+    data = data.frame(
+      x1 = x0[1],
+      x2 = x0[2]
+    ),
+    aes(
+      x = x1,
+      y = x2
+    ),
+    inherit.aes = FALSE,
+    size = 2.8
+  ) +
+  annotate(
+    "text",
+    x = x0[1] + 0.72,
+    y = x0[2] + 0.58,
+    label = "gradiente",
+    hjust = 0,
+    size = 4
+  ) +
+  annotate(
+    "text",
+    x = x0[1] - 0.72,
+    y = x0[2] + 0.62,
+    label = "direção tangente",
+    hjust = 0.5,
+    size = 4
+  ) +
+  coord_equal() +
+  labs(
+    x = expression(x[1]),
+    y = expression(x[2])
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.minor = element_blank()
+  )
+```
+
+A direção do gradiente depende do ponto. Para a função considerada, as curvas de nível são elipses e o gradiente aponta para fora, perpendicularmente à curva correspondente.
+
+### Jacobiana
+
+A derivada de uma função vetorial é representada por sua matriz Jacobiana.
+
+::: {#def-jacobiana}
+## Matriz Jacobiana
+
+Seja
+
+$$
+\mathbf{g}:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{q},
+$$
+
+com
+
+$$
+\mathbf{g}(\mathbf{x})
+=
+\begin{bmatrix}
+g_1(\mathbf{x})\\
+\vdots\\
+g_q(\mathbf{x})
+\end{bmatrix}.
+$$
+
+A matriz Jacobiana é
+
+$$
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+=
+\begin{bmatrix}
+\dfrac{\partial g_1}{\partial x_1}
+&
+\cdots
+&
+\dfrac{\partial g_1}{\partial x_p}
+\\
+\vdots
+&
+\ddots
+&
+\vdots
+\\
+\dfrac{\partial g_q}{\partial x_1}
+&
+\cdots
+&
+\dfrac{\partial g_q}{\partial x_p}
+\end{bmatrix}
+\in
+\mathbb{R}^{q\times p}.
+$$
+:::
+
+Cada linha da Jacobiana é o gradiente transposto de uma componente:
+
+$$
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+=
+\begin{bmatrix}
+\nabla_{\mathbf{x}}g_1(\mathbf{x})^{\top}\\
+\vdots\\
+\nabla_{\mathbf{x}}g_q(\mathbf{x})^{\top}
+\end{bmatrix}.
+$$
+
+A aproximação de primeira ordem é
+
+$$
+\mathbf{g}(\mathbf{x}+\mathbf{h})
+=
+\mathbf{g}(\mathbf{x})
++
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+\mathbf{h}
++
+o(\|\mathbf{h}\|).
+$$
+
+A Jacobiana transforma uma pequena variação no domínio em uma aproximação da variação correspondente no contradomínio.
+
+::: {#exm-jacobiana}
+## Jacobiana de uma função de $\mathbb{R}^2$ em $\mathbb{R}^2$
+
+Considere
+
+$$
+\mathbf{g}(x_1,x_2)
+=
+\begin{bmatrix}
+x_1^2+x_2\\
+x_1x_2
+\end{bmatrix}.
+$$
+
+Os gradientes das componentes são
+
+$$
+\nabla_{\mathbf{x}}g_1
+=
+\begin{bmatrix}
+2x_1\\
+1
+\end{bmatrix}
+$$
+
+e
+
+$$
+\nabla_{\mathbf{x}}g_2
+=
+\begin{bmatrix}
+x_2\\
+x_1
+\end{bmatrix}.
+$$
+
+Logo,
+
+$$
+\mathbf{J}_{\mathbf{g}}(x_1,x_2)
+=
+\begin{bmatrix}
+2x_1&1\\
+x_2&x_1
+\end{bmatrix}.
+$$
+
+No ponto
+
+$$
+\mathbf{x}_0
+=
+\begin{bmatrix}
+1\\
+2
+\end{bmatrix},
+$$
+
+tem-se
+
+$$
+\mathbf{J}_{\mathbf{g}}(\mathbf{x}_0)
+=
+\begin{bmatrix}
+2&1\\
+2&1
+\end{bmatrix}.
+$$
+
+Para uma pequena perturbação
+
+$$
+\mathbf{h}
+=
+\begin{bmatrix}
+h_1\\
+h_2
+\end{bmatrix},
+$$
+
+a alteração é aproximada por
+
+$$
+\mathbf{g}(\mathbf{x}_0+\mathbf{h})
+-
+\mathbf{g}(\mathbf{x}_0)
+\approx
+\begin{bmatrix}
+2&1\\
+2&1
+\end{bmatrix}
+\begin{bmatrix}
+h_1\\
+h_2
+\end{bmatrix}.
+$$
+:::
+
+Para uma transformação afim
+
+$$
+\mathbf{g}(\mathbf{x})
+=
+\mathbf{A}\mathbf{x}
++
+\mathbf{b},
+$$
+
+a Jacobiana é constante:
+
+$$
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+=
+\mathbf{A}.
+$$
+
+O vetor $\mathbf{b}$ altera a posição da imagem, mas não altera a transformação linear local.
+
+### Regra da cadeia
+
+A composição de funções exige a composição de suas aproximações lineares.
+
+::: {#thm-regra-cadeia}
+## Regra da cadeia para funções vetoriais
+
+Considere funções diferenciáveis
+
+$$
+\mathbf{g}:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{q}
+$$
+
+e
+
+$$
+\mathbf{h}:
+\mathbb{R}^{q}
+\longrightarrow
+\mathbb{R}^{r}.
+$$
+
+Para
+
+$$
+\mathbf{f}
+=
+\mathbf{h}\circ\mathbf{g},
+$$
+
+a Jacobiana é
+
+$$
+\mathbf{J}_{\mathbf{f}}(\mathbf{x})
+=
+\mathbf{J}_{\mathbf{h}}
+\left(
+\mathbf{g}(\mathbf{x})
+\right)
+\mathbf{J}_{\mathbf{g}}(\mathbf{x}).
+$$
+
+[@apostol1969calculus2]
+:::
+
+As dimensões do produto são
+
+$$
+(r\times q)
+(q\times p)
+=
+r\times p.
+$$
+
+A ordem das matrizes acompanha a ordem inversa da aplicação das aproximações lineares: primeiro atua a Jacobiana de $\mathbf{g}$ e, depois, a Jacobiana de $\mathbf{h}$.
+
+No caso de uma composição escalar
+
+$$
+f(\mathbf{x})
+=
+h
+\left(
+\mathbf{g}(\mathbf{x})
+\right),
+$$
+
+em que
+
+$$
+h:
+\mathbb{R}^{q}
+\longrightarrow
+\mathbb{R},
+$$
+
+a regra da cadeia assume a forma
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})^{\top}
+\nabla_{\mathbf{y}}h(\mathbf{y})
+\bigg|_{
+\mathbf{y}=\mathbf{g}(\mathbf{x})
+}.
+$$
+
+::: {#exm-regra-cadeia}
+## Gradiente de uma função composta
+
+Considere
+
+$$
+\mathbf{g}(\mathbf{x})
+=
+\mathbf{A}\mathbf{x}
+-
+\mathbf{b}
+$$
+
+e
+
+$$
+h(\mathbf{y})
+=
+\mathbf{y}^{\top}\mathbf{y}.
+$$
+
+A função composta é
+
+$$
+f(\mathbf{x})
+=
+\left\|
+\mathbf{A}\mathbf{x}
+-
+\mathbf{b}
+\right\|^2.
+$$
+
+Como
+
+$$
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+=
+\mathbf{A}
+$$
+
+e
+
+$$
+\nabla_{\mathbf{y}}h(\mathbf{y})
+=
+2\mathbf{y},
+$$
+
+segue que
+
+$$
+\begin{aligned}
+\nabla_{\mathbf{x}}f(\mathbf{x})
+&=
+\mathbf{A}^{\top}
+\left[
+2
+\left(
+\mathbf{A}\mathbf{x}
+-
+\mathbf{b}
+\right)
+\right]\\
+&=
+2\mathbf{A}^{\top}
+\left(
+\mathbf{A}\mathbf{x}
+-
+\mathbf{b}
+\right).
+\end{aligned}
+$$
+
+Essa expressão será retomada no estudo das funções de mínimos quadrados.
+:::
+
+### Hessiana
+
+A Hessiana descreve a variação local do gradiente.
+
+::: {#def-hessiana}
+## Matriz Hessiana
+
+Seja
+
+$$
+f:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}
+$$
+
+uma função duas vezes diferenciável. Sua matriz Hessiana é
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+=
+\begin{bmatrix}
+\dfrac{\partial^2f}{\partial x_1^2}
+&
+\cdots
+&
+\dfrac{\partial^2f}{\partial x_1\partial x_p}
+\\
+\vdots
+&
+\ddots
+&
+\vdots
+\\
+\dfrac{\partial^2f}{\partial x_p\partial x_1}
+&
+\cdots
+&
+\dfrac{\partial^2f}{\partial x_p^2}
+\end{bmatrix}
+\in
+\mathbb{R}^{p\times p}.
+$$
+:::
+
+A Hessiana é a Jacobiana do gradiente:
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+=
+\mathbf{J}_{\nabla f}(\mathbf{x}).
+$$
+
+Se as derivadas parciais de segunda ordem são contínuas em uma vizinhança do ponto, então
+
+$$
+\frac{
+\partial^2f
+}{
+\partial x_i\partial x_j
+}
+=
+\frac{
+\partial^2f
+}{
+\partial x_j\partial x_i
+},
+$$
+
+e a Hessiana é simétrica:
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+=
+\nabla_{\mathbf{x}}^2f(\mathbf{x})^{\top}.
+$$
+
+O segundo diferencial é
+
+$$
+d^2f
+=
+d\mathbf{x}^{\top}
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+d\mathbf{x}.
+$$
+
+Para uma direção $\mathbf{u}$, considere novamente
+
+$$
+\varphi(t)
+=
+f(\mathbf{x}+t\mathbf{u}).
+$$
+
+A primeira derivada é
+
+$$
+\varphi'(0)
+=
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}
+\mathbf{u}.
+$$
+
+A segunda derivada é
+
+$$
+\varphi''(0)
+=
+\mathbf{u}^{\top}
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+\mathbf{u}.
+$$
+
+Essa forma quadrática representa a curvatura da função na direção $\mathbf{u}$.
+
+::: {#exm-hessiana-funcao-quadratica}
+## Hessiana de uma função quadrática
+
+Considere
+
+$$
+f(x_1,x_2)
+=
+x_1^2
++
+2x_2^2.
+$$
+
+O gradiente é
+
+$$
+\nabla_{\mathbf{x}}f(x_1,x_2)
+=
+\begin{bmatrix}
+2x_1\\
+4x_2
+\end{bmatrix}.
+$$
+
+A Hessiana é
+
+$$
+\nabla_{\mathbf{x}}^2f(x_1,x_2)
+=
+\begin{bmatrix}
+2&0\\
+0&4
+\end{bmatrix}.
+$$
+
+Para
+
+$$
+\mathbf{u}
+=
+\begin{bmatrix}
+u_1\\
+u_2
+\end{bmatrix},
+$$
+
+a curvatura direcional é
+
+$$
+\begin{aligned}
+\mathbf{u}^{\top}
+\nabla_{\mathbf{x}}^2f
+\mathbf{u}
+&=
+\begin{bmatrix}
+u_1&u_2
+\end{bmatrix}
+\begin{bmatrix}
+2&0\\
+0&4
+\end{bmatrix}
+\begin{bmatrix}
+u_1\\
+u_2
+\end{bmatrix}\\
+&=
+2u_1^2
++
+4u_2^2.
+\end{aligned}
+$$
+
+Ela é positiva para todo vetor não nulo. A curvatura é maior em direções com componente mais acentuada no segundo eixo.
+:::
+
+Para a função quadrática
+
+$$
+f(\mathbf{x})
+=
+\frac{1}{2}
+\mathbf{x}^{\top}
+\mathbf{A}
+\mathbf{x}
+-
+\mathbf{b}^{\top}\mathbf{x}
++
+c,
+$$
+
+com $\mathbf{A}$ simétrica,
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+\mathbf{A}\mathbf{x}
+-
+\mathbf{b}
+$$
+
+e
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+=
+\mathbf{A}.
+$$
+
+A curvatura da função é determinada pela matriz $\mathbf{A}$. A relação entre a Hessiana, a aproximação de segunda ordem, a convexidade e a classificação de pontos estacionários será desenvolvida na próxima seção.
+
+## Aproximações de Taylor e classificação local
+
+### Aproximação de Taylor de primeira ordem
+
+A diferenciabilidade fornece uma aproximação linear da função em uma vizinhança de um ponto.
+
+Para
+
+$$
+f:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R},
+$$
+
+diferenciável em $\mathbf{x}_0$,
+
+$$
+f(\mathbf{x}_0+\mathbf{h})
+=
+f(\mathbf{x}_0)
++
+\nabla_{\mathbf{x}}f(\mathbf{x}_0)^{\top}\mathbf{h}
++
+o(\|\mathbf{h}\|).
+$$
+
+Tomando
+
+$$
+\mathbf{h}
+=
+\mathbf{x}-\mathbf{x}_0,
+$$
+
+obtém-se
+
+$$
+f(\mathbf{x})
+\approx
+f(\mathbf{x}_0)
++
+\nabla_{\mathbf{x}}f(\mathbf{x}_0)^{\top}
+\left(
+\mathbf{x}-\mathbf{x}_0
+\right).
+$$
+
+Essa é a aproximação de Taylor de primeira ordem.
+
+Para funções de uma variável, ela corresponde à reta tangente. Para funções de duas variáveis, corresponde ao plano tangente. Em dimensão geral, corresponde a uma função afim que aproxima localmente $f$.
+
+::: {#exm-taylor-primeira-ordem}
+## Aproximação linear de uma função quadrática
+
+Considere
+
+$$
+f(x_1,x_2)
+=
+x_1^2
++
+2x_2^2
+$$
+
+e o ponto
+
+$$
+\mathbf{x}_0
+=
+\begin{bmatrix}
+1\\
+1/2
+\end{bmatrix}.
+$$
+
+Tem-se
+
+$$
+f(\mathbf{x}_0)
+=
+1^2
++
+2
+\left(
+\frac12
+\right)^2
+=
+\frac32
+$$
+
+e
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x}_0)
+=
+\begin{bmatrix}
+2\\
+2
+\end{bmatrix}.
+$$
+
+A aproximação de primeira ordem é
+
+$$
+\begin{aligned}
+f(\mathbf{x})
+&\approx
+\frac32
++
+\begin{bmatrix}
+2&2
+\end{bmatrix}
+\left[
+\begin{bmatrix}
+x_1\\
+x_2
+\end{bmatrix}
+-
+\begin{bmatrix}
+1\\
+1/2
+\end{bmatrix}
+\right]\\
+&=
+\frac32
++
+2(x_1-1)
++
+2
+\left(
+x_2-\frac12
+\right).
+\end{aligned}
+$$
+:::
+
+A aproximação linear descreve a variação determinada pelo gradiente. Ela não representa a curvatura da função.
+
+### Aproximação de Taylor de segunda ordem
+
+Quando $f$ é duas vezes diferenciável, a Hessiana permite incorporar a curvatura local.
+
+::: {#thm-taylor-segunda-ordem}
+## Expansão de Taylor de segunda ordem
+
+Se
+
+$$
+f:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}
+$$
+
+possui derivadas de segunda ordem contínuas em uma vizinhança de $\mathbf{x}_0$, então
+
+$$
+\begin{aligned}
+f(\mathbf{x}_0+\mathbf{h})
+&=
+f(\mathbf{x}_0)
++
+\nabla_{\mathbf{x}}f(\mathbf{x}_0)^{\top}\mathbf{h}\\
+&\quad+
+\frac12
+\mathbf{h}^{\top}
+\nabla_{\mathbf{x}}^2f(\mathbf{x}_0)
+\mathbf{h}
++
+o(\|\mathbf{h}\|^2).
+\end{aligned}
+$$
+
+[@apostol1969calculus2]
+:::
+
+Em termos de $\mathbf{x}-\mathbf{x}_0$,
+
+$$
+\begin{aligned}
+f(\mathbf{x})
+&\approx
+f(\mathbf{x}_0)
++
+\nabla_{\mathbf{x}}f(\mathbf{x}_0)^{\top}
+\left(
+\mathbf{x}-\mathbf{x}_0
+\right)\\
+&\quad+
+\frac12
+\left(
+\mathbf{x}-\mathbf{x}_0
+\right)^{\top}
+\nabla_{\mathbf{x}}^2f(\mathbf{x}_0)
+\left(
+\mathbf{x}-\mathbf{x}_0
+\right).
+\end{aligned}
+$$
+
+Os três termos possuem funções distintas:
+
+-   $f(\mathbf{x}_0)$ determina o nível da aproximação;
+-   o gradiente determina a inclinação local;
+-   a Hessiana determina a curvatura local.
+
+Quando
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x}_0)
+=
+\mathbf{0},
+$$
+
+o termo linear desaparece e a forma quadrática associada à Hessiana passa a determinar o comportamento local dominante.
+
+::: {#exm-taylor-segunda-ordem}
+## Expansão de uma função quadrática
+
+Considere
+
+$$
+f(\mathbf{x})
+=
+\frac12
+\mathbf{x}^{\top}
+\mathbf{A}
+\mathbf{x}
+-
+\mathbf{b}^{\top}\mathbf{x}
++
+c,
+$$
+
+com $\mathbf{A}$ simétrica.
+
+O gradiente é
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+\mathbf{A}\mathbf{x}
+-
+\mathbf{b},
+$$
+
+e a Hessiana é
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+=
+\mathbf{A}.
+$$
+
+Como a função é quadrática, a expansão de Taylor de segunda ordem é exata:
+
+$$
+\begin{aligned}
+f(\mathbf{x}_0+\mathbf{h})
+&=
+f(\mathbf{x}_0)
++
+\left(
+\mathbf{A}\mathbf{x}_0-\mathbf{b}
+\right)^{\top}\mathbf{h}\\
+&\quad+
+\frac12
+\mathbf{h}^{\top}\mathbf{A}\mathbf{h}.
+\end{aligned}
+$$
+
+Não existe termo residual de ordem superior.
+:::
+
+### Pontos estacionários
+
+::: {#def-ponto-estacionario}
+## Ponto estacionário
+
+Um ponto
+
+$$
+\mathbf{x}^{\star}
+$$
+
+é estacionário para uma função diferenciável $f$ quando
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+=
+\mathbf{0}.
+$$
+:::
+
+Em um ponto estacionário, todas as derivadas direcionais de primeira ordem são nulas:
+
+$$
+D_{\mathbf{u}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+=
+0
+$$
+
+para toda direção $\mathbf{u}$.
+
+Todo ponto interior em que uma função diferenciável possui máximo ou mínimo local é estacionário. A recíproca não é necessariamente verdadeira: um ponto estacionário pode ser mínimo, máximo ou ponto de sela.
+
+### Classificação pela Hessiana
+
+::: {#thm-classificacao-hessiana}
+## Teste da Hessiana em um ponto estacionário
+
+Considere uma função duas vezes continuamente diferenciável e um ponto estacionário $\mathbf{x}^{\star}$.
+
+Se
+
+$$
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{\star}
+\right)
+\succ
+\mathbf{0},
+$$
+
+então $\mathbf{x}^{\star}$ é um mínimo local estrito.
+
+Se
+
+$$
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{\star}
+\right)
+\prec
+\mathbf{0},
+$$
+
+então $\mathbf{x}^{\star}$ é um máximo local estrito.Se a Hessiana é indefinida, então $\mathbf{x}^{\star}$ é um ponto de sela. Se a Hessiana é semidefinida positiva ou semidefinida negativa, o teste pode ser inconclusivo. [@apostol1969calculus2]
+:::
+
+::: proof
+Como
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+=
+\mathbf{0},
+$$
+
+a expansão de Taylor fornece
+
+$$
+f
+\left(
+\mathbf{x}^{\star}+\mathbf{h}
+\right)
+-
+f
+\left(
+\mathbf{x}^{\star}
+\right)
+=
+\frac12
+\mathbf{h}^{\top}
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{\star}
+\right)
+\mathbf{h}
++
+o(\|\mathbf{h}\|^2).
+$$
+
+Se a Hessiana é positiva definida, a forma quadrática é positiva para todo $\mathbf{h}\neq\mathbf{0}$. Para perturbações suficientemente pequenas, o termo quadrático domina o restante, produzindo um mínimo local estrito.
+
+O argumento é análogo para uma Hessiana negativa definida.
+
+Se a Hessiana é indefinida, existem direções $\mathbf{u}_1$ e $\mathbf{u}_2$ tais que
+
+$$
+\mathbf{u}_1^{\top}
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{\star}
+\right)
+\mathbf{u}_1
+>
+0
+$$
+
+e
+
+$$
+\mathbf{u}_2^{\top}
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{\star}
+\right)
+\mathbf{u}_2
+<
+0.
+$$
+
+A função aumenta em algumas direções e diminui em outras. Portanto, o ponto é de sela.
+:::
+
+::: {#exm-classificacao-pontos}
+## Mínimo, máximo e ponto de sela
+
+Considere as funções
+
+$$
+f_1(x_1,x_2)
+=
+x_1^2+x_2^2,
+$$
+
+$$
+f_2(x_1,x_2)
+=
+-
+x_1^2-x_2^2
+$$
+
+e
+
+$$
+f_3(x_1,x_2)
+=
+x_1^2-x_2^2.
+$$
+
+As três possuem ponto estacionário na origem.
+
+Para $f_1$,
+
+$$
+\nabla_{\mathbf{x}}^2f_1
+=
+\begin{bmatrix}
+2&0\\
+0&2
+\end{bmatrix}
+\succ
+\mathbf{0}.
+$$
+
+Logo, a origem é um mínimo estrito.
+
+Para $f_2$,
+
+$$
+\nabla_{\mathbf{x}}^2f_2
+=
+\begin{bmatrix}
+-2&0\\
+0&-2
+\end{bmatrix}
+\prec
+\mathbf{0}.
+$$
+
+Logo, a origem é um máximo estrito.
+
+Para $f_3$,
+
+$$
+\nabla_{\mathbf{x}}^2f_3
+=
+\begin{bmatrix}
+2&0\\
+0&-2
+\end{bmatrix}.
+$$
+
+A Hessiana possui um autovalor positivo e outro negativo. Portanto, a origem é um ponto de sela.
+:::
+
+A @fig-curvatura-hessiana compara as curvas de nível dos três casos.
+
+```{r}
+#| label: fig-curvatura-hessiana
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Curvas de nível associadas a um mínimo, um máximo e um ponto de sela."
+#| fig-width: 9
+#| fig-height: 4
+#| fig-align: center
+
+library(ggplot2)
+
+grade <- expand.grid(
+  x1 = seq(
+    -2,
+    2,
+    length.out = 250
+  ),
+  x2 = seq(
+    -2,
+    2,
+    length.out = 250
+  )
+)
+
+dados_minimo <- transform(
+  grade,
+  valor = x1^2 + x2^2,
+  tipo = "Mínimo"
+)
+
+dados_maximo <- transform(
+  grade,
+  valor = -x1^2 - x2^2,
+  tipo = "Máximo"
+)
+
+dados_sela <- transform(
+  grade,
+  valor = x1^2 - x2^2,
+  tipo = "Ponto de sela"
+)
+
+dados_curvatura <- rbind(
+  dados_minimo,
+  dados_maximo,
+  dados_sela
+)
+
+dados_curvatura$tipo <- factor(
+  dados_curvatura$tipo,
+  levels = c(
+    "Mínimo",
+    "Máximo",
+    "Ponto de sela"
+  )
+)
+
+ggplot(
+  dados_curvatura,
+  aes(
+    x = x1,
+    y = x2,
+    z = valor
+  )
+) +
+  geom_contour(
+    bins = 10,
+    linewidth = 0.55
+  ) +
+  geom_point(
+    data = data.frame(
+      x1 = 0,
+      x2 = 0,
+      tipo = c(
+        "Mínimo",
+        "Máximo",
+        "Ponto de sela"
+      )
+    ),
+    aes(
+      x = x1,
+      y = x2
+    ),
+    inherit.aes = FALSE,
+    size = 2.4
+  ) +
+  facet_wrap(
+    ~tipo,
+    nrow = 1
+  ) +
+  coord_equal() +
+  labs(
+    x = expression(x[1]),
+    y = expression(x[2])
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.minor = element_blank()
+  )
+```
+
+### Caso inconclusivo
+
+Considere
+
+$$
+f(x_1,x_2)
+=
+x_1^4+x_2^4.
+$$
+
+A origem é um ponto estacionário e
+
+$$
+\nabla_{\mathbf{x}}^2f(0,0)
+=
+\begin{bmatrix}
+0&0\\
+0&0
+\end{bmatrix}.
+$$
+
+A Hessiana é semidefinida positiva, mas não positiva definida. Ainda assim,
+
+$$
+f(x_1,x_2)
+\geq
+0
+$$
+
+para todos os pontos, com igualdade somente na origem. Portanto, a origem é um mínimo estrito.
+
+Considere agora
+
+$$
+g(x_1,x_2)
+=
+x_1^4-x_2^4.
+$$
+
+A Hessiana na origem também é nula. Entretanto, a função assume valores positivos e negativos em qualquer vizinhança da origem. O ponto é de sela.
+
+Esses exemplos mostram que, quando o termo quadrático se anula em determinadas direções, é necessário examinar termos de ordem superior ou utilizar outro argumento.
+
+## Convexidade e concavidade
+
+### Conjuntos convexos
+
+::: {#def-conjunto-convexo}
+## Conjunto convexo
+
+Um conjunto
+
+$$
+\mathcal{C}
+\subseteq
+\mathbb{R}^{p}
+$$
+
+é convexo quando, para quaisquer
+
+$$
+\mathbf{x},\mathbf{y}
+\in
+\mathcal{C}
+$$
+
+e
+
+$$
+t\in[0,1],
+$$
+
+tem-se
+
+$$
+t\mathbf{x}
++
+(1-t)\mathbf{y}
+\in
+\mathcal{C}.
+$$
+:::
+
+O vetor
+
+$$
+t\mathbf{x}
++
+(1-t)\mathbf{y}
+$$
+
+percorre o segmento de reta entre $\mathbf{x}$ e $\mathbf{y}$. Assim, um conjunto é convexo quando contém todos os segmentos que ligam seus pontos.
+
+Subespaços, hiperplanos, bolas, regiões elipsoidais da forma
+
+$$
+\left\{
+\mathbf{x}:
+\left(
+\mathbf{x}-\boldsymbol{\mu}
+\right)^{\top}
+\mathbf{A}
+\left(
+\mathbf{x}-\boldsymbol{\mu}
+\right)
+\leq c
+\right\},
+$$
+
+com $\mathbf{A}\succ\mathbf{0}$ e $c>0$, e o cone das matrizes positivas definidas são exemplos de conjuntos convexos.
+
+### Funções convexas
+
+::: {#def-funcao-convexa}
+## Função convexa
+
+Uma função
+
+$$
+f:
+\mathcal{C}
+\longrightarrow
+\mathbb{R},
+$$
+
+definida em um conjunto convexo $\mathcal{C}$, é convexa quando
+
+$$
+f
+\left(
+t\mathbf{x}
++
+(1-t)\mathbf{y}
+\right)
+\leq
+t f(\mathbf{x})
++
+(1-t)f(\mathbf{y})
+$$
+
+para quaisquer $\mathbf{x},\mathbf{y}\in\mathcal{C}$ e $t\in[0,1]$.
+:::
+
+A função é estritamente convexa quando a desigualdade é estrita para $\mathbf{x}\neq\mathbf{y}$ e $t\in(0,1)$.
+
+Uma função é côncava quando $-f$ é convexa.
+
+Geometricamente, o gráfico de uma função convexa permanece abaixo das cordas que ligam dois pontos de seu gráfico.
+
+### Caracterização de primeira ordem
+
+::: {#thm-convexidade-primeira-ordem}
+## Critério de primeira ordem para convexidade
+
+Se $f$ é diferenciável em um conjunto convexo aberto $\mathcal{C}$, então $f$ é convexa se, e somente se,
+
+$$
+f(\mathbf{y})
+\geq
+f(\mathbf{x})
++
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}
+\left(
+\mathbf{y}-\mathbf{x}
+\right)
+$$
+
+para quaisquer $\mathbf{x},\mathbf{y}\in\mathcal{C}$.[@boyd2004convex]
+:::
+
+A expressão
+
+$$
+f(\mathbf{x})
++
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}
+\left(
+\mathbf{y}-\mathbf{x}
+\right)
+$$
+
+é a aproximação afim determinada pelo plano tangente em $\mathbf{x}$. Para uma função convexa, essa aproximação é um limite inferior global.
+
+### Caracterização pela Hessiana
+
+::: {#thm-convexidade-hessiana}
+## Critério da Hessiana para convexidade
+
+Considere uma função duas vezes continuamente diferenciável em um conjunto convexo aberto $\mathcal{C}$.
+
+Se
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+\succeq
+\mathbf{0}
+$$
+
+para todo $\mathbf{x}\in\mathcal{C}$, então $f$ é convexa.
+
+Se
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+\succ
+\mathbf{0}
+$$
+
+para todo $\mathbf{x}\in\mathcal{C}$, então $f$ é estritamente convexa.
+
+Se
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+\preceq
+\mathbf{0},
+$$
+
+a função é côncava.
+
+Se
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+\prec
+\mathbf{0},
+$$
+
+a função é estritamente côncava. [@boyd2004convex]
+:::
+
+A positividade da Hessiana deve ser verificada para todos os pontos do domínio considerado, e não somente em um ponto estacionário.
+
+### Consequências para otimização
+
+::: {#thm-convexidade-minimizacao}
+## Pontos estacionários de funções convexas
+
+Se $f$ é diferenciável e convexa em um conjunto convexo, qualquer ponto
+
+$$
+\mathbf{x}^{\star}
+$$
+
+que satisfaça
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+=
+\mathbf{0}
+$$
+
+é um mínimo global.
+
+Se $f$ é estritamente convexa, esse mínimo global é único. [@boyd2004convex]
+:::
+
+::: proof
+Pela caracterização de primeira ordem,
+
+$$
+f(\mathbf{x})
+\geq
+f
+\left(
+\mathbf{x}^{\star}
+\right)
++
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)^{\top}
+\left(
+\mathbf{x}-\mathbf{x}^{\star}
+\right).
+$$
+
+Como o gradiente é nulo,
+
+$$
+f(\mathbf{x})
+\geq
+f
+\left(
+\mathbf{x}^{\star}
+\right)
+$$
+
+para todo $\mathbf{x}$ do domínio.
+
+Se a função é estritamente convexa, a igualdade só pode ocorrer em $\mathbf{x}=\mathbf{x}^{\star}$.
+:::
+
+Essa propriedade diferencia a otimização convexa da otimização geral. Para uma função convexa, não existem mínimos locais que deixem de ser globais.
+
+### Funções quadráticas
+
+Considere
+
+$$
+f(\mathbf{x})
+=
+\frac12
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+-
+\mathbf{b}^{\top}\mathbf{x}
++
+c,
+$$
+
+com $\mathbf{A}$ simétrica.
+
+Como
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+=
+\mathbf{A},
+$$
+
+tem-se:
+
+-   $f$ é convexa se $\mathbf{A}\succeq\mathbf{0}$;
+-   $f$ é estritamente convexa se $\mathbf{A}\succ\mathbf{0}$;
+-   $f$ é côncava se $\mathbf{A}\preceq\mathbf{0}$;
+-   $f$ é estritamente côncava se $\mathbf{A}\prec\mathbf{0}$.
+
+Se
+
+$$
+\mathbf{A}
+\succ
+\mathbf{0},
+$$
+
+o ponto estacionário satisfaz
+
+$$
+\mathbf{A}\mathbf{x}^{\star}
+=
+\mathbf{b},
+$$
+
+e
+
+$$
+\mathbf{x}^{\star}
+=
+\mathbf{A}^{-1}\mathbf{b}.
+$$
+
+Esse ponto é o único mínimo global.
+
+Se
+
+$$
+\mathbf{A}
+\succeq
+\mathbf{0}
+$$
+
+é singular, a existência de minimizadores depende de $\mathbf{b}$.
+
+Quando
+
+$$
+\mathbf{b}
+\in
+\mathcal{C}(\mathbf{A}),
+$$
+
+o sistema
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\mathbf{b}
+$$
+
+possui solução. Nesse caso, os minimizadores formam o conjunto afim
+
+$$
+\mathbf{x}_0
++
+\mathcal{N}(\mathbf{A}),
+$$
+
+em que $\mathbf{x}_0$ é uma solução particular.
+
+Quando
+
+$$
+\mathbf{b}
+\notin
+\mathcal{C}(\mathbf{A}),
+$$
+
+a função é ilimitada inferiormente e não possui minimizador.
+
+## Otimização sem restrições
+
+Um problema de minimização sem restrições possui a forma
+
+$$
+\min_{\mathbf{x}\in\mathbb{R}^{p}}
+f(\mathbf{x}).
+$$
+
+Quando $f$ é diferenciável, a condição de primeira ordem para um mínimo interior é
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+=
+\mathbf{0}.
+$$
+
+Essa condição é necessária, mas não suficiente no caso geral.
+
+Uma condição suficiente de segunda ordem é
+
+$$
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{\star}
+\right)
+\succ
+\mathbf{0}.
+$$
+
+Para funções convexas, a condição de gradiente nulo já é suficiente para um mínimo global [@boyd2004convex].
+
+### Método de Newton
+
+O método de Newton utiliza a aproximação quadrática local de $f$.
+
+Em torno de um ponto $\mathbf{x}^{(t)}$,
+
+$$
+\begin{aligned}
+f(\mathbf{x})
+&\approx
+f
+\left(
+\mathbf{x}^{(t)}
+\right)
++
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{(t)}
+\right)^{\top}
+\left(
+\mathbf{x}
+-
+\mathbf{x}^{(t)}
+\right)\\
+&\quad+
+\frac12
+\left(
+\mathbf{x}
+-
+\mathbf{x}^{(t)}
+\right)^{\top}
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{(t)}
+\right)
+\left(
+\mathbf{x}
+-
+\mathbf{x}^{(t)}
+\right).
+\end{aligned}
+$$
+
+O gradiente dessa aproximação em relação a $\mathbf{x}$ é
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{(t)}
+\right)
++
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{(t)}
+\right)
+\left(
+\mathbf{x}
+-
+\mathbf{x}^{(t)}
+\right).
+$$
+
+Igualando a zero,
+
+$$
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{(t)}
+\right)
+\left(
+\mathbf{x}
+-
+\mathbf{x}^{(t)}
+\right)
+=
+-
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{(t)}
+\right).
+$$
+
+Se a Hessiana é invertível, obtém-se a atualização
+
+$$
+\mathbf{x}^{(t+1)}
+=
+\mathbf{x}^{(t)}
+-
+\left[
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{(t)}
+\right)
+\right]^{-1}
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{(t)}
+\right).
+$$
+
+A direção de Newton é a solução do sistema linear
+
+$$
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{(t)}
+\right)
+\mathbf{d}^{(t)}
+=
+-
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{(t)}
+\right).
+$$
+
+Na implementação computacional, é preferível resolver esse sistema sem calcular explicitamente a inversa da Hessiana.
+
+O método depende de:
+
+-   existência das derivadas de segunda ordem;
+-   Hessiana invertível;
+-   escolha adequada do ponto inicial;
+-   comportamento local da função.
+
+Longe da solução, uma etapa de Newton pode não reduzir a função. Métodos numéricos costumam combinar a direção de Newton com controle do comprimento da etapa [@boyd2004convex].
+
+::: {#exm-newton-funcao-quadratica}
+## Newton para uma função quadrática
+
+Considere
+
+$$
+f(\mathbf{x})
+=
+\frac12
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+-
+\mathbf{b}^{\top}\mathbf{x},
+$$
+
+com $\mathbf{A}\succ\mathbf{0}$.
+
+O gradiente é
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+\mathbf{A}\mathbf{x}
+-
+\mathbf{b},
+$$
+
+e a Hessiana é
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+=
+\mathbf{A}.
+$$
+
+A atualização de Newton é
+
+$$
+\begin{aligned}
+\mathbf{x}^{(t+1)}
+&=
+\mathbf{x}^{(t)}
+-
+\mathbf{A}^{-1}
+\left(
+\mathbf{A}\mathbf{x}^{(t)}
+-
+\mathbf{b}
+\right)\\
+&=
+\mathbf{A}^{-1}\mathbf{b}.
+\end{aligned}
+$$
+
+Assim, para uma função quadrática com Hessiana positiva definida, Newton encontra o minimizador em uma única etapa, independentemente do ponto inicial.
+:::
+
+## Otimização com restrições de igualdade
+
+Considere o problema
+
+$$
+\min_{\mathbf{x}\in\mathbb{R}^{p}}
+f(\mathbf{x})
+$$
+
+sujeito a
+
+$$
+\mathbf{c}(\mathbf{x})
+=
+\mathbf{0},
+$$
+
+em que
+
+$$
+\mathbf{c}:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{m}
+$$
+
+é uma função vetorial de restrições:
+
+$$
+\mathbf{c}(\mathbf{x})
+=
+\begin{bmatrix}
+c_1(\mathbf{x})\\
+\vdots\\
+c_m(\mathbf{x})
+\end{bmatrix}.
+$$
+
+O conjunto viável é
+
+$$
+\mathcal{F}
+=
+\left\{
+\mathbf{x}:
+\mathbf{c}(\mathbf{x})
+=
+\mathbf{0}
+\right\}.
+$$
+
+Em um ponto regular, os gradientes das restrições determinam as direções normais ao conjunto viável.
+
+Uma direção tangente $\mathbf{d}$ satisfaz
+
+$$
+\mathbf{J}_{\mathbf{c}}(\mathbf{x})
+\mathbf{d}
+=
+\mathbf{0}.
+$$
+
+Em um ótimo restrito, a derivada direcional de $f$ deve ser nula em todas as direções tangentes:
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}
+\mathbf{d}
+=
+0
+$$
+
+para todo $\mathbf{d}$ tal que
+
+$$
+\mathbf{J}_{\mathbf{c}}(\mathbf{x})
+\mathbf{d}
+=
+\mathbf{0}.
+$$
+
+Isso implica que o gradiente da função objetivo pertence ao espaço gerado pelos gradientes das restrições.
+
+### Multiplicadores de Lagrange
+
+::: {#thm-multiplicadores-lagrange}
+## Condição de Lagrange
+
+Considere um ponto $\mathbf{x}^{\star}$ que é ótimo local do problema
+
+$$
+\min_{\mathbf{x}}
+f(\mathbf{x})
+$$
+
+sujeito a
+
+$$
+\mathbf{c}(\mathbf{x})
+=
+\mathbf{0}.
+$$
+
+Suponha que as linhas da Jacobiana
+
+$$
+\mathbf{J}_{\mathbf{c}}
+\left(
+\mathbf{x}^{\star}
+\right)
+$$
+
+sejam linearmente independentes.
+
+Então existe um vetor
+
+$$
+\boldsymbol{\lambda}^{\star}
+\in
+\mathbb{R}^{m}
+$$
+
+tal que
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
++
+\mathbf{J}_{\mathbf{c}}
+\left(
+\mathbf{x}^{\star}
+\right)^{\top}
+\boldsymbol{\lambda}^{\star}
+=
+\mathbf{0}.
+$$
+
+[@apostol1969calculus2]
+:::
+
+A função lagrangiana é
+
+$$
+\mathcal{L}
+\left(
+\mathbf{x},
+\boldsymbol{\lambda}
+\right)
+=
+f(\mathbf{x})
++
+\boldsymbol{\lambda}^{\top}
+\mathbf{c}(\mathbf{x}).
+$$
+
+As condições de primeira ordem são
+
+$$
+\nabla_{\mathbf{x}}
+\mathcal{L}
+\left(
+\mathbf{x},
+\boldsymbol{\lambda}
+\right)
+=
+\mathbf{0}
+$$
+
+e
+
+$$
+\nabla_{\boldsymbol{\lambda}}
+\mathcal{L}
+\left(
+\mathbf{x},
+\boldsymbol{\lambda}
+\right)
+=
+\mathbf{c}(\mathbf{x})
+=
+\mathbf{0}.
+$$
+
+Os multiplicadores ajustam a condição de gradiente nulo para levar em conta as direções que não estão disponíveis devido às restrições.
+
+::: {#exm-lagrange-restricao-norma}
+## Otimização com restrição de norma
+
+Considere
+
+$$
+\max_{\mathbf{x}}
+\mathbf{a}^{\top}\mathbf{x}
+$$
+
+sujeito a
+
+$$
+\mathbf{x}^{\top}\mathbf{x}
+=
+1.
+$$
+
+Escreva a restrição como
+
+$$
+c(\mathbf{x})
+=
+\mathbf{x}^{\top}\mathbf{x}
+-
+1
+=
+0.
+$$
+
+A lagrangiana pode ser definida por
+
+$$
+\mathcal{L}(\mathbf{x},\lambda)
+=
+-
+\mathbf{a}^{\top}\mathbf{x}
++
+\lambda
+\left(
+\mathbf{x}^{\top}\mathbf{x}-1
+\right),
+$$
+
+convertendo a maximização em minimização.
+
+A condição em relação a $\mathbf{x}$ é
+
+$$
+-\mathbf{a}
++
+2\lambda\mathbf{x}
+=
+\mathbf{0}.
+$$
+
+Logo,
+
+$$
+\mathbf{x}
+=
+\frac{1}{2\lambda}
+\mathbf{a}.
+$$
+
+A restrição implica
+
+$$
+\frac{
+\|\mathbf{a}\|^2
+}{
+4\lambda^2
+}
+=
+1.
+$$
+
+Para maximizar $\mathbf{a}^{\top}\mathbf{x}$, escolhe-se
+
+$$
+\mathbf{x}^{\star}
+=
+\frac{
+\mathbf{a}
+}{
+\|\mathbf{a}\|
+}.
+$$
+
+O valor máximo é
+
+$$
+\mathbf{a}^{\top}\mathbf{x}^{\star}
+=
+\|\mathbf{a}\|.
+$$
+
+Esse resultado coincide com a igualdade na desigualdade de Cauchy--Schwarz.
+:::
+
+### Relação com problemas de autovalores
+
+Considere o problema
+
+$$
+\max_{\mathbf{x}}
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+$$
+
+sujeito a
+
+$$
+\mathbf{x}^{\top}\mathbf{x}
+=
+1,
+$$
+
+com $\mathbf{A}$ simétrica.
+
+A lagrangiana é
+
+$$
+\mathcal{L}(\mathbf{x},\lambda)
+=
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+-
+\lambda
+\left(
+\mathbf{x}^{\top}\mathbf{x}
+-
+1
+\right).
+$$
+
+A condição de primeira ordem é
+
+$$
+2\mathbf{A}\mathbf{x}
+-
+2\lambda\mathbf{x}
+=
+\mathbf{0},
+$$
+
+ou
+
+$$
+\mathbf{A}\mathbf{x}
+=
+\lambda\mathbf{x}.
+$$
+
+O problema de otimização conduz, portanto, a um problema de autovalores. O maior valor da função objetivo é o maior autovalor de $\mathbf{A}$.
+
+Essa relação foi desenvolvida no capítulo de decomposição espectral. Aqui, ela mostra como os multiplicadores de Lagrange produzem a equação de autovalores a partir de uma restrição de norma.
+
+### Restrições lineares
+
+Considere o problema quadrático
+
+$$
+\min_{\mathbf{x}}
+\frac12
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+-
+\mathbf{b}^{\top}\mathbf{x}
+$$
+
+sujeito a
+
+$$
+\mathbf{C}\mathbf{x}
+=
+\mathbf{d},
+$$
+
+em que $\mathbf{A}$ é simétrica.
+
+A lagrangiana é
+
+$$
+\mathcal{L}
+\left(
+\mathbf{x},
+\boldsymbol{\lambda}
+\right)
+=
+\frac12
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+-
+\mathbf{b}^{\top}\mathbf{x}
++
+\boldsymbol{\lambda}^{\top}
+\left(
+\mathbf{C}\mathbf{x}-\mathbf{d}
+\right).
+$$
+
+As condições de primeira ordem são
+
+$$
+\mathbf{A}\mathbf{x}
+-
+\mathbf{b}
++
+\mathbf{C}^{\top}
+\boldsymbol{\lambda}
+=
+\mathbf{0}
+$$
+
+e
+
+$$
+\mathbf{C}\mathbf{x}
+=
+\mathbf{d}.
+$$
+
+Essas condições podem ser organizadas no sistema em blocos
+
+$$
+\begin{bmatrix}
+\mathbf{A}&\mathbf{C}^{\top}\\
+\mathbf{C}&\mathbf{0}
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{x}\\
+\boldsymbol{\lambda}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\mathbf{b}\\
+\mathbf{d}
+\end{bmatrix}.
+$$
+
+A solução exige condições de posto e invertibilidade compatíveis com a matriz do sistema.
+
+As ferramentas desta seção serão aplicadas a funções de resíduos, critérios quadráticos e funções de parâmetros matriciais.
+
+## Derivadas de formas lineares, quadráticas e funções de resíduos
+
+### Formas lineares e bilineares
+
+Considere
+
+$$
+f(\mathbf{x})
+=
+\mathbf{a}^{\top}\mathbf{x},
+$$
+
+em que $\mathbf{a}\in\mathbb{R}^{p}$ é constante. Como
+
+$$
+df
+=
+\mathbf{a}^{\top}d\mathbf{x},
+$$
+
+tem-se
+
+$$
+\nabla_{\mathbf{x}}f
+=
+\mathbf{a}
+$$
+
+e
+
+$$
+\nabla_{\mathbf{x}}^2f
+=
+\mathbf{0}.
+$$
+
+Para a forma bilinear
+
+$$
+f(\mathbf{x},\mathbf{y})
+=
+\mathbf{x}^{\top}\mathbf{A}\mathbf{y},
+$$
+
+com
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{p\times q},
+$$
+
+o diferencial é
+
+$$
+df
+=
+d\mathbf{x}^{\top}\mathbf{A}\mathbf{y}
++
+\mathbf{x}^{\top}\mathbf{A}\,d\mathbf{y}.
+$$
+
+Reescrevendo o primeiro termo,
+
+$$
+d\mathbf{x}^{\top}\mathbf{A}\mathbf{y}
+=
+\left(
+\mathbf{A}\mathbf{y}
+\right)^{\top}
+d\mathbf{x},
+$$
+
+e o segundo,
+
+$$
+\mathbf{x}^{\top}\mathbf{A}\,d\mathbf{y}
+=
+\left(
+\mathbf{A}^{\top}\mathbf{x}
+\right)^{\top}
+d\mathbf{y}.
+$$
+
+Logo,
+
+$$
+\nabla_{\mathbf{x}}f
+=
+\mathbf{A}\mathbf{y}
+$$
+
+e
+
+$$
+\nabla_{\mathbf{y}}f
+=
+\mathbf{A}^{\top}\mathbf{x}.
+$$
+
+### Formas quadráticas
+
+Considere
+
+$$
+f(\mathbf{x})
+=
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x},
+$$
+
+com
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{p\times p}.
+$$
+
+O diferencial é
+
+$$
+\begin{aligned}
+df
+&=
+d\mathbf{x}^{\top}
+\mathbf{A}\mathbf{x}
++
+\mathbf{x}^{\top}
+\mathbf{A}\,d\mathbf{x}\\
+&=
+\mathbf{x}^{\top}
+\mathbf{A}^{\top}
+d\mathbf{x}
++
+\mathbf{x}^{\top}
+\mathbf{A}
+d\mathbf{x}\\
+&=
+\left[
+\left(
+\mathbf{A}
++
+\mathbf{A}^{\top}
+\right)
+\mathbf{x}
+\right]^{\top}
+d\mathbf{x}.
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+\left(
+\mathbf{A}
++
+\mathbf{A}^{\top}
+\right)
+\mathbf{x}
+$$
+
+e
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+=
+\mathbf{A}
++
+\mathbf{A}^{\top}.
+$$
+
+A forma quadrática depende somente da parte simétrica da matriz:
+
+$$
+\mathbf{A}_{s}
+=
+\frac{
+\mathbf{A}
++
+\mathbf{A}^{\top}
+}{
+2
+}.
+$$
+
+Assim,
+
+$$
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+=
+\mathbf{x}^{\top}\mathbf{A}_{s}\mathbf{x},
+$$
+
+e
+
+$$
+\nabla_{\mathbf{x}}
+\left(
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+\right)
+=
+2\mathbf{A}_{s}\mathbf{x}.
+$$
+
+Quando $\mathbf{A}$ é simétrica,
+
+$$
+\nabla_{\mathbf{x}}
+\left(
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+\right)
+=
+2\mathbf{A}\mathbf{x}
+$$
+
+e
+
+$$
+\nabla_{\mathbf{x}}^2
+\left(
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+\right)
+=
+2\mathbf{A}.
+$$
+
+::: {#thm-derivadas-forma-quadratica}
+## Derivadas de uma forma quadrática deslocada
+
+Se $\mathbf{A}$ é simétrica e
+
+$$
+f(\mathbf{x})
+=
+\left(
+\mathbf{x}
+-
+\boldsymbol{\mu}
+\right)^{\top}
+\mathbf{A}
+\left(
+\mathbf{x}
+-
+\boldsymbol{\mu}
+\right),
+$$
+
+então
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+2\mathbf{A}
+\left(
+\mathbf{x}
+-
+\boldsymbol{\mu}
+\right)
+$$
+
+e
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+=
+2\mathbf{A}.
+$$
+:::
+
+::: proof
+Defina
+
+$$
+\mathbf{z}
+=
+\mathbf{x}
+-
+\boldsymbol{\mu}.
+$$
+
+Como
+
+$$
+d\mathbf{z}
+=
+d\mathbf{x},
+$$
+
+tem-se
+
+$$
+\begin{aligned}
+df
+&=
+d\mathbf{z}^{\top}\mathbf{A}\mathbf{z}
++
+\mathbf{z}^{\top}\mathbf{A}\,d\mathbf{z}\\
+&=
+2\mathbf{z}^{\top}\mathbf{A}\,d\mathbf{x},
+\end{aligned}
+$$
+
+pois $\mathbf{A}$ é simétrica. Portanto,
+
+$$
+\nabla_{\mathbf{x}}f
+=
+2\mathbf{A}\mathbf{z}
+=
+2\mathbf{A}
+\left(
+\mathbf{x}
+-
+\boldsymbol{\mu}
+\right).
+$$
+
+A diferenciação do gradiente fornece a Hessiana.
+:::
+
+Se
+
+$$
+\mathbf{A}
+\succeq
+\mathbf{0},
+$$
+
+a forma quadrática deslocada é convexa. Se
+
+$$
+\mathbf{A}
+\succ
+\mathbf{0},
+$$
+
+ela é estritamente convexa e possui mínimo único em
+
+$$
+\mathbf{x}
+=
+\boldsymbol{\mu}.
+$$
+
+### Norma euclidiana
+
+Como
+
+$$
+\|\mathbf{x}\|^2
+=
+\mathbf{x}^{\top}\mathbf{x},
+$$
+
+segue que
+
+$$
+\nabla_{\mathbf{x}}
+\|\mathbf{x}\|^2
+=
+2\mathbf{x}
+$$
+
+e
+
+$$
+\nabla_{\mathbf{x}}^2
+\|\mathbf{x}\|^2
+=
+2\mathbf{I}_p.
+$$
+
+Para $\mathbf{x}\neq\mathbf{0}$,
+
+$$
+\|\mathbf{x}\|
+=
+\left(
+\mathbf{x}^{\top}\mathbf{x}
+\right)^{1/2}.
+$$
+
+Pela regra da cadeia,
+
+$$
+\nabla_{\mathbf{x}}\|\mathbf{x}\|
+=
+\frac{
+\mathbf{x}
+}{
+\|\mathbf{x}\|
+}.
+$$
+
+A norma euclidiana não é diferenciável em $\mathbf{x}=\mathbf{0}$.
+
+### Funções de resíduos lineares
+
+Considere
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{q\times p},
+\qquad
+\mathbf{b}
+\in
+\mathbb{R}^{q},
+$$
+
+e defina o vetor de resíduos
+
+$$
+\mathbf{r}(\mathbf{x})
+=
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}.
+$$
+
+Sua Jacobiana é
+
+$$
+\mathbf{J}_{\mathbf{r}}(\mathbf{x})
+=
+-
+\mathbf{A}.
+$$
+
+A soma de quadrados dos resíduos é
+
+$$
+f(\mathbf{x})
+=
+\|\mathbf{r}(\mathbf{x})\|^2
+=
+\left(
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\right)^{\top}
+\left(
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\right).
+$$
+
+Pela regra da cadeia,
+
+$$
+\begin{aligned}
+\nabla_{\mathbf{x}}f(\mathbf{x})
+&=
+2
+\mathbf{J}_{\mathbf{r}}(\mathbf{x})^{\top}
+\mathbf{r}(\mathbf{x})\\
+&=
+-2\mathbf{A}^{\top}
+\left(
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\right).
+\end{aligned}
+$$
+
+Equivalentemente,
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+2\mathbf{A}^{\top}
+\left(
+\mathbf{A}\mathbf{x}
+-
+\mathbf{b}
+\right).
+$$
+
+A Hessiana é
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+=
+2\mathbf{A}^{\top}\mathbf{A}.
+$$
+
+Como
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+\succeq
+\mathbf{0},
+$$
+
+a função é convexa.
+
+Se $\mathbf{A}$ possui posto coluna completo,
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+\succ
+\mathbf{0},
+$$
+
+e a função é estritamente convexa.
+
+### Equações normais
+
+Uma solução de mínimos quadrados deve satisfazer
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+\mathbf{0}.
+$$
+
+Logo,
+
+$$
+\mathbf{A}^{\top}
+\left(
+\mathbf{A}\mathbf{x}
+-
+\mathbf{b}
+\right)
+=
+\mathbf{0},
+$$
+
+ou
+
+$$
+\mathbf{A}^{\top}\mathbf{A}\mathbf{x}
+=
+\mathbf{A}^{\top}\mathbf{b}.
+$$
+
+Essas são as equações normais.
+
+A condição também pode ser escrita como
+
+$$
+\mathbf{A}^{\top}\mathbf{r}(\mathbf{x})
+=
+\mathbf{0}.
+$$
+
+Portanto, no ponto de mínimo, o vetor residual é ortogonal ao espaço coluna de $\mathbf{A}$.
+
+Quando $\mathbf{A}$ possui posto coluna completo, a solução é única:
+
+$$
+\widehat{\mathbf{x}}
+=
+\left(
+\mathbf{A}^{\top}\mathbf{A}
+\right)^{-1}
+\mathbf{A}^{\top}\mathbf{b}.
+$$
+
+Quando $\mathbf{A}$ é deficiente em posto, as equações normais podem possuir várias soluções. A pseudoinversa fornece a solução de menor norma:
+
+$$
+\widehat{\mathbf{x}}^{\star}
+=
+\mathbf{A}^{+}\mathbf{b}.
+$$
+
+A geometria das soluções de mínimos quadrados e a construção pela SVD foram desenvolvidas no capítulo anterior.
+
+::: {#exm-media-minimos-quadrados}
+## Média como solução de mínimos quadrados
+
+Considere valores
+
+$$
+z_1,\ldots,z_n
+$$
+
+e a função
+
+$$
+f(m)
+=
+\sum_{i=1}^{n}
+\left(
+z_i-m
+\right)^2.
+$$
+
+A derivada é
+
+$$
+\begin{aligned}
+f'(m)
+&=
+-2
+\sum_{i=1}^{n}
+\left(
+z_i-m
+\right)\\
+&=
+2nm
+-
+2
+\sum_{i=1}^{n}z_i.
+\end{aligned}
+$$
+
+A condição
+
+$$
+f'(m)=0
+$$
+
+fornece
+
+$$
+m
+=
+\frac{1}{n}
+\sum_{i=1}^{n}z_i.
+$$
+
+Como
+
+$$
+f''(m)
+=
+2n
+>
+0,
+$$
+
+a média aritmética é o único minimizador da soma dos quadrados dos desvios.
+:::
+
+### Mínimos quadrados ponderados
+
+Considere pesos
+
+$$
+\omega_1,\ldots,\omega_q
+$$
+
+e a matriz diagonal
+
+$$
+\boldsymbol{\Omega}
+=
+\operatorname{diag}
+\left(
+\omega_1,\ldots,\omega_q
+\right).
+$$
+
+A função de mínimos quadrados ponderados é
+
+$$
+f_{\omega}(\mathbf{x})
+=
+\left(
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\right)^{\top}
+\boldsymbol{\Omega}
+\left(
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\right).
+$$
+
+Quando $\boldsymbol{\Omega}$ é simétrica,
+
+$$
+\nabla_{\mathbf{x}}f_{\omega}(\mathbf{x})
+=
+-2
+\mathbf{A}^{\top}
+\boldsymbol{\Omega}
+\left(
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\right)
+$$
+
+e
+
+$$
+\nabla_{\mathbf{x}}^2f_{\omega}(\mathbf{x})
+=
+2
+\mathbf{A}^{\top}
+\boldsymbol{\Omega}
+\mathbf{A}.
+$$
+
+Se
+
+$$
+\boldsymbol{\Omega}
+\succeq
+\mathbf{0},
+$$
+
+a função é convexa.
+
+As equações normais ponderadas são
+
+$$
+\mathbf{A}^{\top}
+\boldsymbol{\Omega}
+\mathbf{A}
+\mathbf{x}
+=
+\mathbf{A}^{\top}
+\boldsymbol{\Omega}
+\mathbf{b}.
+$$
+
+Se
+
+$$
+\boldsymbol{\Omega}
+\succ
+\mathbf{0}
+$$
+
+e $\mathbf{A}$ possui posto coluna completo, então
+
+$$
+\mathbf{A}^{\top}
+\boldsymbol{\Omega}
+\mathbf{A}
+\succ
+\mathbf{0},
+$$
+
+e o minimizador é único:
+
+$$
+\widehat{\mathbf{x}}
+=
+\left(
+\mathbf{A}^{\top}
+\boldsymbol{\Omega}
+\mathbf{A}
+\right)^{-1}
+\mathbf{A}^{\top}
+\boldsymbol{\Omega}
+\mathbf{b}.
+$$
+
+A matriz $\boldsymbol{\Omega}$ modifica a importância relativa dos resíduos. Para uma matriz diagonal, cada observação recebe um peso próprio.
+
+### Funções compostas de resíduos
+
+Considere uma função diferenciável
+
+$$
+\rho:
+\mathbb{R}
+\longrightarrow
+\mathbb{R}
+$$
+
+e resíduos escalares
+
+$$
+r_i(\mathbf{x}),
+\qquad
+i=1,\ldots,q.
+$$
+
+Uma função de ajuste pode ser escrita como
+
+$$
+f(\mathbf{x})
+=
+\sum_{i=1}^{q}
+\rho
+\left(
+r_i(\mathbf{x})
+\right).
+$$
+
+Pela regra da cadeia,
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+\sum_{i=1}^{q}
+\rho'
+\left(
+r_i(\mathbf{x})
+\right)
+\nabla_{\mathbf{x}}r_i(\mathbf{x}).
+$$
+
+Se
+
+$$
+\rho(t)
+=
+t^2,
+$$
+
+então
+
+$$
+\rho'(t)
+=
+2t,
+$$
+
+e recupera-se a soma de quadrados.
+
+Essa formulação mostra que diferentes funções de perda modificam a contribuição de cada resíduo no gradiente.
+
+### Mínimos quadrados não lineares
+
+Considere uma função residual diferenciável
+
+$$
+\mathbf{r}:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{q}
+$$
+
+e o critério
+
+$$
+f(\mathbf{x})
+=
+\|\mathbf{r}(\mathbf{x})\|^2.
+$$
+
+A Jacobiana dos resíduos é
+
+$$
+\mathbf{J}_{\mathbf{r}}(\mathbf{x})
+\in
+\mathbb{R}^{q\times p}.
+$$
+
+::: {#thm-gradiente-residuos-nao-lineares}
+## Derivadas de uma soma de quadrados não linear
+
+Para
+
+$$
+f(\mathbf{x})
+=
+\sum_{i=1}^{q}
+r_i(\mathbf{x})^2,
+$$
+
+tem-se
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+2
+\mathbf{J}_{\mathbf{r}}(\mathbf{x})^{\top}
+\mathbf{r}(\mathbf{x})
+$$
+
+e
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+=
+2
+\mathbf{J}_{\mathbf{r}}(\mathbf{x})^{\top}
+\mathbf{J}_{\mathbf{r}}(\mathbf{x})
++
+2
+\sum_{i=1}^{q}
+r_i(\mathbf{x})
+\nabla_{\mathbf{x}}^2r_i(\mathbf{x}).
+$$
+:::
+
+::: proof
+Pela regra da cadeia,
+
+$$
+\begin{aligned}
+\nabla_{\mathbf{x}}f(\mathbf{x})
+&=
+\sum_{i=1}^{q}
+2r_i(\mathbf{x})
+\nabla_{\mathbf{x}}r_i(\mathbf{x})\\
+&=
+2
+\mathbf{J}_{\mathbf{r}}(\mathbf{x})^{\top}
+\mathbf{r}(\mathbf{x}).
+\end{aligned}
+$$
+
+Diferenciando novamente cada parcela,
+
+$$
+\nabla_{\mathbf{x}}
+\left[
+r_i(\mathbf{x})
+\nabla_{\mathbf{x}}r_i(\mathbf{x})
+\right]
+=
+\nabla_{\mathbf{x}}r_i(\mathbf{x})
+\nabla_{\mathbf{x}}r_i(\mathbf{x})^{\top}
++
+r_i(\mathbf{x})
+\nabla_{\mathbf{x}}^2r_i(\mathbf{x}).
+$$
+
+Somando sobre $i$, obtém-se a expressão da Hessiana.
+:::
+
+O primeiro termo da Hessiana,
+
+$$
+2
+\mathbf{J}_{\mathbf{r}}(\mathbf{x})^{\top}
+\mathbf{J}_{\mathbf{r}}(\mathbf{x}),
+$$
+
+é semidefinido positivo.
+
+O segundo termo depende:
+
+-   dos valores dos resíduos;
+-   das Hessianas das funções residuais;
+-   da não linearidade do modelo.
+
+Quando os resíduos são pequenos, pode-se aproximar a Hessiana por
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+\approx
+2
+\mathbf{J}_{\mathbf{r}}(\mathbf{x})^{\top}
+\mathbf{J}_{\mathbf{r}}(\mathbf{x}).
+$$
+
+Essa aproximação conduz ao método de Gauss--Newton. Seu desenvolvimento computacional não será necessário neste capítulo.
+
+As mesmas ideias serão estendidas a funções cujos argumentos são matrizes. Nesse caso, os diferenciais e as identidades de traço permitem organizar as derivadas sem decompor a matriz em todos os seus elementos.
+
+## Diferenciais matriciais e cálculo por traços
+
+Uma função escalar pode depender de todos os elementos de uma matriz. A diferenciação elemento a elemento é possível, mas se torna extensa quando a dimensão aumenta. Os diferenciais matriciais e as identidades de traço permitem organizar essas derivadas preservando a estrutura dos produtos.
+
+Considere uma função
+
+$$
+\phi:
+\mathbb{R}^{m\times n}
+\longrightarrow
+\mathbb{R},
+$$
+
+cujo argumento é
+
+$$
+\mathbf{X}
+=
+(x_{ij}).
+$$
+
+O diferencial total pode ser escrito como
+
+$$
+d\phi
+=
+\sum_{i=1}^{m}
+\sum_{j=1}^{n}
+\frac{
+\partial\phi
+}{
+\partial x_{ij}
+}
+dx_{ij}.
+$$
+
+Defina o gradiente matricial por
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+\left(
+\frac{
+\partial\phi
+}{
+\partial x_{ij}
+}
+\right)
+\in
+\mathbb{R}^{m\times n}.
+$$
+
+Utilizando o produto interno de Frobenius,
+
+$$
+\langle
+\mathbf{A},
+\mathbf{B}
+\rangle_F
+=
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}\mathbf{B}
+\right),
+$$
+
+o diferencial assume a forma
+
+$$
+d\phi
+=
+\left\langle
+\nabla_{\mathbf{X}}\phi,
+d\mathbf{X}
+\right\rangle_F.
+$$
+
+Portanto,
+
+$$
+d\phi
+=
+\operatorname{tr}
+\left[
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)^{\top}
+d\mathbf{X}
+\right].
+$$
+
+Essa identidade será utilizada para reconhecer o gradiente após reorganizar o diferencial.
+
+### Regras básicas do diferencial matricial
+
+Se $\mathbf{A}$ e $\mathbf{B}$ são matrizes constantes e $\mathbf{X}$ é variável, então
+
+$$
+d\mathbf{A}
+=
+\mathbf{0}
+$$
+
+e
+
+$$
+d\mathbf{B}
+=
+\mathbf{0}.
+$$
+
+O diferencial é linear:
+
+$$
+d
+\left(
+\mathbf{X}
++
+\mathbf{Y}
+\right)
+=
+d\mathbf{X}
++
+d\mathbf{Y},
+$$
+
+e, para escalares constantes $\alpha$ e $\beta$,
+
+$$
+d
+\left(
+\alpha\mathbf{X}
++
+\beta\mathbf{Y}
+\right)
+=
+\alpha\,d\mathbf{X}
++
+\beta\,d\mathbf{Y}.
+$$
+
+Para um produto de matrizes variáveis,
+
+$$
+d
+\left(
+\mathbf{X}\mathbf{Y}
+\right)
+=
+d\mathbf{X}\,\mathbf{Y}
++
+\mathbf{X}\,d\mathbf{Y}.
+$$
+
+Para três fatores,
+
+$$
+\begin{aligned}
+d
+\left(
+\mathbf{X}\mathbf{Y}\mathbf{Z}
+\right)
+&=
+d\mathbf{X}\,\mathbf{Y}\mathbf{Z}\\
+&\quad+
+\mathbf{X}\,d\mathbf{Y}\,\mathbf{Z}\\
+&\quad+
+\mathbf{X}\mathbf{Y}\,d\mathbf{Z}.
+\end{aligned}
+$$
+
+A transposição comuta com o diferencial:
+
+$$
+d
+\left(
+\mathbf{X}^{\top}
+\right)
+=
+\left(
+d\mathbf{X}
+\right)^{\top}.
+$$
+
+Quando $\mathbf{A}$ e $\mathbf{B}$ são constantes,
+
+$$
+d
+\left(
+\mathbf{A}\mathbf{X}\mathbf{B}
+\right)
+=
+\mathbf{A}\,d\mathbf{X}\,\mathbf{B}.
+$$
+
+Para o produto cruzado,
+
+$$
+d
+\left(
+\mathbf{X}^{\top}\mathbf{X}
+\right)
+=
+d\mathbf{X}^{\top}\mathbf{X}
++
+\mathbf{X}^{\top}d\mathbf{X}.
+$$
+
+Essas regras mantêm a ordem dos fatores. Em geral, os produtos matriciais não podem ser reorganizados por comutatividade.
+
+### Identidades de traço
+
+O traço transforma expressões matriciais quadradas em escalares e permite realizar permutações cíclicas dos fatores:
+
+$$
+\operatorname{tr}
+\left(
+\mathbf{A}\mathbf{B}
+\right)
+=
+\operatorname{tr}
+\left(
+\mathbf{B}\mathbf{A}
+\right),
+$$
+
+quando os produtos são definidos.
+
+Para três fatores,
+
+$$
+\operatorname{tr}
+\left(
+\mathbf{A}\mathbf{B}\mathbf{C}
+\right)
+=
+\operatorname{tr}
+\left(
+\mathbf{B}\mathbf{C}\mathbf{A}
+\right)
+=
+\operatorname{tr}
+\left(
+\mathbf{C}\mathbf{A}\mathbf{B}
+\right).
+$$
+
+A ordem cíclica pode ser alterada, mas não uma ordem arbitrária. Em geral,
+
+$$
+\operatorname{tr}
+\left(
+\mathbf{A}\mathbf{B}\mathbf{C}
+\right)
+\neq
+\operatorname{tr}
+\left(
+\mathbf{A}\mathbf{C}\mathbf{B}
+\right).
+$$
+
+Também são válidas as identidades
+
+$$
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+\operatorname{tr}(\mathbf{A})
+$$
+
+e
+
+$$
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}\mathbf{B}
+\right)
+=
+\operatorname{tr}
+\left(
+\mathbf{B}^{\top}\mathbf{A}
+\right).
+$$
+
+Para reorganizar diferenciais, será utilizada a relação
+
+$$
+\operatorname{tr}
+\left(
+\mathbf{A}\,d\mathbf{X}^{\top}
+\right)
+=
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}d\mathbf{X}
+\right).
+$$
+
+De modo semelhante,
+
+$$
+\operatorname{tr}
+\left(
+d\mathbf{X}^{\top}\mathbf{A}
+\right)
+=
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}d\mathbf{X}
+\right).
+$$
+
+O objetivo dessas transformações é escrever o diferencial na forma
+
+$$
+d\phi
+=
+\operatorname{tr}
+\left(
+\mathbf{G}^{\top}d\mathbf{X}
+\right).
+$$
+
+Nesse caso,
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+\mathbf{G}.
+$$
+
+### Função linear de uma matriz
+
+::: {#thm-gradiente-funcao-linear-matriz}
+## Gradiente de uma função matricial linear
+
+Se
+
+$$
+\phi(\mathbf{X})
+=
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}\mathbf{X}
+\right),
+$$
+
+em que $\mathbf{A}$ é constante e possui a mesma dimensão de $\mathbf{X}$, então
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+\mathbf{A}.
+$$
+
+[@magnus2019matrix]
+:::
+
+::: proof
+O diferencial é
+
+$$
+\begin{aligned}
+d\phi
+&=
+d\operatorname{tr}
+\left(
+\mathbf{A}^{\top}\mathbf{X}
+\right)\\
+&=
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}d\mathbf{X}
+\right).
+\end{aligned}
+$$
+
+Comparando com
+
+$$
+d\phi
+=
+\operatorname{tr}
+\left[
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)^{\top}
+d\mathbf{X}
+\right],
+$$
+
+obtém-se
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+\mathbf{A}.
+$$
+:::
+
+Como
+
+$$
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}\mathbf{X}
+\right)
+=
+\sum_{i=1}^{m}
+\sum_{j=1}^{n}
+a_{ij}x_{ij},
+$$
+
+essa função é o equivalente matricial da forma linear $\mathbf{a}^{\top}\mathbf{x}$.
+
+### Norma de Frobenius
+
+A norma de Frobenius satisfaz
+
+$$
+\|\mathbf{X}\|_F^2
+=
+\operatorname{tr}
+\left(
+\mathbf{X}^{\top}\mathbf{X}
+\right).
+$$
+
+Seu diferencial é
+
+$$
+\begin{aligned}
+d
+\|\mathbf{X}\|_F^2
+&=
+d\operatorname{tr}
+\left(
+\mathbf{X}^{\top}\mathbf{X}
+\right)\\
+&=
+\operatorname{tr}
+\left(
+d\mathbf{X}^{\top}\mathbf{X}
+\right)
++
+\operatorname{tr}
+\left(
+\mathbf{X}^{\top}d\mathbf{X}
+\right).
+\end{aligned}
+$$
+
+Como
+
+$$
+\operatorname{tr}
+\left(
+d\mathbf{X}^{\top}\mathbf{X}
+\right)
+=
+\operatorname{tr}
+\left(
+\mathbf{X}^{\top}d\mathbf{X}
+\right),
+$$
+
+segue que
+
+$$
+d
+\|\mathbf{X}\|_F^2
+=
+2
+\operatorname{tr}
+\left(
+\mathbf{X}^{\top}d\mathbf{X}
+\right).
+$$
+
+Portanto,
+
+$$
+\nabla_{\mathbf{X}}
+\|\mathbf{X}\|_F^2
+=
+2\mathbf{X}.
+$$
+
+Para uma matriz constante $\mathbf{M}$,
+
+$$
+\phi(\mathbf{X})
+=
+\|\mathbf{X}-\mathbf{M}\|_F^2
+$$
+
+possui gradiente
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+2
+\left(
+\mathbf{X}-\mathbf{M}
+\right).
+$$
+
+O único minimizador é
+
+$$
+\mathbf{X}
+=
+\mathbf{M}.
+$$
+
+### Funções quadráticas de uma matriz
+
+Considere
+
+$$
+\phi(\mathbf{X})
+=
+\operatorname{tr}
+\left(
+\mathbf{X}^{\top}
+\mathbf{A}
+\mathbf{X}
+\boldsymbol{\Gamma}
+\right),
+$$
+
+com
+
+$$
+\mathbf{X}
+\in
+\mathbb{R}^{m\times n},
+\qquad
+\mathbf{A}
+\in
+\mathbb{R}^{m\times m}
+$$
+
+e
+
+$$
+\boldsymbol{\Gamma}
+\in
+\mathbb{R}^{n\times n}.
+$$
+
+O diferencial é
+
+$$
+\begin{aligned}
+d\phi
+&=
+\operatorname{tr}
+\left(
+d\mathbf{X}^{\top}
+\mathbf{A}
+\mathbf{X}
+\boldsymbol{\Gamma}
+\right)\\
+&\quad+
+\operatorname{tr}
+\left(
+\mathbf{X}^{\top}
+\mathbf{A}
+d\mathbf{X}
+\boldsymbol{\Gamma}
+\right).
+\end{aligned}
+$$
+
+O primeiro termo pode ser escrito como
+
+$$
+\operatorname{tr}
+\left(
+d\mathbf{X}^{\top}
+\mathbf{A}
+\mathbf{X}
+\boldsymbol{\Gamma}
+\right)
+=
+\operatorname{tr}
+\left[
+\left(
+\mathbf{A}
+\mathbf{X}
+\boldsymbol{\Gamma}
+\right)^{\top}
+d\mathbf{X}
+\right].
+$$
+
+No segundo termo, pela propriedade cíclica,
+
+$$
+\begin{aligned}
+\operatorname{tr}
+\left(
+\mathbf{X}^{\top}
+\mathbf{A}
+d\mathbf{X}
+\boldsymbol{\Gamma}
+\right)
+&=
+\operatorname{tr}
+\left(
+\boldsymbol{\Gamma}
+\mathbf{X}^{\top}
+\mathbf{A}
+d\mathbf{X}
+\right)\\
+&=
+\operatorname{tr}
+\left[
+\left(
+\mathbf{A}^{\top}
+\mathbf{X}
+\boldsymbol{\Gamma}^{\top}
+\right)^{\top}
+d\mathbf{X}
+\right].
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}
++
+\mathbf{A}^{\top}
+\mathbf{X}
+\boldsymbol{\Gamma}^{\top}.
+$$
+
+Se $\mathbf{A}$ e $\boldsymbol{\Gamma}$ são simétricas,
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+2
+\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}.
+$$
+
+::: {#exm-forma-quadratica-matricial}
+## Soma ponderada de produtos quadráticos
+
+Considere
+
+$$
+\phi(\mathbf{X})
+=
+\operatorname{tr}
+\left(
+\mathbf{X}^{\top}
+\mathbf{A}
+\mathbf{X}
+\right),
+$$
+
+com $\mathbf{A}$ simétrica.
+
+Esse é o caso particular
+
+$$
+\boldsymbol{\Gamma}
+=
+\mathbf{I}_n.
+$$
+
+Portanto,
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+2\mathbf{A}\mathbf{X}.
+$$
+
+Se as colunas de $\mathbf{X}$ são
+
+$$
+\mathbf{x}_1,\ldots,\mathbf{x}_n,
+$$
+
+então
+
+$$
+\phi(\mathbf{X})
+=
+\sum_{j=1}^{n}
+\mathbf{x}_j^{\top}
+\mathbf{A}
+\mathbf{x}_j.
+$$
+
+O gradiente reúne, em suas colunas, os gradientes das formas quadráticas individuais:
+
+$$
+2\mathbf{A}\mathbf{x}_1,
+\ldots,
+2\mathbf{A}\mathbf{x}_n.
+$$
+:::
+
+### Funções matriciais de resíduos
+
+Considere o modelo matricial
+
+$$
+\mathbf{Y}
+=
+\mathbf{X}\mathbf{B}
++
+\boldsymbol{\mathcal E},
+$$
+
+em que
+
+$$
+\mathbf{Y}
+\in
+\mathbb{R}^{n\times p},
+\qquad
+\mathbf{X}
+\in
+\mathbb{R}^{n\times k}
+$$
+
+e
+
+$$
+\mathbf{B}
+\in
+\mathbb{R}^{k\times p}.
+$$
+
+Para um valor genérico de $\mathbf{B}$, defina a matriz de resíduos
+
+$$
+\boldsymbol{\mathcal E}(\mathbf{B})
+=
+\mathbf{Y}
+-
+\mathbf{X}\mathbf{B}.
+$$
+
+A função de soma de quadrados é
+
+$$
+Q(\mathbf{B})
+=
+\left\|
+\boldsymbol{\mathcal E}(\mathbf{B})
+\right\|_F^2.
+$$
+
+Equivalentemente,
+
+$$
+Q(\mathbf{B})
+=
+\operatorname{tr}
+\left[
+\boldsymbol{\mathcal E}(\mathbf{B})^{\top}
+\boldsymbol{\mathcal E}(\mathbf{B})
+\right].
+$$
+
+Como
+
+$$
+d\boldsymbol{\mathcal E}
+=
+-
+\mathbf{X}\,d\mathbf{B},
+$$
+
+tem-se
+
+$$
+\begin{aligned}
+dQ
+&=
+2
+\operatorname{tr}
+\left(
+\boldsymbol{\mathcal E}^{\top}
+d\boldsymbol{\mathcal E}
+\right)\\
+&=
+-2
+\operatorname{tr}
+\left(
+\boldsymbol{\mathcal E}^{\top}
+\mathbf{X}
+d\mathbf{B}
+\right)\\
+&=
+-2
+\operatorname{tr}
+\left[
+\left(
+\mathbf{X}^{\top}
+\boldsymbol{\mathcal E}
+\right)^{\top}
+d\mathbf{B}
+\right].
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\nabla_{\mathbf{B}}Q(\mathbf{B})
+=
+-2
+\mathbf{X}^{\top}
+\boldsymbol{\mathcal E}(\mathbf{B}).
+$$
+
+Substituindo a matriz de resíduos,
+
+$$
+\nabla_{\mathbf{B}}Q(\mathbf{B})
+=
+2
+\mathbf{X}^{\top}
+\left(
+\mathbf{X}\mathbf{B}
+-
+\mathbf{Y}
+\right).
+$$
+
+A condição de primeira ordem é
+
+$$
+\mathbf{X}^{\top}
+\left(
+\mathbf{Y}
+-
+\mathbf{X}\mathbf{B}
+\right)
+=
+\mathbf{0},
+$$
+
+ou
+
+$$
+\mathbf{X}^{\top}\mathbf{X}\mathbf{B}
+=
+\mathbf{X}^{\top}\mathbf{Y}.
+$$
+
+Essas são as equações normais matriciais.
+
+Se $\mathbf{X}$ possui posto coluna completo,
+
+$$
+\widehat{\mathbf{B}}
+=
+\left(
+\mathbf{X}^{\top}\mathbf{X}
+\right)^{-1}
+\mathbf{X}^{\top}\mathbf{Y}.
+$$
+
+Cada coluna de $\widehat{\mathbf{B}}$ corresponde ao ajuste de uma coluna de $\mathbf{Y}$ sobre a mesma matriz de delineamento $\mathbf{X}$.
+
+::: {#thm-convexidade-minimos-quadrados-matriciais}
+## Convexidade dos mínimos quadrados matriciais
+
+A função
+
+$$
+Q(\mathbf{B})
+=
+\left\|
+\mathbf{Y}
+-
+\mathbf{X}\mathbf{B}
+\right\|_F^2
+$$
+
+é convexa em $\mathbf{B}$.
+
+Ela é estritamente convexa quando $\mathbf{X}$ possui posto coluna completo.
+:::
+
+::: proof
+Considere uma perturbação
+
+$$
+d\mathbf{B}.
+$$
+
+A segunda variação de $Q$ é
+
+$$
+d^2Q
+=
+2
+\operatorname{tr}
+\left(
+d\mathbf{B}^{\top}
+\mathbf{X}^{\top}
+\mathbf{X}
+d\mathbf{B}
+\right).
+$$
+
+Equivalentemente,
+
+$$
+d^2Q
+=
+2
+\left\|
+\mathbf{X}\,d\mathbf{B}
+\right\|_F^2
+\geq
+0.
+$$
+
+Portanto, a função é convexa.
+
+Se $\mathbf{X}$ possui posto coluna completo, então
+
+$$
+\mathbf{X}\,d\mathbf{B}
+=
+\mathbf{0}
+$$
+
+implica
+
+$$
+d\mathbf{B}
+=
+\mathbf{0}.
+$$
+
+Assim, a segunda variação é positiva para toda perturbação não nula, e a função é estritamente convexa.
+:::
+
+### Ponderação de observações e respostas
+
+Considere uma matriz diagonal de pesos das observações
+
+$$
+\boldsymbol{\Omega}
+=
+\operatorname{diag}
+\left(
+\omega_1,\ldots,\omega_n
+\right)
+\succeq
+\mathbf{0}
+$$
+
+e uma matriz simétrica positiva definida
+
+$$
+\boldsymbol{\Sigma}
+\in
+\mathbb{R}^{p\times p}.
+$$
+
+O critério ponderado é
+
+$$
+Q_{\Omega,\Sigma}(\mathbf{B})
+=
+\operatorname{tr}
+\left[
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mathcal E}(\mathbf{B})^{\top}
+\boldsymbol{\Omega}
+\boldsymbol{\mathcal E}(\mathbf{B})
+\right].
+$$
+
+A matriz $\boldsymbol{\Omega}$ pondera as linhas da matriz de resíduos. A matriz $\boldsymbol{\Sigma}^{-1}$ pondera as combinações entre as colunas.
+
+Como $\boldsymbol{\Omega}$ e $\boldsymbol{\Sigma}^{-1}$ são simétricas,
+
+$$
+\begin{aligned}
+dQ_{\Omega,\Sigma}
+&=
+2
+\operatorname{tr}
+\left[
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mathcal E}^{\top}
+\boldsymbol{\Omega}
+d\boldsymbol{\mathcal E}
+\right]\\
+&=
+-2
+\operatorname{tr}
+\left[
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mathcal E}^{\top}
+\boldsymbol{\Omega}
+\mathbf{X}
+d\mathbf{B}
+\right].
+\end{aligned}
+$$
+
+Pela propriedade cíclica,
+
+$$
+dQ_{\Omega,\Sigma}
+=
+-2
+\operatorname{tr}
+\left[
+\left(
+\mathbf{X}^{\top}
+\boldsymbol{\Omega}
+\boldsymbol{\mathcal E}
+\boldsymbol{\Sigma}^{-1}
+\right)^{\top}
+d\mathbf{B}
+\right].
+$$
+
+Portanto,
+
+$$
+\nabla_{\mathbf{B}}
+Q_{\Omega,\Sigma}(\mathbf{B})
+=
+-2
+\mathbf{X}^{\top}
+\boldsymbol{\Omega}
+\boldsymbol{\mathcal E}(\mathbf{B})
+\boldsymbol{\Sigma}^{-1}.
+$$
+
+A condição de primeira ordem é
+
+$$
+\mathbf{X}^{\top}
+\boldsymbol{\Omega}
+\left(
+\mathbf{Y}
+-
+\mathbf{X}\mathbf{B}
+\right)
+\boldsymbol{\Sigma}^{-1}
+=
+\mathbf{0}.
+$$
+
+Como $\boldsymbol{\Sigma}^{-1}$ é invertível,
+
+$$
+\mathbf{X}^{\top}
+\boldsymbol{\Omega}
+\left(
+\mathbf{Y}
+-
+\mathbf{X}\mathbf{B}
+\right)
+=
+\mathbf{0}.
+$$
+
+Logo,
+
+$$
+\mathbf{X}^{\top}
+\boldsymbol{\Omega}
+\mathbf{X}\mathbf{B}
+=
+\mathbf{X}^{\top}
+\boldsymbol{\Omega}
+\mathbf{Y}.
+$$
+
+Se
+
+$$
+\mathbf{X}^{\top}
+\boldsymbol{\Omega}
+\mathbf{X}
+$$
+
+é invertível, o minimizador é
+
+$$
+\widehat{\mathbf{B}}
+=
+\left(
+\mathbf{X}^{\top}
+\boldsymbol{\Omega}
+\mathbf{X}
+\right)^{-1}
+\mathbf{X}^{\top}
+\boldsymbol{\Omega}
+\mathbf{Y}.
+$$
+
+Nesse critério, a ponderação invertível entre as respostas altera o valor da função e sua geometria, mas não altera o ponto de mínimo em relação a $\mathbf{B}$. A ponderação das observações, por outro lado, modifica as equações normais e o estimador.
+
+As próximas identidades tratam funções que envolvem inversas e determinantes. Esses objetos aparecem em critérios definidos sobre o conjunto das matrizes positivas definidas.
+
+## Derivadas de inversas, determinantes e log-determinantes
+
+As matrizes inversas e os determinantes aparecem em transformações de coordenadas, funções de densidade e critérios de estimação. Suas derivadas exigem condições de invertibilidade e, em aplicações com matrizes de covariâncias, definição positiva.
+
+### Diferencial da matriz inversa
+
+Considere uma matriz invertível
+
+$$
+\mathbf{X}
+\in
+\mathbb{R}^{p\times p}.
+$$
+
+A identidade
+
+$$
+\mathbf{X}\mathbf{X}^{-1}
+=
+\mathbf{I}_p
+$$
+
+permite obter o diferencial da inversa.
+
+::: {#thm-diferencial-inversa}
+## Diferencial da matriz inversa
+
+Se $\mathbf{X}$ é invertível, então
+
+$$
+d
+\left(
+\mathbf{X}^{-1}
+\right)
+=
+-
+\mathbf{X}^{-1}
+\left(
+d\mathbf{X}
+\right)
+\mathbf{X}^{-1}.
+$$
+
+[@magnus2019matrix]
+:::
+
+::: proof
+Diferenciando
+
+$$
+\mathbf{X}\mathbf{X}^{-1}
+=
+\mathbf{I}_p,
+$$
+
+obtém-se
+
+$$
+d\mathbf{X}\,\mathbf{X}^{-1}
++
+\mathbf{X}\,d
+\left(
+\mathbf{X}^{-1}
+\right)
+=
+\mathbf{0}.
+$$
+
+Multiplicando à esquerda por $\mathbf{X}^{-1}$,
+
+$$
+\mathbf{X}^{-1}
+d\mathbf{X}\,
+\mathbf{X}^{-1}
++
+d
+\left(
+\mathbf{X}^{-1}
+\right)
+=
+\mathbf{0}.
+$$
+
+Logo,
+
+$$
+d
+\left(
+\mathbf{X}^{-1}
+\right)
+=
+-
+\mathbf{X}^{-1}
+\left(
+d\mathbf{X}
+\right)
+\mathbf{X}^{-1}.
+$$
+:::
+
+O sinal negativo indica que o aumento de uma matriz positiva definida em determinada direção produz redução de sua inversa na direção correspondente, segundo a ordem matricial apropriada.
+
+Para uma perturbação $d\mathbf{X}$,
+
+$$
+(\mathbf{X}+d\mathbf{X})^{-1}
+\approx
+\mathbf{X}^{-1}
+-
+\mathbf{X}^{-1}
+d\mathbf{X}
+\mathbf{X}^{-1}.
+$$
+
+Essa aproximação é válida para perturbações suficientemente pequenas que preservem a invertibilidade.
+
+::: {#exm-derivada-inversa-escalar}
+## Caso escalar
+
+Para
+
+$$
+x\neq0,
+$$
+
+a função inversa é
+
+$$
+f(x)
+=
+\frac1x.
+$$
+
+A fórmula matricial reduz-se a
+
+$$
+d(x^{-1})
+=
+-
+x^{-1}(dx)x^{-1}
+=
+-
+\frac{1}{x^2}dx.
+$$
+
+Portanto,
+
+$$
+f'(x)
+=
+-
+\frac{1}{x^2}.
+$$
+:::
+
+### Diferencial do determinante
+
+O determinante é uma função escalar definida sobre matrizes quadradas:
+
+$$
+\det:
+\mathbb{R}^{p\times p}
+\longrightarrow
+\mathbb{R}.
+$$
+
+Sua derivada é descrita pela fórmula de Jacobi.
+
+::: {#thm-formula-jacobi}
+## Fórmula de Jacobi
+
+Se $\mathbf{X}$ é invertível, então
+
+$$
+d\det(\mathbf{X})
+=
+\det(\mathbf{X})
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}d\mathbf{X}
+\right).
+$$ [@magnus2019matrix]
+:::
+
+Como
+
+$$
+d\det(\mathbf{X})
+=
+\operatorname{tr}
+\left[
+\left(
+\nabla_{\mathbf{X}}\det(\mathbf{X})
+\right)^{\top}
+d\mathbf{X}
+\right],
+$$
+
+segue que
+
+$$
+\nabla_{\mathbf{X}}
+\det(\mathbf{X})
+=
+\det(\mathbf{X})
+\mathbf{X}^{-\top}.
+$$
+
+Se $\mathbf{X}$ é simétrica,
+
+$$
+\mathbf{X}^{-\top}
+=
+\mathbf{X}^{-1},
+$$
+
+e
+
+$$
+\nabla_{\mathbf{X}}
+\det(\mathbf{X})
+=
+\det(\mathbf{X})
+\mathbf{X}^{-1}.
+$$
+
+A fórmula pode ser estendida a matrizes singulares por meio da matriz adjunta, mas a forma envolvendo $\mathbf{X}^{-1}$ exige invertibilidade.
+
+### Diferencial do log-determinante
+
+Para matrizes positivas definidas,
+
+$$
+\mathbf{X}\succ\mathbf{0},
+$$
+
+o determinante é positivo e a função
+
+$$
+\phi(\mathbf{X})
+=
+\log\det(\mathbf{X})
+$$
+
+está bem definida.
+
+::: {#thm-diferencial-logdet}
+## Diferencial do log-determinante
+
+Se $\mathbf{X}\succ\mathbf{0}$, então
+
+$$
+d\log\det(\mathbf{X})
+=
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}d\mathbf{X}
+\right).
+$$
+
+Consequentemente,
+
+$$
+\nabla_{\mathbf{X}}
+\log\det(\mathbf{X})
+=
+\mathbf{X}^{-1}.
+$$
+:::
+
+::: proof
+Pela regra da cadeia,
+
+$$
+d\log\det(\mathbf{X})
+=
+\frac{1}{\det(\mathbf{X})}
+d\det(\mathbf{X}).
+$$
+
+Aplicando a fórmula de Jacobi,
+
+$$
+\begin{aligned}
+d\log\det(\mathbf{X})
+&=
+\frac{1}{\det(\mathbf{X})}
+\det(\mathbf{X})
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}d\mathbf{X}
+\right)\\
+&=
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}d\mathbf{X}
+\right).
+\end{aligned}
+$$
+
+Como $\mathbf{X}$ é simétrica,
+
+$$
+\mathbf{X}^{-\top}
+=
+\mathbf{X}^{-1},
+$$
+
+o que fornece o gradiente.
+:::
+
+Para uma matriz invertível não necessariamente simétrica, a função
+
+$$
+\log|\det(\mathbf{X})|
+$$
+
+satisfaz
+
+$$
+\nabla_{\mathbf{X}}
+\log|\det(\mathbf{X})|
+=
+\mathbf{X}^{-\top}
+$$
+
+em qualquer região em que o sinal do determinante permaneça constante.
+
+### Segunda variação do log-determinante
+
+Considere uma matriz positiva definida $\mathbf{X}$ e uma perturbação simétrica $d\mathbf{X}$.
+
+A primeira variação é
+
+$$
+d\phi
+=
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}d\mathbf{X}
+\right).
+$$
+
+Utilizando o diferencial da inversa,
+
+$$
+d
+\left(
+\mathbf{X}^{-1}
+\right)
+=
+-
+\mathbf{X}^{-1}
+d\mathbf{X}
+\mathbf{X}^{-1},
+$$
+
+a segunda variação na mesma direção é
+
+$$
+d^2\phi
+=
+-
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}
+d\mathbf{X}
+\mathbf{X}^{-1}
+d\mathbf{X}
+\right).
+$$
+
+Como
+
+$$
+\mathbf{X}^{-1/2}
+d\mathbf{X}
+\mathbf{X}^{-1/2}
+$$
+
+é simétrica,
+
+$$
+\begin{aligned}
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}
+d\mathbf{X}
+\mathbf{X}^{-1}
+d\mathbf{X}
+\right)
+&=
+\left\|
+\mathbf{X}^{-1/2}
+d\mathbf{X}
+\mathbf{X}^{-1/2}
+\right\|_F^2\\
+&\geq
+0.
+\end{aligned}
+$$
+
+Logo,
+
+$$
+d^2\phi
+\leq
+0.
+$$
+
+::: {#thm-concavidade-logdet}
+## Concavidade do log-determinante
+
+A função
+
+$$
+\phi(\mathbf{X})
+=
+\log\det(\mathbf{X})
+$$
+
+é estritamente côncava no conjunto das matrizes simétricas positivas definidas. [@boyd2004convex]
+:::
+
+Consequentemente,
+
+$$
+-\log\det(\mathbf{X})
+$$
+
+é estritamente convexa nesse domínio.
+
+### Traço envolvendo uma matriz inversa
+
+Considere
+
+$$
+\phi(\mathbf{X})
+=
+\operatorname{tr}
+\left(
+\mathbf{A}\mathbf{X}^{-1}
+\right),
+$$
+
+em que $\mathbf{A}$ é constante e $\mathbf{X}$ é invertível.
+
+O diferencial é
+
+$$
+\begin{aligned}
+d\phi
+&=
+\operatorname{tr}
+\left[
+\mathbf{A}\,
+d
+\left(
+\mathbf{X}^{-1}
+\right)
+\right]\\
+&=
+-
+\operatorname{tr}
+\left(
+\mathbf{A}
+\mathbf{X}^{-1}
+d\mathbf{X}
+\mathbf{X}^{-1}
+\right).
+\end{aligned}
+$$
+
+Pela propriedade cíclica,
+
+$$
+d\phi
+=
+-
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}
+\mathbf{A}
+\mathbf{X}^{-1}
+d\mathbf{X}
+\right).
+$$
+
+Portanto,
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+-
+\mathbf{X}^{-\top}
+\mathbf{A}^{\top}
+\mathbf{X}^{-\top}.
+$$
+
+Se $\mathbf{A}$ e $\mathbf{X}$ são simétricas,
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+-
+\mathbf{X}^{-1}
+\mathbf{A}
+\mathbf{X}^{-1}.
+$$
+
+::: {#exm-traco-inversa}
+## Traço da inversa
+
+Para
+
+$$
+\phi(\mathbf{X})
+=
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}
+\right),
+$$
+
+tem-se $\mathbf{A}=\mathbf{I}_p$. Logo,
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+-
+\mathbf{X}^{-\top}
+\mathbf{X}^{-\top}.
+$$
+
+Se $\mathbf{X}$ é simétrica positiva definida,
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+-
+\mathbf{X}^{-2}.
+$$
+:::
+
+### Forma quadrática com matriz inversa
+
+Considere
+
+$$
+\phi(\mathbf{X})
+=
+\mathbf{a}^{\top}
+\mathbf{X}^{-1}
+\mathbf{a},
+$$
+
+em que $\mathbf{a}\in\mathbb{R}^{p}$ é constante e $\mathbf{X}\succ\mathbf{0}$.
+
+A função pode ser escrita como
+
+$$
+\phi(\mathbf{X})
+=
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}
+\mathbf{a}\mathbf{a}^{\top}
+\right).
+$$
+
+Aplicando o resultado anterior,
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+-
+\mathbf{X}^{-1}
+\mathbf{a}\mathbf{a}^{\top}
+\mathbf{X}^{-1}.
+$$
+
+Equivalentemente,
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+-
+\left(
+\mathbf{X}^{-1}\mathbf{a}
+\right)
+\left(
+\mathbf{X}^{-1}\mathbf{a}
+\right)^{\top}.
+$$
+
+Essa matriz é semidefinida negativa.
+
+Se o vetor também varia, considere
+
+$$
+\phi(\mathbf{x},\mathbf{X})
+=
+\mathbf{x}^{\top}
+\mathbf{X}^{-1}
+\mathbf{x}.
+$$
+
+Em relação ao vetor,
+
+$$
+\nabla_{\mathbf{x}}\phi
+=
+2\mathbf{X}^{-1}\mathbf{x},
+$$
+
+enquanto, em relação à matriz,
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+-
+\mathbf{X}^{-1}
+\mathbf{x}\mathbf{x}^{\top}
+\mathbf{X}^{-1}.
+$$
+
+### Critério com log-determinante e traço
+
+Considere
+
+$$
+L(\boldsymbol{\Sigma})
+=
+\frac{n}{2}
+\log\det(\boldsymbol{\Sigma})
++
+\frac12
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}^{-1}
+\mathbf{G}
+\right),
+$$
+
+em que
+
+$$
+\boldsymbol{\Sigma}\succ\mathbf{0}
+$$
+
+é variável e
+
+$$
+\mathbf{G}\succeq\mathbf{0}
+$$
+
+é constante e simétrica.
+
+O diferencial é
+
+$$
+\begin{aligned}
+dL
+&=
+\frac{n}{2}
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}^{-1}
+d\boldsymbol{\Sigma}
+\right)\\
+&\quad-
+\frac12
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}^{-1}
+\mathbf{G}
+\boldsymbol{\Sigma}^{-1}
+d\boldsymbol{\Sigma}
+\right).
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\nabla_{\boldsymbol{\Sigma}}L
+=
+\frac{n}{2}
+\boldsymbol{\Sigma}^{-1}
+-
+\frac12
+\boldsymbol{\Sigma}^{-1}
+\mathbf{G}
+\boldsymbol{\Sigma}^{-1}.
+$$
+
+A condição de primeira ordem é
+
+$$
+n\boldsymbol{\Sigma}^{-1}
+=
+\boldsymbol{\Sigma}^{-1}
+\mathbf{G}
+\boldsymbol{\Sigma}^{-1}.
+$$
+
+Multiplicando à esquerda e à direita por $\boldsymbol{\Sigma}$,
+
+$$
+n\boldsymbol{\Sigma}
+=
+\mathbf{G}.
+$$
+
+Portanto, o ponto estacionário é
+
+$$
+\widehat{\boldsymbol{\Sigma}}
+=
+\frac1n
+\mathbf{G}.
+$$
+
+Para que esse ponto pertença ao domínio
+
+$$
+\boldsymbol{\Sigma}\succ\mathbf{0},
+$$
+
+é necessário que
+
+$$
+\mathbf{G}\succ\mathbf{0}.
+$$
+
+::: {#thm-minimizador-criterio-covariancia}
+## Minimização do critério de covariância
+
+Se
+
+$$
+\mathbf{G}\succ\mathbf{0},
+$$
+
+a função
+
+$$
+L(\boldsymbol{\Sigma})
+=
+\frac{n}{2}
+\log\det(\boldsymbol{\Sigma})
++
+\frac12
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}^{-1}
+\mathbf{G}
+\right)
+$$
+
+possui minimizador único no conjunto das matrizes positivas definidas:
+
+$$
+\widehat{\boldsymbol{\Sigma}}
+=
+\frac1n
+\mathbf{G}.
+$$
+:::
+
+::: proof
+Defina
+
+$$
+\mathbf{Z}
+=
+\mathbf{G}^{1/2}
+\boldsymbol{\Sigma}^{-1}
+\mathbf{G}^{1/2}.
+$$
+
+Como $\mathbf{G}$ e $\boldsymbol{\Sigma}$ são positivas definidas,
+
+$$
+\mathbf{Z}\succ\mathbf{0}.
+$$
+
+Além disso,
+
+$$
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}^{-1}\mathbf{G}
+\right)
+=
+\operatorname{tr}(\mathbf{Z})
+$$
+
+e
+
+$$
+\log\det(\boldsymbol{\Sigma})
+=
+\log\det(\mathbf{G})
+-
+\log\det(\mathbf{Z}).
+$$
+
+Assim, a menos de uma constante,
+
+$$
+L(\boldsymbol{\Sigma})
+=
+\frac12
+\left[
+\operatorname{tr}(\mathbf{Z})
+-
+n\log\det(\mathbf{Z})
+\right].
+$$
+
+Se
+
+$$
+z_1,\ldots,z_p
+$$
+
+são os autovalores positivos de $\mathbf{Z}$, então
+
+$$
+L(\boldsymbol{\Sigma})
+=
+\text{constante}
++
+\frac12
+\sum_{j=1}^{p}
+\left(
+z_j
+-
+n\log z_j
+\right).
+$$
+
+Para cada $z_j>0$, a função
+
+$$
+h(z)
+=
+z-n\log z
+$$
+
+possui derivada
+
+$$
+h'(z)
+=
+1-\frac{n}{z}
+$$
+
+e segunda derivada
+
+$$
+h''(z)
+=
+\frac{n}{z^2}
+>
+0.
+$$
+
+Seu único mínimo ocorre em
+
+$$
+z=n.
+$$
+
+Portanto,
+
+$$
+\mathbf{Z}
+=
+n\mathbf{I}_p.
+$$
+
+Essa igualdade equivale a
+
+$$
+\boldsymbol{\Sigma}
+=
+\frac1n
+\mathbf{G}.
+$$
+:::
+
+Se $\mathbf{G}$ é singular, o candidato
+
+$$
+\frac1n\mathbf{G}
+$$
+
+não pertence ao domínio positivo definido. Nesse caso, o critério não possui minimizador interior. É possível fazer alguns autovalores de $\boldsymbol{\Sigma}$ tenderem a zero em direções pertencentes ao núcleo de $\mathbf{G}$, fazendo o log-determinante tender a $-\infty$ sem aumento compensatório no termo de traço.
+
+### Parâmetros matriciais simétricos
+
+As fórmulas anteriores foram escritas utilizando matrizes completas. Entretanto, uma matriz simétrica
+
+$$
+\boldsymbol{\Sigma}
+=
+\boldsymbol{\Sigma}^{\top}
+$$
+
+possui apenas
+
+$$
+\frac{p(p+1)}{2}
+$$
+
+elementos distintos.
+
+Quando o argumento é restrito ao espaço das matrizes simétricas, as perturbações admissíveis também devem ser simétricas:
+
+$$
+d\boldsymbol{\Sigma}
+=
+d\boldsymbol{\Sigma}^{\top}.
+$$
+
+Para uma função escalar $\phi(\boldsymbol{\Sigma})$, somente a parte simétrica do gradiente contribui para o diferencial:
+
+$$
+\operatorname{tr}
+\left[
+\left(
+\nabla_{\boldsymbol{\Sigma}}\phi
+\right)^{\top}
+d\boldsymbol{\Sigma}
+\right]
+=
+\operatorname{tr}
+\left[
+\left(
+\frac{
+\nabla_{\boldsymbol{\Sigma}}\phi
++
+\nabla_{\boldsymbol{\Sigma}}\phi^{\top}
+}{2}
+\right)^{\top}
+d\boldsymbol{\Sigma}
+\right].
+$$
+
+Nos resultados anteriores, os gradientes obtidos para argumentos positivos definidos já são simétricos quando as matrizes constantes envolvidas também são simétricas.
+
+Uma parametrização explícita dos elementos distintos será desenvolvida com os operadores de vetorização e meia vetorização.
+
+## Vetorização, produto de Kronecker e parâmetros matriciais
+
+A vetorização transforma uma matriz em um vetor. Essa operação permite representar transformações matriciais por matrizes usuais e aplicar resultados de cálculo vetorial a parâmetros matriciais.
+
+### Operador de vetorização
+
+::: {#def-operador-vec}
+## Operador de vetorização
+
+Para
+
+$$
+\mathbf{X}
+=
+\begin{bmatrix}
+x_{11}&\cdots&x_{1n}\\
+\vdots&\ddots&\vdots\\
+x_{m1}&\cdots&x_{mn}
+\end{bmatrix}
+\in
+\mathbb{R}^{m\times n},
+$$
+
+o vetor
+
+$$
+\operatorname{vec}(\mathbf{X})
+\in
+\mathbb{R}^{mn}
+$$
+
+é obtido pelo empilhamento das colunas de $\mathbf{X}$:
+
+$$
+\operatorname{vec}(\mathbf{X})
+=
+\begin{bmatrix}
+x_{11}\\
+\vdots\\
+x_{m1}\\
+x_{12}\\
+\vdots\\
+x_{m2}\\
+\vdots\\
+x_{1n}\\
+\vdots\\
+x_{mn}
+\end{bmatrix}.
+$$
+:::
+
+::: {#exm-vetorizacao-matriz}
+## Vetorização de uma matriz
+
+Considere
+
+$$
+\mathbf{X}
+=
+\begin{bmatrix}
+1&2&3\\
+4&5&6
+\end{bmatrix}.
+$$
+
+Então,
+
+$$
+\operatorname{vec}(\mathbf{X})
+=
+\begin{bmatrix}
+1\\
+4\\
+2\\
+5\\
+3\\
+6
+\end{bmatrix}.
+$$
+:::
+
+A vetorização é linear:
+
+$$
+\operatorname{vec}
+\left(
+\alpha\mathbf{X}
++
+\beta\mathbf{Y}
+\right)
+=
+\alpha\operatorname{vec}(\mathbf{X})
++
+\beta\operatorname{vec}(\mathbf{Y}).
+$$
+
+Além disso,
+
+$$
+\|\mathbf{X}\|_F
+=
+\left\|
+\operatorname{vec}(\mathbf{X})
+\right\|.
+$$
+
+Isso ocorre porque os dois lados reúnem os mesmos elementos ao quadrado:
+
+$$
+\|\mathbf{X}\|_F^2
+=
+\sum_{i=1}^{m}
+\sum_{j=1}^{n}
+x_{ij}^2.
+$$
+
+### Produto de Kronecker
+
+::: {#def-produto-kronecker}
+## Produto de Kronecker
+
+Considere
+
+$$
+\mathbf{A}
+=
+(a_{ij})
+\in
+\mathbb{R}^{m\times n}
+$$
+
+e
+
+$$
+\mathbf{C}
+\in
+\mathbb{R}^{r\times s}.
+$$
+
+O produto de Kronecker é a matriz
+
+$$
+\mathbf{A}
+\otimes
+\mathbf{C}
+=
+\begin{bmatrix}
+a_{11}\mathbf{C}
+&
+\cdots
+&
+a_{1n}\mathbf{C}
+\\
+\vdots
+&
+\ddots
+&
+\vdots
+\\
+a_{m1}\mathbf{C}
+&
+\cdots
+&
+a_{mn}\mathbf{C}
+\end{bmatrix}
+\in
+\mathbb{R}^{mr\times ns}.
+$$
+:::
+
+::: {#exm-produto-kronecker}
+## Produto de Kronecker
+
+Considere
+
+$$
+\mathbf{A}
+=
+\begin{bmatrix}
+1&2\\
+3&4
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{C}
+=
+\begin{bmatrix}
+1&0\\
+0&-1
+\end{bmatrix}.
+$$
+
+Então,
+
+$$
+\begin{aligned}
+\mathbf{A}\otimes\mathbf{C}
+&=
+\begin{bmatrix}
+1\mathbf{C}&2\mathbf{C}\\
+3\mathbf{C}&4\mathbf{C}
+\end{bmatrix}\\
+&=
+\begin{bmatrix}
+1&0&2&0\\
+0&-1&0&-2\\
+3&0&4&0\\
+0&-3&0&-4
+\end{bmatrix}.
+\end{aligned}
+$$
+
+[@magnus2019matrix]
+:::
+
+O produto de Kronecker satisfaz:
+
+$$
+\left(
+\mathbf{A}\otimes\mathbf{C}
+\right)^{\top}
+=
+\mathbf{A}^{\top}
+\otimes
+\mathbf{C}^{\top},
+$$
+
+e, para produtos de dimensões compatíveis,
+
+$$
+\left(
+\mathbf{A}_1\otimes\mathbf{C}_1
+\right)
+\left(
+\mathbf{A}_2\otimes\mathbf{C}_2
+\right)
+=
+\left(
+\mathbf{A}_1\mathbf{A}_2
+\right)
+\otimes
+\left(
+\mathbf{C}_1\mathbf{C}_2
+\right).
+$$
+
+Se $\mathbf{A}$ e $\mathbf{C}$ são invertíveis,
+
+$$
+\left(
+\mathbf{A}\otimes\mathbf{C}
+\right)^{-1}
+=
+\mathbf{A}^{-1}
+\otimes
+\mathbf{C}^{-1}.
+$$
+
+Se $\mathbf{A}$ e $\mathbf{C}$ são simétricas positivas definidas, então
+
+$$
+\mathbf{A}\otimes\mathbf{C}
+\succ
+\mathbf{0}.
+$$
+
+### Identidade de vetorização
+
+A relação entre vetorização e produto de Kronecker permite representar um produto matricial como uma transformação linear do vetor de elementos da matriz.
+
+::: {#thm-identidade-vec}
+## Identidade fundamental da vetorização
+
+Considere
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{r\times m},
+\qquad
+\mathbf{X}
+\in
+\mathbb{R}^{m\times n}
+$$
+
+e
+
+$$
+\boldsymbol{\Gamma}
+\in
+\mathbb{R}^{n\times s}.
+$$
+
+Então,
+
+$$
+\operatorname{vec}
+\left(
+\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}
+\right)
+=
+\left(
+\boldsymbol{\Gamma}^{\top}
+\otimes
+\mathbf{A}
+\right)
+\operatorname{vec}(\mathbf{X}).
+$$
+
+[@magnus2019matrix]
+:::
+
+O lado esquerdo possui dimensão $rs$. No lado direito,
+
+$$
+\boldsymbol{\Gamma}^{\top}
+\otimes
+\mathbf{A}
+\in
+\mathbb{R}^{rs\times mn},
+$$
+
+e
+
+$$
+\operatorname{vec}(\mathbf{X})
+\in
+\mathbb{R}^{mn}.
+$$
+
+Casos particulares importantes são
+
+$$
+\operatorname{vec}
+\left(
+\mathbf{A}\mathbf{X}
+\right)
+=
+\left(
+\mathbf{I}_n
+\otimes
+\mathbf{A}
+\right)
+\operatorname{vec}(\mathbf{X})
+$$
+
+e
+
+$$
+\operatorname{vec}
+\left(
+\mathbf{X}\boldsymbol{\Gamma}
+\right)
+=
+\left(
+\boldsymbol{\Gamma}^{\top}
+\otimes
+\mathbf{I}_m
+\right)
+\operatorname{vec}(\mathbf{X}).
+$$
+
+::: {#exm-vec-produto-matricial}
+## Vetorização de um produto matricial
+
+Considere
+
+$$
+\mathbf{Y}
+=
+\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}.
+$$
+
+Uma pequena perturbação de $\mathbf{X}$ produz
+
+$$
+d\mathbf{Y}
+=
+\mathbf{A}\,d\mathbf{X}\,\boldsymbol{\Gamma}.
+$$
+
+Vetorizando,
+
+$$
+d\operatorname{vec}(\mathbf{Y})
+=
+\left(
+\boldsymbol{\Gamma}^{\top}
+\otimes
+\mathbf{A}
+\right)
+d\operatorname{vec}(\mathbf{X}).
+$$
+
+Portanto, a Jacobiana da transformação vetorizada é
+
+$$
+\frac{
+\partial\operatorname{vec}(\mathbf{Y})
+}{
+\partial\operatorname{vec}(\mathbf{X})^{\top}
+}
+=
+\boldsymbol{\Gamma}^{\top}
+\otimes
+\mathbf{A}.
+$$
+:::
+
+### Gradiente matricial e gradiente vetorizado
+
+Considere
+
+$$
+\phi:
+\mathbb{R}^{m\times n}
+\longrightarrow
+\mathbb{R}.
+$$
+
+Pela definição do gradiente matricial,
+
+$$
+d\phi
+=
+\operatorname{tr}
+\left[
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)^{\top}
+d\mathbf{X}
+\right].
+$$
+
+Como
+
+$$
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}\boldsymbol{\Gamma}
+\right)
+=
+\operatorname{vec}(\mathbf{A})^{\top}
+\operatorname{vec}(\boldsymbol{\Gamma}),
+$$
+
+tem-se
+
+$$
+d\phi
+=
+\operatorname{vec}
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)^{\top}
+d\operatorname{vec}(\mathbf{X}).
+$$
+
+Logo,
+
+$$
+\nabla_{\operatorname{vec}(\mathbf{X})}\phi
+=
+\operatorname{vec}
+\left(
+\nabla_{\mathbf{X}}\phi
+\right).
+$$
+
+A forma matricial e a forma vetorizada representam a mesma derivada, organizadas em estruturas diferentes.
+
+### Hessiana de uma função matricial
+
+Para uma função escalar de matriz, a Hessiana vetorizada é definida por
+
+$$
+\nabla_{\operatorname{vec}(\mathbf{X})}^2\phi
+=
+\frac{
+\partial
+\operatorname{vec}
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)
+}{
+\partial
+\operatorname{vec}(\mathbf{X})^{\top}
+}.
+$$
+
+Considere
+
+$$
+\phi(\mathbf{X})
+=
+\operatorname{tr}
+\left(
+\mathbf{X}^{\top}
+\mathbf{A}
+\mathbf{X}
+\boldsymbol{\Gamma}
+\right),
+$$
+
+com $\mathbf{A}$ e $\boldsymbol{\Gamma}$ simétricas.
+
+Foi obtido que
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+2\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}.
+$$
+
+Vetorizando,
+
+$$
+\begin{aligned}
+\operatorname{vec}
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)
+&=
+2
+\operatorname{vec}
+\left(
+\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}
+\right)\\
+&=
+2
+\left(
+\boldsymbol{\Gamma}
+\otimes
+\mathbf{A}
+\right)
+\operatorname{vec}(\mathbf{X}).
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+\nabla_{\operatorname{vec}(\mathbf{X})}^2\phi
+=
+2
+\left(
+\boldsymbol{\Gamma}
+\otimes
+\mathbf{A}
+\right).
+$$
+
+Se
+
+$$
+\mathbf{A}\succeq\mathbf{0}
+$$
+
+e
+
+$$
+\boldsymbol{\Gamma}\succeq\mathbf{0},
+$$
+
+a Hessiana é semidefinida positiva e a função é convexa.
+
+### Gradiente matricial e gradiente vetorizado
+
+Considere
+
+$$
+\phi:
+\mathbb{R}^{m\times n}
+\longrightarrow
+\mathbb{R}.
+$$
+
+Pela definição do gradiente matricial,
+
+$$
+d\phi
+=
+\operatorname{tr}
+\left[
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)^{\top}
+d\mathbf{X}
+\right].
+$$
+
+Como
+
+$$
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}\mathbf{C}
+\right)
+=
+\operatorname{vec}(\mathbf{A})^{\top}
+\operatorname{vec}(\mathbf{C}),
+$$
+
+tem-se
+
+$$
+d\phi
+=
+\operatorname{vec}
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)^{\top}
+d\operatorname{vec}(\mathbf{X}).
+$$
+
+Logo,
+
+$$
+\nabla_{\operatorname{vec}(\mathbf{X})}\phi
+=
+\operatorname{vec}
+\left(
+\nabla_{\mathbf{X}}\phi
+\right).
+$$
+
+A forma matricial e a forma vetorizada representam a mesma derivada, organizadas em estruturas diferentes.
+
+### Hessiana de uma função matricial
+
+Para uma função escalar de matriz, a Hessiana vetorizada é definida por
+
+$$
+\nabla_{\operatorname{vec}(\mathbf{X})}^2\phi
+=
+\frac{
+\partial
+\operatorname{vec}
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)
+}{
+\partial
+\operatorname{vec}(\mathbf{X})^{\top}
+}.
+$$
+
+Considere
+
+$$
+\phi(\mathbf{X})
+=
+\operatorname{tr}
+\left(
+\mathbf{X}^{\top}
+\mathbf{A}
+\mathbf{X}
+\mathbf{C}
+\right),
+$$
+
+com $\mathbf{A}$ e $\mathbf{C}$ simétricas.
+
+Foi obtido que
+
+$$
+\nabla_{\mathbf{X}}\phi
+=
+2\mathbf{A}\mathbf{X}\mathbf{C}.
+$$
+
+Vetorizando,
+
+$$
+\begin{aligned}
+\operatorname{vec}
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)
+&=
+2
+\operatorname{vec}
+\left(
+\mathbf{A}\mathbf{X}\mathbf{C}
+\right)\\
+&=
+2
+\left(
+\mathbf{C}
+\otimes
+\mathbf{A}
+\right)
+\operatorname{vec}(\mathbf{X}).
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+\nabla_{\operatorname{vec}(\mathbf{X})}^2\phi
+=
+2
+\left(
+\mathbf{C}
+\otimes
+\mathbf{A}
+\right).
+$$
+
+Se
+
+$$
+\mathbf{A}\succeq\mathbf{0}
+$$
+
+e
+
+$$
+\mathbf{C}\succeq\mathbf{0},
+$$
+
+a Hessiana é semidefinida positiva e a função é convexa.
+
+### Matriz de comutação
+
+A vetorização de uma matriz e de sua transposta possui ordenações diferentes.
+
+::: {#def-matriz-comutacao}
+## Matriz de comutação
+
+A matriz de comutação
+
+$$
+\mathbf{K}_{m,n}
+\in
+\mathbb{R}^{mn\times mn}
+$$
+
+é a matriz de permutação que satisfaz
+
+$$
+\mathbf{K}_{m,n}
+\operatorname{vec}(\mathbf{X})
+=
+\operatorname{vec}
+\left(
+\mathbf{X}^{\top}
+\right)
+$$
+
+para toda
+
+$$
+\mathbf{X}
+\in
+\mathbb{R}^{m\times n}.
+$$
+:::
+
+A transposição pode ser desfeita:
+
+$$
+\mathbf{K}_{n,m}
+\mathbf{K}_{m,n}
+=
+\mathbf{I}_{mn}.
+$$
+
+Logo,
+
+$$
+\mathbf{K}_{m,n}^{-1}
+=
+\mathbf{K}_{n,m}
+=
+\mathbf{K}_{m,n}^{\top}.
+$$
+
+Para matrizes quadradas,
+
+$$
+\mathbf{K}_{p,p}
+=
+\mathbf{K}_{p,p}^{\top}
+$$
+
+e
+
+$$
+\mathbf{K}_{p,p}^2
+=
+\mathbf{I}_{p^2}.
+$$
+
+Considere
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{m\times n}
+$$
+
+e
+
+$$
+\boldsymbol{\Gamma}
+\in
+\mathbb{R}^{r\times s}.
+$$
+
+A matriz de comutação satisfaz
+
+$$
+\mathbf{K}_{m,r}
+\left(
+\mathbf{A}
+\otimes
+\boldsymbol{\Gamma}
+\right)
+=
+\left(
+\boldsymbol{\Gamma}
+\otimes
+\mathbf{A}
+\right)
+\mathbf{K}_{n,s}.
+$$
+
+Equivalentemente,
+
+$$
+\mathbf{K}_{m,r}
+\left(
+\mathbf{A}
+\otimes
+\boldsymbol{\Gamma}
+\right)
+\mathbf{K}_{s,n}
+=
+\boldsymbol{\Gamma}
+\otimes
+\mathbf{A}.
+$$
+
+### Meia vetorização de matrizes simétricas
+
+Uma matriz simétrica possui elementos repetidos acima e abaixo da diagonal. O operador $\operatorname{vech}$ conserva somente os elementos da parte triangular inferior.
+
+::: {#def-operador-vech}
+## Operador de meia vetorização
+
+Para uma matriz simétrica
+
+$$
+\mathbf{S}
+=
+\mathbf{S}^{\top}
+\in
+\mathbb{R}^{p\times p},
+$$
+
+o vetor
+
+$$
+\operatorname{vech}(\mathbf{S})
+\in
+\mathbb{R}^{p(p+1)/2}
+$$
+
+é obtido pelo empilhamento, por colunas, dos elementos da parte triangular inferior, incluindo a diagonal.
+:::
+
+::: {#exm-meia-vetorizacao}
+## Meia vetorização de uma matriz simétrica
+
+Considere
+
+$$
+\mathbf{S}
+=
+\begin{bmatrix}
+s_{11}&s_{12}&s_{13}\\
+s_{12}&s_{22}&s_{23}\\
+s_{13}&s_{23}&s_{33}
+\end{bmatrix}.
+$$
+
+Então,
+
+$$
+\operatorname{vech}(\mathbf{S})
+=
+\begin{bmatrix}
+s_{11}\\
+s_{12}\\
+s_{13}\\
+s_{22}\\
+s_{23}\\
+s_{33}
+\end{bmatrix}.
+$$
+
+A ordem acompanha as colunas da parte triangular inferior:
+
+-   primeira coluna: $s_{11},s_{12},s_{13}$;
+-   segunda coluna: $s_{22},s_{23}$;
+-   terceira coluna: $s_{33}$.
+:::
+
+O operador $\operatorname{vech}$ elimina a duplicação dos elementos simétricos. Enquanto
+
+$$
+\operatorname{vec}(\mathbf{S})
+$$
+
+possui $p^2$ elementos,
+
+$$
+\operatorname{vech}(\mathbf{S})
+$$
+
+possui
+
+$$
+\frac{
+p(p+1)
+}{
+2
+}
+$$
+
+elementos.
+
+### Matriz de duplicação
+
+::: {#def-matriz-duplicacao}
+## Matriz de duplicação
+
+A matriz de duplicação
+
+$$
+\mathbf{D}_p^{\mathrm{dup}}
+\in
+\mathbb{R}^{
+p^2
+\times
+p(p+1)/2
+}
+$$
+
+é definida pela identidade
+
+$$
+\operatorname{vec}(\mathbf{S})
+=
+\mathbf{D}_p^{\mathrm{dup}}
+\operatorname{vech}(\mathbf{S})
+$$
+
+para toda matriz simétrica
+
+$$
+\mathbf{S}
+\in
+\mathbb{R}^{p\times p}.
+$$
+:::
+
+A matriz de duplicação repete os elementos fora da diagonal nas posições correspondentes de $\operatorname{vec}(\mathbf{S})$.
+
+Para $p=2$,
+
+$$
+\mathbf{S}
+=
+\begin{bmatrix}
+s_{11}&s_{12}\\
+s_{12}&s_{22}
+\end{bmatrix},
+$$
+
+e
+
+$$
+\operatorname{vech}(\mathbf{S})
+=
+\begin{bmatrix}
+s_{11}\\
+s_{12}\\
+s_{22}
+\end{bmatrix}.
+$$
+
+Como
+
+$$
+\operatorname{vec}(\mathbf{S})
+=
+\begin{bmatrix}
+s_{11}\\
+s_{12}\\
+s_{12}\\
+s_{22}
+\end{bmatrix},
+$$
+
+tem-se
+
+$$
+\mathbf{D}_2^{\mathrm{dup}}
+=
+\begin{bmatrix}
+1&0&0\\
+0&1&0\\
+0&1&0\\
+0&0&1
+\end{bmatrix}.
+$$
+
+### Matriz de eliminação
+
+::: {#def-matriz-eliminacao}
+## Matriz de eliminação
+
+A matriz de eliminação
+
+$$
+\mathbf{L}_p^{\mathrm{elim}}
+\in
+\mathbb{R}^{
+p(p+1)/2
+\times
+p^2
+}
+$$
+
+é definida por
+
+$$
+\operatorname{vech}(\mathbf{S})
+=
+\mathbf{L}_p^{\mathrm{elim}}
+\operatorname{vec}(\mathbf{S})
+$$
+
+para toda matriz simétrica $\mathbf{S}$.
+:::
+
+A matriz de eliminação seleciona da vetorização completa os elementos pertencentes à parte triangular inferior.
+
+As duas matrizes satisfazem
+
+$$
+\mathbf{L}_p^{\mathrm{elim}}
+\mathbf{D}_p^{\mathrm{dup}}
+=
+\mathbf{I}_{p(p+1)/2}.
+$$
+
+Em geral,
+
+$$
+\mathbf{D}_p^{\mathrm{dup}}
+\mathbf{L}_p^{\mathrm{elim}}
+$$
+
+não é a identidade em $\mathbb{R}^{p^2}$, pois o produto atua sobre vetores que podem representar matrizes não simétricas.
+
+### Diferenciais de parâmetros simétricos
+
+Se
+
+$$
+\boldsymbol{\Sigma}
+=
+\boldsymbol{\Sigma}^{\top}
+$$
+
+é um parâmetro matricial simétrico, então
+
+$$
+d\operatorname{vec}(\boldsymbol{\Sigma})
+=
+\mathbf{D}_p^{\mathrm{dup}}
+d\operatorname{vech}(\boldsymbol{\Sigma}).
+$$
+
+Considere uma função escalar
+
+$$
+\phi(\boldsymbol{\Sigma})
+$$
+
+com gradiente matricial
+
+$$
+\nabla_{\boldsymbol{\Sigma}}\phi.
+$$
+
+Seu diferencial é
+
+$$
+d\phi
+=
+\operatorname{vec}
+\left(
+\nabla_{\boldsymbol{\Sigma}}\phi
+\right)^{\top}
+d\operatorname{vec}(\boldsymbol{\Sigma}).
+$$
+
+Substituindo a matriz de duplicação,
+
+$$
+d\phi
+=
+\operatorname{vec}
+\left(
+\nabla_{\boldsymbol{\Sigma}}\phi
+\right)^{\top}
+\mathbf{D}_p^{\mathrm{dup}}
+d\operatorname{vech}(\boldsymbol{\Sigma}).
+$$
+
+Portanto,
+
+$$
+\nabla_{\operatorname{vech}(\boldsymbol{\Sigma})}
+\phi
+=
+\left(
+\mathbf{D}_p^{\mathrm{dup}}
+\right)^{\top}
+\operatorname{vec}
+\left(
+\nabla_{\boldsymbol{\Sigma}}\phi
+\right).
+$$
+
+Essa expressão transforma o gradiente matricial em um gradiente relativo somente aos elementos distintos do parâmetro simétrico.
+
+### Jacobiana de transformações matriciais
+
+Considere uma transformação
+
+$$
+\mathcal{G}:
+\mathbb{R}^{m\times n}
+\longrightarrow
+\mathbb{R}^{r\times s}.
+$$
+
+Sua representação vetorizada é
+
+$$
+\mathbf{g}
+\left(
+\operatorname{vec}(\mathbf{X})
+\right)
+=
+\operatorname{vec}
+\left(
+\mathcal{G}(\mathbf{X})
+\right).
+$$
+
+A Jacobiana vetorizada é
+
+$$
+\mathbf{J}_{\mathcal{G}}(\mathbf{X})
+=
+\frac{
+\partial
+\operatorname{vec}
+\left(
+\mathcal{G}(\mathbf{X})
+\right)
+}{
+\partial
+\operatorname{vec}(\mathbf{X})^{\top}
+}.
+$$
+
+Ela satisfaz
+
+$$
+d\operatorname{vec}
+\left(
+\mathcal{G}(\mathbf{X})
+\right)
+=
+\mathbf{J}_{\mathcal{G}}(\mathbf{X})
+d\operatorname{vec}(\mathbf{X}).
+$$
+
+::: {#exm-jacobiana-produto-cruzado}
+## Jacobiana de $\mathbf{X}^{\top}\mathbf{X}$
+
+Considere
+
+$$
+\mathcal{G}(\mathbf{X})
+=
+\mathbf{X}^{\top}\mathbf{X},
+$$
+
+com
+
+$$
+\mathbf{X}
+\in
+\mathbb{R}^{m\times n}.
+$$
+
+O diferencial é
+
+$$
+d\mathcal{G}
+=
+d\mathbf{X}^{\top}\mathbf{X}
++
+\mathbf{X}^{\top}d\mathbf{X}.
+$$
+
+Vetorizando o primeiro termo,
+
+$$
+\begin{aligned}
+\operatorname{vec}
+\left(
+d\mathbf{X}^{\top}\mathbf{X}
+\right)
+&=
+\left(
+\mathbf{X}^{\top}
+\otimes
+\mathbf{I}_n
+\right)
+\operatorname{vec}
+\left(
+d\mathbf{X}^{\top}
+\right)\\
+&=
+\left(
+\mathbf{X}^{\top}
+\otimes
+\mathbf{I}_n
+\right)
+\mathbf{K}_{m,n}
+\operatorname{vec}
+\left(
+d\mathbf{X}
+\right).
+\end{aligned}
+$$
+
+Para o segundo termo,
+
+$$
+\operatorname{vec}
+\left(
+\mathbf{X}^{\top}d\mathbf{X}
+\right)
+=
+\left(
+\mathbf{I}_n
+\otimes
+\mathbf{X}^{\top}
+\right)
+\operatorname{vec}
+\left(
+d\mathbf{X}
+\right).
+$$
+
+Logo,
+
+$$
+\begin{aligned}
+d\operatorname{vec}
+\left(
+\mathbf{X}^{\top}\mathbf{X}
+\right)
+&=
+\left[
+\left(
+\mathbf{X}^{\top}
+\otimes
+\mathbf{I}_n
+\right)
+\mathbf{K}_{m,n}
++
+\mathbf{I}_n
+\otimes
+\mathbf{X}^{\top}
+\right]\\
+&\quad\times
+d\operatorname{vec}(\mathbf{X}).
+\end{aligned}
+$$
+
+Portanto, a Jacobiana vetorizada é
+
+$$
+\mathbf{J}_{\mathcal{G}}(\mathbf{X})
+=
+\left(
+\mathbf{X}^{\top}
+\otimes
+\mathbf{I}_n
+\right)
+\mathbf{K}_{m,n}
++
+\mathbf{I}_n
+\otimes
+\mathbf{X}^{\top}.
+$$
+:::
+
+A vetorização e o produto de Kronecker permitem representar derivadas matriciais por matrizes usuais. Essa representação será útil para covariâncias de vetores matriciais, Hessianas e aproximações de funções de parâmetros matriciais.
+
+## Integração múltipla e mudança de variáveis
+
+O cálculo integral permite obter probabilidades, esperanças e distribuições marginais. Para vetores aleatórios contínuos, as integrais são realizadas sobre subconjuntos de $\mathbb{R}^{p}$.
+
+### Integrais múltiplas
+
+Considere uma função
+
+$$
+f:
+\mathcal{D}
+\subseteq
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}.
+$$
+
+Sua integral sobre $\mathcal{D}$ é representada por
+
+$$
+\int_{\mathcal{D}}
+f(\mathbf{x})
+\,d\mathbf{x},
+$$
+
+em que
+
+$$
+d\mathbf{x}
+=
+dx_1\cdots dx_p.
+$$
+
+Em duas dimensões,
+
+$$
+\int_{\mathcal{D}}
+f(x_1,x_2)
+\,dx_1\,dx_2
+$$
+
+representa a acumulação dos valores da função sobre uma região do plano.
+
+Quando
+
+$$
+\mathcal{D}
+=
+\mathcal{D}_1
+\times
+\cdots
+\times
+\mathcal{D}_p
+$$
+
+é um produto cartesiano, a integral pode ser escrita como integral iterada:
+
+$$
+\int_{\mathcal{D}}
+f(\mathbf{x})
+\,d\mathbf{x}
+=
+\int_{\mathcal{D}_p}
+\cdots
+\int_{\mathcal{D}_1}
+f(x_1,\ldots,x_p)
+\,dx_1
+\cdots
+dx_p,
+$$
+
+desde que sejam satisfeitas as condições que permitem a integração sucessiva.
+
+### Teoremas de Tonelli e Fubini
+
+::: {#thm-tonelli}
+## Teorema de Tonelli
+
+Se
+
+$$
+f:
+\mathcal{D}_1
+\times
+\mathcal{D}_2
+\longrightarrow
+[0,\infty]
+$$
+
+é mensurável e não negativa, então
+
+$$
+\begin{aligned}
+\int_{\mathcal{D}_1\times\mathcal{D}_2}
+f(x_1,x_2)
+\,dx_1\,dx_2
+&=
+\int_{\mathcal{D}_1}
+\left[
+\int_{\mathcal{D}_2}
+f(x_1,x_2)
+\,dx_2
+\right]
+dx_1\\
+&=
+\int_{\mathcal{D}_2}
+\left[
+\int_{\mathcal{D}_1}
+f(x_1,x_2)
+\,dx_1
+\right]
+dx_2,
+\end{aligned}
+$$
+
+permitindo valores infinitos.[@axler2020measure]
+:::
+
+Para funções não negativas, a ordem de integração pode ser alterada mesmo quando a integral total não é finita.
+
+::: {#thm-fubini}
+## Teorema de Fubini
+
+Se
+
+$$
+\int_{\mathcal{D}_1\times\mathcal{D}_2}
+\left|
+f(x_1,x_2)
+\right|
+\,dx_1\,dx_2
+<
+\infty,
+$$
+
+então as integrais iteradas existem, são finitas e satisfazem
+
+$$
+\begin{aligned}
+\int_{\mathcal{D}_1\times\mathcal{D}_2}
+f(x_1,x_2)
+\,dx_1\,dx_2
+&=
+\int_{\mathcal{D}_1}
+\left[
+\int_{\mathcal{D}_2}
+f(x_1,x_2)
+\,dx_2
+\right]
+dx_1\\
+&=
+\int_{\mathcal{D}_2}
+\left[
+\int_{\mathcal{D}_1}
+f(x_1,x_2)
+\,dx_1
+\right]
+dx_2.
+\end{aligned}
+$$
+:::
+
+A integrabilidade absoluta é uma condição suficiente para trocar a ordem de integração.
+
+### Densidades multivariadas
+
+Considere um vetor aleatório contínuo
+
+$$
+\boldsymbol{\mathsf X}
+=
+\begin{bmatrix}
+\mathsf X_1\\
+\vdots\\
+\mathsf X_p
+\end{bmatrix}
+\in
+\mathbb{R}^{p}.
+$$
+
+Uma função
+
+$$
+f_{\boldsymbol{\mathsf X}}:
+\mathbb{R}^{p}
+\longrightarrow
+[0,\infty)
+$$
+
+é uma densidade conjunta quando
+
+$$
+f_{\boldsymbol{\mathsf X}}(\mathbf{x})
+\geq
+0
+$$
+
+e
+
+$$
+\int_{\mathbb{R}^{p}}
+f_{\boldsymbol{\mathsf X}}(\mathbf{x})
+\,d\mathbf{x}
+=
+1.
+$$
+
+Para um conjunto mensurável
+
+$$
+\mathcal{A}
+\subseteq
+\mathbb{R}^{p},
+$$
+
+a probabilidade é
+
+$$
+P
+\left(
+\boldsymbol{\mathsf X}
+\in
+\mathcal{A}
+\right)
+=
+\int_{\mathcal{A}}
+f_{\boldsymbol{\mathsf X}}(\mathbf{x})
+\,d\mathbf{x}.
+$$
+
+Em duas dimensões,
+
+$$
+P
+\left[
+(\mathsf X_1,\mathsf X_2)
+\in
+\mathcal{A}
+\right]
+=
+\iint_{\mathcal{A}}
+f_{\mathsf X_1,\mathsf X_2}(x_1,x_2)
+\,dx_1\,dx_2.
+$$
+
+### Distribuições marginais
+
+Considere a partição
+
+$$
+\boldsymbol{\mathsf X}
+=
+\begin{bmatrix}
+\boldsymbol{\mathsf X}_1\\
+\boldsymbol{\mathsf X}_2
+\end{bmatrix},
+$$
+
+com
+
+$$
+\boldsymbol{\mathsf X}_1
+\in
+\mathbb{R}^{p_1},
+\qquad
+\boldsymbol{\mathsf X}_2
+\in
+\mathbb{R}^{p_2}
+$$
+
+e
+
+$$
+p_1+p_2=p.
+$$
+
+A densidade marginal de $\boldsymbol{\mathsf X}_1$ é obtida integrando a densidade conjunta em relação às componentes de $\boldsymbol{\mathsf X}_2$:
+
+$$
+f_{\boldsymbol{\mathsf X}_1}(\mathbf{x}_1)
+=
+\int_{\mathbb{R}^{p_2}}
+f_{\boldsymbol{\mathsf X}_1,\boldsymbol{\mathsf X}_2}
+(\mathbf{x}_1,\mathbf{x}_2)
+\,d\mathbf{x}_2.
+$$
+
+De modo semelhante,
+
+$$
+f_{\boldsymbol{\mathsf X}_2}(\mathbf{x}_2)
+=
+\int_{\mathbb{R}^{p_1}}
+f_{\boldsymbol{\mathsf X}_1,\boldsymbol{\mathsf X}_2}
+(\mathbf{x}_1,\mathbf{x}_2)
+\,d\mathbf{x}_1.
+$$
+
+A marginalização elimina as variáveis que não aparecem no resultado, acumulando a densidade conjunta sobre todos os seus valores possíveis.
+
+::: {#exm-marginalizacao}
+## Densidade marginal em uma região triangular
+
+Considere a densidade conjunta
+
+$$
+f_{\mathsf X_1,\mathsf X_2}(x_1,x_2)
+=
+2,
+$$
+
+para
+
+$$
+0<x_2<x_1<1,
+$$
+
+e zero fora dessa região.
+
+A densidade marginal de $\mathsf X_1$ é
+
+$$
+\begin{aligned}
+f_{\mathsf X_1}(x_1)
+&=
+\int_{0}^{x_1}
+2
+\,dx_2\\
+&=
+2x_1,
+\qquad
+0<x_1<1.
+\end{aligned}
+$$
+
+A densidade marginal de $\mathsf X_2$ é
+
+$$
+\begin{aligned}
+f_{\mathsf X_2}(x_2)
+&=
+\int_{x_2}^{1}
+2
+\,dx_1\\
+&=
+2(1-x_2),
+\qquad
+0<x_2<1.
+\end{aligned}
+$$
+
+As duas densidades integram 1 em seus respectivos domínios.
+:::
+
+### Esperanças de funções vetoriais
+
+Se
+
+$$
+h:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}
+$$
+
+é uma função integrável, sua esperança é
+
+$$
+E
+\left[
+h(\boldsymbol{\mathsf X})
+\right]
+=
+\int_{\mathbb{R}^{p}}
+h(\mathbf{x})
+f_{\boldsymbol{\mathsf X}}(\mathbf{x})
+\,d\mathbf{x}.
+$$
+
+Para uma função vetorial
+
+$$
+\mathbf{g}:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{q},
+$$
+
+com
+
+$$
+\mathbf{g}(\mathbf{x})
+=
+\begin{bmatrix}
+g_1(\mathbf{x})\\
+\vdots\\
+g_q(\mathbf{x})
+\end{bmatrix},
+$$
+
+a esperança é definida componente a componente:
+
+$$
+E
+\left[
+\mathbf{g}(\boldsymbol{\mathsf X})
+\right]
+=
+\begin{bmatrix}
+E[g_1(\boldsymbol{\mathsf X})]\\
+\vdots\\
+E[g_q(\boldsymbol{\mathsf X})]
+\end{bmatrix}.
+$$
+
+Equivalentemente,
+
+$$
+E
+\left[
+\mathbf{g}(\boldsymbol{\mathsf X})
+\right]
+=
+\int_{\mathbb{R}^{p}}
+\mathbf{g}(\mathbf{x})
+f_{\boldsymbol{\mathsf X}}(\mathbf{x})
+\,d\mathbf{x}.
+$$
+
+Para uma função matricial
+
+$$
+\mathcal{G}:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{m\times n},
+$$
+
+a esperança também é calculada elemento a elemento:
+
+$$
+E
+\left[
+\mathcal{G}(\boldsymbol{\mathsf X})
+\right]
+=
+\int_{\mathbb{R}^{p}}
+\mathcal{G}(\mathbf{x})
+f_{\boldsymbol{\mathsf X}}(\mathbf{x})
+\,d\mathbf{x}.
+$$
+
+Em particular,
+
+$$
+E
+\left[
+\boldsymbol{\mathsf X}\boldsymbol{\mathsf X}^{\top}
+\right]
+=
+\int_{\mathbb{R}^{p}}
+\mathbf{x}\mathbf{x}^{\top}
+f_{\boldsymbol{\mathsf X}}(\mathbf{x})
+\,d\mathbf{x}.
+$$
+
+A existência da esperança vetorial ou matricial exige integrabilidade dos elementos correspondentes.
+
+### Mudança de variáveis
+
+Uma transformação diferenciável altera a posição dos pontos e o volume dos elementos infinitesimais. O determinante da Jacobiana mede essa alteração local de volume.
+
+Considere uma transformação
+
+$$
+\mathbf{g}:
+\mathcal{D}
+\subseteq
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{p}
+$$
+
+e defina
+
+$$
+\mathbf{y}
+=
+\mathbf{g}(\mathbf{x}).
+$$
+
+A aproximação local é
+
+$$
+d\mathbf{y}
+=
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+d\mathbf{x}.
+$$
+
+O fator local de alteração de volume é
+
+$$
+\left|
+\det
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+\right|.
+$$
+
+O valor absoluto é necessário porque o determinante pode ser negativo quando a transformação altera a orientação do espaço.
+
+::: {#thm-mudanca-variaveis-integral}
+## Teorema da Mudança de Variáveis
+
+Considere conjuntos abertos
+
+$$
+\mathcal{D},
+\mathcal{G}
+\subseteq
+\mathbb{R}^{p}
+$$
+
+e uma transformação bijetiva
+
+$$
+\mathbf{g}:
+\mathcal{D}
+\longrightarrow
+\mathcal{G}
+$$
+
+continuamente diferenciável, com inversa continuamente diferenciável e
+
+$$
+\det
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+\neq
+0
+$$
+
+para todo $\mathbf{x}\in\mathcal{D}$.
+
+Então, para uma função integrável $h$,
+
+$$
+\int_{\mathcal{G}}
+h(\mathbf{y})
+\,d\mathbf{y}
+=
+\int_{\mathcal{D}}
+h
+\left(
+\mathbf{g}(\mathbf{x})
+\right)
+\left|
+\det
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+\right|
+\,d\mathbf{x}.
+$$
+
+[@apostol1969calculus2]
+:::
+
+Utilizando a transformação inversa
+
+$$
+\mathbf{x}
+=
+\mathbf{g}^{-1}(\mathbf{y}),
+$$
+
+tem-se
+
+$$
+d\mathbf{x}
+=
+\left|
+\det
+\mathbf{J}_{\mathbf{g}^{-1}}(\mathbf{y})
+\right|
+d\mathbf{y}.
+$$
+
+Como
+
+$$
+\mathbf{J}_{\mathbf{g}^{-1}}(\mathbf{y})
+=
+\left[
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+\right]^{-1},
+$$
+
+segue que
+
+$$
+\left|
+\det
+\mathbf{J}_{\mathbf{g}^{-1}}(\mathbf{y})
+\right|
+=
+\frac{
+1
+}{
+\left|
+\det
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+\right|
+}.
+$$
+
+### Transformação de densidades
+
+::: {#thm-transformacao-densidade}
+## Densidade de uma transformação invertível
+
+Considere um vetor aleatório contínuo $\boldsymbol{\mathsf X}$ com densidade $f_{\boldsymbol{\mathsf X}}$ e a transformação
+
+$$
+\boldsymbol{\mathsf Y}
+=
+\mathbf{g}(\boldsymbol{\mathsf X}),
+$$
+
+satisfazendo as condições do Teorema da Mudança de Variáveis.
+
+Então,
+
+$$
+f_{\boldsymbol{\mathsf Y}}(\mathbf{y})
+=
+f_{\boldsymbol{\mathsf X}}
+\left(
+\mathbf{g}^{-1}(\mathbf{y})
+\right)
+\left|
+\det
+\mathbf{J}_{\mathbf{g}^{-1}}(\mathbf{y})
+\right|.
+$$
+:::
+
+Equivalentemente, com
+
+$$
+\mathbf{y}
+=
+\mathbf{g}(\mathbf{x}),
+$$
+
+tem-se
+
+$$
+f_{\boldsymbol{\mathsf Y}}
+\left(
+\mathbf{g}(\mathbf{x})
+\right)
+=
+\frac{
+f_{\boldsymbol{\mathsf X}}(\mathbf{x})
+}{
+\left|
+\det
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+\right|
+}.
+$$
+
+A densidade é reduzida em regiões expandidas pela transformação e aumentada em regiões contraídas, de modo que a probabilidade total permaneça igual a 1.
+
+Quando a transformação não é injetiva em todo o domínio, o domínio deve ser particionado em regiões de injetividade. As contribuições das diferentes pré-imagens são somadas.
+
+### Transformações afins
+
+Considere
+
+$$
+\boldsymbol{\mathsf Y}
+=
+\mathbf{A}\boldsymbol{\mathsf X}
++
+\mathbf{b},
+$$
+
+em que
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{p\times p}
+$$
+
+é invertível e
+
+$$
+\mathbf{b}
+\in
+\mathbb{R}^{p}.
+$$
+
+A transformação inversa é
+
+$$
+\boldsymbol{\mathsf X}
+=
+\mathbf{A}^{-1}
+\left(
+\boldsymbol{\mathsf Y}
+-
+\mathbf{b}
+\right).
+$$
+
+A Jacobiana da transformação é constante:
+
+$$
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+=
+\mathbf{A}.
+$$
+
+A Jacobiana da inversa é
+
+$$
+\mathbf{J}_{\mathbf{g}^{-1}}(\mathbf{y})
+=
+\mathbf{A}^{-1}.
+$$
+
+Logo,
+
+$$
+f_{\boldsymbol{\mathsf Y}}(\mathbf{y})
+=
+f_{\boldsymbol{\mathsf X}}
+\left[
+\mathbf{A}^{-1}
+\left(
+\mathbf{y}
+-
+\mathbf{b}
+\right)
+\right]
+\frac{
+1
+}{
+|\det(\mathbf{A})|
+}.
+$$
+
+A translação $\mathbf{b}$ altera a posição da distribuição, mas não altera o fator de volume. Esse fator depende apenas da parte linear.
+
+::: {#exm-transformacao-escalar-densidade}
+## Transformação afim em uma dimensão
+
+Considere
+
+$$
+\mathsf Y=a\mathsf X+b,
+$$
+
+com $a\neq0$.
+
+A transformação inversa é
+
+$$
+\mathsf X
+=
+\frac{\mathsf Y-b}{a},
+$$
+
+e
+
+$$
+\left|
+\frac{dx}{dy}
+\right|
+=
+\frac{1}{|a|}.
+$$
+
+Portanto,
+
+$$
+f_{\mathsf Y}(y)
+=
+f_{\mathsf X}
+\left(
+\frac{y-b}{a}
+\right)
+\frac{1}{|a|}.
+$$
+:::
+
+### Interpretação geométrica do determinante Jacobiano
+
+Considere a transformação não linear
+
+$$
+\mathbf{g}(x_1,x_2)
+=
+\begin{bmatrix}
+x_1+0.35x_1x_2\\
+x_2+0.20x_1^2
+\end{bmatrix}.
+$$
+
+Sua Jacobiana é
+
+$$
+\mathbf{J}_{\mathbf{g}}(x_1,x_2)
+=
+\begin{bmatrix}
+1+0.35x_2&0.35x_1\\
+0.40x_1&1
+\end{bmatrix}.
+$$
+
+O determinante é
+
+$$
+\det
+\mathbf{J}_{\mathbf{g}}(x_1,x_2)
+=
+1
++
+0.35x_2
+-
+0.14x_1^2.
+$$
+
+O fator de alteração de área varia de acordo com o ponto. A @fig-jacobiano-alteracao-area mostra uma grade no domínio e sua imagem pela transformação.
+
+```{r}
+#| label: fig-jacobiano-alteracao-area
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Transformação de uma grade e alteração local de área determinada pelo Jacobiano."
+#| fig-width: 9
+#| fig-height: 4.5
+#| fig-align: center
+
+library(ggplot2)
+
+transformar <- function(x1, x2) {
+  data.frame(
+    y1 = x1 + 0.35 * x1 * x2,
+    y2 = x2 + 0.20 * x1^2
+  )
+}
+
+valores_grade <- seq(
+  -1.4,
+  1.4,
+  length.out = 9
+)
+
+valores_linha <- seq(
+  -1.4,
+  1.4,
+  length.out = 150
+)
+
+linhas_verticais <- do.call(
+  rbind,
+  lapply(
+    seq_along(valores_grade),
+    function(i) {
+      data.frame(
+        x1 = valores_grade[i],
+        x2 = valores_linha,
+        linha = paste0("v", i)
+      )
+    }
+  )
+)
+
+linhas_horizontais <- do.call(
+  rbind,
+  lapply(
+    seq_along(valores_grade),
+    function(i) {
+      data.frame(
+        x1 = valores_linha,
+        x2 = valores_grade[i],
+        linha = paste0("h", i)
+      )
+    }
+  )
+)
+
+grade_dominio <- rbind(
+  linhas_verticais,
+  linhas_horizontais
+)
+
+grade_dominio$painel <- "Domínio"
+grade_dominio$coord1 <- grade_dominio$x1
+grade_dominio$coord2 <- grade_dominio$x2
+
+grade_transformada <- transformar(
+  grade_dominio$x1,
+  grade_dominio$x2
+)
+
+grade_imagem <- data.frame(
+  x1 = grade_dominio$x1,
+  x2 = grade_dominio$x2,
+  linha = grade_dominio$linha,
+  painel = "Imagem",
+  coord1 = grade_transformada$y1,
+  coord2 = grade_transformada$y2
+)
+
+dados_grade <- rbind(
+  grade_dominio,
+  grade_imagem
+)
+
+dados_grade$painel <- factor(
+  dados_grade$painel,
+  levels = c("Domínio", "Imagem")
+)
+
+limite_x <- range(dados_grade$coord1)
+limite_y <- range(dados_grade$coord2)
+
+ggplot(
+  dados_grade,
+  aes(
+    x = coord1,
+    y = coord2,
+    group = linha
+  )
+) +
+  geom_path(
+    linewidth = 0.55,
+    colour = "#3366AA"
+  ) +
+  facet_wrap(
+    ~painel,
+    nrow = 1
+  ) +
+  coord_equal(
+    xlim = limite_x,
+    ylim = limite_y,
+    expand = TRUE
+  ) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    strip.background = element_blank(),
+    strip.text = element_text(
+      face = "bold"
+    )
+  )
+```
+
+Uma pequena região em torno de $\mathbf{x}$ tem sua área multiplicada aproximadamente por
+
+$$
+\left|
+\det
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+\right|.
+$$
+
+A imagem da grade apresenta expansão e contração diferentes ao longo do domínio porque o determinante Jacobiano não é constante.
+
+### Coordenadas polares
+
+Em duas dimensões, defina
+
+$$
+x_1
+=
+r\cos\theta
+$$
+
+e
+
+$$
+x_2
+=
+r\sin\theta,
+$$
+
+com
+
+$$
+r>0
+$$
+
+e
+
+$$
+0\leq\theta<2\pi.
+$$
+
+A transformação é
+
+$$
+\mathbf{g}(r,\theta)
+=
+\begin{bmatrix}
+r\cos\theta\\
+r\sin\theta
+\end{bmatrix}.
+$$
+
+Sua Jacobiana é
+
+$$
+\mathbf{J}_{\mathbf{g}}(r,\theta)
+=
+\begin{bmatrix}
+\cos\theta&-r\sin\theta\\
+\sin\theta&r\cos\theta
+\end{bmatrix}.
+$$
+
+O determinante é
+
+$$
+\det
+\mathbf{J}_{\mathbf{g}}(r,\theta)
+=
+r.
+$$
+
+Portanto,
+
+$$
+dx_1\,dx_2
+=
+r\,dr\,d\theta.
+$$
+
+Assim,
+
+$$
+\iint_{\mathbb{R}^{2}}
+h(x_1,x_2)
+\,dx_1\,dx_2
+=
+\int_{0}^{2\pi}
+\int_{0}^{\infty}
+h
+\left(
+r\cos\theta,
+r\sin\theta
+\right)
+r
+\,dr\,d\theta,
+$$
+
+quando a função é integrável.
+
+O fator $r$ representa o aumento da área dos setores à medida que a distância à origem cresce.
+
+### Transformações elipsoidais
+
+Considere uma matriz positiva definida
+
+$$
+\boldsymbol{\Sigma}
+\in
+\mathbb{R}^{p\times p}
+$$
+
+e uma transformação
+
+$$
+\mathbf{x}
+=
+\boldsymbol{\mu}
++
+\boldsymbol{\Sigma}^{1/2}\mathbf{z}.
+$$
+
+A Jacobiana é
+
+$$
+\mathbf{J}_{\mathbf{g}}(\mathbf{z})
+=
+\boldsymbol{\Sigma}^{1/2}.
+$$
+
+Logo,
+
+$$
+\left|
+\det
+\mathbf{J}_{\mathbf{g}}(\mathbf{z})
+\right|
+=
+\det
+\left(
+\boldsymbol{\Sigma}^{1/2}
+\right)
+=
+\det(\boldsymbol{\Sigma})^{1/2}.
+$$
+
+A transformação inversa é
+
+$$
+\mathbf{z}
+=
+\boldsymbol{\Sigma}^{-1/2}
+\left(
+\mathbf{x}
+-
+\boldsymbol{\mu}
+\right),
+$$
+
+com fator
+
+$$
+\left|
+\det
+\mathbf{J}_{\mathbf{g}^{-1}}(\mathbf{x})
+\right|
+=
+\det(\boldsymbol{\Sigma})^{-1/2}.
+$$
+
+Além disso,
+
+$$
+\begin{aligned}
+\mathbf{z}^{\top}\mathbf{z}
+&=
+\left(
+\mathbf{x}
+-
+\boldsymbol{\mu}
+\right)^{\top}
+\boldsymbol{\Sigma}^{-1/2}
+\boldsymbol{\Sigma}^{-1/2}
+\left(
+\mathbf{x}
+-
+\boldsymbol{\mu}
+\right)\\
+&=
+\left(
+\mathbf{x}
+-
+\boldsymbol{\mu}
+\right)^{\top}
+\boldsymbol{\Sigma}^{-1}
+\left(
+\mathbf{x}
+-
+\boldsymbol{\mu}
+\right).
+\end{aligned}
+$$
+
+A transformação converte esferas no espaço de $\mathbf{z}$ em elipsoides no espaço de $\mathbf{x}$. Essa relação será utilizada na construção de densidades multivariadas.
+
+### Diferenciação sob o sinal de integração
+
+Considere um conjunto mensurável
+
+$$
+\mathcal{D}
+\subseteq
+\mathbb{R}^{p},
+$$
+
+uma região aberta
+
+$$
+\mathcal{V}
+\subseteq
+\mathbb{R}^{k}
+$$
+
+e uma função
+
+$$
+h:
+\mathcal{D}
+\times
+\mathcal{V}
+\longrightarrow
+\mathbb{R}.
+$$
+
+A função depende da variável de integração $\mathbf{x}$ e do parâmetro
+
+$$
+\boldsymbol{\theta}
+\in
+\mathcal{V}.
+$$
+
+Defina
+
+$$
+F(\boldsymbol{\theta})
+=
+\int_{\mathcal{D}}
+h(\mathbf{x},\boldsymbol{\theta})
+\,d\mathbf{x}.
+$$
+
+A troca entre diferenciação e integração pode ser justificada pelo Teorema da Convergência Dominada.
+
+::: {#thm-convergencia-dominada}
+## Teorema da Convergência Dominada
+
+Considere uma sequência de funções mensuráveis
+
+$$
+g_1,g_2,\ldots
+$$
+
+definidas em $\mathcal{D}$ e suponha que
+
+$$
+g_m(\mathbf{x})
+\longrightarrow
+g(\mathbf{x})
+$$
+
+para quase todo $\mathbf{x}\in\mathcal{D}$.
+
+Se existe uma função integrável
+
+$$
+M:
+\mathcal{D}
+\longrightarrow
+[0,\infty)
+$$
+
+tal que
+
+$$
+|g_m(\mathbf{x})|
+\leq
+M(\mathbf{x})
+$$
+
+para todo $m$ e quase todo $\mathbf{x}\in\mathcal{D}$, então $g$ é integrável e
+
+$$
+\lim_{m\to\infty}
+\int_{\mathcal{D}}
+g_m(\mathbf{x})
+\,d\mathbf{x}
+=
+\int_{\mathcal{D}}
+g(\mathbf{x})
+\,d\mathbf{x}.
+$$
+
+[@axler2020measure]
+:::
+
+O teorema permite trocar um limite e uma integral quando todas as funções da sequência são dominadas por uma mesma função integrável. A diferenciação sob o sinal de integração decorre da aplicação desse resultado aos quocientes de diferenças.
+
+::: {#thm-diferenciacao-integral}
+## Diferenciação sob o sinal de integração
+
+Considere um ponto
+
+$$
+\boldsymbol{\theta}_0
+\in
+\mathcal{V}
+$$
+
+e uma componente
+
+$$
+j
+\in
+\{1,\ldots,k\}.
+$$
+
+Suponha que:
+
+1.  para todo $\boldsymbol{\theta}\in\mathcal{V}$, a função
+
+    $$
+    \mathbf{x}
+    \longmapsto
+    h(\mathbf{x},\boldsymbol{\theta})
+    $$
+
+    seja mensurável e integrável em $\mathcal{D}$;
+
+2.  exista $\delta>0$ tal que
+
+    $$
+    \boldsymbol{\theta}_0
+    +
+    t\mathbf{e}_j
+    \in
+    \mathcal{V}
+    $$
+
+    para todo $t$ com $|t|<\delta$, em que $\mathbf{e}_j$ é o $j$-ésimo vetor da base canônica de $\mathbb{R}^{k}$;
+
+3.  para quase todo $\mathbf{x}\in\mathcal{D}$, a função
+
+    $$
+    t
+    \longmapsto
+    h
+    \left(
+    \mathbf{x},
+    \boldsymbol{\theta}_0+t\mathbf{e}_j
+    \right)
+    $$
+
+    seja diferenciável em $(-\delta,\delta)$;
+
+4.  exista uma função integrável
+
+    $$
+    M_j:
+    \mathcal{D}
+    \longrightarrow
+    [0,\infty)
+    $$
+
+    tal que
+
+    $$
+    \left|
+    \frac{
+    \partial
+    h
+    \left(
+    \mathbf{x},
+    \boldsymbol{\theta}_0+t\mathbf{e}_j
+    \right)
+    }{
+    \partial\theta_j
+    }
+    \right|
+    \leq
+    M_j(\mathbf{x})
+    $$
+
+    para todo $t$ com $|t|<\delta$ e quase todo $\mathbf{x}\in\mathcal{D}$;
+
+5.  a função
+
+    $$
+    \mathbf{x}
+    \longmapsto
+    \frac{
+    \partial
+    h(\mathbf{x},\boldsymbol{\theta}_0)
+    }{
+    \partial\theta_j
+    }
+    $$
+
+    seja mensurável.
+
+Então, $F$ é parcialmente diferenciável em relação a $\theta_j$ no ponto $\boldsymbol{\theta}_0$ e
+
+$$
+\frac{
+\partial
+F(\boldsymbol{\theta}_0)
+}{
+\partial\theta_j
+}
+=
+\int_{\mathcal{D}}
+\frac{
+\partial
+h(\mathbf{x},\boldsymbol{\theta}_0)
+}{
+\partial\theta_j
+}
+\,d\mathbf{x}.
+$$
+:::
+
+::: proof
+Considere uma sequência arbitrária de números não nulos
+
+$$
+t_1,t_2,\ldots
+$$
+
+tal que
+
+$$
+t_m
+\longrightarrow
+0
+$$
+
+e
+
+$$
+|t_m|<\delta.
+$$
+
+Defina o quociente de diferenças
+
+$$
+q_m(\mathbf{x})
+=
+\frac{
+h
+\left(
+\mathbf{x},
+\boldsymbol{\theta}_0+t_m\mathbf{e}_j
+\right)
+-
+h
+\left(
+\mathbf{x},
+\boldsymbol{\theta}_0
+\right)
+}{
+t_m
+}.
+$$
+
+Para quase todo $\mathbf{x}\in\mathcal{D}$, a diferenciabilidade em relação a $\theta_j$ implica
+
+$$
+q_m(\mathbf{x})
+\longrightarrow
+\frac{
+\partial
+h(\mathbf{x},\boldsymbol{\theta}_0)
+}{
+\partial\theta_j
+}.
+$$
+
+Pelo Teorema do Valor Médio aplicado à função
+
+$$
+t
+\longmapsto
+h
+\left(
+\mathbf{x},
+\boldsymbol{\theta}_0+t\mathbf{e}_j
+\right),
+$$
+
+existe um número $\xi_m(\mathbf{x})$ situado entre $0$ e $t_m$ tal que
+
+$$
+q_m(\mathbf{x})
+=
+\frac{
+\partial
+h
+\left(
+\mathbf{x},
+\boldsymbol{\theta}_0+\xi_m(\mathbf{x})\mathbf{e}_j
+\right)
+}{
+\partial\theta_j
+}.
+$$
+
+Como
+
+$$
+|\xi_m(\mathbf{x})|
+<
+\delta,
+$$
+
+a hipótese de dominação fornece
+
+$$
+|q_m(\mathbf{x})|
+\leq
+M_j(\mathbf{x})
+$$
+
+para quase todo $\mathbf{x}\in\mathcal{D}$.
+
+O Teorema da Convergência Dominada implica
+
+$$
+\begin{aligned}
+\lim_{m\to\infty}
+\int_{\mathcal{D}}
+q_m(\mathbf{x})
+\,d\mathbf{x}
+&=
+\int_{\mathcal{D}}
+\lim_{m\to\infty}
+q_m(\mathbf{x})
+\,d\mathbf{x}\\
+&=
+\int_{\mathcal{D}}
+\frac{
+\partial
+h(\mathbf{x},\boldsymbol{\theta}_0)
+}{
+\partial\theta_j
+}
+\,d\mathbf{x}.
+\end{aligned}
+$$
+
+Por outro lado,
+
+$$
+\begin{aligned}
+\int_{\mathcal{D}}
+q_m(\mathbf{x})
+\,d\mathbf{x}
+&=
+\frac{
+\displaystyle
+\int_{\mathcal{D}}
+h
+\left(
+\mathbf{x},
+\boldsymbol{\theta}_0+t_m\mathbf{e}_j
+\right)
+\,d\mathbf{x}
+-
+\displaystyle
+\int_{\mathcal{D}}
+h
+\left(
+\mathbf{x},
+\boldsymbol{\theta}_0
+\right)
+\,d\mathbf{x}
+}{
+t_m
+}\\
+&=
+\frac{
+F
+\left(
+\boldsymbol{\theta}_0+t_m\mathbf{e}_j
+\right)
+-
+F(\boldsymbol{\theta}_0)
+}{
+t_m
+}.
+\end{aligned}
+$$
+
+Logo,
+
+$$
+\lim_{m\to\infty}
+\frac{
+F
+\left(
+\boldsymbol{\theta}_0+t_m\mathbf{e}_j
+\right)
+-
+F(\boldsymbol{\theta}_0)
+}{
+t_m
+}
+=
+\int_{\mathcal{D}}
+\frac{
+\partial
+h(\mathbf{x},\boldsymbol{\theta}_0)
+}{
+\partial\theta_j
+}
+\,d\mathbf{x}.
+$$
+
+Como a sequência $t_m\to0$ foi escolhida arbitrariamente, a derivada parcial existe e satisfaz a igualdade enunciada.
+:::
+
+Quando as condições do @thm-diferenciacao-integral são satisfeitas para todas as componentes do parâmetro,
+
+$$
+\nabla_{\boldsymbol{\theta}}
+F(\boldsymbol{\theta}_0)
+=
+\int_{\mathcal{D}}
+\nabla_{\boldsymbol{\theta}}
+h(\mathbf{x},\boldsymbol{\theta}_0)
+\,d\mathbf{x}.
+$$
+
+A função dominante pode ser diferente para cada componente do gradiente, desde que cada uma seja integrável.
+
+O resultado pressupõe que o domínio $\mathcal{D}$ não depende de $\boldsymbol{\theta}$. Quando o domínio ou a fronteira da região de integração varia com o parâmetro, a derivação pode produzir termos adicionais. Esse caso não será desenvolvido neste capítulo.
+
+::: {#exm-derivacao-normalizacao}
+## Derivação de uma identidade de normalização
+
+Considere uma família de densidades
+
+$$
+f(\mathbf{x};\boldsymbol{\theta}),
+$$
+
+definida sobre um suporte comum
+
+$$
+\mathcal{D}
+$$
+
+que não depende de $\boldsymbol{\theta}$.
+
+Para todo $\boldsymbol{\theta}$,
+
+$$
+\int_{\mathcal{D}}
+f(\mathbf{x};\boldsymbol{\theta})
+\,d\mathbf{x}
+=
+1.
+$$
+
+Suponha que as condições do @thm-diferenciacao-integral sejam satisfeitas para todas as componentes de $\boldsymbol{\theta}$. Então,
+
+$$
+\begin{aligned}
+\mathbf{0}
+&=
+\nabla_{\boldsymbol{\theta}}1\\
+&=
+\nabla_{\boldsymbol{\theta}}
+\int_{\mathcal{D}}
+f(\mathbf{x};\boldsymbol{\theta})
+\,d\mathbf{x}\\
+&=
+\int_{\mathcal{D}}
+\nabla_{\boldsymbol{\theta}}
+f(\mathbf{x};\boldsymbol{\theta})
+\,d\mathbf{x}.
+\end{aligned}
+$$
+
+Se
+
+$$
+f(\mathbf{x};\boldsymbol{\theta})
+>
+0
+$$
+
+para quase todo $\mathbf{x}\in\mathcal{D}$, então
+
+$$
+\nabla_{\boldsymbol{\theta}}
+f(\mathbf{x};\boldsymbol{\theta})
+=
+f(\mathbf{x};\boldsymbol{\theta})
+\nabla_{\boldsymbol{\theta}}
+\log
+f(\mathbf{x};\boldsymbol{\theta}).
+$$
+
+Portanto,
+
+$$
+\int_{\mathcal{D}}
+f(\mathbf{x};\boldsymbol{\theta})
+\nabla_{\boldsymbol{\theta}}
+\log
+f(\mathbf{x};\boldsymbol{\theta})
+\,d\mathbf{x}
+=
+\mathbf{0}.
+$$
+
+Se
+
+$$
+\boldsymbol{\mathsf X}
+$$
+
+possui densidade $f(\mathbf{x};\boldsymbol{\theta})$, segue que
+
+$$
+E_{\boldsymbol{\theta}}
+\left[
+\nabla_{\boldsymbol{\theta}}
+\log
+f
+\left(
+\boldsymbol{\mathsf X};
+\boldsymbol{\theta}
+\right)
+\right]
+=
+\mathbf{0}.
+$$
+
+Essa é a identidade de média nula do escore para uma observação. Sua validade depende do suporte comum e das condições de dominação que justificam a troca entre diferenciação e integração.
+:::
+
+As integrais múltiplas, a marginalização e a mudança de variáveis fornecem a base para o estudo das distribuições multivariadas. A diferenciação sob o sinal de integração conecta essas ferramentas às funções de verossimilhança, ao vetor escore e à informação de Fisher.
+
+## Aplicações à estimação e à inferência
+
+As ferramentas de diferenciação permitem formular condições de estimação, construir aproximações locais e estudar transformações de estimadores. Nesta seção, essas aplicações serão apresentadas apenas em sua estrutura matemática.
+
+### Log-verossimilhança e vetor escore
+
+Considere uma amostra
+
+$$
+\mathbf{x}_1,\ldots,\mathbf{x}_n
+$$
+
+de uma distribuição com função de densidade ou de probabilidade
+
+$$
+f(\mathbf{x};\boldsymbol{\theta}),
+$$
+
+em que
+
+$$
+\boldsymbol{\theta}
+\in
+\boldsymbol{\Theta}
+\subseteq
+\mathbb{R}^{k}
+$$
+
+é o vetor de parâmetros.
+
+Sob independência, a função de verossimilhança é
+
+$$
+L_n(\boldsymbol{\theta})
+=
+\prod_{i=1}^{n}
+f(\mathbf{x}_i;\boldsymbol{\theta}).
+$$
+
+A log-verossimilhança é
+
+$$
+\ell_n(\boldsymbol{\theta})
+=
+\log
+L_n(\boldsymbol{\theta})
+=
+\sum_{i=1}^{n}
+\log
+f(\mathbf{x}_i;\boldsymbol{\theta}).
+$$
+
+Como o logaritmo é estritamente crescente, maximizar $L_n$ equivale a maximizar $\ell_n$.
+
+::: {#def-vetor-escore}
+## Vetor escore
+
+O vetor escore é o gradiente da log-verossimilhança:
+
+$$
+\mathbf{s}_n(\boldsymbol{\theta})
+=
+\nabla_{\boldsymbol{\theta}}
+\ell_n(\boldsymbol{\theta})
+\in
+\mathbb{R}^{k}.
+$$
+:::
+
+Em coordenadas,
+
+$$
+\mathbf{s}_n(\boldsymbol{\theta})
+=
+\begin{bmatrix}
+\dfrac{
+\partial\ell_n
+}{
+\partial\theta_1
+}\\
+\vdots\\
+\dfrac{
+\partial\ell_n
+}{
+\partial\theta_k
+}
+\end{bmatrix}.
+$$
+
+Um estimador de máxima verossimilhança interior deve satisfazer
+
+$$
+\mathbf{s}_n
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+=
+\mathbf{0}.
+$$
+
+Essa condição é necessária, mas pode não ser suficiente para identificar um máximo. Também devem ser examinados:
+
+-   a curvatura da log-verossimilhança;
+-   a existência e a unicidade da solução;
+-   os limites do espaço paramétrico;
+-   possíveis máximos na fronteira.
+
+### Informação observada e informação de Fisher
+
+::: {#def-informacao-observada}
+## Informação observada
+
+A matriz de informação observada é
+
+$$
+\mathcal{J}_n(\boldsymbol{\theta})
+=
+-
+\nabla_{\boldsymbol{\theta}}^2
+\ell_n(\boldsymbol{\theta}).
+$$
+:::
+
+Quando
+
+$$
+\mathcal{J}_n
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\succ
+\mathbf{0},
+$$
+
+a Hessiana da log-verossimilhança é negativa definida no ponto estimado, fornecendo uma condição suficiente de máximo local estrito.
+
+A informação observada pode ser singular ou apenas semidefinida quando:
+
+-   há parâmetros não identificados;
+-   existem redundâncias na parametrização;
+-   o máximo ocorre na fronteira;
+-   a log-verossimilhança apresenta pouca curvatura em determinadas direções.
+
+::: {#def-informacao-fisher}
+## Informação de Fisher
+
+A informação de Fisher é definida por
+
+$$
+\mathcal{I}_n(\boldsymbol{\theta})
+=
+E_{\boldsymbol{\theta}}
+\left[
+\mathcal{J}_n(\boldsymbol{\theta})
+\right],
+$$
+
+quando essa esperança existe. [@casella2002inference]
+:::
+
+Sob condições que permitem diferenciar a densidade sob o sinal de integração,
+
+$$
+E_{\boldsymbol{\theta}}
+\left[
+\mathbf{s}_n(\boldsymbol{\theta})
+\right]
+=
+\mathbf{0}.
+$$
+
+Sob condições adicionais de regularidade,
+
+$$
+\mathcal{I}_n(\boldsymbol{\theta})
+=
+E_{\boldsymbol{\theta}}
+\left[
+\mathbf{s}_n(\boldsymbol{\theta})
+\mathbf{s}_n(\boldsymbol{\theta})^{\top}
+\right].
+$$
+
+Essa identidade não deve ser utilizada sem verificar as condições de regularidade e a independência do suporte em relação ao parâmetro.
+
+### Newton--Raphson
+
+A estimação por máxima verossimilhança pode exigir a solução numérica de
+
+$$
+\mathbf{s}_n(\boldsymbol{\theta})
+=
+\mathbf{0}.
+$$
+
+A expansão de primeira ordem do escore em torno de um valor atual $\boldsymbol{\theta}^{(t)}$ é
+
+$$
+\mathbf{s}_n(\boldsymbol{\theta})
+\approx
+\mathbf{s}_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right)
++
+\nabla_{\boldsymbol{\theta}}^2
+\ell_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right)
+\left(
+\boldsymbol{\theta}
+-
+\boldsymbol{\theta}^{(t)}
+\right).
+$$
+
+Igualando a aproximação a zero,
+
+$$
+\begin{aligned}
+\boldsymbol{\theta}^{(t+1)}
+&=
+\boldsymbol{\theta}^{(t)}
+-
+\left[
+\nabla_{\boldsymbol{\theta}}^2
+\ell_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right)
+\right]^{-1}
+\mathbf{s}_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right)\\
+&=
+\boldsymbol{\theta}^{(t)}
++
+\mathcal{J}_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right)^{-1}
+\mathbf{s}_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right).
+\end{aligned}
+$$
+
+Na implementação, a atualização deve ser obtida pela solução do sistema
+
+$$
+\mathcal{J}_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right)
+\mathbf{d}^{(t)}
+=
+\mathbf{s}_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right),
+$$
+
+seguida de
+
+$$
+\boldsymbol{\theta}^{(t+1)}
+=
+\boldsymbol{\theta}^{(t)}
++
+\mathbf{d}^{(t)}.
+$$
+
+Isso evita calcular explicitamente a inversa da informação observada.
+
+### Método do escore de Fisher
+
+O método do escore de Fisher substitui a informação observada pela informação esperada:
+
+$$
+\boldsymbol{\theta}^{(t+1)}
+=
+\boldsymbol{\theta}^{(t)}
++
+\mathcal{I}_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right)^{-1}
+\mathbf{s}_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right).
+$$
+
+Os dois métodos coincidem quando
+
+$$
+\mathcal{J}_n(\boldsymbol{\theta})
+=
+\mathcal{I}_n(\boldsymbol{\theta})
+$$
+
+ou quando essas matrizes produzem a mesma atualização.
+
+### Expansão local de um estimador
+
+Suponha que um estimador
+
+$$
+\widehat{\boldsymbol{\theta}}
+$$
+
+satisfaça a equação
+
+$$
+\mathbf{s}_n
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+=
+\mathbf{0}.
+$$
+
+Expandindo o escore em torno do parâmetro verdadeiro $\boldsymbol{\theta}_0$,
+
+$$
+\begin{aligned}
+\mathbf{0}
+&=
+\mathbf{s}_n
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)\\
+&\approx
+\mathbf{s}_n
+\left(
+\boldsymbol{\theta}_0
+\right)
++
+\nabla_{\boldsymbol{\theta}}^2
+\ell_n
+\left(
+\boldsymbol{\theta}_0
+\right)
+\left(
+\widehat{\boldsymbol{\theta}}
+-
+\boldsymbol{\theta}_0
+\right).
+\end{aligned}
+$$
+
+Como
+
+$$
+\nabla_{\boldsymbol{\theta}}^2
+\ell_n
+\left(
+\boldsymbol{\theta}_0
+\right)
+=
+-
+\mathcal{J}_n
+\left(
+\boldsymbol{\theta}_0
+\right),
+$$
+
+obtém-se a aproximação
+
+$$
+\widehat{\boldsymbol{\theta}}
+-
+\boldsymbol{\theta}_0
+\approx
+\mathcal{J}_n
+\left(
+\boldsymbol{\theta}_0
+\right)^{-1}
+\mathbf{s}_n
+\left(
+\boldsymbol{\theta}_0
+\right).
+$$
+
+Essa relação mostra que o erro do estimador pode ser aproximado pelo produto entre:
+
+-   a inversa da curvatura da log-verossimilhança;
+-   o escore calculado no parâmetro verdadeiro.
+
+A obtenção de uma distribuição assintótica exige resultados probabilísticos adicionais sobre consistência, convergência da informação e distribuição limite do escore.
+
+### Método delta
+
+O método delta utiliza a aproximação de Taylor para obter a distribuição aproximada de uma transformação de um estimador.
+
+::: {#thm-metodo-delta}
+## Método delta multivariado
+
+Suponha que
+
+$$
+\sqrt{n}
+\left(
+\widehat{\boldsymbol{\theta}}
+-
+\boldsymbol{\theta}
+\right)
+\overset{d}{\longrightarrow}
+N_k
+\left(
+\mathbf{0},
+\boldsymbol{\Xi}
+\right),
+$$
+
+em que
+
+$$
+\boldsymbol{\Xi}
+\in
+\mathbb{R}^{k\times k}.
+$$
+
+Considere uma função diferenciável
+
+$$
+\mathbf{g}:
+\mathbb{R}^{k}
+\longrightarrow
+\mathbb{R}^{q}.
+$$
+
+Então,
+
+$$
+\sqrt{n}
+\left[
+\mathbf{g}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+-
+\mathbf{g}
+\left(
+\boldsymbol{\theta}
+\right)
+\right]
+\overset{d}{\longrightarrow}
+N_q
+\left(
+\mathbf{0},
+\mathbf{J}_{\mathbf{g}}(\boldsymbol{\theta})
+\boldsymbol{\Xi}
+\mathbf{J}_{\mathbf{g}}(\boldsymbol{\theta})^{\top}
+\right).
+$$
+
+[@vandervaart1998]
+:::
+
+A aproximação de primeira ordem é
+
+$$
+\mathbf{g}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+-
+\mathbf{g}
+\left(
+\boldsymbol{\theta}
+\right)
+\approx
+\mathbf{J}_{\mathbf{g}}(\boldsymbol{\theta})
+\left(
+\widehat{\boldsymbol{\theta}}
+-
+\boldsymbol{\theta}
+\right).
+$$
+
+A covariância aproximada é
+
+$$
+\operatorname{Cov}
+\left[
+\mathbf{g}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right]
+\approx
+\frac1n
+\mathbf{J}_{\mathbf{g}}(\boldsymbol{\theta})
+\boldsymbol{\Xi}
+\mathbf{J}_{\mathbf{g}}(\boldsymbol{\theta})^{\top}.
+$$
+
+Para uma função escalar
+
+$$
+g:
+\mathbb{R}^{k}
+\longrightarrow
+\mathbb{R},
+$$
+
+a variância aproximada é
+
+$$
+\operatorname{Var}
+\left[
+g
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\right]
+\approx
+\frac1n
+\nabla_{\boldsymbol{\theta}}g(\boldsymbol{\theta})^{\top}
+\boldsymbol{\Xi}
+\nabla_{\boldsymbol{\theta}}g(\boldsymbol{\theta}).
+$$
+
+::: {#exm-metodo-delta-razao}
+## Método delta para uma razão
+
+Considere
+
+$$
+\boldsymbol{\theta}
+=
+\begin{bmatrix}
+\theta_1\\
+\theta_2
+\end{bmatrix},
+\qquad
+\theta_2\neq0,
+$$
+
+e
+
+$$
+g(\boldsymbol{\theta})
+=
+\frac{\theta_1}{\theta_2}.
+$$
+
+O gradiente é
+
+$$
+\nabla_{\boldsymbol{\theta}}g
+=
+\begin{bmatrix}
+\dfrac{1}{\theta_2}\\[6pt]
+-\dfrac{\theta_1}{\theta_2^2}
+\end{bmatrix}.
+$$
+
+Se
+
+$$
+\sqrt{n}
+\left(
+\widehat{\boldsymbol{\theta}}
+-
+\boldsymbol{\theta}
+\right)
+\overset{d}{\longrightarrow}
+N_2
+\left(
+\mathbf{0},
+\boldsymbol{\Xi}
+\right),
+$$
+
+então
+
+$$
+\sqrt{n}
+\left(
+\frac{
+\widehat{\theta}_1
+}{
+\widehat{\theta}_2
+}
+-
+\frac{
+\theta_1
+}{
+\theta_2
+}
+\right)
+$$
+
+converge em distribuição para uma normal com variância
+
+$$
+\nabla_{\boldsymbol{\theta}}g^{\top}
+\boldsymbol{\Xi}
+\nabla_{\boldsymbol{\theta}}g.
+$$
+:::
+
+### Estimação de um vetor de médias
+
+Considere observações
+
+$$
+\mathbf{x}_1,\ldots,\mathbf{x}_n
+\in
+\mathbb{R}^{p}
+$$
+
+e uma matriz positiva definida conhecida
+
+$$
+\boldsymbol{\Sigma}.
+$$
+
+Considere o critério
+
+$$
+Q(\boldsymbol{\mu})
+=
+\sum_{i=1}^{n}
+\left(
+\mathbf{x}_i
+-
+\boldsymbol{\mu}
+\right)^{\top}
+\boldsymbol{\Sigma}^{-1}
+\left(
+\mathbf{x}_i
+-
+\boldsymbol{\mu}
+\right).
+$$
+
+O gradiente é
+
+$$
+\nabla_{\boldsymbol{\mu}}Q
+=
+-2
+\boldsymbol{\Sigma}^{-1}
+\sum_{i=1}^{n}
+\left(
+\mathbf{x}_i
+-
+\boldsymbol{\mu}
+\right).
+$$
+
+A condição de primeira ordem é
+
+$$
+\sum_{i=1}^{n}
+\left(
+\mathbf{x}_i
+-
+\boldsymbol{\mu}
+\right)
+=
+\mathbf{0}.
+$$
+
+Logo,
+
+$$
+\widehat{\boldsymbol{\mu}}
+=
+\frac1n
+\sum_{i=1}^{n}
+\mathbf{x}_i.
+$$
+
+A Hessiana é
+
+$$
+\nabla_{\boldsymbol{\mu}}^2Q
+=
+2n
+\boldsymbol{\Sigma}^{-1}
+\succ
+\mathbf{0}.
+$$
+
+Portanto, o vetor de médias amostrais é o único minimizador do critério.
+
+### Critério do modelo linear multivariado
+
+Considere
+
+$$
+\mathbf{Y}
+=
+\mathbf{X}\mathbf{B}
++
+\boldsymbol{\mathcal E},
+$$
+
+com
+
+$$
+\mathbf{Y}
+\in
+\mathbb{R}^{n\times p},
+\qquad
+\mathbf{X}
+\in
+\mathbb{R}^{n\times k},
+\qquad
+\mathbf{B}
+\in
+\mathbb{R}^{k\times p}.
+$$
+
+Para
+
+$$
+\boldsymbol{\Sigma}\succ\mathbf{0},
+$$
+
+considere
+
+$$
+\begin{aligned}
+L(\mathbf{B},\boldsymbol{\Sigma})
+&=
+\frac{n}{2}
+\log\det(\boldsymbol{\Sigma})\\
+&\quad+
+\frac12
+\operatorname{tr}
+\left[
+\boldsymbol{\Sigma}^{-1}
+\left(
+\mathbf{Y}
+-
+\mathbf{X}\mathbf{B}
+\right)^{\top}
+\left(
+\mathbf{Y}
+-
+\mathbf{X}\mathbf{B}
+\right)
+\right].
+\end{aligned}
+$$
+
+Para $\boldsymbol{\Sigma}$ fixada,
+
+$$
+\nabla_{\mathbf{B}}L
+=
+-
+\mathbf{X}^{\top}
+\left(
+\mathbf{Y}
+-
+\mathbf{X}\mathbf{B}
+\right)
+\boldsymbol{\Sigma}^{-1}.
+$$
+
+A condição de primeira ordem é
+
+$$
+\mathbf{X}^{\top}
+\left(
+\mathbf{Y}
+-
+\mathbf{X}\mathbf{B}
+\right)
+=
+\mathbf{0}.
+$$
+
+Se $\mathbf{X}$ possui posto coluna completo,
+
+$$
+\widehat{\mathbf{B}}
+=
+\left(
+\mathbf{X}^{\top}\mathbf{X}
+\right)^{-1}
+\mathbf{X}^{\top}\mathbf{Y}.
+$$
+
+Defina a matriz de Gram dos resíduos
+
+$$
+\mathbf{G}_{\mathcal E}
+=
+\left(
+\mathbf{Y}
+-
+\mathbf{X}\widehat{\mathbf{B}}
+\right)^{\top}
+\left(
+\mathbf{Y}
+-
+\mathbf{X}\widehat{\mathbf{B}}
+\right).
+$$
+
+Para $\mathbf{B}=\widehat{\mathbf{B}}$, o critério em relação a $\boldsymbol{\Sigma}$ é
+
+$$
+L(\boldsymbol{\Sigma})
+=
+\frac{n}{2}
+\log\det(\boldsymbol{\Sigma})
++
+\frac12
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}^{-1}\mathbf{G}_{\mathcal E}
+\right).
+$$
+
+Se
+
+$$
+\mathbf{G}_{\mathcal E}\succ\mathbf{0},
+$$
+
+o minimizador interior é
+
+$$
+\widehat{\boldsymbol{\Sigma}}
+=
+\frac1n
+\mathbf{G}_{\mathcal E}.
+$$
+
+A condição
+
+$$
+\mathbf{G}_{\mathcal E}\succ\mathbf{0}
+$$
+
+exige que a matriz residual possua posto coluna completo. Quando $\mathbf{G}_{\mathcal E}$ é singular, o critério não possui minimizador no interior do conjunto das matrizes positivas definidas.
+
+A interpretação probabilística desse critério e as propriedades dos estimadores serão desenvolvidas nos capítulos de estimação e modelo linear multivariado.
+
+## Síntese do capítulo
+
+O cálculo diferencial descreve a variação local de funções escalares, vetoriais e matriciais. Para uma função escalar de vetor, o gradiente determina a aproximação linear:
+
+$$
+f(\mathbf{x}+\mathbf{h})
+=
+f(\mathbf{x})
++
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}\mathbf{h}
++
+o(\|\mathbf{h}\|).
+$$
+
+A Jacobiana representa a transformação linear local de uma função vetorial:
+
+$$
+\mathbf{g}(\mathbf{x}+\mathbf{h})
+=
+\mathbf{g}(\mathbf{x})
++
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})\mathbf{h}
++
+o(\|\mathbf{h}\|).
+$$
+
+A Hessiana descreve a curvatura de uma função escalar. Em um ponto estacionário, sua definitude permite distinguir mínimos, máximos e pontos de sela. Para funções convexas, qualquer ponto estacionário é um mínimo global.
+
+A diferenciação de funções de resíduos conduz às equações normais. Para
+
+$$
+f(\mathbf{x})
+=
+\left\|
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\right\|^2,
+$$
+
+tem-se
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x})
+=
+-2\mathbf{A}^{\top}
+\left(
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\right),
+$$
+
+e a condição de primeira ordem é
+
+$$
+\mathbf{A}^{\top}\mathbf{A}\mathbf{x}
+=
+\mathbf{A}^{\top}\mathbf{b}.
+$$
+
+O cálculo matricial organiza derivadas de funções cujos argumentos são matrizes. O gradiente matricial é definido por
+
+$$
+d\phi
+=
+\operatorname{tr}
+\left[
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)^{\top}
+d\mathbf{X}
+\right].
+$$
+
+Essa representação permite diferenciar normas de Frobenius, funções de resíduos matriciais, produtos quadráticos, inversas, determinantes e log-determinantes.
+
+A vetorização transforma uma matriz em um vetor e permite representar transformações matriciais por produtos de Kronecker:
+
+$$
+\operatorname{vec}
+\left(
+\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}
+\right)
+=
+\left(
+\boldsymbol{\Gamma}^{\top}\otimes\mathbf{A}
+\right)
+\operatorname{vec}(\mathbf{X}).
+$$
+
+Para matrizes simétricas, o operador $\operatorname{vech}$ elimina elementos repetidos. As matrizes de duplicação e eliminação relacionam as parametrizações por $\operatorname{vec}$ e $\operatorname{vech}$.
+
+O cálculo integral fornece probabilidades, esperanças e distribuições marginais. A mudança de variáveis incorpora o fator
+
+$$
+\left|
+\det
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+\right|,
+$$
+
+que representa a alteração local de volume produzida pela transformação.
+
+Na estimação, o gradiente da log-verossimilhança define o vetor escore, enquanto sua Hessiana negativa define a informação observada. Expansões de Taylor sustentam métodos iterativos de estimação e aproximações como o método delta.
+
+A @tbl-identidades-calculo-3 reúne algumas das identidades utilizadas ao longo do capítulo.
+
+| Função                                                                                         | Derivada ou diferencial                                                                                                 |
+|:-----------------------------------|:-----------------------------------|
+| $f(\mathbf{x})=\mathbf{a}^{\top}\mathbf{x}$                                                    | $\nabla_{\mathbf{x}}f=\mathbf{a}$                                                                                       |
+| $f(\mathbf{x})=\mathbf{x}^{\top}\mathbf{A}\mathbf{x}$                                          | $\nabla_{\mathbf{x}}f=(\mathbf{A}+\mathbf{A}^{\top})\mathbf{x}$                                                         |
+| $f(\mathbf{x})=\|\mathbf{b}-\mathbf{A}\mathbf{x}\|^2$                                          | $\nabla_{\mathbf{x}}f=-2\mathbf{A}^{\top}(\mathbf{b}-\mathbf{A}\mathbf{x})$                                             |
+| $\phi(\mathbf{X})=\operatorname{tr}(\mathbf{A}^{\top}\mathbf{X})$                              | $\nabla_{\mathbf{X}}\phi=\mathbf{A}$                                                                                    |
+| $\phi(\mathbf{X})=\|\mathbf{X}\|_F^2$                                                          | $\nabla_{\mathbf{X}}\phi=2\mathbf{X}$                                                                                   |
+| $\phi(\mathbf{X})=\operatorname{tr}(\mathbf{X}^{\top}\mathbf{A}\mathbf{X}\boldsymbol{\Gamma})$ | $\nabla_{\mathbf{X}}\phi=\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}+\mathbf{A}^{\top}\mathbf{X}\boldsymbol{\Gamma}^{\top}$ |
+| $\mathbf{X}\mapsto\mathbf{X}^{-1}$                                                             | $d(\mathbf{X}^{-1})=-\mathbf{X}^{-1}(d\mathbf{X})\mathbf{X}^{-1}$                                                       |
+| $\phi(\mathbf{X})=\log\det(\mathbf{X})$, $\mathbf{X}\succ\mathbf{0}$                           | $d\phi=\operatorname{tr}(\mathbf{X}^{-1}d\mathbf{X})$                                                                   |
+| $\phi(\mathbf{X})=\operatorname{tr}(\mathbf{A}\mathbf{X}^{-1})$                                | $\nabla_{\mathbf{X}}\phi=-\mathbf{X}^{-\top}\mathbf{A}^{\top}\mathbf{X}^{-\top}$                                        |
+| $\mathbf{Y}=\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}$                                           | $\operatorname{vec}(\mathbf{Y})=(\boldsymbol{\Gamma}^{\top}\otimes\mathbf{A})\operatorname{vec}(\mathbf{X})$            |
+
+: Identidades selecionadas de cálculo vetorial e matricial. {#tbl-identidades-calculo-2} Ao final do capítulo, o estudante deverá ser capaz de:
+
+-   distinguir gradiente, Jacobiana, Hessiana e gradiente matricial;
+-   construir aproximações de Taylor de primeira e segunda ordens;
+-   classificar pontos estacionários por meio da Hessiana;
+-   reconhecer condições de convexidade e concavidade;
+-   formular condições de primeira ordem em problemas com e sem restrições;
+-   diferenciar formas quadráticas, critérios de resíduos e funções matriciais;
+-   utilizar diferenciais de inversas, determinantes e log-determinantes;
+-   aplicar vetorização, produto de Kronecker e meia vetorização;
+-   interpretar o determinante Jacobiano em mudanças de variáveis;
+-   reconhecer o papel do cálculo em problemas de estimação e inferência.
+
+O próximo capítulo inicia o estudo probabilístico dos dados multivariados por meio das matrizes de covariâncias e correlações. Essas matrizes combinam expectativas, produtos cruzados, formas quadráticas e transformações lineares, reunindo os principais objetos desenvolvidos ao longo do Módulo 1.
