@@ -2,9 +2,30 @@
 
 Os capítulos anteriores apresentaram vetores, matrizes, espaços vetoriais, bases e projeções. Esses objetos permitem representar observações multivariadas e descrever relações lineares entre suas coordenadas.
 
-Uma matriz também pode representar uma aplicação que transforma vetores. Essa aplicação pode alterar a orientação, a escala ou a dimensão da configuração original. Quando preserva combinações lineares, ela é denominada transformação linear.
+Uma matriz também pode representar uma aplicação que transforma vetores. Essa aplicação pode alterar a orientação, a escala ou a dimensão da configuração original. Quando preserva combinações lineares, ela é denominada **transformação linear**.
+
+No capítulo anterior, o espaço nulo e o espaço coluna foram definidos diretamente a partir de uma matriz. Neste capítulo, essas estruturas serão também interpretadas, respectivamente, como o núcleo e a imagem da transformação linear associada à matriz.
 
 Este capítulo desenvolve a definição e a representação matricial das transformações lineares, sua aplicação a matrizes de dados, a composição de operações, a invertibilidade e a perda de informação. Também são estudadas transformações geométricas, transformações ortogonais, mudanças de coordenadas e transformações afins utilizadas no pré-processamento de dados.
+
+::: {.callout-note appearance="simple" icon="false"}
+
+## Convenções para transformações lineares
+
+As convenções vetoriais e matriciais estabelecidas nos capítulos anteriores permanecem válidas. Neste capítulo, serão utilizadas também as seguintes convenções:
+
+- $T:V\to W$ representa uma transformação entre os espaços vetoriais $V$ e $W$;
+- $V$ representa o domínio e $W$ o contradomínio da transformação;
+- $\mathbf{x}\in V$ representa um vetor do domínio e $T(\mathbf{x})\in W$ sua imagem pela transformação;
+- $T_{\mathbf{A}}$ representa a transformação linear associada à matriz $\mathbf{A}$;
+- $\mathbf{A}\in\mathbb{R}^{q\times p}$ representa uma transformação de $\mathbb{R}^p$ em $\mathbb{R}^q$ quando utilizada na forma $T_{\mathbf{A}}(\mathbf{x})=\mathbf{A}\mathbf{x}$;
+- $\ker(T)$ representa o núcleo de uma transformação linear;
+- $\operatorname{Im}(T)$ representa a imagem de uma transformação linear;
+- $\mathcal{E}_p$ representa a base canônica de $\mathbb{R}^p$;
+- $[T]_{\mathcal{C}\leftarrow\mathcal{B}}$ representa a matriz de uma transformação em relação a uma base $\mathcal{B}$ do domínio e a uma base $\mathcal{C}$ do contradomínio.
+
+As relações entre essas notações e os espaços fundamentais das matrizes serão estabelecidas ao longo do capítulo.
+:::
 
 ## Transformações lineares e representação matricial
 
@@ -77,9 +98,9 @@ A @fig-preservacao-operacoes representa a preservação da soma. O paralelogramo
 #| warning: false
 #| message: false
 #| fig-cap: "Preservação da soma de vetores por uma transformação linear."
-#| fig-width: 10
-#| fig-height: 5
-#| out-width: "95%"
+#| fig-width: 9
+#| fig-height: 4.5
+#| fig-align: center
 
 library(ggplot2)
 
@@ -108,42 +129,28 @@ ordem_paineis <- c(
 vetores <- rbind(
   data.frame(
     painel = "Vetores originais",
-    vetor = c(
-      "u",
-      "v",
-      "u + v"
-    ),
+    tipo = c("u", "v", "soma"),
     x = 0,
     y = 0,
-    xend = c(
-      u[1],
-      v[1],
-      soma[1]
-    ),
-    yend = c(
-      u[2],
-      v[2],
-      soma[2]
+    xend = c(u[1], v[1], soma[1]),
+    yend = c(u[2], v[2], soma[2]),
+    rotulo = c(
+      "bold(u)",
+      "bold(v)",
+      "bold(u)+bold(v)"
     )
   ),
   data.frame(
     painel = "Após a transformação",
-    vetor = c(
-      "T(u)",
-      "T(v)",
-      "T(u + v)"
-    ),
+    tipo = c("u", "v", "soma"),
     x = 0,
     y = 0,
-    xend = c(
-      Tu[1],
-      Tv[1],
-      Tsoma[1]
-    ),
-    yend = c(
-      Tu[2],
-      Tv[2],
-      Tsoma[2]
+    xend = c(Tu[1], Tv[1], Tsoma[1]),
+    yend = c(Tu[2], Tv[2], Tsoma[2]),
+    rotulo = c(
+      "T(bold(u))",
+      "T(bold(v))",
+      "T(bold(u)+bold(v))"
     )
   )
 )
@@ -156,41 +163,17 @@ vetores$painel <- factor(
 paralelogramos <- rbind(
   data.frame(
     painel = "Vetores originais",
-    x = c(
-      u[1],
-      v[1]
-    ),
-    y = c(
-      u[2],
-      v[2]
-    ),
-    xend = c(
-      soma[1],
-      soma[1]
-    ),
-    yend = c(
-      soma[2],
-      soma[2]
-    )
+    x = c(u[1], v[1]),
+    y = c(u[2], v[2]),
+    xend = c(soma[1], soma[1]),
+    yend = c(soma[2], soma[2])
   ),
   data.frame(
     painel = "Após a transformação",
-    x = c(
-      Tu[1],
-      Tv[1]
-    ),
-    y = c(
-      Tu[2],
-      Tv[2]
-    ),
-    xend = c(
-      Tsoma[1],
-      Tsoma[1]
-    ),
-    yend = c(
-      Tsoma[2],
-      Tsoma[2]
-    )
+    x = c(Tu[1], Tv[1]),
+    y = c(Tu[2], Tv[2]),
+    xend = c(Tsoma[1], Tsoma[1]),
+    yend = c(Tsoma[2], Tsoma[2])
   )
 )
 
@@ -199,48 +182,20 @@ paralelogramos$painel <- factor(
   levels = ordem_paineis
 )
 
-rotulos <- rbind(
-  data.frame(
-    painel = "Vetores originais",
-    x = c(
-      u[1] + 0.16,
-      v[1] - 0.25,
-      soma[1] + 0.15
-    ),
-    y = c(
-      u[2] - 0.18,
-      v[2] + 0.20,
-      soma[2] + 0.10
-    ),
-    rotulo = c(
-      "bold(u)",
-      "bold(v)",
-      "bold(u)+bold(v)"
-    )
-  ),
-  data.frame(
-    painel = "Após a transformação",
-    x = c(
-      Tu[1] + 0.16,
-      Tv[1] - 0.30,
-      Tsoma[1] + 0.15
-    ),
-    y = c(
-      Tu[2] - 0.18,
-      Tv[2] + 0.20,
-      Tsoma[2] + 0.10
-    ),
-    rotulo = c(
-      "T(bold(u))",
-      "T(bold(v))",
-      "T(bold(u)+bold(v))"
-    )
-  )
+rotulos <- transform(
+  vetores,
+  x = xend,
+  y = yend
 )
 
-rotulos$painel <- factor(
-  rotulos$painel,
-  levels = ordem_paineis
+rotulos$x <- rotulos$x + c(
+  0.16, -0.25, 0.15,
+  0.16, -0.30, 0.15
+)
+
+rotulos$y <- rotulos$y + c(
+  -0.18, 0.20, 0.10,
+  -0.18, 0.20, 0.10
 )
 
 ggplot() +
@@ -262,65 +217,48 @@ ggplot() +
       xend = xend,
       yend = yend
     ),
-    linewidth = 0.55,
+    linewidth = 0.6,
     linetype = "dashed",
     color = "gray55"
   ) +
   geom_segment(
-    data = subset(
-      vetores,
-      vetor %in% c(
-        "u",
-        "v",
-        "T(u)",
-        "T(v)"
-      )
-    ),
+    data = vetores,
     aes(
       x = x,
       y = y,
       xend = xend,
-      yend = yend
+      yend = yend,
+      color = tipo
     ),
-    linewidth = 0.8,
+    linewidth = 1.1,
     arrow = grid::arrow(
-      length = grid::unit(0.20, "cm"),
+      length = grid::unit(0.18, "cm"),
       type = "closed"
-    )
-  ) +
-  geom_segment(
-    data = subset(
-      vetores,
-      vetor %in% c(
-        "u + v",
-        "T(u + v)"
-      )
     ),
-    aes(
-      x = x,
-      y = y,
-      xend = xend,
-      yend = yend
-    ),
-    linewidth = 1.05,
-    arrow = grid::arrow(
-      length = grid::unit(0.22, "cm"),
-      type = "closed"
-    )
+    show.legend = FALSE
   ) +
   geom_text(
     data = rotulos,
     aes(
       x = x,
       y = y,
-      label = rotulo
+      label = rotulo,
+      color = tipo
     ),
     parse = TRUE,
-    size = 4
+    size = 4.2,
+    show.legend = FALSE
   ) +
   facet_wrap(
     ~painel,
     nrow = 1
+  ) +
+  scale_color_manual(
+    values = c(
+      "u" = "#1f77b4",
+      "v" = "#2ca02c",
+      "soma" = "#d62728"
+    )
   ) +
   coord_equal(
     xlim = c(-0.4, 5.2),
@@ -328,32 +266,17 @@ ggplot() +
     expand = FALSE,
     clip = "off"
   ) +
-  scale_x_continuous(
-    name = expression(x[1])
+  labs(
+    x = expression(x[1]),
+    y = expression(x[2])
   ) +
-  scale_y_continuous(
-    name = expression(x[2])
+  theme_minimal(
+    base_size = 13
   ) +
-  theme_minimal(base_size = 12) +
   theme(
     panel.grid.minor = element_blank(),
-    panel.grid.major = element_line(
-      linewidth = 0.25,
-      color = "gray88"
-    ),
-    panel.spacing = grid::unit(1.1, "cm"),
-    strip.background = element_blank(),
     strip.text = element_text(
-      face = "bold",
-      size = 11.5
-    ),
-    axis.title = element_text(size = 12),
-    axis.text = element_text(size = 9.5),
-    plot.margin = margin(
-      t = 10,
-      r = 15,
-      b = 10,
-      l = 10
+      face = "bold"
     )
   )
 ```
@@ -370,7 +293,7 @@ $$
 
 é preservada.
 
-::: {#thm-propriedades-elementares-transformacao-linear}
+::: {#prp-propriedades-elementares-transformacao-linear}
 ## Propriedades elementares das transformações lineares
 
 Se
@@ -391,7 +314,7 @@ $$
 [@meyer2023matrix]
 :::
 
-::: proof
+::: {.proof}
 Pela homogeneidade,
 
 $$
@@ -440,15 +363,16 @@ A igualdade $T(\mathbf{0})=\mathbf{0}$ é uma condição necessária para a line
 Uma transformação linear é determinada por sua ação sobre os vetores de uma base do domínio.
 
 ::: {#thm-transformacao-determinada-base}
+
 ## Determinação de uma transformação por uma base
 
-Seja
+Seja $V$ um espaço vetorial de dimensão finita e seja
 
 $$
 \mathcal{B}
 =
 \{
-\mathbf{v}_1,\ldots,\mathbf{v}_p
+\mathbf{v}_1,\ldots,\mathbf{v}_k
 \}
 $$
 
@@ -464,38 +388,22 @@ $$
 fica completamente determinada pelos vetores
 
 $$
-T(\mathbf{v}_1),\ldots,T(\mathbf{v}_p).
+T(\mathbf{v}_1),\ldots,T(\mathbf{v}_k).
 $$
 
 [@meyer2023matrix]
 :::
 
-::: proof
+::: {.proof}
 Todo vetor $\mathbf{x}\in V$ possui uma representação única na base $\mathcal{B}$:
 
-$$
-\mathbf{x}
-=
-c_1\mathbf{v}_1
-+
-\cdots
-+
-c_p\mathbf{v}_p.
-$$
+$$\mathbf{x}=c_1\mathbf{v}_1+\cdots+c_k\mathbf{v}_k.$$
 
 Pela linearidade,
 
-$$
-T(\mathbf{x})
-=
-c_1T(\mathbf{v}_1)
-+
-\cdots
-+
-c_pT(\mathbf{v}_p).
-$$
+$$T(\mathbf{x})=c_1T(\mathbf{v}_1)+\cdots+c_kT(\mathbf{v}_k).$$
 
-Portanto, conhecidas as imagens dos vetores da base, a imagem de qualquer vetor do domínio pode ser determinada.
+Portanto, conhecidas as imagens dos vetores da base, a imagem de qualquer vetor do domínio fica determinada de maneira única.
 :::
 
 Considere uma transformação
@@ -699,11 +607,9 @@ para todo $\mathbf{x}\in\mathbb{R}^p$.
 
 A $j$-ésima coluna de $\mathbf{A}$ é a imagem do $j$-ésimo vetor da base canônica:
 
-$$
-\mathbf{a}_j
-=
-T(\mathbf{e}_j).
-$$
+$$\mathbf{a}_j=T(\mathbf{e}_j).$$
+
+[@meyer2023matrix]
 :::
 
 Reciprocamente, toda matriz
@@ -760,6 +666,88 @@ T_{\mathbf{A}}
 $$
 
 A matriz apresentada nessa representação corresponde às bases canônicas do domínio e do contradomínio. A representação em bases gerais será desenvolvida posteriormente.
+
+### Núcleo e imagem de uma transformação linear
+
+Dois subespaços descrevem aspectos fundamentais da ação de uma transformação linear: os vetores do domínio que são enviados ao vetor nulo e os vetores do contradomínio que podem ser obtidos pela transformação.
+
+::: {#def-nucleo-imagem-transformacao}
+
+## Núcleo e imagem de uma transformação linear
+
+Seja
+
+$$T:V\longrightarrow W$$
+
+uma transformação linear.
+
+O **núcleo** de $T$ é o conjunto
+
+$$
+\ker(T)
+=
+\{
+\mathbf{x}\in V:T(\mathbf{x})=\mathbf{0}
+\}.
+$$
+
+A **imagem** de $T$ é o conjunto
+
+$$
+\operatorname{Im}(T)
+=
+\{
+T(\mathbf{x}):\mathbf{x}\in V
+\}.
+$$
+
+O núcleo é um subespaço do domínio $V$, enquanto a imagem é um subespaço do contradomínio $W$.
+:::
+
+Para a transformação matricial
+
+$$
+T_{\mathbf{A}}:
+\mathbb{R}^p
+\longrightarrow
+\mathbb{R}^q,
+\qquad
+T_{\mathbf{A}}(\mathbf{x})
+=
+\mathbf{A}\mathbf{x},
+$$
+
+o núcleo é
+
+$$
+\begin{aligned}
+\ker(T_{\mathbf{A}})
+&=
+\{
+\mathbf{x}\in\mathbb{R}^p:
+\mathbf{A}\mathbf{x}=\mathbf{0}
+\}\\
+&=
+\mathcal{N}(\mathbf{A}),
+\end{aligned}
+$$
+
+e a imagem é
+
+$$
+\begin{aligned}
+\operatorname{Im}(T_{\mathbf{A}})
+&=
+\{
+\mathbf{A}\mathbf{x}:
+\mathbf{x}\in\mathbb{R}^p
+\}\\
+&=
+\mathcal{C}(\mathbf{A}).
+\end{aligned}
+$$
+
+Assim, o espaço nulo e o espaço coluna estudados no capítulo anterior correspondem, respectivamente, ao núcleo e à imagem da transformação linear associada à matriz $\mathbf{A}$.
 
 ### Imagem de um subespaço
 
@@ -922,7 +910,7 @@ $$
 \mathbf{x}_i^{\top}\mathbf{A}^{\top}.
 $$
 
-::: {#thm-transformacao-matriz-dados}
+::: {#prp-transformacao-matriz-dados}
 ## Transformação de uma matriz de dados
 
 Se as observações estão organizadas nas linhas de
@@ -956,7 +944,7 @@ $$
 $$
 :::
 
-::: proof
+::: {.proof}
 A $i$-ésima linha de $\mathbf{Y}$ é
 
 $$
@@ -1059,11 +1047,7 @@ $$
 
 A $j$-ésima coluna da matriz transformada é
 
-$$
-\mathbf{y}^{(j)}
-=
-\mathbf{X}\mathbf{w}_j.
-$$
+$$\mathbf{y}_{\cdot j}=\mathbf{X}\mathbf{w}_j.$$
 
 Cada nova variável é, portanto, uma combinação linear das variáveis originais. Para a $i$-ésima observação,
 
@@ -1173,23 +1157,11 @@ $$
 
 A primeira variável transformada é a soma das duas variáveis originais:
 
-$$
-\mathbf{y}^{(1)}
-=
-\mathbf{x}^{(1)}
-+
-\mathbf{x}^{(2)}.
-$$
+$$\mathbf{y}_{\cdot 1}=\mathbf{x}_{\cdot 1}+\mathbf{x}_{\cdot 2}.$$
 
 A segunda é
 
-$$
-\mathbf{y}^{(2)}
-=
-2\mathbf{x}^{(1)}
--
-\mathbf{x}^{(2)}.
-$$
+$$\mathbf{y}_{\cdot 2}=2\mathbf{x}_{\cdot 1}-\mathbf{x}_{\cdot 2}.$$
 :::
 
 ### Dimensão da configuração transformada
@@ -1266,13 +1238,11 @@ $$
 \mathcal{C}(\mathbf{A}).
 $$
 
-Portanto, a configuração transformada está contida em um subespaço de dimensão
+Portanto, todas as observações transformadas pertencem a um subespaço de dimensão
 
-$$
-r
-=
-\operatorname{posto}(\mathbf{A}).
-$$
+$$r=\operatorname{posto}(\mathbf{A}).$$
+
+Assim, a dimensão da configuração transformada não pode exceder $\operatorname{posto}(\mathbf{A})$, embora possa ser menor, dependendo da configuração original dos dados.
 
 Se
 
@@ -1290,19 +1260,9 @@ $$
 
 a imagem ocupa apenas um subespaço próprio de $\mathbb{R}^q$.
 
-Quando
+Quando $r<p$, a transformação possui núcleo não trivial e elimina pelo menos uma direção do domínio. Existe, nesse caso, um vetor não nulo
 
-$$
-r<p,
-$$
-
-a transformação elimina pelo menos uma direção do domínio. Existe, nesse caso, um vetor não nulo
-
-$$
-\mathbf{v}
-\in
-\mathcal{N}(\mathbf{A})
-$$
+$$\mathbf{v}\in\ker(T_{\mathbf{A}})=\mathcal{N}(\mathbf{A})$$
 
 tal que
 
@@ -1341,7 +1301,7 @@ A @fig-efeitos-transformacoes compara os efeitos de diferentes matrizes sobre um
 #| fig-cap: "Efeito de diferentes transformações lineares sobre uma mesma configuração de pontos."
 #| fig-width: 11
 #| fig-height: 7
-#| out-width: "100%"
+#| fig-align: center
 
 library(ggplot2)
 
@@ -1414,6 +1374,7 @@ P <- matrix(
 )
 
 transformar <- function(X, A, painel) {
+
   Y <- X %*% t(A)
 
   data.frame(
@@ -1456,18 +1417,16 @@ dados <- rbind(
   )
 )
 
-ordem_paineis <- c(
-  "Original",
-  "Rotação",
-  "Reflexão",
-  "Escalonamento",
-  "Cisalhamento",
-  "Projeção"
-)
-
 dados$painel <- factor(
   dados$painel,
-  levels = ordem_paineis
+  levels = c(
+    "Original",
+    "Rotação",
+    "Reflexão",
+    "Escalonamento",
+    "Cisalhamento",
+    "Projeção"
+  )
 )
 
 ggplot(
@@ -1480,16 +1439,17 @@ ggplot(
   geom_hline(
     yintercept = 0,
     linewidth = 0.4,
-    color = "gray60"
+    color = "gray55"
   ) +
   geom_vline(
     xintercept = 0,
     linewidth = 0.4,
-    color = "gray60"
+    color = "gray55"
   ) +
   geom_point(
-    size = 1.4,
-    alpha = 0.7
+    size = 1.5,
+    alpha = 0.7,
+    color = "#1f77b4"
   ) +
   facet_wrap(
     ~painel,
@@ -1500,31 +1460,17 @@ ggplot(
     ylim = c(-4.5, 4.5),
     expand = FALSE
   ) +
-  scale_x_continuous(
-    name = expression(x[1])
+  labs(
+    x = expression(x[1]),
+    y = expression(x[2])
   ) +
-  scale_y_continuous(
-    name = expression(x[2])
+  theme_minimal(
+    base_size = 13
   ) +
-  theme_minimal(base_size = 12) +
   theme(
     panel.grid.minor = element_blank(),
-    panel.grid.major = element_line(
-      linewidth = 0.25,
-      color = "gray88"
-    ),
-    strip.background = element_blank(),
     strip.text = element_text(
-      face = "bold",
-      size = 11
-    ),
-    axis.title = element_text(size = 12),
-    axis.text = element_text(size = 9),
-    plot.margin = margin(
-      t = 10,
-      r = 12,
-      b = 10,
-      l = 10
+      face = "bold"
     )
   )
 ```
@@ -1585,11 +1531,9 @@ $$
 
 A matriz
 
-$$
-\mathbf{A}^{\top}\mathbf{A}
-$$
+$$\mathbf{A}^{\top}\mathbf{A}$$
 
-descreve, no domínio, a geometria induzida pela transformação.
+descreve, no domínio, como a transformação modifica produtos internos, comprimentos e distâncias. Quando $\mathbf{A}$ possui posto completo nas colunas, $\mathbf{A}^{\top}\mathbf{A}$ é positiva definida e determina um produto interno no domínio. Quando $\mathbf{A}$ não possui posto completo nas colunas, essa matriz é apenas semidefinida positiva e algumas direções são eliminadas pela transformação.
 
 Para quaisquer vetores $\mathbf{x},\mathbf{z}\in\mathbb{R}^p$,
 
@@ -1663,7 +1607,7 @@ $$
 e a expressão
 
 $$
-\|\mathbf{x}\|_{\mathbf{A}}
+\|\mathbf{x}\|_{\mathbf{A}^{\top}\mathbf{A}}
 =
 \sqrt{
 \mathbf{x}^{\top}
@@ -1676,15 +1620,15 @@ $$
 
 define uma norma em $\mathbb{R}^p$.
 
-Quando $\mathbf{A}$ não possui posto completo nas colunas, existem vetores não nulos em $\mathcal{N}(\mathbf{A})$ para os quais
+Quando $\mathbf{A}$ não possui posto completo nas colunas, existem vetores não nulos em
 
-$$
-\|\mathbf{x}\|_{\mathbf{A}}
-=
-0.
-$$
+$$\ker(T_{\mathbf{A}})=\mathcal{N}(\mathbf{A})$$
 
-Nesse caso, $\|\cdot\|_{\mathbf{A}}$ define uma seminorma.
+para os quais
+
+$$\|\mathbf{x}\|_{\mathbf{A}^{\top}\mathbf{A}}=0.$$
+
+Nesse caso, $\|\cdot\|_{\mathbf{A}^{\top}\mathbf{A}}$ define uma seminorma.
 
 ### Transformação das matrizes de produtos internos
 
@@ -1852,7 +1796,7 @@ T_1(\mathbf{x})
 \end{aligned}
 $$
 
-::: {#thm-matriz-composicao}
+::: {#prp-matriz-composicao}
 ## Matriz de uma composição
 
 Se $T_1$ é representada por $\mathbf{A}$ e $T_2$ é representada por $\mathbf{B}$, então a composição
@@ -2017,7 +1961,7 @@ A @fig-composicao-transformacoes compara as duas ordens de aplicação.
 #| fig-cap: "Efeito da ordem na composição de uma rotação e de um escalonamento não uniforme."
 #| fig-width: 11
 #| fig-height: 4.8
-#| out-width: "100%"
+#| fig-align: center
 
 library(ggplot2)
 
@@ -2110,8 +2054,9 @@ ggplot(
     color = "gray60"
   ) +
   geom_point(
-    size = 1.45,
-    alpha = 0.7
+    size = 1.5,
+    alpha = 0.7,
+    color = "#1f77b4"
   ) +
   facet_wrap(
     ~painel,
@@ -2128,7 +2073,7 @@ ggplot(
   scale_y_continuous(
     name = expression(x[2])
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
     panel.grid.major = element_line(
@@ -2239,7 +2184,7 @@ $$
 
 A transformação inversa é representada por $\mathbf{A}^{-1}$.
 
-::: {#thm-inversa-composicao}
+::: {#prp-inversa-composicao}
 ## Inversa de uma composição
 
 Se $\mathbf{A}$ e $\mathbf{B}$ são matrizes quadradas e invertíveis de dimensões compatíveis, então
@@ -2254,7 +2199,7 @@ $$
 $$
 :::
 
-::: proof
+::: {.proof}
 Tem-se
 
 $$
@@ -2372,186 +2317,109 @@ $$
 essas propriedades podem ser caracterizadas pelo núcleo, pelo espaço coluna e pelo posto.
 
 ::: {#thm-caracterizacoes-transformacao-linear}
+
 ## Caracterizações por núcleo, imagem e posto
 
-Se
+Seja
 
 $$
-\mathbf{A}
-\in
-\mathbb{R}^{q\times p},
+T_{\mathbf{A}}:
+\mathbb{R}^p
+\longrightarrow
+\mathbb{R}^q,
+\qquad
+T_{\mathbf{A}}(\mathbf{x})
+=
+\mathbf{A}\mathbf{x},
 $$
 
-então:
+com $\mathbf{A}\in\mathbb{R}^{q\times p}$. Então:
 
-1.  $T_{\mathbf{A}}$ é injetiva se, e somente se,
+1. $T_{\mathbf{A}}$ é injetiva se, e somente se,
 
-    $$
-    \mathcal{N}(\mathbf{A})
-    =
-    \{\mathbf{0}\};
-    $$
+   $$\ker(T_{\mathbf{A}})=\mathcal{N}(\mathbf{A})=\{\mathbf{0}\};$$
 
-2.  $T_{\mathbf{A}}$ é injetiva se, e somente se,
+2. $T_{\mathbf{A}}$ é injetiva se, e somente se,
 
-    $$
-    \operatorname{posto}(\mathbf{A})
-    =
-    p;
-    $$
+   $$\operatorname{posto}(\mathbf{A})=p;$$
 
-3.  $T_{\mathbf{A}}$ é sobrejetiva se, e somente se,
+3. $T_{\mathbf{A}}$ é sobrejetiva se, e somente se,
 
-    $$
-    \mathcal{C}(\mathbf{A})
-    =
-    \mathbb{R}^q;
-    $$
+   $$\operatorname{Im}(T_{\mathbf{A}})=\mathcal{C}(\mathbf{A})=\mathbb{R}^q;$$
 
-4.  $T_{\mathbf{A}}$ é sobrejetiva se, e somente se,
+4. $T_{\mathbf{A}}$ é sobrejetiva se, e somente se,
 
-    $$
-    \operatorname{posto}(\mathbf{A})
-    =
-    q.
-    $$
+   $$\operatorname{posto}(\mathbf{A})=q.$$
+
+[@meyer2023matrix]
 :::
 
-::: proof
-Suponha que $T_{\mathbf{A}}$ seja injetiva. Se
+::: {.proof}
+Suponha inicialmente que $T_{\mathbf{A}}$ seja injetiva. Se
 
-$$
-\mathbf{x}
-\in
-\mathcal{N}(\mathbf{A}),
-$$
+$$\mathbf{x}\in\ker(T_{\mathbf{A}})=\mathcal{N}(\mathbf{A}),$$
 
 então
 
-$$
-\mathbf{A}\mathbf{x}
-=
-\mathbf{0}
-=
-\mathbf{A}\mathbf{0}.
-$$
+$$\mathbf{A}\mathbf{x}=\mathbf{0}=\mathbf{A}\mathbf{0}.$$
 
 Pela injetividade,
 
-$$
-\mathbf{x}
-=
-\mathbf{0}.
-$$
+$$\mathbf{x}=\mathbf{0}.$$
 
 Logo,
 
-$$
-\mathcal{N}(\mathbf{A})
-=
-\{\mathbf{0}\}.
-$$
+$$\ker(T_{\mathbf{A}})=\mathcal{N}(\mathbf{A})=\{\mathbf{0}\}.$$
 
 Reciprocamente, suponha que
 
-$$
-\mathcal{N}(\mathbf{A})
-=
-\{\mathbf{0}\}
-$$
+$$\ker(T_{\mathbf{A}})=\mathcal{N}(\mathbf{A})=\{\mathbf{0}\}$$
 
 e que
 
-$$
-\mathbf{A}\mathbf{x}_1
-=
-\mathbf{A}\mathbf{x}_2.
-$$
+$$\mathbf{A}\mathbf{x}_1=\mathbf{A}\mathbf{x}_2.$$
 
 Então,
 
-$$
-\mathbf{A}
-\left(
-\mathbf{x}_1-\mathbf{x}_2
-\right)
-=
-\mathbf{0}.
-$$
+$$\mathbf{A}(\mathbf{x}_1-\mathbf{x}_2)=\mathbf{0}.$$
 
 Portanto,
 
-$$
-\mathbf{x}_1-\mathbf{x}_2
-\in
-\mathcal{N}(\mathbf{A}),
-$$
+$$\mathbf{x}_1-\mathbf{x}_2\in\ker(T_{\mathbf{A}})=\mathcal{N}(\mathbf{A}),$$
 
 o que implica
 
-$$
-\mathbf{x}_1
-=
-\mathbf{x}_2.
-$$
+$$\mathbf{x}_1=\mathbf{x}_2.$$
 
 Assim, $T_{\mathbf{A}}$ é injetiva.
 
 Pelo @thm-posto-nulidade,
 
-$$
-\dim
-\left(
-\mathcal{N}(\mathbf{A})
-\right)
-+
-\operatorname{posto}(\mathbf{A})
-=
-p.
-$$
+$$\dim\mathcal{N}(\mathbf{A})+\operatorname{posto}(\mathbf{A})=p.$$
 
-Logo,
+Como $\mathcal{N}(\mathbf{A})=\ker(T_{\mathbf{A}})$, tem-se
 
-$$
-\mathcal{N}(\mathbf{A})
-=
-\{\mathbf{0}\}
-$$
+$$\ker(T_{\mathbf{A}})=\{\mathbf{0}\}$$
 
 se, e somente se,
 
-$$
-\operatorname{posto}(\mathbf{A})
-=
-p.
-$$
+$$\operatorname{posto}(\mathbf{A})=p.$$
 
-A transformação é sobrejetiva quando todo vetor de $\mathbb{R}^q$ pertence à imagem de $T_{\mathbf{A}}$. Como essa imagem é $\mathcal{C}(\mathbf{A})$, a sobrejetividade equivale a
+Por outro lado, $T_{\mathbf{A}}$ é sobrejetiva quando todo vetor de $\mathbb{R}^q$ pertence à sua imagem. Como
 
-$$
-\mathcal{C}(\mathbf{A})
-=
-\mathbb{R}^q.
-$$
+$$\operatorname{Im}(T_{\mathbf{A}})=\mathcal{C}(\mathbf{A}),$$
+
+a sobrejetividade equivale a
+
+$$\operatorname{Im}(T_{\mathbf{A}})=\mathcal{C}(\mathbf{A})=\mathbb{R}^q.$$
 
 Essa igualdade ocorre se, e somente se,
 
-$$
-\dim
-\left(
-\mathcal{C}(\mathbf{A})
-\right)
-=
-q,
-$$
+$$\dim\mathcal{C}(\mathbf{A})=q,$$
 
 isto é,
 
-$$
-\operatorname{posto}(\mathbf{A})
-=
-q.
-$$
+$$\operatorname{posto}(\mathbf{A})=q.$$
 :::
 
 Uma transformação de $\mathbb{R}^p$ em $\mathbb{R}^q$ pode ser injetiva somente quando
@@ -2615,8 +2483,8 @@ São equivalentes:
 1.  $T_{\mathbf{A}}$ é injetiva;
 2.  $T_{\mathbf{A}}$ é sobrejetiva;
 3.  $T_{\mathbf{A}}$ é bijetiva;
-4.  $\mathcal{N}(\mathbf{A})=\{\mathbf{0}\}$;
-5.  $\mathcal{C}(\mathbf{A})=\mathbb{R}^p$;
+4.  $\ker(T_{\mathbf{A}})=\mathcal{N}(\mathbf{A})=\{\mathbf{0}\}$;
+5.  $\operatorname{Im}(T_{\mathbf{A}})=\mathcal{C}(\mathbf{A})=\mathbb{R}^p$;
 6.  $\operatorname{posto}(\mathbf{A})=p$;
 7.  $\det(\mathbf{A})\neq0$;
 8.  $\mathbf{A}^{-1}$ existe.
@@ -2628,8 +2496,8 @@ A @tbl-injetividade-sobrejetividade resume as relações principais.
 
 | Propriedade     | Condição geométrica                                    | Condição matricial                                                              |
 |:-----------------------|:-----------------------|:-----------------------|
-| Injetividade    | Vetores distintos possuem imagens distintas            | $\mathcal{N}(\mathbf{A})=\{\mathbf{0}\}$ e $\operatorname{posto}(\mathbf{A})=p$ |
-| Sobrejetividade | Todo vetor do contradomínio é atingido                 | $\mathcal{C}(\mathbf{A})=\mathbb{R}^q$ e $\operatorname{posto}(\mathbf{A})=q$   |
+| Injetividade    | Vetores distintos possuem imagens distintas            | $\ker(T_{\mathbf{A}})=\mathcal{N}(\mathbf{A})=\{\mathbf{0}\}$ e $\operatorname{posto}(\mathbf{A})=p$ |
+| Sobrejetividade | Todo vetor do contradomínio é atingido                  | $\operatorname{Im}(T_{\mathbf{A}})=\mathcal{C}(\mathbf{A})=\mathbb{R}^q$ e $\operatorname{posto}(\mathbf{A})=q$ |
 | Bijetividade    | Há correspondência única entre domínio e contradomínio | $p=q=\operatorname{posto}(\mathbf{A})$                                          |
 | Invertibilidade | A transformação pode ser desfeita                      | $\mathbf{A}$ é quadrada e $\det(\mathbf{A})\neq0$                               |
 
@@ -2641,11 +2509,7 @@ Quando a transformação não é injetiva, existem vetores distintos com a mesma
 
 Se
 
-$$
-\mathbf{v}
-\in
-\mathcal{N}(\mathbf{A}),
-$$
+$$\mathbf{v}\in\ker(T_{\mathbf{A}})=\mathcal{N}(\mathbf{A}),$$
 
 então, para qualquer $\mathbf{x}\in\mathbb{R}^p$,
 
@@ -2669,11 +2533,11 @@ Portanto, todos os vetores do conjunto
 $$
 \mathbf{x}
 +
-\mathcal{N}(\mathbf{A})
+\ker(T_{\mathbf{A}})
 =
 \left\{
 \mathbf{x}+\mathbf{v}:
-\mathbf{v}\in\mathcal{N}(\mathbf{A})
+\mathbf{v}\in\ker(T_{\mathbf{A}})
 \right\}
 $$
 
@@ -2695,7 +2559,7 @@ $$
 \mathcal{N}(\mathbf{A}).
 $$
 
-A ambiguidade na recuperação do vetor original é, assim, determinada pelo espaço nulo.
+A ambiguidade na recuperação do vetor original é, assim, determinada pelo núcleo da transformação, que coincide com o espaço nulo da matriz associada.
 
 Se
 
@@ -2820,7 +2684,7 @@ A @fig-inversibilidade compara uma transformação invertível, a recuperação 
 #| fig-cap: "Transformação invertível, recuperação pela inversa e colapso provocado por uma transformação singular."
 #| fig-width: 12
 #| fig-height: 5
-#| out-width: "100%"
+#| fig-align: center
 
 library(ggplot2)
 
@@ -2898,7 +2762,7 @@ dados$painel <- factor(
     "Original",
     "Transformada",
     "Recuperada",
-    "Transformação singular"
+    "Transf. singular"
   )
 )
 
@@ -2906,7 +2770,8 @@ ggplot(
   dados,
   aes(
     x = x,
-    y = y
+    y = y,
+    color = painel
   )
 ) +
   geom_hline(
@@ -2919,9 +2784,18 @@ ggplot(
     linewidth = 0.4,
     color = "gray60"
   ) +
-  geom_point(
-    size = 1.4,
-    alpha = 0.7
+    geom_point(
+    size = 1.5,
+    alpha = 0.7,
+    show.legend = FALSE
+  ) +
+  scale_color_manual(
+    values = c(
+      "Original" = "#1f77b4",
+      "Transformada" = "#2ca02c",
+      "Recuperada" = "#1f77b4",
+      "Transformação singular" = "#d62728"
+    )
   ) +
   facet_wrap(
     ~painel,
@@ -2938,7 +2812,7 @@ ggplot(
   scale_y_continuous(
     name = expression(x[2])
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
     panel.grid.major = element_line(
@@ -2984,7 +2858,7 @@ Essas relações permitem interpretar o posto como o número de direções indep
 
 ## Transformações geométricas
 
-Matrizes distintas produzem efeitos geométricos diferentes sobre vetores e conjuntos de pontos. Algumas modificam apenas a orientação da configuração, enquanto outras alteram comprimentos, ângulos, áreas ou dimensão.
+Matrizes distintas produzem efeitos geométricos diferentes sobre vetores e conjuntos de pontos. Algumas modificam a posição da configuração em relação aos eixos coordenados sem deformar sua geometria, enquanto outras alteram comprimentos, ângulos, áreas ou dimensão.
 
 Nesta seção, são examinadas cinco transformações no plano:
 
@@ -3256,7 +3130,9 @@ $$
 \|\mathbf{u}\|=1,
 $$
 
-representa a reflexão em relação ao hiperplano ortogonal a $\mathbf{u}$. Essa transformação é denominada reflexão de Householder.
+representa a reflexão em relação ao hiperplano ortogonal a $\mathbf{u}$. Essa transformação é denominada **reflexão de Householder**.
+
+Observe que as duas construções preservam componentes diferentes. A matriz $2\mathbf{u}\mathbf{u}^{\top}-\mathbf{I}$ preserva a componente na direção de $\mathbf{u}$ e inverte as componentes ortogonais a ela, enquanto $\mathbf{I}-2\mathbf{u}\mathbf{u}^{\top}$ preserva as componentes ortogonais a $\mathbf{u}$ e inverte a componente na direção de $\mathbf{u}$.
 
 ### Escalonamento
 
@@ -3309,13 +3185,9 @@ Nesse caso, todos os comprimentos e todas as distâncias são multiplicados por 
 
 Quando
 
-$$
-s_1
-\neq
-s_2,
-$$
+$$s_1\neq s_2,$$
 
-o escalonamento é não uniforme. Cada direção coordenada é ampliada ou comprimida por um fator diferente, de modo que comprimentos, ângulos e proporções podem ser alterados.
+o escalonamento é não uniforme. Cada direção coordenada é reescalada por um fator próprio, de modo que comprimentos, ângulos e proporções podem ser alterados. Se algum fator $s_j$ for negativo, além da alteração de escala ocorre a inversão do sentido da coordenada correspondente.
 
 O determinante da matriz é
 
@@ -3488,61 +3360,11 @@ $$
 
 Assim, o cisalhamento preserva áreas e volumes, mas altera comprimentos e ângulos. Retas e paralelismo são preservados.
 
-### Projeção
-
-Uma projeção mantém a componente de um vetor pertencente a um subespaço e elimina a componente ortogonal.
-
-Para uma direção unitária $\mathbf{u}\in\mathbb{R}^p$, a matriz de projeção é
-
-$$
-\mathbf{P}_{\mathbf{u}}
-=
-\mathbf{u}\mathbf{u}^{\top}.
-$$
-
-A imagem de $\mathbf{x}$ é
-
-$$
-\mathbf{P}_{\mathbf{u}}\mathbf{x}
-=
-\left(
-\mathbf{u}^{\top}\mathbf{x}
-\right)
-\mathbf{u}.
-$$
-
-Como estudado no Capítulo 3,
-
-$$
-\mathbf{P}_{\mathbf{u}}^2
-=
-\mathbf{P}_{\mathbf{u}}
-$$
-
-e
-
-$$
-\mathbf{P}_{\mathbf{u}}^{\top}
-=
-\mathbf{P}_{\mathbf{u}}.
-$$
-
-Se $p>1$, a projeção sobre uma única direção possui posto 1. Consequentemente,
-
-$$
-\det
-\left(
-\mathbf{P}_{\mathbf{u}}
-\right)
-=
-0.
-$$
-
 A projeção é uma transformação linear não invertível. Vetores que possuem a mesma componente na direção de $\mathbf{u}$ são enviados ao mesmo ponto.
 
 ### Comparação geométrica
 
-A @fig-transformacoes-quadrado mostra o efeito das transformações anteriores sobre o quadrado unitário.
+A @fig-transformacoes-quadrado mostra o efeito das transformações anteriores sobre o quadrado unitário. Como todos os painéis utilizam a mesma escala, alterações de forma, área e dimensão podem ser comparadas diretamente.
 
 ```{r}
 #| label: fig-transformacoes-quadrado
@@ -3552,7 +3374,7 @@ A @fig-transformacoes-quadrado mostra o efeito das transformações anteriores s
 #| fig-cap: "Efeito de diferentes transformações lineares sobre o quadrado unitário."
 #| fig-width: 11
 #| fig-height: 7
-#| out-width: "100%"
+#| fig-align: center
 
 library(ggplot2)
 
@@ -3566,7 +3388,7 @@ quadrado <- rbind(
 
 theta <- pi / 5
 
-R <- matrix(
+Q <- matrix(
   c(
     cos(theta), -sin(theta),
     sin(theta),  cos(theta)
@@ -3584,7 +3406,7 @@ F <- matrix(
   byrow = TRUE
 )
 
-S <- matrix(
+L <- matrix(
   c(
     1.7, 0,
     0, 0.55
@@ -3593,7 +3415,7 @@ S <- matrix(
   byrow = TRUE
 )
 
-H <- matrix(
+C <- matrix(
   c(
     1, 0.8,
     0, 1
@@ -3635,7 +3457,7 @@ dados <- rbind(
   ),
   transformar_poligono(
     quadrado,
-    R,
+    Q,
     "Rotação"
   ),
   transformar_poligono(
@@ -3645,12 +3467,12 @@ dados <- rbind(
   ),
   transformar_poligono(
     quadrado,
-    S,
+    L,
     "Escalonamento"
   ),
   transformar_poligono(
     quadrado,
-    H,
+    C,
     "Cisalhamento"
   ),
   transformar_poligono(
@@ -3685,20 +3507,26 @@ ggplot(
   geom_hline(
     yintercept = 0,
     linewidth = 0.4,
-    color = "gray60"
+    color = "gray55"
   ) +
   geom_vline(
     xintercept = 0,
     linewidth = 0.4,
-    color = "gray60"
+    color = "gray55"
   ) +
   geom_polygon(
-    fill = "gray85",
-    color = "gray30",
-    linewidth = 0.8
+    fill = "#1f77b4",
+    color = "#1f77b4",
+    alpha = 0.14,
+    linewidth = 0.9
+  ) +
+  geom_path(
+    color = "#1f77b4",
+    linewidth = 0.9
   ) +
   geom_point(
-    size = 2
+    size = 2,
+    color = "#1f77b4"
   ) +
   facet_wrap(
     ~painel,
@@ -3709,36 +3537,22 @@ ggplot(
     ylim = c(-1.8, 2.2),
     expand = FALSE
   ) +
-  scale_x_continuous(
-    name = expression(x[1])
+  labs(
+    x = expression(x[1]),
+    y = expression(x[2])
   ) +
-  scale_y_continuous(
-    name = expression(x[2])
+  theme_minimal(
+    base_size = 13
   ) +
-  theme_minimal(base_size = 12) +
   theme(
     panel.grid.minor = element_blank(),
-    panel.grid.major = element_line(
-      linewidth = 0.25,
-      color = "gray88"
-    ),
-    strip.background = element_blank(),
     strip.text = element_text(
-      face = "bold",
-      size = 11
-    ),
-    axis.title = element_text(size = 12),
-    axis.text = element_text(size = 9),
-    plot.margin = margin(
-      t = 10,
-      r = 12,
-      b = 10,
-      l = 10
+      face = "bold"
     )
   )
 ```
 
-A rotação gira o quadrado em relação aos eixos coordenados sem alterar sua forma, sua área ou sua orientação. A reflexão preserva a forma e a área, mas inverte a orientação. O escalonamento não uniforme transforma o quadrado em um retângulo. O cisalhamento transforma o quadrado em um paralelogramo com a mesma área. A projeção reduz a figura a um segmento de reta.
+A rotação altera a posição do quadrado em relação aos eixos coordenados sem modificar sua forma, sua área ou sua orientação. A reflexão preserva a forma e a área, mas inverte a orientação. O escalonamento não uniforme modifica os comprimentos nas direções coordenadas e transforma o quadrado em um retângulo. O cisalhamento transforma o quadrado em um paralelogramo com a mesma área, mostrando que preservar área não implica preservar ângulos ou comprimentos. A projeção elimina uma direção e reduz a figura a um segmento de reta.
 
 ### Determinante, volume e orientação
 
@@ -3791,25 +3605,28 @@ $$
 em que $\operatorname{Vol}_p$ representa o volume $p$-dimensional.
 
 Se $\det(\mathbf{A})=0$, a imagem está contida em um subespaço de dimensão inferior a $p$ e seu volume $p$-dimensional é igual a zero.
+
+[@meyer2023matrix]
 :::
 
 A demonstração formal desse resultado, baseada no Jacobiano de uma transformação linear, será apresentada no capítulo dedicado ao cálculo multivariado.
 
 No plano, o resultado descreve a alteração de área. Em $\mathbb{R}^3$, descreve a alteração de volume. Em dimensão geral, descreve a alteração do hipervolume.
 
-O sinal do determinante descreve a orientação:
+Quando a transformação é invertível, o sinal do determinante descreve o efeito sobre a orientação:
 
--   se $\det(\mathbf{A})>0$, a orientação é preservada;
--   se $\det(\mathbf{A})<0$, a orientação é invertida;
--   se $\det(\mathbf{A})=0$, ocorre redução de dimensão.
+- se $\det(\mathbf{A})>0$, a orientação é preservada;
+- se $\det(\mathbf{A})<0$, a orientação é invertida.
+
+Se $\det(\mathbf{A})=0$, a transformação não é invertível, sua imagem possui dimensão inferior a $p$ e o volume $p$-dimensional é reduzido a zero.
 
 A @tbl-transformacoes-geometricas resume as propriedades das transformações estudadas.
 
 | Transformação           | Matriz no plano                        | Determinante | Efeito geométrico           |
-|:----------------|:----------------|:-------------------:|:----------------|
+|:----------------|:----------------|:------------------:|:----------------|
 | Rotação                 | $\mathbf{Q}(\theta)$                   |     $1$      | Gira a configuração         |
 | Reflexão                | $\mathbf{F}$                           |     $-1$     | Produz uma imagem especular |
-| Escalonamento           | $\operatorname{diag}(s_1,s_2)$         |   $s_1s_2$   | Amplia ou comprime direções |
+| Escalonamento           | $\operatorname{diag}(s_1,s_2)$         |   $s_1s_2$   | Reescala direções coordenadas |
 | Cisalhamento            | $\begin{bmatrix}1&k\\0&1\end{bmatrix}$ |     $1$      | Inclina a configuração      |
 | Projeção sobre uma reta | $\mathbf{u}\mathbf{u}^{\top}$          |     $0$      | Elimina uma direção         |
 
@@ -3868,7 +3685,25 @@ $$
 
 é denominada **transformação ortogonal**.
 
-Pelo @thm-preservacao-produto-interno, para quaisquer vetores $\mathbf{x},\mathbf{y}\in\mathbb{R}^p$,
+::: {#prp-preservacao-geometria-transformacao-ortogonal}
+
+## Preservação da geometria euclidiana
+
+Se $\mathbf{Q}\in\mathbb{R}^{p\times p}$ é ortogonal, então, para quaisquer $\mathbf{x},\mathbf{y}\in\mathbb{R}^p$, a transformação
+
+$$T_{\mathbf{Q}}(\mathbf{x})=\mathbf{Q}\mathbf{x}$$
+
+preserva:
+
+1. o produto interno;
+2. as normas;
+3. as distâncias euclidianas;
+4. os ângulos;
+5. a ortogonalidade.
+:::
+
+::: {.proof}
+Pelo @thm-preservacao-produto-interno,
 
 $$
 \left(
@@ -3881,15 +3716,13 @@ $$
 \mathbf{x}^{\top}\mathbf{y}.
 $$
 
-Assim, a transformação preserva o produto interno entre todos os pares de vetores.
+Portanto, o produto interno entre quaisquer dois vetores é preservado.
 
 Tomando $\mathbf{y}=\mathbf{x}$,
 
 $$
 \begin{aligned}
-\|
-\mathbf{Q}\mathbf{x}
-\|^2
+\|\mathbf{Q}\mathbf{x}\|^2
 &=
 \left(
 \mathbf{Q}\mathbf{x}
@@ -3904,15 +3737,9 @@ $$
 \end{aligned}
 $$
 
-Portanto,
+Como as normas são não negativas,
 
-$$
-\|
-\mathbf{Q}\mathbf{x}
-\|
-=
-\|\mathbf{x}\|.
-$$
+$$\|\mathbf{Q}\mathbf{x}\|=\|\mathbf{x}\|.$$
 
 Para dois vetores $\mathbf{x}$ e $\mathbf{y}$,
 
@@ -3926,9 +3753,7 @@ $$
 &=
 \|
 \mathbf{Q}
-\left(
-\mathbf{x}-\mathbf{y}
-\right)
+(\mathbf{x}-\mathbf{y})
 \|\\
 &=
 \|
@@ -3937,9 +3762,9 @@ $$
 \end{aligned}
 $$
 
-Logo, todas as distâncias euclidianas são preservadas.
+Logo, todas as distâncias euclidianas entre pares de vetores são preservadas.
 
-Para vetores não nulos, o ângulo $\theta$ é determinado por
+Para vetores não nulos, o ângulo $\theta$ entre $\mathbf{x}$ e $\mathbf{y}$ é determinado por
 
 $$
 \cos(\theta)
@@ -3953,7 +3778,7 @@ $$
 }.
 $$
 
-Como os produtos internos e as normas permanecem inalterados,
+Como o produto interno e as normas são preservados,
 
 $$
 \frac{
@@ -3964,13 +3789,9 @@ $$
 \mathbf{Q}\mathbf{y}
 \right)
 }{
-\|
-\mathbf{Q}\mathbf{x}
-\|
+\|\mathbf{Q}\mathbf{x}\|
 \,
-\|
-\mathbf{Q}\mathbf{y}
-\|
+\|\mathbf{Q}\mathbf{y}\|
 }
 =
 \frac{
@@ -3982,15 +3803,13 @@ $$
 }.
 $$
 
-Portanto, os ângulos também são preservados. Em particular,
+Portanto, os ângulos também são preservados.
 
-$$
-\mathbf{x}^{\top}\mathbf{y}
-=
-0
-$$
+Em particular, se
 
-implica
+$$\mathbf{x}^{\top}\mathbf{y}=0,$$
+
+então
 
 $$
 \left(
@@ -4000,19 +3819,13 @@ $$
 \mathbf{Q}\mathbf{y}
 \right)
 =
-0.
+0,
 $$
 
-Transformações ortogonais preservam, assim:
+e a ortogonalidade é preservada.
+:::
 
--   produtos internos;
--   normas;
--   distâncias;
--   ângulos;
--   ortogonalidade;
--   áreas e volumes.
-
-Elas podem modificar a orientação da configuração, mas não alteram suas relações métricas internas.
+Assim, transformações ortogonais preservam integralmente as relações métricas determinadas pelo produto interno euclidiano. Elas podem alterar a orientação da configuração, mas não deformam sua geometria interna.
 
 ### Transformação de uma matriz de dados
 
@@ -4040,7 +3853,7 @@ $$
 \mathbf{X}\mathbf{Q}^{\top}.
 $$
 
-::: {#thm-gram-transformacao-ortogonal}
+::: {#prp-gram-transformacao-ortogonal}
 ## Preservação da matriz de Gram
 
 Se
@@ -4060,7 +3873,7 @@ $$
 $$
 :::
 
-::: proof
+::: {.proof}
 Tem-se
 
 $$
@@ -4099,13 +3912,25 @@ A nuvem de pontos pode ser rotacionada ou refletida, mas sua forma e suas relaç
 
 ### Determinante e orientação
 
+::: {#prp-determinante-matriz-ortogonal}
+
+## Determinante de uma matriz ortogonal
+
+Se $\mathbf{Q}\in\mathbb{R}^{p\times p}$ é ortogonal, então
+
+$$\det(\mathbf{Q})\in\{-1,1\}.$$
+
+Consequentemente,
+
+$$|\det(\mathbf{Q})|=1,$$
+
+e a transformação preserva volumes $p$-dimensionais.
+:::
+
+::: {.proof}
 Como
 
-$$
-\mathbf{Q}^{\top}\mathbf{Q}
-=
-\mathbf{I}_p,
-$$
+$$\mathbf{Q}^{\top}\mathbf{Q}=\mathbf{I}_p,$$
 
 tem-se
 
@@ -4130,27 +3955,14 @@ $$
 
 Portanto,
 
-$$
-\det(\mathbf{Q})
-=
-1
-\qquad
-\text{ou}
-\qquad
-\det(\mathbf{Q})
-=
--1.
-$$
+$$\det(\mathbf{Q})=1\qquad\text{ou}\qquad\det(\mathbf{Q})=-1.$$
 
-Como
+Logo,
 
-$$
-|\det(\mathbf{Q})|
-=
-1,
-$$
+$$|\det(\mathbf{Q})|=1.$$
+:::
 
-áreas e volumes são preservados.
+No plano, a preservação do volume $p$-dimensional corresponde à preservação de áreas; em $\mathbb{R}^3$, corresponde à preservação de volumes.
 
 Quando
 
@@ -4202,47 +4014,38 @@ $$
 \end{bmatrix},
 $$
 
-então
+então suas colunas satisfazem
 
-$$
-\mathbf{q}_i^{\top}\mathbf{q}_j
-=
-\begin{cases}
-1, & i=j,\\
-0, & i\neq j.
-\end{cases}
-$$
+$$\mathbf{q}_i^{\top}\mathbf{q}_j=\delta_{ij},$$
+
+em que $\delta_{ij}$ é o delta de Kronecker definido no Capítulo 2. Portanto, as colunas de $\mathbf{Q}$ possuem norma unitária e são ortogonais duas a duas.
 
 Como
 
-$$
-\mathbf{Q}\mathbf{Q}^{\top}
-=
-\mathbf{I}_p,
-$$
+$$\mathbf{Q}\mathbf{Q}^{\top}=\mathbf{I}_p,$$
 
-as linhas de $\mathbf{Q}$ também são ortonormais.
+as linhas de $\mathbf{Q}$ também formam um conjunto ortonormal.
 
-A mesma matriz pode ser interpretada de duas formas:
+Uma matriz ortogonal admite, portanto, duas interpretações que devem ser distinguidas:
 
--   como uma transformação que preserva a geometria euclidiana;
--   como uma base ortonormal organizada em suas colunas.
+- como matriz de uma transformação linear que preserva a geometria euclidiana;
+- como matriz cujas colunas constituem uma base ortonormal de $\mathbb{R}^p$.
 
-A relação entre essas interpretações será desenvolvida na seção sobre mudanças de coordenadas.
+Na primeira interpretação, a matriz atua sobre o vetor e modifica sua posição no espaço. Na segunda, seus vetores-coluna definem um sistema de coordenadas. A relação entre essas duas interpretações será desenvolvida na seção seguinte.
 
 ### Comparação com transformações não ortogonais
 
-A @fig-transformacoes-ortogonais compara o efeito de diferentes matrizes sobre a circunferência unitária e sobre duas direções ortogonais.
+A @fig-transformacoes-ortogonais compara o efeito de diferentes matrizes sobre a circunferência unitária e sobre duas direções inicialmente ortogonais. O marcador de ângulo reto identifica os casos em que a ortogonalidade é preservada.
 
 ```{r}
 #| label: fig-transformacoes-ortogonais
 #| echo: false
 #| warning: false
 #| message: false
-#| fig-cap: "Efeito de transformações ortogonais e não ortogonais sobre a circunferência unitária e duas direções ortogonais."
+#| fig-cap: "Efeito de transformações ortogonais e não ortogonais sobre a circunferência unitária e duas direções inicialmente ortogonais."
 #| fig-width: 11
 #| fig-height: 7
-#| out-width: "100%"
+#| fig-align: center
 
 library(ggplot2)
 
@@ -4303,11 +4106,20 @@ transformacoes <- list(
   "Cisalhamento" = H
 )
 
+ordem_paineis <- c(
+  "Original",
+  "Rotação",
+  "Reflexão",
+  "Escalonamento",
+  "Cisalhamento"
+)
+
 curvas <- do.call(
   rbind,
   lapply(
     names(transformacoes),
     function(nome) {
+
       A <- transformacoes[[nome]]
       resultado <- circunferencia %*% t(A)
 
@@ -4325,6 +4137,7 @@ vetores <- do.call(
   lapply(
     names(transformacoes),
     function(nome) {
+
       A <- transformacoes[[nome]]
 
       e1 <- drop(
@@ -4356,12 +4169,52 @@ vetores <- do.call(
   )
 )
 
-ordem_paineis <- c(
+# Marcadores de ângulo reto para as transformações ortogonais
+paineis_angulo_reto <- c(
   "Original",
   "Rotação",
   "Reflexão",
-  "Escalonamento",
-  "Cisalhamento"
+  "Escalonamento"
+)
+
+tamanho <- 0.18
+
+angulos_retos <- do.call(
+  rbind,
+  lapply(
+    paineis_angulo_reto,
+    function(nome) {
+
+      A <- transformacoes[[nome]]
+
+      u <- drop(
+        A %*% c(1, 0)
+      )
+
+      v <- drop(
+        A %*% c(0, 1)
+      )
+
+      p1 <- tamanho * u
+      p2 <- tamanho * (u + v)
+      p3 <- tamanho * v
+
+      data.frame(
+        x = c(
+          p1[1],
+          p2[1],
+          p3[1]
+        ),
+        y = c(
+          p1[2],
+          p2[2],
+          p3[2]
+        ),
+        painel = nome,
+        grupo = nome
+      )
+    }
+  )
 )
 
 curvas$painel <- factor(
@@ -4374,16 +4227,21 @@ vetores$painel <- factor(
   levels = ordem_paineis
 )
 
+angulos_retos$painel <- factor(
+  angulos_retos$painel,
+  levels = ordem_paineis
+)
+
 ggplot() +
   geom_hline(
     yintercept = 0,
     linewidth = 0.4,
-    color = "gray65"
+    color = "gray55"
   ) +
   geom_vline(
     xintercept = 0,
     linewidth = 0.4,
-    color = "gray65"
+    color = "gray55"
   ) +
   geom_path(
     data = curvas,
@@ -4391,7 +4249,8 @@ ggplot() +
       x = x,
       y = y
     ),
-    linewidth = 0.85
+    linewidth = 0.9,
+    color = "gray45"
   ) +
   geom_segment(
     data = vetores,
@@ -4400,54 +4259,65 @@ ggplot() +
       y = y,
       xend = xend,
       yend = yend,
-      linetype = vetor
+      color = vetor
     ),
-    linewidth = 0.85,
+    linewidth = 1.05,
     arrow = grid::arrow(
       length = grid::unit(0.18, "cm"),
       type = "closed"
+    )
+  ) +
+  geom_path(
+    data = angulos_retos,
+    aes(
+      x = x,
+      y = y,
+      group = grupo
     ),
-    show.legend = FALSE
+    linewidth = 0.7,
+    color = "gray25"
   ) +
   facet_wrap(
     ~painel,
     ncol = 3
+  ) +
+  scale_color_manual(
+    values = c(
+      "e1" = "#1f77b4",
+      "e2" = "#2ca02c"
+    ),
+    breaks = c(
+      "e1",
+      "e2"
+    ),
+    labels = c(
+      expression(bold(e)[1]),
+      expression(bold(e)[2])
+    ),
+    name = NULL
   ) +
   coord_equal(
     xlim = c(-2, 2),
     ylim = c(-2, 2),
     expand = FALSE
   ) +
-  scale_x_continuous(
-    name = expression(x[1])
+  labs(
+    x = expression(x[1]),
+    y = expression(x[2])
   ) +
-  scale_y_continuous(
-    name = expression(x[2])
+  theme_minimal(
+    base_size = 13
   ) +
-  theme_minimal(base_size = 12) +
   theme(
     panel.grid.minor = element_blank(),
-    panel.grid.major = element_line(
-      linewidth = 0.25,
-      color = "gray88"
-    ),
-    strip.background = element_blank(),
     strip.text = element_text(
-      face = "bold",
-      size = 11
+      face = "bold"
     ),
-    axis.title = element_text(size = 12),
-    axis.text = element_text(size = 9),
-    plot.margin = margin(
-      t = 10,
-      r = 12,
-      b = 10,
-      l = 10
-    )
+    legend.position = "bottom"
   )
 ```
 
-A rotação e a reflexão mantêm a circunferência unitária e o ângulo reto entre as direções. O escalonamento transforma a circunferência em uma elipse. O cisalhamento também deforma a circunferência e altera o ângulo entre os vetores.
+A rotação e a reflexão mantêm a circunferência unitária e preservam o ângulo reto entre as duas direções. O escalonamento não uniforme transforma a circunferência em uma elipse; embora as duas direções coordenadas permaneçam ortogonais neste exemplo particular, seus comprimentos são alterados e a transformação não é ortogonal. O cisalhamento deforma a circunferência e também altera o ângulo entre as direções.
 
 A @tbl-transformacoes-ortogonais compara as propriedades dessas transformações.
 
@@ -4494,10 +4364,10 @@ $$
 \}
 $$
 
-uma base de $\mathbb{R}^p$. Organizando seus vetores nas colunas de uma matriz, define-se
+uma base de $\mathbb{R}^p$, com a ordem dos vetores fixada. Como definido no capítulo anterior, a matriz formada pelos vetores da base é
 
 $$
-\mathbf{P}_{\mathcal{B}}
+\mathbf{B}
 =
 \begin{bmatrix}
 \mathbf{b}_1&
@@ -4506,13 +4376,7 @@ $$
 \end{bmatrix}.
 $$
 
-Como os vetores de $\mathcal{B}$ são linearmente independentes,
-
-$$
-\mathbf{P}_{\mathcal{B}}
-$$
-
-é invertível.
+Como os vetores de $\mathcal{B}$ são linearmente independentes, $\mathbf{B}$ é invertível.
 
 Se
 
@@ -4528,61 +4392,29 @@ $$
 
 é o vetor de coordenadas de $\mathbf{x}$ na base $\mathcal{B}$, então
 
-$$
-\mathbf{x}
-=
-c_1\mathbf{b}_1
-+
-\cdots
-+
-c_p\mathbf{b}_p.
-$$
+$$\mathbf{x}=c_1\mathbf{b}_1+\cdots+c_p\mathbf{b}_p.$$
 
 Em forma matricial,
 
-$$
-\mathbf{x}
-=
-\mathbf{P}_{\mathcal{B}}
-[\mathbf{x}]_{\mathcal{B}}.
-$$
+$$\mathbf{x}=\mathbf{B}[\mathbf{x}]_{\mathcal{B}}.$$
 
 Consequentemente,
 
-$$
-[\mathbf{x}]_{\mathcal{B}}
-=
-\mathbf{P}_{\mathcal{B}}^{-1}
-\mathbf{x}.
-$$
+$$[\mathbf{x}]_{\mathcal{B}}=\mathbf{B}^{-1}\mathbf{x}.$$
 
-A matriz $\mathbf{P}_{\mathcal{B}}$ converte coordenadas na base $\mathcal{B}$ em coordenadas canônicas. Sua inversa realiza a conversão no sentido contrário.
+Assim, $\mathbf{B}$ converte as coordenadas de $\mathbf{x}$ na base $\mathcal{B}$ em suas coordenadas na base canônica, enquanto $\mathbf{B}^{-1}$ realiza a conversão no sentido contrário.
 
 Quando $\mathcal{B}$ é uma base ortonormal, pela @def-base-ortonormal,
 
-$$
-\mathbf{P}_{\mathcal{B}}^{\top}
-\mathbf{P}_{\mathcal{B}}
-=
-\mathbf{I}_p.
-$$
+$$\mathbf{B}^{\top}\mathbf{B}=\mathbf{I}_p.$$
 
 Logo,
 
-$$
-\mathbf{P}_{\mathcal{B}}^{-1}
-=
-\mathbf{P}_{\mathcal{B}}^{\top}
-$$
+$$\mathbf{B}^{-1}=\mathbf{B}^{\top}$$
 
 e
 
-$$
-[\mathbf{x}]_{\mathcal{B}}
-=
-\mathbf{P}_{\mathcal{B}}^{\top}
-\mathbf{x}.
-$$
+$$[\mathbf{x}]_{\mathcal{B}}=\mathbf{B}^{\top}\mathbf{x}.$$
 
 Nesse caso,
 
@@ -4593,14 +4425,14 @@ $$
 \mathbf{b}_1^{\top}\mathbf{x}\\
 \vdots\\
 \mathbf{b}_p^{\top}\mathbf{x}
-\end{bmatrix}.
+\end{bmatrix},
 $$
 
-Cada coordenada é o produto interno entre o vetor e uma direção da base.
+de modo que cada coordenada é obtida pelo produto interno entre $\mathbf{x}$ e o vetor correspondente da base.
 
 ### Conversão entre duas bases
 
-Considere duas bases de $\mathbb{R}^p$:
+Considere duas bases de $\mathbb{R}^p$,
 
 $$
 \mathcal{B}
@@ -4617,210 +4449,105 @@ $$
 =
 \{
 \mathbf{c}_1,\ldots,\mathbf{c}_p
-\}.
+\},
+$$
+
+e as respectivas matrizes
+
+$$
+\mathbf{B}
+=
+\begin{bmatrix}
+\mathbf{b}_1&
+\cdots&
+\mathbf{b}_p
+\end{bmatrix}
+$$
+
+e
+
+$$
+\mathbf{C}
+=
+\begin{bmatrix}
+\mathbf{c}_1&
+\cdots&
+\mathbf{c}_p
+\end{bmatrix}.
 $$
 
 O mesmo vetor pode ser representado por
 
-$$
-\mathbf{x}
-=
-\mathbf{P}_{\mathcal{B}}
-[\mathbf{x}]_{\mathcal{B}}
-$$
+$$\mathbf{x}=\mathbf{B}[\mathbf{x}]_{\mathcal{B}}$$
 
 e por
 
-$$
-\mathbf{x}
-=
-\mathbf{P}_{\mathcal{C}}
-[\mathbf{x}]_{\mathcal{C}}.
-$$
+$$\mathbf{x}=\mathbf{C}[\mathbf{x}]_{\mathcal{C}}.$$
 
 Igualando as duas expressões,
 
 $$
-\mathbf{P}_{\mathcal{C}}
+\mathbf{C}
 [\mathbf{x}]_{\mathcal{C}}
 =
-\mathbf{P}_{\mathcal{B}}
+\mathbf{B}
 [\mathbf{x}]_{\mathcal{B}}.
 $$
 
-Multiplicando por $\mathbf{P}_{\mathcal{C}}^{-1}$,
+Multiplicando à esquerda por $\mathbf{C}^{-1}$,
 
 $$
 [\mathbf{x}]_{\mathcal{C}}
 =
-\mathbf{P}_{\mathcal{C}}^{-1}
-\mathbf{P}_{\mathcal{B}}
+\mathbf{C}^{-1}
+\mathbf{B}
 [\mathbf{x}]_{\mathcal{B}}.
 $$
 
 ::: {#def-matriz-mudanca-base}
+
 ## Matriz de mudança de base
 
-A matriz que converte coordenadas da base $\mathcal{B}$ para a base $\mathcal{C}$ é
+A **matriz de mudança de base de $\mathcal{B}$ para $\mathcal{C}$** é
 
-$$
-\mathbf{P}_{\mathcal{C}\leftarrow\mathcal{B}}
-=
-\mathbf{P}_{\mathcal{C}}^{-1}
-\mathbf{P}_{\mathcal{B}}.
-$$
+$$\mathbf{C}^{-1}\mathbf{B}.$$
 
-Assim,
+Ela transforma as coordenadas de um vetor na base $\mathcal{B}$ em suas coordenadas na base $\mathcal{C}$:
 
 $$
 [\mathbf{x}]_{\mathcal{C}}
 =
-\mathbf{P}_{\mathcal{C}\leftarrow\mathcal{B}}
+\left(
+\mathbf{C}^{-1}\mathbf{B}
+\right)
 [\mathbf{x}]_{\mathcal{B}}.
 $$
 :::
 
-A seta indica o sentido da conversão:
+O sentido da conversão deve ser observado na ordem das matrizes:
 
 $$
 \mathcal{B}
 \longrightarrow
-\mathcal{C}.
+\mathcal{C}
+\qquad\Longleftrightarrow\qquad
+\mathbf{C}^{-1}\mathbf{B}.
 $$
 
-A conversão no sentido contrário é dada por
+No sentido contrário, a matriz de mudança de base é
+
+$$\mathbf{B}^{-1}\mathbf{C}.$$
+
+As duas matrizes são inversas entre si:
 
 $$
-\mathbf{P}_{\mathcal{B}\leftarrow\mathcal{C}}
-=
-\mathbf{P}_{\mathcal{B}}^{-1}
-\mathbf{P}_{\mathcal{C}}.
-$$
-
-As duas matrizes são inversas:
-
-$$
-\mathbf{P}_{\mathcal{B}\leftarrow\mathcal{C}}
+\mathbf{B}^{-1}\mathbf{C}
 =
 \left(
-\mathbf{P}_{\mathcal{C}\leftarrow\mathcal{B}}
+\mathbf{C}^{-1}\mathbf{B}
 \right)^{-1}.
 $$
 
-### Representação de uma transformação em bases gerais
-
-Considere uma transformação linear
-
-$$
-T:
-\mathbb{R}^p
-\longrightarrow
-\mathbb{R}^q
-$$
-
-representada nas bases canônicas por
-
-$$
-\mathbf{y}
-=
-\mathbf{A}\mathbf{x},
-$$
-
-com
-
-$$
-\mathbf{A}
-\in
-\mathbb{R}^{q\times p}.
-$$
-
-Seja $\mathcal{B}$ uma base do domínio e $\mathcal{C}$ uma base do contradomínio. As coordenadas canônicas do vetor de entrada são
-
-$$
-\mathbf{x}
-=
-\mathbf{P}_{\mathcal{B}}
-[\mathbf{x}]_{\mathcal{B}},
-$$
-
-enquanto as coordenadas da imagem na base $\mathcal{C}$ são
-
-$$
-[T(\mathbf{x})]_{\mathcal{C}}
-=
-\mathbf{P}_{\mathcal{C}}^{-1}
-T(\mathbf{x}).
-$$
-
-Substituindo a representação matricial de $T$,
-
-$$
-\begin{aligned}
-[T(\mathbf{x})]_{\mathcal{C}}
-&=
-\mathbf{P}_{\mathcal{C}}^{-1}
-\mathbf{A}\mathbf{x}\\
-&=
-\mathbf{P}_{\mathcal{C}}^{-1}
-\mathbf{A}
-\mathbf{P}_{\mathcal{B}}
-[\mathbf{x}]_{\mathcal{B}}.
-\end{aligned}
-$$
-
-::: {#thm-transformacao-bases-gerais}
-## Matriz de uma transformação em bases gerais
-
-Se uma transformação linear
-
-$$
-T:
-\mathbb{R}^p
-\longrightarrow
-\mathbb{R}^q
-$$
-
-é representada nas bases canônicas por $\mathbf{A}$, sua matriz em relação à base $\mathcal{B}$ do domínio e à base $\mathcal{C}$ do contradomínio é
-
-$$
-[T]_{\mathcal{C}\leftarrow\mathcal{B}}
-=
-\mathbf{P}_{\mathcal{C}}^{-1}
-\mathbf{A}
-\mathbf{P}_{\mathcal{B}}.
-$$
-
-Para todo $\mathbf{x}\in\mathbb{R}^p$,
-
-$$
-[T(\mathbf{x})]_{\mathcal{C}}
-=
-[T]_{\mathcal{C}\leftarrow\mathcal{B}}
-[\mathbf{x}]_{\mathcal{B}}.
-$$
-
-[@meyer2023matrix]
-:::
-
-As colunas de
-
-$$
-[T]_{\mathcal{C}\leftarrow\mathcal{B}}
-$$
-
-são as coordenadas, na base $\mathcal{C}$, das imagens dos vetores da base $\mathcal{B}$:
-
-$$
-[T]_{\mathcal{C}\leftarrow\mathcal{B}}
-=
-\begin{bmatrix}
-[T(\mathbf{b}_1)]_{\mathcal{C}}&
-\cdots&
-[T(\mathbf{b}_p)]_{\mathcal{C}}
-\end{bmatrix}.
-$$
-
-Essa construção generaliza a representação matricial nas bases canônicas.
 
 ::: {#exm-transformacao-bases-distintas}
 ## Representação de uma transformação em bases distintas
@@ -4882,7 +4609,7 @@ $$
 As matrizes das bases são
 
 $$
-\mathbf{P}_{\mathcal{B}}
+\mathbf{B}
 =
 \begin{bmatrix}
 1&1\\
@@ -4893,7 +4620,7 @@ $$
 e
 
 $$
-\mathbf{P}_{\mathcal{C}}
+\mathbf{C}
 =
 \begin{bmatrix}
 1&1\\
@@ -4904,7 +4631,7 @@ $$
 Como
 
 $$
-\mathbf{P}_{\mathcal{C}}^{-1}
+\mathbf{C}^{-1}
 =
 \begin{bmatrix}
 1&-1\\
@@ -4918,9 +4645,9 @@ $$
 \begin{aligned}
 [T]_{\mathcal{C}\leftarrow\mathcal{B}}
 &=
-\mathbf{P}_{\mathcal{C}}^{-1}
+\mathbf{C}^{-1}
 \mathbf{A}
-\mathbf{P}_{\mathcal{B}}\\
+\mathbf{B}\\
 &=
 \begin{bmatrix}
 1&-1\\
@@ -4978,40 +4705,46 @@ $$
 
 representado na base canônica por $\mathbf{A}$.
 
-Quando a mesma base $\mathcal{B}$ é utilizada no domínio e no contradomínio, a matriz do operador nessa base é
+Quando a mesma base $\mathcal{B}$ é utilizada no domínio e no contradomínio,
+
+$$
+[T]_{\mathcal{B}\leftarrow\mathcal{B}}
+=
+\mathbf{B}^{-1}
+\mathbf{A}
+\mathbf{B}.
+$$
+
+Quando conveniente, essa matriz será denotada abreviadamente por
 
 $$
 \mathbf{A}_{\mathcal{B}}
 =
-\mathbf{P}_{\mathcal{B}}^{-1}
+\mathbf{B}^{-1}
 \mathbf{A}
-\mathbf{P}_{\mathcal{B}}.
+\mathbf{B}.
 $$
 
 ::: {#def-matrizes-semelhantes}
 ## Matrizes semelhantes
 
-Duas matrizes quadradas $\mathbf{A}$ e $\mathbf{B}$ são **semelhantes** quando existe uma matriz invertível $\mathbf{P}$ tal que
+Duas matrizes quadradas $\mathbf{A}$ e $\mathbf{D}$ são **semelhantes** quando existe uma matriz invertível $\mathbf{P}$ tal que
 
-$$
-\mathbf{B}
-=
-\mathbf{P}^{-1}
-\mathbf{A}
-\mathbf{P}.
-$$
+$$\mathbf{D}=\mathbf{P}^{-1}\mathbf{A}\mathbf{P}.$$
 :::
+
 
 Matrizes semelhantes representam o mesmo operador linear em bases diferentes. Por essa razão, preservam propriedades que não dependem do sistema de coordenadas.
 
-::: {#thm-invariantes-semelhanca}
+::: {#prp-invariantes-semelhanca}
+
 ## Invariantes por semelhança
 
 Sejam
 
 $$
 \mathbf{A},
-\mathbf{B},
+\mathbf{D},
 \mathbf{P}
 \in
 \mathbb{R}^{p\times p},
@@ -5019,24 +4752,18 @@ $$
 
 com $\mathbf{P}$ invertível. Se
 
-$$
-\mathbf{B}
-=
-\mathbf{P}^{-1}
-\mathbf{A}
-\mathbf{P},
-$$
+$$\mathbf{D}=\mathbf{P}^{-1}\mathbf{A}\mathbf{P},$$
 
 então
 
 $$
-\det(\mathbf{B})
+\det(\mathbf{D})
 =
 \det(\mathbf{A}),
 $$
 
 $$
-\operatorname{tr}(\mathbf{B})
+\operatorname{tr}(\mathbf{D})
 =
 \operatorname{tr}(\mathbf{A})
 $$
@@ -5044,14 +4771,14 @@ $$
 e
 
 $$
-\operatorname{posto}(\mathbf{B})
+\operatorname{posto}(\mathbf{D})
 =
 \operatorname{posto}(\mathbf{A}).
-$$
+$$ 
 [@horn2013matrix]
 :::
 
-::: proof
+::: {.proof}
 Para o determinante,
 
 $$
@@ -5186,11 +4913,9 @@ $$
 
 Quando $\mathbf{Q}$ é ortogonal,
 
-$$
-\mathbf{Q}^{-1}
-=
-\mathbf{Q}^{\top}.
-$$
+$$\mathbf{Q}^{-1}=\mathbf{Q}^{\top}.$$
+
+Portanto, embora uma mesma matriz ortogonal possa aparecer nas duas interpretações, o sentido da operação é distinto: na transformação ativa, $\mathbf{Q}$ atua sobre o vetor; na mudança passiva para a base formada pelas colunas de $\mathbf{Q}$, a conversão das coordenadas é realizada por $\mathbf{Q}^{-1}=\mathbf{Q}^{\top}$.
 
 A @fig-ativa-passiva compara as duas interpretações.
 
@@ -5202,7 +4927,7 @@ A @fig-ativa-passiva compara as duas interpretações.
 #| fig-cap: "Comparação entre uma transformação ativa e uma mudança passiva de coordenadas."
 #| fig-width: 10
 #| fig-height: 5.2
-#| out-width: "95%"
+#| fig-align: center
 
 library(ggplot2)
 
@@ -5384,9 +5109,10 @@ ggplot() +
       yend = yend
     ),
     linewidth = 0.65,
-    linetype = "dashed"
+    linetype = "dashed",
+    color = "gray40"
   ) +
-  geom_segment(
+    geom_segment(
     data = subset(
       vetores,
       vetor == "x"
@@ -5397,13 +5123,14 @@ ggplot() +
       xend = xend,
       yend = yend
     ),
-    linewidth = 0.95,
+    linewidth = 1.05,
+    color = "#1f77b4",
     arrow = grid::arrow(
-      length = grid::unit(0.20, "cm"),
+      length = grid::unit(0.18, "cm"),
       type = "closed"
     )
   ) +
-  geom_segment(
+    geom_segment(
     data = subset(
       vetores,
       vetor == "Qx"
@@ -5414,10 +5141,10 @@ ggplot() +
       xend = xend,
       yend = yend
     ),
-    linewidth = 0.95,
-    linetype = "dashed",
+    linewidth = 1.05,
+    color = "#2ca02c",
     arrow = grid::arrow(
-      length = grid::unit(0.20, "cm"),
+      length = grid::unit(0.18, "cm"),
       type = "closed"
     )
   ) +
@@ -5447,7 +5174,7 @@ ggplot() +
   scale_y_continuous(
     name = expression(x[2])
   ) +
-  theme_minimal(base_size = 12) +
+    theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
     panel.grid.major = element_line(
@@ -5519,10 +5246,10 @@ $$
 
 A @tbl-ativa-passiva resume as duas operações.
 
-| Operação                                    | Vetor-coluna                             | Matriz de dados                          |
-|:-----------------------|:-----------------------|:-----------------------|
-| Transformação ativa                         | $\mathbf{y}=\mathbf{Q}\mathbf{x}$        | $\mathbf{Y}=\mathbf{X}\mathbf{Q}^{\top}$ |
-| Mudança passiva para a base de $\mathbf{Q}$ | $\mathbf{z}=\mathbf{Q}^{\top}\mathbf{x}$ | $\mathbf{Z}=\mathbf{X}\mathbf{Q}$        |
+| Operação | Vetor-coluna | Matriz de dados |
+|:---|:---|:---|
+| Transformação ativa por $\mathbf{Q}$ | $\mathbf{y}=\mathbf{Q}\mathbf{x}$ | $\mathbf{Y}=\mathbf{X}\mathbf{Q}^{\top}$ |
+| Mudança passiva para a base formada pelas colunas de $\mathbf{Q}$ | $\mathbf{z}=\mathbf{Q}^{\top}\mathbf{x}$ | $\mathbf{Z}=\mathbf{X}\mathbf{Q}$ |
 
 : Transformação ativa e mudança passiva para uma base ortonormal. {#tbl-ativa-passiva}
 
@@ -5719,7 +5446,19 @@ $$
 \mathbf{1}_n\mathbf{b}^{\top}
 $$
 
-possui $n$ linhas iguais a $\mathbf{b}^{\top}$. Assim, o mesmo deslocamento é acrescentado a todas as observações.
+possui dimensão $n\times q$ e contém $n$ linhas iguais a $\mathbf{b}^{\top}$. Assim, o mesmo deslocamento é acrescentado a todas as observações.
+
+As dimensões da transformação são
+
+$$
+\underbrace{\mathbf{X}}_{n\times p}
+\underbrace{\mathbf{A}^{\top}}_{p\times q}
++
+\underbrace{\mathbf{1}_n}_{n\times 1}
+\underbrace{\mathbf{b}^{\top}}_{1\times q}
+=
+\underbrace{\mathbf{Y}}_{n\times q}.
+$$
 
 No caso de uma translação pura,
 
@@ -5842,11 +5581,7 @@ $$
 
 a matriz centralizada pode ser escrita como
 
-$$
-\mathbf{X}_c
-=
-\mathbf{H}_n\mathbf{X}.
-$$
+$$\mathbf{X}_c=\mathbf{H}_n\mathbf{X}.$$
 
 De fato,
 
@@ -5876,7 +5611,7 @@ $$
 \end{aligned}
 $$
 
-A centralização de cada observação em torno de um vetor fixo é uma transformação afim. A aplicação
+A centralização de cada observação em torno de um vetor fixo é uma transformação afim. Em contraste, a aplicação
 
 $$
 \mathbf{X}
@@ -5886,25 +5621,70 @@ $$
 
 sobre o espaço das matrizes de dados é linear, pois $\mathbf{H}_n$ é uma matriz fixa.
 
-Como
+Além disso,
 
 $$
-\mathbf{H}_n\mathbf{1}_n
+\mathbf{H}_n
 =
-\mathbf{0},
+\mathbf{H}_n^{\top}
 $$
 
-tem-se
+e
+
+$$
+\mathbf{H}_n^2
+=
+\mathbf{H}_n.
+$$
+
+Portanto, $\mathbf{H}_n$ é uma matriz de projeção ortogonal. Como
+
+$$\mathbf{H}_n\mathbf{1}_n=\mathbf{0},$$
+
+seu núcleo é
+
+$$
+\mathcal{N}(\mathbf{H}_n)
+=
+\operatorname{span}\{\mathbf{1}_n\},
+$$
+
+e sua imagem é o subespaço
+
+$$
+\mathcal{C}(\mathbf{H}_n)
+=
+\left\{
+\mathbf{z}\in\mathbb{R}^n:
+\mathbf{1}_n^{\top}\mathbf{z}=0
+\right\}
+=
+\operatorname{span}\{\mathbf{1}_n\}^{\perp}.
+$$
+
+Assim, multiplicar uma variável observada por $\mathbf{H}_n$ equivale a projetá-la ortogonalmente sobre o subespaço dos vetores cujas componentes somam zero.
+
+Como $\mathbf{H}_n$ é simétrica e
+
+$$\mathbf{H}_n\mathbf{1}_n=\mathbf{0},$$
+
+tem-se também
+
+$$\mathbf{1}_n^{\top}\mathbf{H}_n=\mathbf{0}^{\top}.$$
+
+Consequentemente,
 
 $$
 \mathbf{1}_n^{\top}\mathbf{X}_c
+=
+\mathbf{1}_n^{\top}\mathbf{H}_n\mathbf{X}
 =
 \mathbf{0}^{\top}.
 $$
 
 Portanto, cada coluna de $\mathbf{X}_c$ possui média igual a zero.
 
-::: {#thm-centralizacao-preserva-distancias}
+::: {#prp-centralizacao-preserva-distancias}
 ## Preservação das distâncias pela centralização
 
 Se
@@ -5940,7 +5720,7 @@ $$
 $$
 :::
 
-::: proof
+::: {.proof}
 Tem-se
 
 $$
@@ -6013,7 +5793,7 @@ $$
 
 A multiplicação ocorre à direita porque as variáveis ocupam as colunas de $\mathbf{X}$.
 
-Quando as escalas são diferentes, o escalonamento modifica distâncias e ângulos. Para duas observações,
+Quando as escalas são diferentes, o escalonamento modifica, em geral, distâncias e ângulos. Alguns pares particulares de vetores podem manter sua relação angular, mas a geometria euclidiana não é preservada para todos os vetores. Para duas observações,
 
 $$
 \begin{aligned}
@@ -6033,13 +5813,15 @@ $$
 \end{aligned}
 $$
 
-O escalonamento induz, no espaço original, a geometria determinada por
+O escalonamento induz, no espaço original, a geometria determinada pela matriz positiva definida
 
-$$
-\mathbf{L}^{-2}.
-$$
+$$\mathbf{L}^{-2}.$$
 
-Variáveis associadas a escalas menores recebem maior peso nas distâncias transformadas.
+Variáveis associadas a escalas menores recebem maior peso nas distâncias transformadas. Quando todas as escalas são iguais, isto é,
+
+$$\mathbf{L}=\ell\mathbf{I}_p,$$
+
+o escalonamento é uniforme: todas as distâncias são multiplicadas pelo mesmo fator $1/\ell$ e os ângulos são preservados.
 
 ### Padronização
 
@@ -6095,7 +5877,7 @@ $$
 \mathbf{L}^{-1}.
 $$
 
-Quando $\mathbf{m}=\bar{\mathbf{x}}$ e os elementos diagonais de $\mathbf{L}$ são os desvios-padrão amostrais, cada coluna de $\mathbf{Z}$ possui média zero e desvio-padrão igual a 1.
+Quando $\mathbf{m}=\bar{\mathbf{x}}$ e os elementos diagonais de $\mathbf{L}$ são os desvios-padrão amostrais, cada coluna de $\mathbf{Z}$ possui média zero e desvio-padrão igual a 1. Essa transformação será retomada posteriormente na relação entre matrizes de covariâncias e de correlações e na formulação de técnicas sensíveis à escala das variáveis.
 
 Para duas observações padronizadas,
 
@@ -6275,11 +6057,11 @@ T^{-1}(\mathbf{y})
 \mathbf{A}^{-1}\mathbf{b}.
 $$
 
-Uma transformação afim é invertível quando sua parte linear é invertível.
+Uma transformação afim de $\mathbb{R}^p$ em $\mathbb{R}^p$ é invertível se, e somente se, sua parte linear $\mathbf{A}$ é invertível.
 
 ### Comparação das operações de pré-processamento
 
-A @fig-transformacoes-afins compara centralização, escalonamento e padronização de uma mesma nuvem de pontos.
+A @fig-transformacoes-afins compara centralização, escalonamento e padronização de uma mesma nuvem de pontos. O mesmo vetor de escalas é utilizado no escalonamento e na padronização, permitindo separar visualmente o efeito da alteração de escala do efeito da centralização.
 
 ```{r}
 #| label: fig-transformacoes-afins
@@ -6289,7 +6071,7 @@ A @fig-transformacoes-afins compara centralização, escalonamento e padronizaç
 #| fig-cap: "Efeito da centralização, do escalonamento e da padronização sobre uma mesma configuração de dados."
 #| fig-width: 11
 #| fig-height: 7
-#| out-width: "100%"
+#| fig-align: center
 
 library(ggplot2)
 
@@ -6330,20 +6112,12 @@ X_centralizada <- sweep(
 )
 
 L_inv <- diag(
-  1 / c(
-    2.5,
-    0.7
-  )
+  1 / desvio
 )
 
 X_escalonada <- X %*% L_inv
 
-X_padronizada <- sweep(
-  X_centralizada,
-  2,
-  desvio,
-  FUN = "/"
-)
+X_padronizada <- X_centralizada %*% L_inv
 
 dados <- rbind(
   data.frame(
@@ -6378,6 +6152,12 @@ dados$painel <- factor(
   )
 )
 
+centros <- aggregate(
+  cbind(x, y) ~ painel,
+  data = dados,
+  FUN = mean
+)
+
 limites <- range(
   c(
     dados$x,
@@ -6402,61 +6182,59 @@ ggplot(
   geom_hline(
     yintercept = 0,
     linewidth = 0.4,
-    color = "gray60"
+    color = "gray55"
   ) +
   geom_vline(
     xintercept = 0,
     linewidth = 0.4,
-    color = "gray60"
+    color = "gray55"
   ) +
   geom_point(
-    size = 1.4,
-    alpha = 0.7
+    size = 1.5,
+    alpha = 0.65,
+    color = "#1f77b4"
+  ) +
+  geom_point(
+    data = centros,
+    aes(
+      x = x,
+      y = y
+    ),
+    size = 3,
+    shape = 4,
+    stroke = 1.1,
+    color = "#d62728"
   ) +
   facet_wrap(
-  ~painel,
-  ncol = 2
+    ~painel,
+    ncol = 2
   ) +
-coord_equal(
-  xlim = limites,
-  ylim = limites,
-  expand = FALSE
+  coord_equal(
+    xlim = limites,
+    ylim = limites,
+    expand = FALSE
   ) +
-  scale_x_continuous(
-    name = expression(x[1])
+  labs(
+    x = expression(x[1]),
+    y = expression(x[2])
   ) +
-  scale_y_continuous(
-    name = expression(x[2])
+  theme_minimal(
+    base_size = 13
   ) +
-  theme_minimal(base_size = 12) +
   theme(
     panel.grid.minor = element_blank(),
-    panel.grid.major = element_line(
-      linewidth = 0.25,
-      color = "gray88"
-    ),
-    strip.background = element_blank(),
     strip.text = element_text(
-      face = "bold",
-      size = 11
-    ),
-    axis.title = element_text(size = 12),
-    axis.text = element_text(size = 9),
-    plot.margin = margin(
-      t = 10,
-      r = 12,
-      b = 10,
-      l = 10
+      face = "bold"
     )
   )
 ```
 
-A centralização desloca a nuvem para que sua média coincida com a origem, sem modificar as distâncias entre as observações. O escalonamento altera as unidades das coordenadas e modifica a geometria. A padronização combina as duas operações.
+A centralização desloca a nuvem para que sua média coincida com a origem, sem modificar as diferenças nem as distâncias entre as observações. O escalonamento altera as unidades das coordenadas e, em geral, modifica comprimentos, distâncias e ângulos. A padronização combina esses dois efeitos: centraliza a nuvem e reescala suas coordenadas.
 
 A @tbl-lineares-afins resume as diferenças entre as transformações estudadas nesta seção.
 
-| Operação             | Expressão                                |               Linear               | Mantém a origem fixa |
-|:----------------|:----------------|:-----------------:|:-----------------:|
+| Operação | Expressão para um vetor | Linear como função de $\mathbf{x}$? | Mantém a origem fixa? |
+|:---|:---|:---:|:---:|
 | Transformação linear | $\mathbf{A}\mathbf{x}$                   |                Sim                 |         Sim          |
 | Translação           | $\mathbf{x}+\mathbf{b}$                  | Não, se $\mathbf{b}\neq\mathbf{0}$ |         Não          |
 | Transformação afim   | $\mathbf{A}\mathbf{x}+\mathbf{b}$        |           Não, em geral            |    Não, em geral     |
@@ -6466,138 +6244,226 @@ A @tbl-lineares-afins resume as diferenças entre as transformações estudadas 
 
 : Comparação entre transformações lineares, transformações afins e operações de pré-processamento. {#tbl-lineares-afins}
 
-Transformações lineares modificam direção, escala ou dimensão mantendo a origem fixa. Transformações afins acrescentam a possibilidade de deslocar a configuração. A centralização e a padronização pertencem a essa segunda classe quando são consideradas como operações sobre observações individuais.
+Transformações lineares podem modificar direção, escala ou dimensão, mas mantêm necessariamente a origem fixa. Transformações afins acrescentam a possibilidade de deslocar a configuração. A centralização e a padronização pertencem a essa segunda classe quando consideradas como operações sobre uma observação individual e para parâmetros de localização e escala fixados. Quando a centralização de uma matriz de dados é escrita como $\mathbf{X}\mapsto\mathbf{H}_n\mathbf{X}$, a operação é linear no espaço das matrizes.
 
 ## Síntese do capítulo
 
-Uma transformação linear preserva combinações lineares. Conforme a @def-transformacao-linear,
+Uma transformação linear preserva combinações lineares. Para uma transformação
+
+$$T:V\longrightarrow W,$$
+
+tem-se
 
 $$
-T
-\left(
-\alpha\mathbf{u}
-+
-\beta\mathbf{v}
-\right)
+T(\alpha\mathbf{u}+\beta\mathbf{v})
 =
 \alpha T(\mathbf{u})
 +
 \beta T(\mathbf{v}).
 $$
 
-Essa propriedade implica $T(\mathbf{0})=\mathbf{0}$ e permite determinar a transformação a partir das imagens dos vetores de uma base.
+Essa propriedade implica, entre outras consequências,
 
-Toda transformação linear
+$$T(\mathbf{0})=\mathbf{0},$$
+
+e permite determinar uma transformação linear a partir de sua ação sobre uma base do domínio.
+
+Fixadas as bases do domínio e do contradomínio, uma transformação linear possui uma representação matricial única. Em particular, nas bases canônicas, uma transformação
 
 $$
-T:
+T_{\mathbf{A}}:
 \mathbb{R}^p
 \longrightarrow
 \mathbb{R}^q
 $$
 
-possui uma representação matricial única:
+é representada por
 
 $$
-T(\mathbf{x})
+T_{\mathbf{A}}(\mathbf{x})
 =
 \mathbf{A}\mathbf{x},
 \qquad
-\mathbf{A}
-\in
-\mathbb{R}^{q\times p}.
+\mathbf{A}\in\mathbb{R}^{q\times p}.
 $$
 
-Nas bases canônicas, as colunas de $\mathbf{A}$ são as imagens dos vetores da base do domínio. Quando as observações ocupam as linhas de uma matriz
+Quando as observações ocupam as linhas de uma matriz de dados
+
+$$\mathbf{X}\in\mathbb{R}^{n\times p},$$
+
+a transformação simultânea das observações é
+
+$$\mathbf{Y}=\mathbf{X}\mathbf{A}^{\top}.$$
+
+Cada linha de $\mathbf{Y}$ representa uma observação transformada, enquanto cada coluna corresponde a uma combinação linear das variáveis originais.
+
+A matriz associada à transformação permite relacionar os conceitos desenvolvidos neste capítulo aos espaços fundamentais estudados anteriormente:
 
 $$
-\mathbf{X}
-\in
-\mathbb{R}^{n\times p},
-$$
-
-a transformação simultânea de todas as observações é
-
-$$
-\mathbf{Y}
+\ker(T_{\mathbf{A}})
 =
-\mathbf{X}\mathbf{A}^{\top}.
-$$
-
-Cada linha de $\mathbf{Y}$ representa uma observação transformada e cada coluna corresponde a uma combinação linear das variáveis originais.
-
-O posto de $\mathbf{A}$ determina a dimensão da imagem, enquanto o espaço nulo reúne as direções eliminadas pela transformação:
-
-$$
-\dim
-\left(
 \mathcal{N}(\mathbf{A})
-\right)
+$$
+
+e
+
+$$
+\operatorname{Im}(T_{\mathbf{A}})
+=
+\mathcal{C}(\mathbf{A}).
+$$
+
+Assim, o núcleo reúne os vetores eliminados pela transformação, enquanto a imagem contém todos os vetores que podem ser produzidos por ela. Pelo teorema posto-nulidade,
+
+$$
+\dim\ker(T_{\mathbf{A}})
++
+\dim\operatorname{Im}(T_{\mathbf{A}})
+=
+p,
+$$
+
+ou, equivalentemente,
+
+$$
+\dim\mathcal{N}(\mathbf{A})
 +
 \operatorname{posto}(\mathbf{A})
 =
 p.
 $$
 
-Quando $\mathcal{N}(\mathbf{A})$ contém vetores não nulos, diferentes vetores do domínio podem possuir a mesma imagem. Para uma matriz quadrada, posto completo, núcleo trivial, determinante não nulo, bijetividade e existência da inversa são condições equivalentes.
+O posto é, portanto, a dimensão da imagem da transformação. Quando o núcleo contém vetores não nulos, diferentes vetores do domínio podem possuir a mesma imagem e ocorre perda de informação.
 
-A composição de transformações é representada pelo produto de suas matrizes. Se $T_1$ é representada por $\mathbf{A}$ e $T_2$ por $\mathbf{B}$, então
+Para uma transformação quadrada, as condições
+
+$$
+\ker(T_{\mathbf{A}})=\{\mathbf{0}\},
+$$
+
+$$
+\operatorname{Im}(T_{\mathbf{A}})=\mathbb{R}^p,
+$$
+
+$$
+\operatorname{posto}(\mathbf{A})=p,
+$$
+
+$$
+\det(\mathbf{A})\neq0
+$$
+
+e a existência de $\mathbf{A}^{-1}$ são equivalentes.
+
+A composição de transformações corresponde ao produto de suas matrizes. Se $T_1$ é representada por $\mathbf{A}_1$ e $T_2$ por $\mathbf{A}_2$, então
 
 $$
 [T_2\circ T_1]
 =
-\mathbf{B}\mathbf{A}.
+\mathbf{A}_2\mathbf{A}_1.
 $$
 
-A matriz situada à direita atua primeiro. Como a multiplicação matricial não é comutativa, a ordem das transformações pode alterar o resultado.
+A matriz situada à direita atua primeiro. Como o produto matricial não é comutativo, a ordem das transformações pode alterar o resultado.
 
-As transformações geométricas estudadas produzem efeitos distintos sobre uma configuração de pontos. Rotações e reflexões preservam distâncias e ângulos. Escalonamentos modificam o comprimento das direções, cisalhamentos alteram ângulos e projeções eliminam componentes fora de um subespaço. Para uma transformação quadrada, $|\det(\mathbf{A})|$ representa o fator de alteração do volume, enquanto o sinal do determinante informa se a orientação é preservada ou invertida.
+As transformações geométricas estudadas ilustram diferentes efeitos possíveis sobre uma configuração. Rotações e reflexões são transformações ortogonais e preservam a geometria euclidiana. Escalonamentos alteram as escalas das direções coordenadas; cisalhamentos modificam, em geral, ângulos e comprimentos; projeções eliminam componentes pertencentes ao complemento do subespaço sobre o qual se projeta.
 
-Transformações ortogonais são caracterizadas por
+Para uma transformação quadrada,
 
-$$
-\mathbf{Q}^{\top}\mathbf{Q}
-=
-\mathbf{I}_p.
-$$
+$$|\det(\mathbf{A})|$$
 
-Elas preservam produtos internos, normas, distâncias, ângulos e volumes. Também satisfazem
+representa o fator de alteração do volume $p$-dimensional. Quando $\det(\mathbf{A})\neq0$, seu sinal informa também o efeito sobre a orientação: valores positivos preservam a orientação e valores negativos a invertem. Se
 
-$$
-\mathbf{Q}^{-1}
-=
-\mathbf{Q}^{\top}
-$$
+$$\det(\mathbf{A})=0,$$
+
+a transformação reduz a dimensão e o volume $p$-dimensional da imagem é igual a zero.
+
+As transformações ortogonais são caracterizadas por
+
+$$\mathbf{Q}^{\top}\mathbf{Q}=\mathbf{I}_p.$$
+
+Elas preservam produtos internos e, consequentemente, normas, distâncias, ângulos e ortogonalidade. Além disso,
+
+$$\mathbf{Q}^{-1}=\mathbf{Q}^{\top}$$
 
 e
 
+$$\det(\mathbf{Q})\in\{-1,1\},$$
+
+de modo que também preservam volumes $p$-dimensionais.
+
+As colunas de uma matriz ortogonal formam uma base ortonormal e satisfazem
+
+$$\mathbf{q}_i^{\top}\mathbf{q}_j=\delta_{ij}.$$
+
+Essa propriedade estabelece a ligação entre transformações ortogonais e sistemas de coordenadas ortonormais.
+
+Se
+
 $$
-\det(\mathbf{Q})
+\mathcal{B}
 =
-\pm1.
+\{
+\mathbf{b}_1,\ldots,\mathbf{b}_p
+\}
 $$
 
-Uma transformação também pode ser representada em bases diferentes. Se $\mathcal{B}$ é uma base do domínio, $\mathcal{C}$ é uma base do contradomínio e $\mathbf{A}$ representa a transformação nas bases canônicas, então
+é uma base de $\mathbb{R}^p$ e
+
+$$
+\mathbf{B}
+=
+\begin{bmatrix}
+\mathbf{b}_1&
+\cdots&
+\mathbf{b}_p
+\end{bmatrix},
+$$
+
+então
+
+$$\mathbf{x}=\mathbf{B}[\mathbf{x}]_{\mathcal{B}}$$
+
+e
+
+$$[\mathbf{x}]_{\mathcal{B}}=\mathbf{B}^{-1}\mathbf{x}.$$
+
+Para duas bases $\mathcal{B}$ e $\mathcal{C}$, com matrizes $\mathbf{B}$ e $\mathbf{C}$, respectivamente, a conversão das coordenadas de $\mathcal{B}$ para $\mathcal{C}$ é
+
+$$
+[\mathbf{x}]_{\mathcal{C}}
+=
+\mathbf{C}^{-1}
+\mathbf{B}
+[\mathbf{x}]_{\mathcal{B}}.
+$$
+
+Se uma transformação é representada nas bases canônicas por $\mathbf{A}$, sua matriz em relação à base $\mathcal{B}$ do domínio e à base $\mathcal{C}$ do contradomínio é
 
 $$
 [T]_{\mathcal{C}\leftarrow\mathcal{B}}
 =
-\mathbf{P}_{\mathcal{C}}^{-1}
+\mathbf{C}^{-1}
 \mathbf{A}
-\mathbf{P}_{\mathcal{B}}.
+\mathbf{B}.
 $$
 
-Quando a mesma base é utilizada no domínio e no contradomínio, as matrizes resultantes são semelhantes e representam o mesmo operador em sistemas de coordenadas distintos.
-
-A transformação ativa modifica o vetor em relação a eixos fixos. A mudança passiva mantém o vetor geométrico e modifica apenas suas coordenadas. Para uma base ortonormal organizada nas colunas de $\mathbf{Q}$, essas operações são representadas, respectivamente, por
+Quando a mesma base é utilizada no domínio e no contradomínio,
 
 $$
-\mathbf{y}
+\mathbf{A}_{\mathcal{B}}
 =
-\mathbf{Q}\mathbf{x}
+\mathbf{B}^{-1}
+\mathbf{A}
+\mathbf{B},
 $$
 
-e
+de modo que as duas matrizes são semelhantes e representam o mesmo operador em sistemas de coordenadas distintos.
+
+A transformação ativa e a mudança passiva de coordenadas devem ser diferenciadas. Se $\mathbf{Q}$ é ortogonal, na transformação ativa,
+
+$$\mathbf{y}=\mathbf{Q}\mathbf{x},$$
+
+enquanto, na mudança passiva para a base formada pelas colunas de $\mathbf{Q}$,
 
 $$
 [\mathbf{x}]_{\mathcal{B}}
@@ -6605,42 +6471,89 @@ $$
 \mathbf{Q}^{\top}\mathbf{x}.
 $$
 
-As transformações afins acrescentam uma translação à parte linear:
+Na primeira situação, o vetor é transformado em relação a eixos fixos. Na segunda, o vetor geométrico permanece o mesmo e apenas sua representação em coordenadas é alterada.
+
+As transformações afins generalizam as transformações lineares por meio da inclusão de uma translação:
+
+$$T(\mathbf{x})=\mathbf{A}\mathbf{x}+\mathbf{b}.$$
+
+A centralização de uma observação em torno de um vetor fixo é uma transformação afim, enquanto o escalonamento é uma transformação linear diagonal. A padronização combina essas duas operações.
+
+Para uma matriz de dados, a centralização pela média amostral pode ser escrita como
+
+$$\mathbf{X}_c=\mathbf{H}_n\mathbf{X},$$
+
+em que
 
 $$
-T(\mathbf{x})
+\mathbf{H}_n
 =
-\mathbf{A}\mathbf{x}
-+
-\mathbf{b}.
+\mathbf{I}_n
+-
+\frac{1}{n}
+\mathbf{1}_n\mathbf{1}_n^{\top}.
 $$
 
-A centralização é uma translação, o escalonamento é uma transformação linear e a padronização combina as duas operações. Para uma matriz de dados, a centralização pela média amostral pode ser escrita como
+Como
+
+$$\mathbf{H}_n^{\top}=\mathbf{H}_n$$
+
+e
+
+$$\mathbf{H}_n^2=\mathbf{H}_n,$$
+
+a matriz $\mathbf{H}_n$ é uma matriz de projeção ortogonal. Sua imagem é
 
 $$
-\mathbf{X}_c
+\mathcal{C}(\mathbf{H}_n)
 =
-\mathbf{H}_n\mathbf{X}.
+\operatorname{span}\{\mathbf{1}_n\}^{\perp},
 $$
 
-A @tbl-sintese-transformacoes reúne as expressões principais desenvolvidas no capítulo.
+o subespaço dos vetores cujas componentes somam zero.
 
-| Objeto ou operação      | Expressão                                 | Interpretação                                   |
-|:-----------------------|:-----------------------|:-----------------------|
-| Transformação linear    | $\mathbf{A}\mathbf{x}$                    | Preserva combinações lineares                   |
-| Transformação dos dados | $\mathbf{X}\mathbf{A}^{\top}$             | Transforma simultaneamente todas as observações |
-| Composição              | $\mathbf{B}\mathbf{A}\mathbf{x}$          | Aplica $\mathbf{A}$ antes de $\mathbf{B}$       |
-| Transformação inversa   | $\mathbf{A}^{-1}\mathbf{y}$               | Recupera o vetor original                       |
-| Rotação                 | $\mathbf{Q}(\theta)\mathbf{x}$            | Gira a configuração preservando sua geometria   |
-| Reflexão                | $\mathbf{F}\mathbf{x}$                    | Preserva a geometria e inverte a orientação     |
-| Escalonamento           | $\mathbf{L}\mathbf{x}$                    | Amplia ou comprime direções                     |
-| Cisalhamento            | $\mathbf{C}_{ij}(k)\mathbf{x}$            | Inclina a configuração                          |
-| Projeção                | $\mathbf{P}\mathbf{x}$                    | Elimina componentes fora de um subespaço        |
-| Mudança de base         | $\mathbf{P}_{\mathcal{B}}^{-1}\mathbf{x}$ | Altera as coordenadas do vetor                  |
-| Transformação afim      | $\mathbf{A}\mathbf{x}+\mathbf{b}$         | Combina transformação linear e translação       |
-| Centralização           | $\mathbf{x}-\mathbf{m}$                   | Desloca o centro da configuração                |
-| Padronização            | $\mathbf{L}^{-1}(\mathbf{x}-\mathbf{m})$  | Ajusta localização e escala                     |
+A @tbl-sintese-transformacoes reúne algumas das principais expressões desenvolvidas no capítulo.
+
+| Objeto ou operação | Expressão | Interpretação |
+|:---|:---|:---|
+| Transformação linear | $T_{\mathbf{A}}(\mathbf{x})=\mathbf{A}\mathbf{x}$ | Preserva combinações lineares |
+| Transformação dos dados | $\mathbf{Y}=\mathbf{X}\mathbf{A}^{\top}$ | Transforma simultaneamente as observações |
+| Núcleo | $\ker(T_{\mathbf{A}})=\mathcal{N}(\mathbf{A})$ | Reúne os vetores enviados ao vetor nulo |
+| Imagem | $\operatorname{Im}(T_{\mathbf{A}})=\mathcal{C}(\mathbf{A})$ | Reúne os vetores alcançados pela transformação |
+| Composição | $(T_2\circ T_1)(\mathbf{x})=\mathbf{A}_2\mathbf{A}_1\mathbf{x}$ | Aplica $T_1$ antes de $T_2$ |
+| Transformação inversa | $\mathbf{x}=\mathbf{A}^{-1}\mathbf{y}$ | Recupera o vetor original quando $\mathbf{A}$ é invertível |
+| Rotação | $\mathbf{Q}(\theta)\mathbf{x}$ | Preserva a geometria e a orientação |
+| Reflexão | $\mathbf{F}\mathbf{x}$ | Preserva a geometria; seu efeito sobre a orientação é determinado pelo determinante |
+| Escalonamento | $\mathbf{L}\mathbf{x}$ | Reescala direções coordenadas |
+| Cisalhamento | $\mathbf{C}_{ij}(k)\mathbf{x}$ | Inclina a configuração preservando volume no caso elementar |
+| Projeção ortogonal | $\mathbf{P}_{S}\mathbf{x}$ | Mantém a componente em $S$ e elimina a componente em $S^{\perp}$ |
+| Coordenadas em uma base | $[\mathbf{x}]_{\mathcal{B}}=\mathbf{B}^{-1}\mathbf{x}$ | Representa o mesmo vetor na base $\mathcal{B}$ |
+| Mudança de $\mathcal{B}$ para $\mathcal{C}$ | $[\mathbf{x}]_{\mathcal{C}}=\mathbf{C}^{-1}\mathbf{B}[\mathbf{x}]_{\mathcal{B}}$ | Converte coordenadas entre bases |
+| Transformação em bases gerais | $[T]_{\mathcal{C}\leftarrow\mathcal{B}}=\mathbf{C}^{-1}\mathbf{A}\mathbf{B}$ | Representa a transformação nas bases escolhidas |
+| Transformação afim | $\mathbf{A}\mathbf{x}+\mathbf{b}$ | Combina transformação linear e translação |
+| Centralização dos dados | $\mathbf{X}_c=\mathbf{H}_n\mathbf{X}$ | Projeta cada variável no subespaço de média zero |
+| Padronização | $\mathbf{L}^{-1}(\mathbf{x}-\mathbf{m})$ | Ajusta localização e escala |
 
 : Síntese das transformações desenvolvidas no capítulo. {#tbl-sintese-transformacoes}
 
-O capítulo seguinte examina direções cuja orientação é preservada por uma transformação linear. Essas direções conduzem aos conceitos de autovalor, autovetor e decomposição espectral.
+Ao final deste capítulo, o estudante deverá ser capaz de:
+
+- reconhecer e verificar a linearidade de uma transformação;
+- construir a matriz de uma transformação a partir da imagem de uma base;
+- relacionar núcleo e imagem de uma transformação ao espaço nulo e ao espaço coluna da matriz associada;
+- interpretar posto, injetividade, sobrejetividade, bijetividade e perda de informação;
+- representar a composição e a inversão de transformações por operações matriciais;
+- interpretar geometricamente rotações, reflexões, escalonamentos, cisalhamentos e projeções;
+- relacionar o determinante à alteração de volume, à orientação e à redução de dimensão;
+- reconhecer transformações ortogonais e interpretar as propriedades geométricas que elas preservam;
+- converter coordenadas entre bases;
+- representar uma transformação linear em bases distintas do domínio e do contradomínio;
+- distinguir transformação ativa e mudança passiva de coordenadas;
+- interpretar transformações afins, centralização, escalonamento e padronização;
+- reconhecer a matriz de centralização como uma matriz de projeção ortogonal.
+
+No próximo capítulo, serão estudadas direções especiais para as quais a ação de uma transformação linear produz um múltiplo escalar do próprio vetor,
+
+$$\mathbf{A}\mathbf{v}=\lambda\mathbf{v}.$$
+
+Essas direções conduzem aos conceitos de autovetores, autovalores, autoespaços e decomposição espectral.
