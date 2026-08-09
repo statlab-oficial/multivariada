@@ -60,6 +60,25 @@ Essa representação permite descrever:
 
 A SVD também estabelece uma ligação entre os espaços das observações e das variáveis de uma matriz de dados. Essa dualidade será utilizada posteriormente na formulação de métodos de redução de dimensionalidade e de representação de estruturas matriciais.
 
+::: {.callout-note appearance="simple" icon="false"}
+## Convenções de notação
+
+Ao longo deste capítulo:
+
+- $\mathbf{A}\in\mathbb{R}^{q\times p}$ representa uma matriz real e $T_{\mathbf{A}}:\mathbb{R}^p\to\mathbb{R}^q$ a transformação linear associada;
+- $r=\operatorname{posto}(\mathbf{A})$ representa o posto de $\mathbf{A}$;
+- $d_1\geq\cdots\geq d_r>0$ representam os valores singulares positivos de $\mathbf{A}$;
+- $\mathbf{v}_j\in\mathbb{R}^p$ representa um vetor singular à direita;
+- $\mathbf{u}_j\in\mathbb{R}^q$ representa um vetor singular à esquerda;
+- $\mathbf{U}$, $\mathbf{D}$ e $\mathbf{V}$ representam os fatores da SVD completa;
+- $\mathbf{U}_r$, $\mathbf{D}_r$ e $\mathbf{V}_r$ representam os fatores da SVD compacta;
+- $\mathbf{U}_k$, $\mathbf{D}_k$ e $\mathbf{V}_k$ representam os fatores de uma SVD truncada;
+- $\mathbf{A}^{+}$ representa a pseudoinversa de Moore--Penrose;
+- $\|\mathbf{A}\|_2$ e $\|\mathbf{A}\|_F$ representam, respectivamente, as normas espectral e de Frobenius.
+
+As convenções estabelecidas nos capítulos anteriores para núcleo, imagem, espaço coluna, espaço linha e bases ortonormais permanecem válidas.
+:::
+
 ## Definição e formas da Decomposição em Valores Singulares
 
 Considere uma matriz real
@@ -156,6 +175,8 @@ $$
 Esses elementos são os **valores singulares** de $\mathbf{A}$. [@golub2013matrix]
 :::
 
+A demonstração será apresentada posteriormente, após a construção da SVD a partir das decomposições espectrais de $\mathbf{A}^{\top}\mathbf{A}$ e $\mathbf{A}\mathbf{A}^{\top}$.
+
 A matriz $\mathbf{D}$ é denominada diagonal retangular porque
 
 $$
@@ -235,6 +256,19 @@ d_r
 $$
 
 enquanto os demais valores singulares são iguais a zero.
+
+Assim, o número de valores singulares positivos é exatamente a dimensão da imagem de $T_{\mathbf{A}}$, isto é,
+
+$$
+r
+=
+\dim
+\left(
+\operatorname{Im}(T_{\mathbf{A}})
+\right)
+=
+\operatorname{posto}(\mathbf{A}).
+$$
 
 ### Vetores singulares
 
@@ -399,20 +433,46 @@ $$
 Na primeira etapa,
 
 $$
+\mathbf{z}
+=
 \mathbf{V}^{\top}\mathbf{x}
 $$
 
-fornece as coordenadas de $\mathbf{x}$ na base dos vetores singulares à direita.
+fornece as coordenadas de $\mathbf{x}$ na base ortonormal dos vetores singulares à direita,
+
+$$
+\mathcal{B}_{V}
+=
+\{
+\mathbf{v}_1,\ldots,\mathbf{v}_p
+\}.
+$$
+
+Assim,
+
+$$
+\mathbf{z}
+=
+[\mathbf{x}]_{\mathcal{B}_{V}}.
+$$
 
 Na segunda etapa,
 
 $$
-\mathbf{D}\mathbf{V}^{\top}\mathbf{x}
+\mathbf{D}\mathbf{z}
 $$
 
-multiplica separadamente as coordenadas pelos valores singulares. Como $\mathbf{D}$ pode ser retangular, essa etapa também pode alterar a dimensão do espaço.
+multiplica separadamente as coordenadas pelas entradas diagonais de $\mathbf{D}$. Como $\mathbf{D}\in\mathbb{R}^{q\times p}$ pode ser retangular, essa etapa também realiza a passagem entre as dimensões do domínio e do contradomínio.
 
-Na terceira etapa, $\mathbf{U}$ expressa o resultado na base ortonormal dos vetores singulares à esquerda.
+Na terceira etapa, $\mathbf{U}$ reconstrói o resultado nas coordenadas canônicas de $\mathbb{R}^q$ a partir da base ortonormal
+
+$$
+\mathcal{B}_{U}
+=
+\{
+\mathbf{u}_1,\ldots,\mathbf{u}_q
+\}.
+$$
 
 Como $\mathbf{U}$ e $\mathbf{V}$ são ortogonais, essas duas matrizes preservam normas, distâncias, ângulos e produtos internos. As alterações de comprimento e a possível redução de dimensão são determinadas por $\mathbf{D}$.
 
@@ -804,7 +864,7 @@ A próxima seção constrói essa relação e demonstra por que os quadrados dos
 
 ## Construção da SVD e relação com a decomposição espectral
 
-A existência da SVD decorre das propriedades das matrizes
+A existência da SVD decorre das propriedades das duas matrizes de Gram associadas a $\mathbf{A}$:
 
 $$
 \mathbf{A}^{\top}\mathbf{A}
@@ -814,6 +874,11 @@ $$
 \mathbf{A}\mathbf{A}^{\top}.
 $$
 
+Essas matrizes já apareceram no estudo dos espaços das variáveis e das observações. A SVD mostra agora que seus espectros estão diretamente relacionados e que essa relação permite construir bases ortonormais adaptadas à transformação
+
+$$
+T_{\mathbf{A}}:\mathbb{R}^p\to\mathbb{R}^q.
+$$
 Para
 
 $$
@@ -1024,7 +1089,7 @@ Então:
 [@golub2013matrix]
 :::
 
-::: proof
+::: {.proof}
 Considere inicialmente
 
 $$
@@ -1258,7 +1323,23 @@ $$
 }.
 $$
 
-As transformações entre os autoespaços são inversíveis quando $\lambda>0$. Por isso, as multiplicidades dos autovalores positivos também coincidem.
+Para $\lambda>0$, as aplicações
+
+$$
+\mathbf{v}
+\longmapsto
+\frac{\mathbf{A}\mathbf{v}}{\sqrt{\lambda}}
+$$
+
+e
+
+$$
+\mathbf{u}
+\longmapsto
+\frac{\mathbf{A}^{\top}\mathbf{u}}{\sqrt{\lambda}}
+$$
+
+estabelecem aplicações lineares inversas entre o autoespaço de $\mathbf{A}^{\top}\mathbf{A}$ associado a $\lambda$ e o autoespaço de $\mathbf{A}\mathbf{A}^{\top}$ associado ao mesmo autovalor. Portanto, esses autoespaços possuem a mesma dimensão e as multiplicidades dos autovalores positivos coincidem.
 
 Como
 
@@ -1443,6 +1524,41 @@ $$
 
 formam um conjunto ortonormal.
 
+Além disso, cada $\mathbf{u}_j$ pertence à imagem de $T_{\mathbf{A}}$, pois
+
+$$
+\mathbf{u}_j
+=
+\frac{1}{d_j}
+\mathbf{A}\mathbf{v}_j.
+$$
+
+Como existem $r=\operatorname{posto}(\mathbf{A})$ vetores ortonormais desse tipo e
+
+$$
+\dim
+\left(
+\operatorname{Im}(T_{\mathbf{A}})
+\right)
+=
+r,
+$$
+
+tem-se
+
+$$
+\operatorname{Im}(T_{\mathbf{A}})
+=
+\mathcal{C}(\mathbf{A})
+=
+\operatorname{span}
+\left\{
+\mathbf{u}_1,\ldots,\mathbf{u}_r
+\right\}.
+$$
+
+Assim, $\mathbf{u}_1,\ldots,\mathbf{u}_r$ formam uma base ortonormal da imagem da transformação.
+
 Além disso,
 
 $$
@@ -1596,13 +1712,29 @@ $$
 \end{aligned}
 $$
 
-Essa é a SVD compacta.
+Portanto,
+
+$$
+\mathbf{A}
+=
+\mathbf{U}_r
+\mathbf{D}_r
+\mathbf{V}_r^{\top},
+$$
+
+que é a SVD compacta de $\mathbf{A}$.
+
+Essa construção também explicita o papel dos três fatores:
+
+- as colunas de $\mathbf{V}_r$ formam uma base ortonormal das direções do domínio que não pertencem ao núcleo;
+- $\mathbf{D}_r$ contém os fatores de escalonamento positivos;
+- as colunas de $\mathbf{U}_r$ formam uma base ortonormal da imagem da transformação.
 
 ### Demonstração da existência da SVD completa
 
 A construção anterior também demonstra o @thm-existencia-svd.
 
-::: proof
+::: {.proof}
 Os vetores
 
 $$
@@ -1636,13 +1768,32 @@ $$
 j=r+1,\ldots,p.
 $$
 
-Os vetores
+Como mostrado na construção da SVD compacta, os vetores
 
 $$
 \mathbf{u}_1,\ldots,\mathbf{u}_r
 $$
 
-formam uma base ortonormal do espaço coluna de $\mathbf{A}$. Complete esse conjunto com uma base ortonormal
+formam uma base ortonormal de
+
+$$
+\operatorname{Im}(T_{\mathbf{A}})
+=
+\mathcal{C}(\mathbf{A}).
+$$
+
+Pela ortogonalidade entre os espaços fundamentais,
+
+$$
+\mathcal{C}(\mathbf{A})^{\perp}
+=
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
+Complete esse conjunto com uma base ortonormal
 
 $$
 \mathbf{u}_{r+1},\ldots,\mathbf{u}_q
@@ -1894,6 +2045,31 @@ d_j
 $$
 
 em que $\lambda_j$ é um autovalor positivo de qualquer uma das duas matrizes de Gram.
+
+As duas decomposições também identificam os espaços aos quais pertencem os vetores singulares:
+
+$$
+\mathbf{v}_j
+\in
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right)
+\subseteq
+\mathbb{R}^{p}
+$$
+
+e
+
+$$
+\mathbf{u}_j
+\in
+\mathcal{C}(\mathbf{A})
+\subseteq
+\mathbb{R}^{q}.
+$$
+
+Portanto, $\mathbf{A}^{\top}\mathbf{A}$ descreve a estrutura espectral relevante no domínio, enquanto $\mathbf{A}\mathbf{A}^{\top}$ descreve a estrutura correspondente no contradomínio. Os valores singulares positivos realizam a ligação entre esses dois espaços.
 
 ### Exemplo de construção da SVD
 
@@ -2203,7 +2379,7 @@ $$
 \mathbf{A}\succeq0,
 $$
 
-todos os autovalores são não negativos. Nesse caso, após ordenar os autovalores,
+todos os autovalores são não negativos. Nesse caso, pode-se escolher uma SVD na qual, após ordenar os autovalores,
 
 $$
 \mathbf{U}
@@ -2314,7 +2490,7 @@ A decomposição espectral preserva o sinal dos autovalores na matriz diagonal. 
 
 Para matrizes não simétricas, autovalores e valores singulares representam objetos diferentes. Os autovalores descrevem direções invariantes de um operador quadrado. Os valores singulares descrevem fatores de escalonamento entre direções ortonormais do domínio e do contradomínio e permanecem definidos para matrizes retangulares.
 
-::: {.callout-note appearance="simple"}
+::: {.callout-note appearance="simple" icon="false"}
 ## Construção teórica e cálculo numérico
 
 A decomposição espectral de
@@ -2334,7 +2510,7 @@ $$
 Esse produto pode ampliar diferenças entre as magnitudes dos valores singulares e aumentar os efeitos de erros de arredondamento. Programas numéricos utilizam procedimentos específicos para calcular a SVD diretamente, com maior estabilidade.
 :::
 
-A construção algébrica identifica os pares de direções associados pelos valores singulares. A interpretação geométrica mostra como essas direções transformam uma esfera unitária do domínio em uma elipse ou em um elipsoide no espaço de chegada.
+A construção algébrica identifica os pares de direções associados pelos valores singulares. A interpretação geométrica mostra como a transformação leva a bola unitária do domínio a um elipsoide contido na imagem de $\mathbf{A}$, cujos semieixos são determinados pelos valores e vetores singulares. O comportamento da esfera unitária dependerá da existência ou não de direções pertencentes ao núcleo.
 
 ## Interpretação geométrica da SVD
 
@@ -2425,7 +2601,8 @@ $$
 
 A SVD permite descrever geometricamente sua imagem pela transformação $\mathbf{A}$.
 
-::: {#thm-imagem-bola-svd}
+::: {#prp-imagem-bola-svd}
+
 ## Imagem da bola unitária pela SVD
 
 Seja
@@ -2438,7 +2615,7 @@ $$
 \mathbf{V}_r^{\top}
 $$
 
-a SVD compacta de uma matriz de posto $r$. A imagem da bola unitária por $\mathbf{A}$ é o elipsoide
+a SVD compacta de uma matriz de posto $r\geq1$. A imagem da bola unitária por $\mathbf{A}$ é o elipsoide sólido de dimensão $r$, contido em $\mathcal{C}(\mathbf{A})$,
 
 $$
 \mathbf{A}
@@ -2467,9 +2644,32 @@ e os comprimentos de seus semieixos são
 $$
 d_1,\ldots,d_r.
 $$
+Em particular,
+
+$$
+\mathbf{A}
+\left(
+\mathcal{B}_p
+\right)
+\subseteq
+\mathcal{C}(\mathbf{A}),
+$$
+
+e a dimensão desse elipsoide é
+
+$$
+\dim
+\left(
+\mathcal{C}(\mathbf{A})
+\right)
+=
+r.
+$$
+
+No caso extremo $\mathbf{A}=\mathbf{0}$, a imagem da bola unitária reduz-se ao conjunto $\{\mathbf{0}\}$.
 :::
 
-::: proof
+::: {.proof}
 Escreva
 
 $$
@@ -2589,38 +2789,86 @@ $$
 Logo, o conjunto apresentado coincide com a imagem da bola unitária.
 :::
 
-Quando $\mathbf{A}$ possui posto coluna completo,
+O comportamento da esfera unitária depende da existência de um núcleo não trivial.
+
+Se $\mathbf{A}$ possui posto coluna completo,
 
 $$
 r=p,
 $$
 
-a imagem da esfera unitária
+então
 
 $$
+\mathcal{N}(\mathbf{A})
+=
+\{\mathbf{0}\}.
+$$
+
+Nesse caso, a imagem da esfera unitária
+
+$$
+\mathcal{S}_{p-1}
+=
 \left\{
-\mathbf{x}:
+\mathbf{x}\in\mathbb{R}^p:
 \|\mathbf{x}\|=1
 \right\}
 $$
 
-é a superfície do elipsoide.
+é a fronteira relativa do elipsoide
 
-Quando
+$$
+\mathbf{A}
+\left(
+\mathcal{B}_p
+\right)
+$$
+
+no subespaço $\mathcal{C}(\mathbf{A})$.
+
+Por outro lado, se
 
 $$
 r<p,
 $$
 
-existem direções não nulas eliminadas por $\mathbf{A}$. Nesse caso, a imagem da esfera também contém pontos do interior do elipsoide, pois parte da norma de $\mathbf{x}$ pode estar concentrada no núcleo da transformação.
+então
 
-Se
+$$
+\dim
+\left(
+\mathcal{N}(\mathbf{A})
+\right)
+=
+p-r
+>
+0.
+$$
+
+Nesse caso, a imagem da esfera unitária coincide com a imagem da bola unitária:
+
+$$
+\mathbf{A}
+\left(
+\mathcal{S}_{p-1}
+\right)
+=
+\mathbf{A}
+\left(
+\mathcal{B}_p
+\right).
+$$
+
+De fato, para qualquer ponto do elipsoide cuja componente nas direções $\mathbf{v}_1,\ldots,\mathbf{v}_r$ tenha norma menor que 1, pode-se acrescentar uma componente pertencente ao núcleo até obter um vetor de norma 1, sem alterar sua imagem por $\mathbf{A}$.
+
+Finalmente, se
 
 $$
 r<q,
 $$
 
-o elipsoide está contido no subespaço
+o elipsoide não ocupa todo o espaço de chegada. Ele está contido no subespaço de dimensão $r$
 
 $$
 \mathcal{C}(\mathbf{A})
@@ -2633,7 +2881,7 @@ $$
 \mathbb{R}^{q}.
 $$
 
-Assim, a SVD também revela a dimensão efetiva da imagem da transformação.
+Assim, a geometria da imagem da bola revela simultaneamente os fatores de escala da transformação e a dimensão de sua imagem.
 
 ### Alteração dos comprimentos
 
@@ -2861,7 +3109,7 @@ A SVD mostra que essa imagem é uma elipse com:
 No domínio, as direções correspondentes são $\mathbf{v}_1$ e $\mathbf{v}_2$.
 :::
 
-A @fig-geometria-svd mostra as direções singulares no domínio e no contradomínio. No primeiro painel, $\mathbf{v}_1$ e $\mathbf{v}_2$ formam uma base ortonormal da circunferência unitária. No segundo, essas direções são transformadas em $d_1\mathbf{u}_1$ e $d_2\mathbf{u}_2$, que determinam os semieixos da elipse.
+A @fig-geometria-svd mostra as direções singulares no domínio e no contradomínio. No primeiro painel, $\mathbf{v}_1$ e $\mathbf{v}_2$ formam uma base ortonormal de $\mathbb{R}^2$ e identificam duas direções sobre a circunferência unitária. No segundo, essas direções são transformadas em $d_1\mathbf{u}_1$ e $d_2\mathbf{u}_2$, que determinam os semieixos da elipse.
 
 ```{r}
 #| label: fig-geometria-svd
@@ -3004,22 +3252,39 @@ ggplot() +
     colour = "grey70"
   ) +
   geom_path(
-    data = curvas,
-    aes(
-      x = x,
-      y = y
-    ),
-    linewidth = 1
-  ) +
+  data = subset(
+    curvas,
+    painel == "Espaço de origem"
+  ),
+  aes(
+    x = x,
+    y = y
+  ),
+  linewidth = 1,
+  color = "#1f77b4"
+) +
+geom_path(
+  data = subset(
+    curvas,
+    painel == "Espaço de chegada"
+  ),
+  aes(
+    x = x,
+    y = y
+  ),
+  linewidth = 1,
+  color = "#d62728"
+) +
   geom_segment(
-    data = direcoes,
-    aes(
-      x = x,
-      y = y,
-      xend = xend,
-      yend = yend,
-      linetype = direcao
-    ),
+  data = direcoes,
+  aes(
+    x = x,
+    y = y,
+    xend = xend,
+    yend = yend,
+    color = direcao,
+    linetype = direcao
+  ),
     linewidth = 0.9,
     arrow = grid::arrow(
       length = grid::unit(
@@ -3055,18 +3320,18 @@ ggplot() +
     expand = FALSE,
     clip = "off"
   ) +
-  scale_linetype_manual(
-    values = c(
-      "Primeira direção" = "solid",
-      "Segunda direção" = "dashed"
-    )
-  ) +
+  scale_color_manual(
+  values = c(
+    "Primeira direção" = "#1f77b4",
+    "Segunda direção" = "#2ca02c"
+  )
+) +
   labs(
     x = NULL,
     y = NULL,
     linetype = NULL
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
     axis.text = element_blank(),
@@ -3084,11 +3349,17 @@ ggplot() +
   )
 ```
 
-A figura representa uma transformação não simétrica. Por isso, as direções singulares à direita e à esquerda não coincidem. A matriz $\mathbf{V}^{\top}$ alinha inicialmente a circunferência às direções $\mathbf{v}_1$ e $\mathbf{v}_2$. A matriz $\mathbf{D}$ altera os comprimentos segundo $d_1$ e $d_2$. A matriz $\mathbf{U}$ orienta os semieixos resultantes nas direções $\mathbf{u}_1$ e $\mathbf{u}_2$.
+Neste exemplo, as bases singulares do domínio e do contradomínio são distintas. A matriz $\mathbf{V}^{\top}$ expressa os pontos da circunferência nas coordenadas da base formada por $\mathbf{v}_1$ e $\mathbf{v}_2$. Como essa transformação é ortogonal, a circunferência permanece uma circunferência. Em seguida, $\mathbf{D}$ realiza a deformação, multiplicando os comprimentos nas duas direções por $d_1$ e $d_2$. Finalmente, $\mathbf{U}$ orienta os semieixos da elipse nas direções $\mathbf{u}_1$ e $\mathbf{u}_2$ no espaço de chegada.
 
-### Transformações de posto deficiente
+### Transformações com núcleo não trivial
 
-Quando algum valor singular é zero, a transformação colapsa uma direção do domínio.
+Quando
+
+$$
+r<p,
+$$
+
+a transformação possui núcleo não trivial e elimina $p-r$ direções linearmente independentes do domínio.
 
 Por exemplo, considere
 
@@ -3128,10 +3399,11 @@ A direção correspondente ao valor singular nulo pertence ao núcleo. O elipsoi
 
 De modo geral:
 
--   cada valor singular positivo produz um semieixo da imagem;
--   cada valor singular nulo elimina uma direção;
--   o número de semieixos não nulos é o posto da matriz;
--   o elipsoide está contido no espaço coluna de $\mathbf{A}$.
+- cada valor singular positivo produz um semieixo não nulo da imagem;
+- existem exatamente $r$ semieixos não nulos;
+- o núcleo possui dimensão $p-r$ e reúne as direções eliminadas pela transformação;
+- a dimensão do elipsoide resultante é $r$;
+- o elipsoide está contido em $\mathcal{C}(\mathbf{A})$.
 
 A descrição geométrica da SVD também identifica bases ortonormais dos quatro espaços fundamentais associados à matriz. Essas relações permitem interpretar posto, núcleo, projetores, normas e condicionamento diretamente a partir dos vetores e valores singulares.
 
@@ -3223,7 +3495,8 @@ Quando $r=q$, a matriz $\mathbf{U}_0$ não possui colunas. Quando $r=p$, o mesmo
 
 ### Espaço coluna e espaço linha
 
-::: {#thm-espacos-fundamentais-svd}
+::: {#prp-espacos-fundamentais-svd}
+
 ## Espaços fundamentais determinados pela SVD
 
 Se
@@ -3293,7 +3566,7 @@ $$
 [@golub2013matrix]
 :::
 
-::: proof
+::: {.proof}
 Pela SVD compacta,
 
 $$
@@ -3485,6 +3758,8 @@ $$
 =
 \mathcal{C}(\mathbf{U}_0).
 $$
+
+Assim, a SVD completa fornece bases ortonormais simultaneamente para os quatro espaços fundamentais de $\mathbf{A}$.
 :::
 
 As quatro bases fornecidas pela SVD podem ser organizadas como na @tbl-espacos-svd.
@@ -3574,6 +3849,8 @@ $$
 se decompõe em uma parcela no espaço linha e outra no núcleo de $\mathbf{A}$.
 
 ### Projetores ortogonais
+
+No Capítulo 3, vimos que uma matriz com colunas ortonormais determina o projetor ortogonal sobre o subespaço gerado por essas colunas. Aplicando esse resultado às bases fornecidas pela SVD, obtêm-se diretamente os projetores dos quatro espaços fundamentais.
 
 Como as colunas de $\mathbf{U}_r$ são ortonormais, a matriz
 
@@ -3905,10 +4182,34 @@ $$
 q-r.
 $$
 
-Os valores singulares nulos representam direções eliminadas pela transformação. A quantidade dessas direções depende do espaço considerado:
+A SVD completa também explicita as direções que não participam da ação não nula da transformação.
 
--   no domínio, existem $p-r$ direções no núcleo de $\mathbf{A}$;
--   no contradomínio, existem $q-r$ direções ortogonais à imagem.
+No domínio,
+
+$$
+\dim
+\mathcal{N}(\mathbf{A})
+=
+p-r,
+$$
+
+de modo que existem $p-r$ direções linearmente independentes eliminadas por $\mathbf{A}$.
+
+No contradomínio,
+
+$$
+\dim
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+q-r,
+$$
+
+de modo que existem $q-r$ direções ortogonais à imagem de $\mathbf{A}$.
+
+Quando essas direções aparecem como posições diagonais adicionais na SVD completa, elas estão associadas a entradas nulas de $\mathbf{D}$. Para matrizes retangulares, porém, a dimensão dos núcleos deve ser interpretada a partir de $p-r$ e $q-r$, e não apenas pela contagem dos valores singulares positivos usualmente listados.
 
 ### Produto interno de Frobenius
 
@@ -4052,7 +4353,8 @@ $$
 
 A interpretação geométrica anterior mostra que a norma espectral é o maior fator de ampliação produzido pela transformação.
 
-::: {#thm-normas-valores-singulares}
+::: {#prp-normas-valores-singulares}
+
 ## Normas matriciais e valores singulares
 
 Se
@@ -4086,7 +4388,7 @@ $$
 [@golub2013matrix]
 :::
 
-::: proof
+::: {.proof}
 Para a norma espectral, escreva
 
 $$
@@ -4199,6 +4501,16 @@ $$
 $$
 :::
 
+Se $\mathbf{A}=\mathbf{0}$, então não há valores singulares positivos e, diretamente pelas definições,
+
+$$
+\|\mathbf{A}\|_2
+=
+\|\mathbf{A}\|_F
+=
+0.
+$$
+
 As duas normas medem aspectos diferentes:
 
 -   $\|\mathbf{A}\|_2$ depende somente do maior valor singular e representa o maior fator de ampliação;
@@ -4235,7 +4547,8 @@ $$
 
 As normas espectral e de Frobenius são preservadas por multiplicações ortogonais.
 
-::: {#thm-invariancia-ortogonal-normas}
+::: {#prp-invariancia-ortogonal-normas}
+
 ## Invariância ortogonal das normas
 
 Se $\mathbf{Q}_1$ e $\mathbf{Q}_2$ são matrizes ortogonais de dimensões compatíveis, então
@@ -4263,6 +4576,109 @@ $$
 $$
 
 [@golub2013matrix]
+:::
+
+::: {.proof}
+Para a norma espectral, como $\mathbf{Q}_1$ preserva normas,
+
+$$
+\left\|
+\mathbf{Q}_1
+\mathbf{A}
+\mathbf{Q}_2
+\mathbf{x}
+\right\|
+=
+\left\|
+\mathbf{A}
+\mathbf{Q}_2
+\mathbf{x}
+\right\|.
+$$
+
+Como $\mathbf{Q}_2$ é ortogonal, a transformação
+
+$$
+\mathbf{z}
+=
+\mathbf{Q}_2\mathbf{x}
+$$
+
+preserva a norma e percorre todos os vetores unitários quando $\mathbf{x}$ percorre a esfera unitária. Portanto,
+
+$$
+\begin{aligned}
+\left\|
+\mathbf{Q}_1
+\mathbf{A}
+\mathbf{Q}_2
+\right\|_2
+&=
+\max_{\|\mathbf{x}\|=1}
+\left\|
+\mathbf{A}
+\mathbf{Q}_2
+\mathbf{x}
+\right\|\\
+&=
+\max_{\|\mathbf{z}\|=1}
+\|\mathbf{A}\mathbf{z}\|\\
+&=
+\|\mathbf{A}\|_2.
+\end{aligned}
+$$
+
+Para a norma de Frobenius,
+
+$$
+\begin{aligned}
+\left\|
+\mathbf{Q}_1
+\mathbf{A}
+\mathbf{Q}_2
+\right\|_F^2
+&=
+\operatorname{tr}
+\left[
+\left(
+\mathbf{Q}_1
+\mathbf{A}
+\mathbf{Q}_2
+\right)^{\top}
+\left(
+\mathbf{Q}_1
+\mathbf{A}
+\mathbf{Q}_2
+\right)
+\right]\\
+&=
+\operatorname{tr}
+\left(
+\mathbf{Q}_2^{\top}
+\mathbf{A}^{\top}
+\mathbf{A}
+\mathbf{Q}_2
+\right)\\
+&=
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}
+\mathbf{A}
+\mathbf{Q}_2
+\mathbf{Q}_2^{\top}
+\right)\\
+&=
+\operatorname{tr}
+\left(
+\mathbf{A}^{\top}
+\mathbf{A}
+\right)\\
+&=
+\|\mathbf{A}\|_F^2.
+\end{aligned}
+$$
+
+Logo, ambas as normas são invariantes sob multiplicações ortogonais.
 :::
 
 A SVD pode, portanto, ser interpretada como uma representação que remove fatores ortogonais sem alterar essas normas:
@@ -4437,6 +4853,56 @@ $$
 $$
 :::
 
+É importante distinguir **núcleo não trivial**, **deficiência de posto** e **mau condicionamento**.
+
+Uma matriz possui núcleo não trivial quando
+
+$$
+r<p.
+$$
+
+Isso ocorre necessariamente, por exemplo, em qualquer matriz larga de posto linha completo,
+
+$$
+q<p
+\qquad\text{e}\qquad
+r=q.
+$$
+
+Nesse caso, a matriz possui o maior posto possível para suas dimensões e, portanto, não é deficiente em posto segundo o critério
+
+$$
+r<\min(q,p).
+$$
+
+Ainda assim, ela possui um núcleo de dimensão
+
+$$
+p-q.
+$$
+
+Por outro lado, uma matriz de posto máximo pode ser mal condicionada quando seu menor valor singular positivo é muito pequeno em relação ao maior. Assim,
+
+$$
+r=\min(q,p)
+$$
+
+não implica necessariamente bom condicionamento.
+
+A deficiência de posto corresponde a
+
+$$
+r<\min(q,p),
+$$
+
+enquanto o mau condicionamento, no caso de posto máximo, corresponde a uma razão
+
+$$
+\frac{d_1}{d_s}
+$$
+
+elevada.
+
 Quando $\mathbf{A}$ possui posto máximo, $d_s$ é o menor valor singular positivo.
 
 Se
@@ -4493,7 +4959,9 @@ $$
 p-q.
 $$
 
-Existem, portanto, direções eliminadas pela transformação. Nesse caso, o número de condição descreve a ação de $\mathbf{A}$ restrita ao espaço linha
+Existem, portanto, direções eliminadas pela transformação. 
+
+Nesse caso, a transformação não possui inversa no domínio inteiro, pois há direções pertencentes ao núcleo. Entretanto, sua restrição ao espaço linha
 
 $$
 \mathcal{C}
@@ -4501,9 +4969,10 @@ $$
 \mathbf{A}^{\top}
 \right)
 =
-\mathcal{N}(\mathbf{A})^{\perp}.
+\mathcal{N}(\mathbf{A})^{\perp}
 $$
 
+é injetiva. O número de condição finito descreve a variação dos fatores de escala nessa parte ativa do domínio.
 Nesse subespaço,
 
 $$
@@ -4572,34 +5041,16 @@ $$
 
 A interpretação do número de condição deve considerar somente as direções associadas aos valores singulares positivos.
 
--   Quando
+- Quando $\kappa_2(\mathbf{A})\approx 1$, essas direções são transformadas por fatores semelhantes.
 
-    $$
-    \kappa_2(\mathbf{A})
-    \approx
-    1,
-    $$
+- Quando $\kappa_2(\mathbf{A})$ é elevado, algumas direções ativas são preservadas ou ampliadas, enquanto outras são fortemente contraídas.
 
-    essas direções são transformadas por fatores semelhantes.
+- Quando $\kappa_2(\mathbf{A})= \infty$,  a matriz não possui posto máximo, isto é, $r<\min(q,p)$.
 
--   Quando
-
-    $$
-    \kappa_2(\mathbf{A})
-    $$
-
-    é elevado, algumas direções ativas são preservadas ou ampliadas, enquanto outras são fortemente contraídas.
-
--   Quando
-
-    $$
-    \kappa_2(\mathbf{A})
-    =
-    \infty,
-    $$
-
-    o posto é menor que o máximo possível e há valores singulares nulos adicionais além daqueles impostos pelas dimensões retangulares da matriz.
-
+  Nesse caso, pelo menos uma direção que poderia participar da ação não nula da matriz é também eliminada.
+  
+  Uma matriz de posto máximo com número de condição elevado é denominada **mal condicionada**. Ela pode possuir o maior posto possível para suas dimensões e, ainda assim, apresentar forte sensibilidade à solução de problemas inversos ou de sistemas lineares associados.
+  
 Valores singulares positivos muito pequenos amplificam erros quando se tenta inverter a transformação em seu subespaço ativo. Esse efeito será retomado na seção sobre pseudoinversa e mínimos quadrados.
 
 ::: {#exm-condicionamento-svd}
@@ -4722,24 +5173,27 @@ $$
 \text{número de valores singulares positivos},\\
 \text{imagem}
 &\longleftrightarrow
-\text{vetores singulares à esquerda},\\
+\text{vetores singulares à esquerda associados a }d_j>0,\\
 \text{espaço linha}
 &\longleftrightarrow
-\text{vetores singulares à direita},\\
-\text{núcleos}
+\text{vetores singulares à direita associados a }d_j>0,\\
+\text{núcleo}
 &\longleftrightarrow
-\text{direções associadas a valores nulos},\\
+\text{direções do domínio eliminadas por }\mathbf{A},\\
 \text{ampliação máxima}
 &\longleftrightarrow
 d_1,\\
-\text{contração mínima}
+\text{menor fator positivo de escala}
 &\longleftrightarrow
 d_r,\\
-\text{condicionamento}
+\text{condicionamento, se }r=s
 &\longleftrightarrow
-d_1/d_r.
+d_1/d_s,
+\qquad
+s=\min(q,p).
 \end{aligned}
 $$
+Se $r<p$, a menor norma de $\mathbf{A}\mathbf{x}$ entre todos os vetores unitários do domínio é zero, pois existem vetores unitários no núcleo. O valor $d_r$ descreve o menor fator **positivo** de escala, isto é, a menor ação da transformação quando restrita ao espaço linha $\mathcal{C}(\mathbf{A}^{\top})$.
 
 Quando a matriz representa um conjunto de dados, as bases à esquerda e à direita descrevem, respectivamente, estruturas nos espaços das observações e das variáveis.
 
@@ -4793,14 +5247,14 @@ $$
 \mathbb{R}^{p\times r}.
 $$
 
-Nesse contexto, os dois conjuntos de vetores singulares pertencem a espaços diferentes:
+Nesse contexto, a SVD recupera a dupla representação da matriz de dados introduzida no Capítulo 1:
 
--   as colunas de $\mathbf{U}_r$ pertencem ao espaço das observações $\mathbb{R}^{n}$;
--   as colunas de $\mathbf{V}_r$ pertencem ao espaço das variáveis $\mathbb{R}^{p}$.
+- as colunas de $\mathbf{V}_r$ pertencem a $\mathbb{R}^{p}$ e determinam direções no espaço em que as observações são representadas;
+- as colunas de $\mathbf{U}_r$ pertencem a $\mathbb{R}^{n}$ e determinam direções no espaço em que as variáveis são representadas.
 
-Os valores singulares conectam essas duas representações.
+Os mesmos valores singulares conectam essas duas representações.
 
-### Coordenadas no espaço das variáveis
+### Coordenadas das observações nas direções singulares à direita
 
 Multiplicando a SVD à direita por $\mathbf{V}_r$,
 
@@ -4843,7 +5297,26 @@ $$
 \mathbb{R}^{n\times r}
 $$
 
-contém as coordenadas das observações nas direções determinadas pelos vetores singulares à direita.
+contém as coordenadas das observações na base ortonormal
+
+$$
+\{
+\mathbf{v}_1,\ldots,\mathbf{v}_r
+\}
+$$
+
+do espaço linha
+
+$$
+\mathcal{C}
+\left(
+\mathbf{X}^{\top}
+\right)
+\subseteq
+\mathbb{R}^{p}.
+$$
+
+Como cada vetor associado a uma linha de $\mathbf{X}$ pertence a esse subespaço, essas $r$ coordenadas são suficientes para representar exatamente todas as observações.
 
 Sua $j$-ésima coluna é
 
@@ -4889,42 +5362,68 @@ $$
 
 o vetor singular à esquerda fornece a direção das coordenadas entre as observações, enquanto o valor singular determina sua magnitude.
 
-### Coordenadas no espaço das observações
+### Coordenadas das variáveis nas direções singulares à esquerda
 
-A relação dual é obtida multiplicando a transposta da matriz de dados por $\mathbf{U}_r$:
+A relação dual pode ser escrita transpondo a identidade anterior:
 
 $$
-\begin{aligned}
-\mathbf{X}^{\top}\mathbf{U}_r
-&=
-\mathbf{V}_r
-\mathbf{D}_r
-\mathbf{U}_r^{\top}
-\mathbf{U}_r\\
-&=
-\mathbf{V}_r
-\mathbf{D}_r.
-\end{aligned}
+\mathbf{U}_r^{\top}\mathbf{X}
+=
+\mathbf{D}_r\mathbf{V}_r^{\top}.
 $$
 
-Logo,
+Defina
+
+$$
+\mathbf{W}
+=
+\mathbf{U}_r^{\top}\mathbf{X}
+\in
+\mathbb{R}^{r\times p}.
+$$
+
+A $j$-ésima coluna de $\mathbf{W}$ contém as coordenadas da variável
+
+$$
+\mathbf{x}_{\cdot j}
+\in
+\mathbb{R}^{n}
+$$
+
+na base ortonormal
+
+$$
+\{
+\mathbf{u}_1,\ldots,\mathbf{u}_r
+\}
+$$
+
+do espaço coluna
+
+$$
+\mathcal{C}(\mathbf{X})
+\subseteq
+\mathbb{R}^{n}.
+$$
+
+Para a direção singular $\ell$,
+
+$$
+\mathbf{u}_{\ell}^{\top}
+\mathbf{x}_{\cdot j}
+=
+d_{\ell}v_{j\ell}.
+$$
+
+Assim, os elementos de $\mathbf{V}_r$, após o escalonamento pelos valores singulares, também descrevem as coordenadas das variáveis na base singular à esquerda.
+
+Equivalentemente, transpondo a relação,
 
 $$
 \mathbf{X}^{\top}\mathbf{U}_r
 =
 \mathbf{V}_r\mathbf{D}_r.
 $$
-
-A $j$-ésima coluna dessa matriz é
-
-$$
-\mathbf{X}^{\top}\mathbf{u}_j
-=
-d_j\mathbf{v}_j.
-$$
-
-Essa expressão representa as variáveis nas direções determinadas pelos vetores singulares à esquerda.
-
 As duas relações
 
 $$
@@ -4943,7 +5442,8 @@ $$
 
 expressam a dualidade entre os espaços das observações e das variáveis.
 
-::: {#thm-dualidade-svd-dados}
+::: {#prp-dualidade-svd-dados}
+
 ## Dualidade entre observações e variáveis
 
 Se
@@ -4972,24 +5472,28 @@ $$
 d_j\mathbf{v}_j.
 $$
 
-Portanto, o mesmo valor singular $d_j$ relaciona uma direção no espaço das variáveis a uma direção no espaço das observações.
+Portanto, o mesmo valor singular $d_j$ relaciona uma direção $\mathbf{v}_j$ no espaço das variáveis a uma direção $\mathbf{u}_j$ no espaço das representações das variáveis em $\mathbb{R}^n$. Essa correspondência constitui a dualidade singular entre os espaços associados às linhas e às colunas da matriz de dados.
 :::
 
 ### Matrizes de Gram
 
-As matrizes
+As duas matrizes de Gram associadas a $\mathbf{X}$ descrevem produtos internos entre objetos diferentes:
 
 $$
 \mathbf{X}^{\top}\mathbf{X}
+\in
+\mathbb{R}^{p\times p}
 $$
 
-e
+reúne os produtos internos entre as colunas, isto é, entre as variáveis representadas como vetores de $\mathbb{R}^n$, enquanto
 
 $$
 \mathbf{X}\mathbf{X}^{\top}
+\in
+\mathbb{R}^{n\times n}
 $$
 
-descrevem produtos internos em espaços distintos.
+reúne os produtos internos entre as linhas, isto é, entre as observações representadas como vetores de $\mathbb{R}^p$.
 
 A matriz
 
@@ -5095,7 +5599,7 @@ $$
 \mathbf{Z}\mathbf{V}_r^{\top}.
 $$
 
-A matriz $\mathbf{Z}$ contém as coordenadas das observações na base formada pelas colunas de $\mathbf{V}_r$. A multiplicação por $\mathbf{V}_r^{\top}$ reconstrói as observações no espaço original das variáveis.
+A matriz $\mathbf{Z}$ contém as coordenadas das observações na base ortonormal formada pelas colunas de $\mathbf{V}_r$ para o espaço linha de $\mathbf{X}$. A multiplicação por $\mathbf{V}_r^{\top}$ reconstrói exatamente as observações em $\mathbb{R}^{p}$.
 
 Para a observação $i$,
 
@@ -5120,7 +5624,7 @@ $$
 r<p,
 $$
 
-a nuvem de observações está contida em um subespaço próprio de $\mathbb{R}^{p}$. Nesse caso, existe redundância linear exata entre as variáveis.
+a nuvem de observações está contida em um subespaço próprio de $\mathbb{R}^{p}$. Equivalentemente, as $p$ colunas da matriz de dados são linearmente dependentes, de modo que a matriz observada possui uma representação exata utilizando apenas $r$ direções.
 
 ### Preservação de produtos internos
 
@@ -5199,7 +5703,15 @@ $$
 \right\|.
 $$
 
-A representação compacta reduz a dimensão de $p$ para $r$ quando a matriz possui posto deficiente, sem alterar a geometria euclidiana da nuvem de observações.
+Quando
+
+$$
+r<p,
+$$
+
+a representação compacta reduz exatamente o número de coordenadas necessárias para descrever as observações, de $p$ para $r$, sem alterar a geometria euclidiana da nuvem.
+
+Essa redução não exige que $\mathbf{X}$ seja deficiente em posto relativamente às suas dimensões; basta que seu espaço linha seja um subespaço próprio de $\mathbb{R}^p$.
 
 Essa redução é exata porque são mantidas todas as direções associadas a valores singulares positivos.
 
@@ -5256,7 +5768,7 @@ $$
 \mathbf{0}^{\top}.
 $$
 
-Como $\mathbf{D}_r$ é invertível e $\mathbf{V}_r$ possui posto coluna completo,
+Para $r\geq1$, como $\mathbf{D}_r$ é invertível e $\mathbf{V}_r$ possui colunas ortonormais,
 
 $$
 \mathbf{1}_n^{\top}\mathbf{U}_r
@@ -5284,7 +5796,9 @@ $$
 
 também possuem média zero.
 
-### Relação com a matriz de covariâncias amostral
+### Antecipação: relação com a matriz de covariâncias amostral
+
+A definição e as propriedades estatísticas da matriz de covariâncias serão desenvolvidas posteriormente. Neste ponto, interessa apenas observar a relação algébrica entre a SVD da matriz centralizada e a decomposição espectral da matriz de produtos cruzados normalizada.
 
 A matriz de covariâncias amostral pode ser escrita como
 
@@ -5433,7 +5947,35 @@ $$
 \operatorname{tr}(\mathbf{S}).
 $$
 
-A soma dos quadrados dos valores singulares de $\mathbf{X}_c$ corresponde à dispersão quadrática total da nuvem em torno da média, multiplicada por $n-1$.
+A soma dos quadrados dos valores singulares de $\mathbf{X}_c$ é igual à magnitude quadrática total da nuvem em torno da média:
+
+$$
+\sum_{j=1}^{r}d_j^2
+=
+\|\mathbf{X}_c\|_F^2
+=
+\sum_{i=1}^{n}
+\|
+\mathbf{x}_i-\bar{\mathbf{x}}
+\|^2.
+$$
+
+Equivalentemente, como
+
+$$
+\mathbf{S}
+=
+\frac{1}{n-1}
+\mathbf{X}_c^{\top}\mathbf{X}_c,
+$$
+
+essa quantidade é igual a
+
+$$
+(n-1)\operatorname{tr}(\mathbf{S}).
+$$
+
+Assim, $\operatorname{tr}(\mathbf{S})$ representa a dispersão média por grau de liberdade, enquanto $\|\mathbf{X}_c\|_F^2$ representa a soma quadrática total em torno do centro da nuvem.
 
 Essa interpretação depende da centralização. Para uma matriz de dados não centralizada,
 
@@ -5567,13 +6109,18 @@ Quando todas as $r$ direções associadas a valores singulares positivos são ma
 -   as distâncias euclidianas entre observações são preservadas;
 -   nenhuma parcela da norma de Frobenius é descartada.
 
-Uma representação de dimensão ainda menor utiliza somente os primeiros $k$ valores singulares, com
+Uma representação de dimensão ainda menor utiliza somente os primeiros $k$ pares singulares, com
 
 $$
 k<r.
 $$
 
-Nesse caso, a reconstrução deixa de ser exata. A forma expandida da SVD permite identificar a contribuição de cada direção e quantificar o erro produzido pelo truncamento.
+Nesse caso, algumas direções associadas a valores singulares positivos são deliberadamente descartadas e a reconstrução deixa de ser exata. Surge, então, uma distinção fundamental:
+
+- a SVD compacta remove apenas direções que já pertencem ao núcleo e preserva exatamente a matriz;
+- a SVD truncada remove também direções de ação não nula e produz uma aproximação.
+
+A forma expandida da SVD permitirá identificar a contribuição de cada direção preservada ou descartada e quantificar o erro produzido pelo truncamento.
 
 ## Forma expandida e aproximações de posto reduzido
 
@@ -5641,7 +6188,7 @@ d_j
 \mathbf{v}_j^{\top}
 $$
 
-representa a contribuição do $j$-ésimo par de direções singulares.
+representa uma transformação de posto 1 associada ao $j$-ésimo par de direções singulares: a componente do vetor de entrada na direção $\mathbf{v}_j$ é multiplicada por $d_j$ e enviada para a direção $\mathbf{u}_j$.
 
 ### Parcelas de posto 1
 
@@ -5693,7 +6240,7 @@ d_r
 \mathbf{v}_r^{\top}.
 $$
 
-Os valores singulares determinam a magnitude de cada parcela. Como
+Os valores singulares determinam a magnitude das parcelas de posto 1. Como
 
 $$
 d_1
@@ -5705,11 +6252,31 @@ d_r
 0,
 $$
 
-as parcelas são organizadas em ordem decrescente segundo sua contribuição para as normas espectral e de Frobenius.
+essas parcelas aparecem ordenadas da maior para a menor magnitude. De fato, para cada $j$,
+
+$$
+\left\|
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+\right\|_2
+=
+\left\|
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+\right\|_F
+=
+d_j.
+$$
 
 ### Ortogonalidade das parcelas
 
-As matrizes
+::: {#prp-ortogonalidade-parcelas-svd}
+
+## Ortogonalidade das parcelas singulares
+
+Para $i\neq j$, as parcelas
 
 $$
 \mathbf{u}_i
@@ -5723,9 +6290,43 @@ $$
 \mathbf{v}_j^{\top}
 $$
 
-são ortogonais segundo o produto interno de Frobenius quando $i\neq j$.
+são ortogonais segundo o produto interno de Frobenius:
 
-De fato,
+$$
+\left\langle
+\mathbf{u}_i\mathbf{v}_i^{\top},
+\mathbf{u}_j\mathbf{v}_j^{\top}
+\right\rangle_F
+=
+0.
+$$
+
+Além disso,
+
+$$
+\left\|
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+\right\|_F
+=
+1
+$$
+
+e, portanto,
+
+$$
+\left\|
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+\right\|_F
+=
+d_j.
+$$
+:::
+
+::: {.proof}
+Pelo produto interno de Frobenius,
 
 $$
 \begin{aligned}
@@ -5755,21 +6356,13 @@ $$
 \left(
 \mathbf{u}_i^{\top}\mathbf{u}_j
 \right)
-\operatorname{tr}
-\left(
-\mathbf{v}_i\mathbf{v}_j^{\top}
-\right)\\
-&=
-\left(
-\mathbf{u}_i^{\top}\mathbf{u}_j
-\right)
 \left(
 \mathbf{v}_j^{\top}\mathbf{v}_i
 \right).
 \end{aligned}
 $$
 
-Como os vetores singulares são ortonormais,
+Como os vetores singulares são ortonormais, para $i\neq j$,
 
 $$
 \mathbf{u}_i^{\top}\mathbf{u}_j
@@ -5782,10 +6375,10 @@ e
 $$
 \mathbf{v}_j^{\top}\mathbf{v}_i
 =
-0
+0.
 $$
 
-quando $i\neq j$. Logo,
+Logo,
 
 $$
 \left\langle
@@ -5796,18 +6389,13 @@ $$
 0.
 $$
 
-Além disso,
+Para $i=j$,
 
 $$
 \begin{aligned}
 \left\|
 \mathbf{u}_j\mathbf{v}_j^{\top}
 \right\|_F^2
-&=
-\left\langle
-\mathbf{u}_j\mathbf{v}_j^{\top},
-\mathbf{u}_j\mathbf{v}_j^{\top}
-\right\rangle_F\\
 &=
 \left(
 \mathbf{u}_j^{\top}\mathbf{u}_j
@@ -5820,7 +6408,7 @@ $$
 \end{aligned}
 $$
 
-Portanto,
+Consequentemente,
 
 $$
 \left\|
@@ -5831,16 +6419,17 @@ d_j
 =
 d_j.
 $$
+:::
 
-A identidade
+Como as parcelas da forma expandida são ortogonais segundo o produto interno de Frobenius,
 
 $$
 \|\mathbf{A}\|_F^2
 =
-\sum_{j=1}^{r}d_j^2
+\sum_{j=1}^{r}d_j^2.
 $$
 
-pode ser interpretada como uma decomposição pitagórica da magnitude quadrática total da matriz.
+Essa igualdade é uma decomposição pitagórica da magnitude quadrática total da matriz entre as parcelas singulares.
 
 ### SVD truncada
 
@@ -5868,7 +6457,7 @@ $$
 1\leq k<r,
 $$
 
-a **SVD truncada no posto** $k$ é
+a **SVD truncada de posto** $k$ é
 
 $$
 \mathbf{A}_k
@@ -5889,6 +6478,20 @@ $$
 \mathbf{V}_k^{\top}.
 $$
 :::
+
+A SVD truncada difere da SVD compacta porque
+
+$$
+k<r.
+$$
+
+Portanto, ela descarta parcelas associadas a valores singulares positivos e, em geral,
+
+$$
+\mathbf{A}_k
+\neq
+\mathbf{A}.
+$$
 
 Como as colunas de $\mathbf{U}_k$ e $\mathbf{V}_k$ são linearmente independentes e os elementos diagonais de $\mathbf{D}_k$ são positivos,
 
@@ -6002,6 +6605,26 @@ $$
 
 As duas proporções somam 1.
 
+Para uma matriz genérica, essas razões medem exclusivamente a distribuição da magnitude quadrática segundo a norma de Frobenius. Elas não devem ser interpretadas automaticamente como proporções de variância ou de informação estatística.
+
+Quando $\mathbf{A}$ é uma matriz de dados centralizada, porém,
+
+$$
+\|\mathbf{A}\|_F^2
+$$
+
+corresponde à dispersão quadrática total da nuvem em torno da média. Nesse contexto específico, a razão
+
+$$
+\frac{
+\sum_{j=1}^{k}d_j^2
+}{
+\sum_{j=1}^{r}d_j^2
+}
+$$
+
+pode ser interpretada como a proporção dessa dispersão preservada pela aproximação de posto $k$.
+
 Para uma matriz genérica, essas quantidades devem ser interpretadas em termos da norma de Frobenius. Quando $\mathbf{A}$ é uma matriz de dados centralizada, elas também podem ser relacionadas à dispersão total da nuvem de observações.
 
 ### Erro na norma espectral
@@ -6074,6 +6697,19 @@ $$
 \mathbf{v}_{k+1}
 =
 d_{k+1}\mathbf{u}_{k+1}.
+$$
+Assim, a norma espectral mede um erro de **pior caso**: entre todas as direções unitárias do domínio, $d_{k+1}$ é a maior magnitude que pode permanecer na parte descartada da transformação.
+
+Em contraste, a norma de Frobenius agrega quadraticamente os erros associados a todas as direções singulares descartadas:
+
+$$
+\left\|
+\mathbf{A}
+-
+\mathbf{A}_k
+\right\|_F^2
+=
+\sum_{j=k+1}^{r}d_j^2.
 $$
 
 ### Teorema de Eckart--Young--Mirsky
@@ -6197,7 +6833,7 @@ $$
 [@golub2013matrix]
 :::
 
-::: proof
+::: {.proof}
 Considere inicialmente a norma espectral e uma matriz arbitrária
 
 $$
@@ -6458,7 +7094,88 @@ $$
 \end{aligned}
 $$
 
-Expandindo os vetores $\mathbf{w}_i$ na base dos vetores singulares à esquerda, obtém-se
+Usando a decomposição espectral
+
+$$
+\mathbf{A}\mathbf{A}^{\top}
+=
+\sum_{j=1}^{r}
+d_j^2
+\mathbf{u}_j
+\mathbf{u}_j^{\top},
+$$
+
+tem-se
+
+$$
+\begin{aligned}
+\|\mathbf{P}\mathbf{A}\|_F^2
+&=
+\operatorname{tr}
+\left(
+\mathbf{P}
+\mathbf{A}\mathbf{A}^{\top}
+\right)\\
+&=
+\sum_{j=1}^{r}
+d_j^2
+\operatorname{tr}
+\left(
+\mathbf{P}
+\mathbf{u}_j
+\mathbf{u}_j^{\top}
+\right)\\
+&=
+\sum_{j=1}^{r}
+d_j^2
+\mathbf{u}_j^{\top}
+\mathbf{P}
+\mathbf{u}_j.
+\end{aligned}
+$$
+
+Defina
+
+$$
+c_j
+=
+\mathbf{u}_j^{\top}
+\mathbf{P}
+\mathbf{u}_j
+=
+\|\mathbf{P}\mathbf{u}_j\|^2.
+$$
+
+Como $\mathbf{P}$ é um projetor ortogonal,
+
+$$
+0
+\leq
+c_j
+\leq
+1.
+$$
+
+Além disso,
+
+$$
+\begin{aligned}
+\sum_{j=1}^{r}c_j
+&=
+\sum_{j=1}^{r}
+\mathbf{u}_j^{\top}
+\mathbf{P}
+\mathbf{u}_j\\
+&\leq
+\operatorname{tr}(\mathbf{P})\\
+&=
+\operatorname{posto}(\mathbf{P})\\
+&\leq
+k.
+\end{aligned}
+$$
+
+Portanto,
 
 $$
 \|\mathbf{P}\mathbf{A}\|_F^2
@@ -6467,7 +7184,7 @@ $$
 c_jd_j^2,
 $$
 
-em que
+com
 
 $$
 0\leq c_j\leq1
@@ -6476,17 +7193,36 @@ $$
 e
 
 $$
-\sum_{j=1}^{r}c_j
-\leq k.
+\sum_{j=1}^{r}c_j\leq k.
 $$
 
-Como os valores singulares estão ordenados,
+Como os valores singulares estão ordenados, sob as restrições,
+
+$$
+0\leq c_j\leq1
+\qquad\text{e}\qquad
+\sum_jc_j\leq k,
+$$
+
+a soma ponderada é maximizada atribuindo peso 1 aos $k$ maiores valores $d_j^2$ e peso 0 aos demais. Como
+
+$$
+d_1^2
+\geq
+\cdots
+\geq
+d_r^2,
+$$
+
+segue que
 
 $$
 \|\mathbf{P}\mathbf{A}\|_F^2
 \leq
 \sum_{j=1}^{k}d_j^2.
 $$
+
+
 
 Portanto,
 
@@ -6537,11 +7273,25 @@ $$
 Logo, $\mathbf{A}_k$ também atinge o limite inferior na norma de Frobenius.
 :::
 
-O teorema mostra que nenhum outro procedimento pode produzir uma matriz de posto no máximo $k$ com erro menor nas duas normas consideradas.
+O teorema mostra que nenhuma matriz de posto no máximo $k$ pode apresentar erro menor que $\mathbf{A}_k$ nas duas normas consideradas.
+
+Na norma espectral, o erro ótimo é determinado exclusivamente pelo primeiro valor singular descartado,
+
+$$
+d_{k+1}.
+$$
+
+Na norma de Frobenius, o erro ótimo depende de toda a parcela espectral descartada,
+
+$$
+\sqrt{
+\sum_{j=k+1}^{r}d_j^2
+}.
+$$
 
 ### Unicidade da aproximação
 
-A existência de uma aproximação ótima não implica sempre unicidade.
+A optimalidade estabelecida pelo @thm-eckart-young-mirsky não implica, em geral, unicidade da matriz aproximante. A situação também depende da norma considerada.
 
 Na norma de Frobenius, a aproximação de posto $k$ é única quando
 
@@ -6826,8 +7576,47 @@ $$
 \mathbf{Z}_k
 \mathbf{V}_k^{\top}.
 $$
+Como
 
-A matriz $\mathbf{Z}_k$ fornece uma representação das observações em $k$ coordenadas. A multiplicação por $\mathbf{V}_k^{\top}$ reconstrói uma aproximação das variáveis originais.
+$$
+\mathbf{Z}_k
+=
+\mathbf{X}\mathbf{V}_k,
+$$
+
+também se pode escrever
+
+$$
+\mathbf{X}_k
+=
+\mathbf{X}
+\mathbf{V}_k
+\mathbf{V}_k^{\top}.
+$$
+
+A matriz
+
+$$
+\mathbf{P}_k
+=
+\mathbf{V}_k
+\mathbf{V}_k^{\top}
+$$
+
+é o projetor ortogonal sobre o subespaço
+
+$$
+\mathcal{S}_k
+=
+\operatorname{span}
+\left\{
+\mathbf{v}_1,\ldots,\mathbf{v}_k
+\right\}.
+$$
+
+Portanto, cada observação é aproximada por sua projeção ortogonal sobre esse subespaço.
+
+A matriz $\mathbf{Z}_k$ fornece uma representação das observações em $k$ coordenadas. A multiplicação por $\mathbf{V}_k^{\top}$ reconstrói aproximações das observações no espaço original das $p$ variáveis.
 
 Para a observação $i$,
 
@@ -6849,7 +7638,7 @@ $$
 z_{ij}\mathbf{v}_j.
 $$
 
-A SVD truncada escolhe o subespaço de dimensão $k$ que minimiza a soma dos erros quadráticos de reconstrução de todas as observações:
+Pelo @thm-eckart-young-mirsky, entre todos os subespaços lineares de dimensão no máximo $k$, o subespaço gerado pelos primeiros vetores singulares à direita fornece uma reconstrução com soma mínima dos erros quadráticos:
 
 $$
 \|\mathbf{X}-\mathbf{X}_k\|_F^2
@@ -6876,7 +7665,25 @@ representa a parcela da dispersão quadrática total preservada pelas primeiras 
 
 Essa estrutura será retomada posteriormente na formulação de técnicas de redução de dimensionalidade. Neste capítulo, o resultado deve ser interpretado como uma propriedade geral da aproximação matricial de posto reduzido.
 
-A SVD truncada descarta direções associadas a valores singulares menores. A pseudoinversa realiza uma operação diferente: ela conserva as direções associadas a valores singulares positivos e inverte os respectivos fatores de escala.
+A SVD truncada e a pseudoinversa utilizam os mesmos componentes singulares para resolver problemas diferentes.
+
+Na aproximação de posto reduzido, algumas parcelas associadas a valores singulares positivos são deliberadamente descartadas:
+
+$$
+\mathbf{A}
+\longrightarrow
+\mathbf{A}_k.
+$$
+
+Na pseudoinversa, todas as direções associadas a valores singulares positivos são mantidas, mas seus fatores de escala são invertidos:
+
+$$
+d_j
+\longrightarrow
+\frac{1}{d_j}.
+$$
+
+As direções pertencentes aos núcleos permanecem sem inversão. Essa construção conduz à pseudoinversa de Moore--Penrose e às soluções de mínimos quadrados.
 
 ## Pseudoinversa e soluções de mínimos quadrados
 
@@ -6914,7 +7721,7 @@ $$
 \mathbf{V}_r^{\top}.
 $$
 
-Como todos os elementos diagonais de
+Se $r\geq1$, todos os elementos diagonais de
 
 $$
 \mathbf{D}_r
@@ -6925,7 +7732,7 @@ d_1,\ldots,d_r
 \right)
 $$
 
-são positivos, a matriz
+são positivos. Portanto,
 
 $$
 \mathbf{D}_r^{-1}
@@ -6939,6 +7746,8 @@ $$
 $$
 
 está bem definida.
+
+Se $r=0$, então $\mathbf{A}=\mathbf{0}$ e sua pseudoinversa será definida como a matriz nula de dimensão $p\times q$.
 
 ::: {#def-pseudoinversa-svd}
 ## Pseudoinversa de Moore--Penrose
@@ -6969,6 +7778,14 @@ $$
 \mathbf{A}^{+}
 \in
 \mathbb{R}^{p\times q}.
+$$
+
+No caso $\mathbf{A}=\mathbf{0}$, define-se
+
+$$
+\mathbf{A}^{+}
+=
+\mathbf{0}_{p\times q}.
 $$
 :::
 
@@ -7001,7 +7818,35 @@ $$
 \mathbf{0}.
 $$
 
-Portanto, a pseudoinversa desfaz a ação de $\mathbf{A}$ somente nas direções efetivamente representadas pela transformação.
+Portanto, a pseudoinversa desfaz os escalonamentos de $\mathbf{A}$ nas direções associadas aos valores singulares positivos e anula as componentes pertencentes a
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
+Assim, ela atua como uma inversão entre os subespaços
+
+$$
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right)
+\subseteq
+\mathbb{R}^{p}
+$$
+
+e
+
+$$
+\mathcal{C}(\mathbf{A})
+\subseteq
+\mathbb{R}^{q},
+$$
+
+nos quais a ação de $\mathbf{A}$ é não nula.
 
 ### Relação com a pseudoinversa espectral
 
@@ -7030,6 +7875,24 @@ $$
 em que cada autovalor não nulo é substituído por seu inverso.
 
 A definição pela SVD coincide com essa construção, mas permanece válida quando $\mathbf{A}$ não é simétrica ou é retangular.
+
+No caso simétrico indefinido, os valores singulares são os módulos dos autovalores,
+
+$$
+d_j
+=
+|\lambda_j|,
+$$
+
+enquanto seus sinais são incorporados à relação entre os vetores singulares à esquerda e à direita. Por isso, a inversão espectral
+
+$$
+\lambda_j
+\longmapsto
+\frac{1}{\lambda_j}
+$$
+
+para $\lambda_j\neq0$ é recuperada corretamente pela fórmula da pseudoinversa baseada na SVD.
 
 Se $\mathbf{A}$ é quadrada e invertível, todos os valores singulares são positivos e
 
@@ -7087,7 +7950,7 @@ $$
 [@golub2013matrix]
 :::
 
-::: proof
+::: {.proof}
 Pela SVD compacta,
 
 $$
@@ -7574,6 +8437,24 @@ A @tbl-projetores-pseudoinversa resume essas relações.
 
 : Projetores ortogonais determinados pela pseudoinversa. {#tbl-projetores-pseudoinversa}
 
+Observe que os dois produtos possuem dimensões e papéis distintos:
+
+$$
+\mathbf{A}\mathbf{A}^{+}
+\in
+\mathbb{R}^{q\times q}
+$$
+
+atua no contradomínio e seleciona a parcela que pode ser produzida por $\mathbf{A}$, enquanto
+
+$$
+\mathbf{A}^{+}\mathbf{A}
+\in
+\mathbb{R}^{p\times p}
+$$
+
+atua no domínio e seleciona a parcela ortogonal ao núcleo da transformação.
+
 ### Sistemas lineares compatíveis
 
 Considere o sistema
@@ -7679,6 +8560,26 @@ $$
 +
 \mathbf{V}_0\boldsymbol{\gamma}.
 $$
+As duas parcelas pertencem a subespaços ortogonais:
+
+$$
+\mathbf{A}^{+}\mathbf{b}
+\in
+\mathcal{C}
+\left(
+\mathbf{A}^{\top}
+\right)
+$$
+
+e
+
+$$
+\mathbf{V}_0\boldsymbol{\gamma}
+\in
+\mathcal{N}(\mathbf{A}).
+$$
+
+Portanto, a pseudoinversa fornece a componente da solução no espaço linha, enquanto toda a não unicidade do sistema compatível é representada pelas componentes pertencentes ao núcleo.
 
 Se
 
@@ -7708,7 +8609,8 @@ $$
 
 Quando um sistema compatível possui várias soluções, a pseudoinversa seleciona a solução de menor norma euclidiana.
 
-::: {#thm-solucao-compativel-menor-norma}
+::: {#prp-solucao-compativel-menor-norma}
+
 ## Solução compatível de menor norma
 
 Se
@@ -7730,7 +8632,7 @@ $$
 é a única solução de menor norma euclidiana. [@golub2013matrix]
 :::
 
-::: proof
+::: {.proof}
 Toda solução possui a forma
 
 $$
@@ -7856,7 +8758,9 @@ $$
 \right\|^2.
 $$
 
-Esse é o problema de **mínimos quadrados**.
+Como a função $t\mapsto t^2$ é estritamente crescente para $t\geq0$, minimizar a norma do resíduo ou seu quadrado produz exatamente o mesmo conjunto de soluções.
+
+Esse é o problema de **mínimos quadrados**. Embora esteja sendo introduzido a partir do caso incompatível, sua definição também se aplica a sistemas compatíveis; nesse caso, o erro mínimo é igual a zero.
 
 ::: {#def-solucao-minimos-quadrados}
 ## Solução de mínimos quadrados
@@ -8025,6 +8929,54 @@ $$
 
 Essas são as **equações normais** do problema de mínimos quadrados.
 
+Reciprocamente, se um vetor $\widehat{\mathbf{x}}$ satisfaz
+
+$$
+\mathbf{A}^{\top}
+\left(
+\mathbf{b}
+-
+\mathbf{A}\widehat{\mathbf{x}}
+\right)
+=
+\mathbf{0},
+$$
+
+então seu resíduo pertence a
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right)
+=
+\mathcal{C}(\mathbf{A})^{\perp}.
+$$
+
+Logo,
+
+$$
+\mathbf{A}\widehat{\mathbf{x}}
+$$
+
+é a projeção ortogonal de $\mathbf{b}$ sobre $\mathcal{C}(\mathbf{A})$, e $\widehat{\mathbf{x}}$ é uma solução de mínimos quadrados.
+
+Portanto,
+
+$$
+\widehat{\mathbf{x}}
+\text{ é solução de mínimos quadrados}
+\iff
+\mathbf{A}^{\top}
+\left(
+\mathbf{b}
+-
+\mathbf{A}\widehat{\mathbf{x}}
+\right)
+=
+\mathbf{0}.
+$$
+
 A interpretação geométrica é:
 
 $$
@@ -8076,7 +9028,19 @@ $$
 
 ### Conjunto das soluções de mínimos quadrados
 
-As equações normais podem possuir várias soluções quando $\mathbf{A}$ é deficiente em posto.
+As equações normais possuem uma solução única quando $\mathbf{A}$ possui posto coluna completo,
+
+$$
+r=p.
+$$
+
+Quando
+
+$$
+r<p,
+$$
+
+existem direções pertencentes a $\mathcal{N}(\mathbf{A})$, e todas as soluções de mínimos quadrados podem ser modificadas nessas direções sem alterar o vetor ajustado.
 
 ::: {#thm-solucoes-minimos-quadrados}
 ## Soluções de mínimos quadrados pela SVD
@@ -8121,7 +9085,7 @@ $$
 é a única de menor norma. [@golub2013matrix]
 :::
 
-::: proof
+::: {.proof}
 Todos os vetores da forma
 
 $$
@@ -8156,7 +9120,15 @@ $$
 
 Logo, todos esses vetores minimizam o mesmo resíduo.
 
-Reciprocamente, duas soluções de mínimos quadrados produzem o mesmo vetor ajustado, que é a projeção de $\mathbf{b}$ sobre $\mathcal{C}(\mathbf{A})$. Portanto, a diferença entre elas pertence ao núcleo de $\mathbf{A}$ e pode ser escrita como
+Reciprocamente, toda solução de mínimos quadrados produz o mesmo vetor ajustado, pois a projeção ortogonal de $\mathbf{b}$ sobre $\mathcal{C}(\mathbf{A})$ é única. Portanto, se $\widehat{\mathbf{x}}_1$ e $\widehat{\mathbf{x}}_2$ são duas soluções,
+
+$$
+\mathbf{A}\widehat{\mathbf{x}}_1
+=
+\mathbf{A}\widehat{\mathbf{x}}_2.
+$$
+
+Consequentemente, a diferença entre elas pertence ao núcleo de $\mathbf{A}$ e pode ser escrita como
 
 $$
 \mathbf{V}_0\boldsymbol{\gamma}.
@@ -8377,18 +9349,61 @@ $$
 \frac{1}{d_j}.
 $$
 
+Como os valores singulares positivos de $\mathbf{A}^{+}$ são
+
+$$
+\frac{1}{d_r}
+\geq
+\cdots
+\geq
+\frac{1}{d_1},
+$$
+
+tem-se, para $r\geq1$,
+
+$$
+\|\mathbf{A}^{+}\|_2
+=
+\frac{1}{d_r}.
+$$
+
+Consequentemente,
+
+$$
+\left\|
+\Delta\widehat{\mathbf{x}}
+\right\|
+\leq
+\frac{1}{d_r}
+\|\boldsymbol{\varepsilon}\|.
+$$
+
+O menor valor singular positivo controla, portanto, a maior amplificação possível de uma perturbação pela pseudoinversa.
+
 Esse comportamento relaciona:
 
--   valores singulares pequenos;
--   número de condição elevado;
--   sensibilidade a perturbações;
--   instabilidade de soluções inversas.
+- valores singulares positivos pequenos;
+- forte amplificação nas direções correspondentes da pseudoinversa;
+- sensibilidade a perturbações;
+- instabilidade de problemas inversos.
+
+Quando $\mathbf{A}$ possui posto máximo, um menor valor singular muito pequeno em relação a $d_1$ corresponde também a um número de condição elevado. Se a matriz não possui posto máximo, o número de condição definido anteriormente é infinito, enquanto a pseudoinversa continua invertendo somente os valores singulares positivos.
 
 Descartar ou modificar a inversão de valores singulares pequenos pode reduzir essa instabilidade. Esses procedimentos pertencem ao estudo da regularização e não serão desenvolvidos neste capítulo.
 
 ### Pseudoinversa truncada
 
-A SVD truncada sugere uma inversão aproximada que conserva somente os $k$ maiores valores singulares:
+Considere a aproximação truncada
+
+$$
+\mathbf{A}_k
+=
+\mathbf{U}_k
+\mathbf{D}_k
+\mathbf{V}_k^{\top}.
+$$
+
+Sua pseudoinversa de Moore--Penrose é
 
 $$
 \mathbf{A}_k^{+}
@@ -8397,6 +9412,8 @@ $$
 \mathbf{D}_k^{-1}
 \mathbf{U}_k^{\top}.
 $$
+
+Ela pode ser utilizada como uma inversão truncada de $\mathbf{A}$, conservando somente os $k$ maiores valores singulares.
 
 A solução correspondente é
 
@@ -8625,25 +9642,27 @@ Como $\mathbf{A}$ possui posto coluna completo, a solução de mínimos quadrado
 
 A pseudoinversa reúne, em uma única construção:
 
--   inversão nas direções associadas a valores singulares positivos;
--   projeção sobre os espaços fundamentais;
--   solução de sistemas compatíveis;
--   seleção da solução de menor norma;
--   solução de mínimos quadrados para sistemas incompatíveis.
+- inversão dos fatores de escala associados aos valores singulares positivos;
+- anulação das componentes pertencentes a $\mathcal{N}(\mathbf{A}^{\top})$;
+- construção dos projetores sobre $\mathcal{C}(\mathbf{A})$ e $\mathcal{C}(\mathbf{A}^{\top})$;
+- solução de sistemas lineares compatíveis;
+- seleção da solução exata de menor norma quando há não unicidade;
+- solução de problemas de mínimos quadrados;
+- seleção da solução de mínimos quadrados de menor norma quando há vários minimizadores.
 
 Essas relações encerram a estrutura algébrica da SVD. A síntese do capítulo organiza as formas da decomposição, suas interpretações e suas principais consequências.
 
 ## Síntese do capítulo
 
-A Decomposição em Valores Singulares representa qualquer matriz real
+A Decomposição em Valores Singulares estende a ideia de decomposição espectral a qualquer matriz real. Para
 
 $$
 \mathbf{A}
 \in
-\mathbb{R}^{q\times p}
+\mathbb{R}^{q\times p},
 $$
 
-na forma
+existe uma decomposição
 
 $$
 \mathbf{A}
@@ -8653,9 +9672,9 @@ $$
 \mathbf{V}^{\top},
 $$
 
-em que $\mathbf{U}$ e $\mathbf{V}$ são ortogonais e $\mathbf{D}$ contém os valores singulares não negativos.
+em que $\mathbf{U}$ e $\mathbf{V}$ são matrizes ortogonais e $\mathbf{D}$ contém os valores singulares não negativos.
 
-Para cada valor singular positivo,
+Para cada valor singular positivo $d_j$,
 
 $$
 \mathbf{A}\mathbf{v}_j
@@ -8673,7 +9692,15 @@ $$
 
 Assim, $\mathbf{v}_j$ determina uma direção no domínio, $d_j$ determina o fator de escala e $\mathbf{u}_j$ determina a direção correspondente no contradomínio.
 
-A SVD completa utiliza bases ortonormais de todo o domínio e de todo o contradomínio. A SVD compacta,
+Se
+
+$$
+r
+=
+\operatorname{posto}(\mathbf{A}),
+$$
+
+a SVD compacta é
 
 $$
 \mathbf{A}
@@ -8683,7 +9710,26 @@ $$
 \mathbf{V}_r^{\top},
 $$
 
-conserva somente os $r$ valores singulares positivos e reconstrói exatamente a matriz. A SVD truncada,
+com
+
+$$
+\mathbf{D}_r
+=
+\operatorname{diag}
+\left(
+d_1,\ldots,d_r
+\right),
+\qquad
+d_1
+\geq
+\cdots
+\geq
+d_r
+>
+0.
+$$
+
+A SVD compacta é uma representação exata. A SVD truncada,
 
 $$
 \mathbf{A}_k
@@ -8695,9 +9741,9 @@ $$
 k<r,
 $$
 
-produz uma aproximação de posto reduzido.
+descarta parcelas associadas a valores singulares positivos e produz uma aproximação de posto reduzido.
 
-Os valores singulares são obtidos pelas decomposições espectrais
+A construção da SVD decorre das decomposições espectrais das duas matrizes de Gram:
 
 $$
 \mathbf{A}^{\top}\mathbf{A}
@@ -8717,37 +9763,57 @@ $$
 \mathbf{U}_r^{\top}.
 $$
 
-As duas matrizes possuem os mesmos autovalores positivos,
+Seus autovalores positivos são
 
 $$
-d_1^2,\ldots,d_r^2,
+d_1^2,\ldots,d_r^2.
 $$
 
-mas seus autovetores pertencem a espaços diferentes.
+Assim, $\mathbf{A}^{\top}\mathbf{A}$ descreve a estrutura espectral relevante no domínio, enquanto $\mathbf{A}\mathbf{A}^{\top}$ descreve a estrutura correspondente no contradomínio.
 
-A interpretação geométrica mostra que a SVD transforma a bola unitária em um elipsoide. Suas direções principais são os vetores singulares à esquerda, e os comprimentos dos semieixos são os valores singulares. O maior valor singular satisfaz
+Geometricamente, a imagem da bola unitária é um elipsoide de dimensão $r$ contido em
+
+$$
+\mathcal{C}(\mathbf{A}),
+$$
+
+com semieixos
+
+$$
+d_1\mathbf{u}_1,\ldots,d_r\mathbf{u}_r.
+$$
+
+Os valores singulares medem, portanto, os fatores de escala nas direções singulares. Em particular,
 
 $$
 \|\mathbf{A}\|_2
 =
-d_1
+d_1,
 $$
 
-e representa o maior fator de ampliação da transformação.
+de modo que o maior valor singular é o maior fator de ampliação produzido pela transformação.
 
-A SVD fornece bases ortonormais para os quatro espaços fundamentais:
+A SVD também fornece bases ortonormais para os quatro espaços fundamentais:
 
 $$
 \mathcal{C}(\mathbf{A})
 =
-\mathcal{C}(\mathbf{U}_r),
-\qquad
+\operatorname{span}
+\left\{
+\mathbf{u}_1,\ldots,\mathbf{u}_r
+\right\},
+$$
+
+$$
 \mathcal{N}
 \left(
 \mathbf{A}^{\top}
 \right)
 =
-\mathcal{C}(\mathbf{U}_0),
+\operatorname{span}
+\left\{
+\mathbf{u}_{r+1},\ldots,\mathbf{u}_q
+\right\},
 $$
 
 $$
@@ -8756,22 +9822,57 @@ $$
 \mathbf{A}^{\top}
 \right)
 =
-\mathcal{C}(\mathbf{V}_r),
-\qquad
+\operatorname{span}
+\left\{
+\mathbf{v}_1,\ldots,\mathbf{v}_r
+\right\},
+$$
+
+e
+
+$$
 \mathcal{N}(\mathbf{A})
 =
-\mathcal{C}(\mathbf{V}_0).
+\operatorname{span}
+\left\{
+\mathbf{v}_{r+1},\ldots,\mathbf{v}_p
+\right\}.
 $$
 
-O posto é o número de valores singulares positivos:
+Consequentemente,
 
 $$
-\operatorname{posto}(\mathbf{A})
+\dim
+\left(
+\mathcal{N}(\mathbf{A})
+\right)
 =
-r.
+p-r
 $$
 
-A norma de Frobenius é
+e
+
+$$
+\dim
+\left(
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right)
+\right)
+=
+q-r.
+$$
+
+As normas espectral e de Frobenius possuem representações simples em termos dos valores singulares:
+
+$$
+\|\mathbf{A}\|_2
+=
+d_1
+$$
+
+e
 
 $$
 \|\mathbf{A}\|_F^2
@@ -8779,12 +9880,18 @@ $$
 \sum_{j=1}^{r}d_j^2.
 $$
 
-Quando
+Se
 
 $$
-r
+s
 =
-\min(q,p),
+\min(q,p)
+$$
+
+e
+
+$$
+r=s,
 $$
 
 o número de condição espectral é
@@ -8792,14 +9899,16 @@ o número de condição espectral é
 $$
 \kappa_2(\mathbf{A})
 =
-\frac{
-d_1
-}{
-d_{\min(q,p)}
-}.
+\frac{d_1}{d_s}.
 $$
 
-Se o posto é menor que o máximo possível, adota-se
+Quando
+
+$$
+r<s,
+$$
+
+adota-se
 
 $$
 \kappa_2(\mathbf{A})
@@ -8807,19 +9916,39 @@ $$
 \infty.
 $$
 
-Para matrizes largas com posto linha completo, esse número descreve a ação da transformação no complemento ortogonal de seu núcleo.
+Essa definição deve ser distinguida da existência de um núcleo não trivial. Uma matriz larga pode possuir
 
-Quando $\mathbf{X}$ é uma matriz de dados,
+$$
+r=q<p,
+$$
+
+ter posto máximo para suas dimensões e ainda apresentar
+
+$$
+\mathcal{N}(\mathbf{A})
+\neq
+\{\mathbf{0}\}.
+$$
+
+Para uma matriz de dados
+
+$$
+\mathbf{X}
+\in
+\mathbb{R}^{n\times p},
+$$
+
+a SVD compacta fornece
 
 $$
 \mathbf{X}
 =
 \mathbf{U}_r
 \mathbf{D}_r
-\mathbf{V}_r^{\top},
+\mathbf{V}_r^{\top}.
 $$
 
-as coordenadas das observações nas direções singulares à direita são
+As coordenadas das observações nas direções singulares à direita são
 
 $$
 \mathbf{Z}
@@ -8829,24 +9958,27 @@ $$
 \mathbf{U}_r\mathbf{D}_r.
 $$
 
-Se $\mathbf{X}_c$ está centralizada,
+Analogamente,
 
 $$
-\mathbf{S}
+\mathbf{U}_r^{\top}\mathbf{X}
 =
-\frac{1}{n-1}
+\mathbf{D}_r\mathbf{V}_r^{\top}
+$$
+
+fornece as coordenadas das variáveis nas direções singulares à esquerda.
+
+Quando a matriz de dados está centralizada, a relação
+
+$$
 \mathbf{X}_c^{\top}\mathbf{X}_c
 =
 \mathbf{V}_r
-\frac{
 \mathbf{D}_r^2
-}{
-n-1
-}
-\mathbf{V}_r^{\top}.
+\mathbf{V}_r^{\top}
 $$
 
-Portanto, os vetores singulares à direita são autovetores da matriz de covariâncias amostral, e seus autovalores positivos são $d_j^2/(n-1)$.
+antecipa a conexão entre a SVD e a estrutura de covariâncias, que será desenvolvida posteriormente.
 
 A forma expandida,
 
@@ -8859,7 +9991,28 @@ d_j
 \mathbf{v}_j^{\top},
 $$
 
-decompõe a matriz em parcelas ortogonais de posto 1. Pelo Teorema de Eckart--Young--Mirsky, a SVD truncada fornece uma aproximação ótima:
+representa a matriz como uma soma de parcelas ortogonais de posto 1. Na norma de Frobenius,
+
+$$
+\|\mathbf{A}\|_F^2
+=
+\sum_{j=1}^{r}d_j^2
+$$
+
+é uma decomposição pitagórica da magnitude quadrática total da matriz.
+
+O Teorema de Eckart--Young--Mirsky estabelece que
+
+$$
+\mathbf{A}_k
+=
+\sum_{j=1}^{k}
+d_j
+\mathbf{u}_j
+\mathbf{v}_j^{\top}
+$$
+
+é uma aproximação ótima entre todas as matrizes de posto no máximo $k$. Os erros mínimos são
 
 $$
 \left\|
@@ -8883,15 +10036,19 @@ $$
 \sum_{j=k+1}^{r}d_j^2.
 $$
 
-A pseudoinversa é
+A norma espectral mede o maior erro remanescente em uma direção unitária, enquanto a norma de Frobenius agrega quadraticamente todas as parcelas descartadas.
+
+A pseudoinversa de Moore--Penrose é
 
 $$
 \mathbf{A}^{+}
 =
 \mathbf{V}_r
 \mathbf{D}_r^{-1}
-\mathbf{U}_r^{\top}.
+\mathbf{U}_r^{\top},
 $$
+
+com $\mathbf{A}^{+}=\mathbf{0}$ quando $\mathbf{A}=\mathbf{0}$.
 
 Ela determina os projetores
 
@@ -8899,6 +10056,8 @@ $$
 \mathbf{A}\mathbf{A}^{+}
 =
 \mathbf{U}_r\mathbf{U}_r^{\top}
+=
+\mathbf{P}_{\mathcal{C}(\mathbf{A})}
 $$
 
 e
@@ -8906,42 +10065,91 @@ e
 $$
 \mathbf{A}^{+}\mathbf{A}
 =
-\mathbf{V}_r\mathbf{V}_r^{\top},
+\mathbf{V}_r\mathbf{V}_r^{\top}
+=
+\mathbf{P}_{\mathcal{C}(\mathbf{A}^{\top})}.
 $$
 
-e fornece a solução de mínimos quadrados de menor norma:
+Para qualquer
+
+$$
+\mathbf{b}
+\in
+\mathbb{R}^{q},
+$$
+
+o vetor
 
 $$
 \widehat{\mathbf{x}}^{\star}
 =
-\mathbf{A}^{+}\mathbf{b}.
+\mathbf{A}^{+}\mathbf{b}
+$$
+
+é a solução de mínimos quadrados de menor norma. O vetor ajustado é
+
+$$
+\widehat{\mathbf{b}}
+=
+\mathbf{A}\mathbf{A}^{+}\mathbf{b},
+$$
+
+isto é, a projeção ortogonal de $\mathbf{b}$ sobre $\mathcal{C}(\mathbf{A})$, enquanto o resíduo
+
+$$
+\mathbf{r}
+=
+\left(
+\mathbf{I}_q
+-
+\mathbf{A}\mathbf{A}^{+}
+\right)
+\mathbf{b}
+$$
+
+pertence a
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right).
 $$
 
 A @tbl-sintese-svd reúne as relações principais.
 
-| Objeto            | Expressão                                                         | Interpretação                              |
-|:-----------------------|:-----------------------|:-----------------------|
-| SVD completa      | $\mathbf{A}=\mathbf{U}\mathbf{D}\mathbf{V}^{\top}$                | Bases ortonormais completas                |
-| SVD compacta      | $\mathbf{A}=\mathbf{U}_r\mathbf{D}_r\mathbf{V}_r^{\top}$          | Representação exata com valores positivos  |
-| Pares singulares  | $\mathbf{A}\mathbf{v}_j=d_j\mathbf{u}_j$                          | Associação entre domínio e contradomínio   |
-| Matrizes de Gram  | $\mathbf{A}^{\top}\mathbf{A}$ e $\mathbf{A}\mathbf{A}^{\top}$     | Determinam $d_j^2$ e os vetores singulares |
-| Posto             | $r=\#\{j:d_j>0\}$                                                 | Dimensão efetiva da transformação          |
-| Normas            | $\|\mathbf{A}\|_2=d_1$ e $\|\mathbf{A}\|_F^2=\sum_jd_j^2$         | Ampliação máxima e magnitude quadrática    |
-| Forma expandida   | $\mathbf{A}=\sum_jd_j\mathbf{u}_j\mathbf{v}_j^{\top}$             | Soma de parcelas de posto 1                |
-| SVD truncada      | $\mathbf{A}_k=\mathbf{U}_k\mathbf{D}_k\mathbf{V}_k^{\top}$        | Aproximação de posto reduzido              |
-| Pseudoinversa     | $\mathbf{A}^{+}=\mathbf{V}_r\mathbf{D}_r^{-1}\mathbf{U}_r^{\top}$ | Inversão nas direções ativas               |
-| Mínimos quadrados | $\widehat{\mathbf{x}}^{\star}=\mathbf{A}^{+}\mathbf{b}$           | Solução de menor norma                     |
+| Objeto | Expressão | Interpretação |
+|:---|:---|:---|
+| SVD completa | $\mathbf{A}=\mathbf{U}\mathbf{D}\mathbf{V}^{\top}$ | Bases ortonormais completas no domínio e no contradomínio |
+| SVD compacta | $\mathbf{A}=\mathbf{U}_r\mathbf{D}_r\mathbf{V}_r^{\top}$ | Representação exata usando os valores singulares positivos |
+| Pares singulares | $\mathbf{A}\mathbf{v}_j=d_j\mathbf{u}_j$ | Associa direções do domínio e do contradomínio |
+| Matrizes de Gram | $\mathbf{A}^{\top}\mathbf{A}$ e $\mathbf{A}\mathbf{A}^{\top}$ | Determinam $d_j^2$ e os vetores singulares |
+| Posto | $r=\#\{j:d_j>0\}$ | Dimensão da imagem da transformação |
+| Norma espectral | $\|\mathbf{A}\|_2=d_1$ | Maior fator de ampliação |
+| Norma de Frobenius | $\|\mathbf{A}\|_F^2=\sum_jd_j^2$ | Magnitude quadrática total |
+| SVD truncada | $\mathbf{A}_k=\mathbf{U}_k\mathbf{D}_k\mathbf{V}_k^{\top}$ | Aproximação de posto reduzido |
+| Erro espectral | $\|\mathbf{A}-\mathbf{A}_k\|_2=d_{k+1}$ | Maior ação remanescente na parcela descartada |
+| Erro de Frobenius | $\|\mathbf{A}-\mathbf{A}_k\|_F^2=\sum_{j>k}d_j^2$ | Magnitude quadrática total descartada |
+| Pseudoinversa | $\mathbf{A}^{+}=\mathbf{V}_r\mathbf{D}_r^{-1}\mathbf{U}_r^{\top}$ | Inverte os fatores de escala positivos |
+| Projetor no espaço coluna | $\mathbf{A}\mathbf{A}^{+}$ | Projeta sobre $\mathcal{C}(\mathbf{A})$ |
+| Projetor no espaço linha | $\mathbf{A}^{+}\mathbf{A}$ | Projeta sobre $\mathcal{C}(\mathbf{A}^{\top})$ |
+| Mínimos quadrados | $\widehat{\mathbf{x}}^{\star}=\mathbf{A}^{+}\mathbf{b}$ | Solução de mínimos quadrados de menor norma |
 
 : Síntese das principais relações da Decomposição em Valores Singulares. {#tbl-sintese-svd}
 
-Ao concluir o capítulo, o estudante deverá ser capaz de:
+Ao final deste capítulo, o estudante deverá ser capaz de:
 
-1.  distinguir as formas completa, compacta e truncada da SVD;
-2.  obter valores e vetores singulares a partir das matrizes de Gram;
-3.  interpretar geometricamente os valores singulares;
-4.  identificar os quatro espaços fundamentais;
-5.  relacionar valores singulares a posto, normas e condicionamento;
-6.  construir aproximações de posto reduzido;
-7.  utilizar a pseudoinversa em sistemas lineares e mínimos quadrados.
+- distinguir as formas completa, compacta e truncada da SVD;
+- relacionar a SVD às decomposições espectrais de $\mathbf{A}^{\top}\mathbf{A}$ e $\mathbf{A}\mathbf{A}^{\top}$;
+- interpretar valores e vetores singulares geometricamente;
+- identificar os quatro espaços fundamentais por meio da SVD;
+- relacionar valores singulares a posto, normas, núcleo e condicionamento;
+- interpretar a dualidade entre linhas e colunas de uma matriz de dados;
+- representar uma matriz como soma de parcelas ortogonais de posto 1;
+- construir e interpretar aproximações ótimas de posto reduzido;
+- aplicar o Teorema de Eckart--Young--Mirsky;
+- construir e interpretar a pseudoinversa de Moore--Penrose;
+- distinguir solução exata, solução de mínimos quadrados e solução de menor norma;
+- interpretar mínimos quadrados como projeção ortogonal.
 
-O próximo capítulo desenvolve cálculo diferencial, integral e matricial aplicado à Estatística Multivariada. As normas, formas quadráticas, projeções e problemas de mínimos quadrados estudados até aqui serão retomados na formulação de gradientes, Hessianas, funções objetivo, condições de otimalidade e procedimentos de estimação.
+A SVD encerra o percurso do módulo dedicado às principais estruturas de álgebra linear utilizadas no livro. O próximo capítulo desenvolve **Cálculo Diferencial, Integral e Matricial Aplicado à Estatística Multivariada**. Gradientes, Hessianas, multiplicadores de Lagrange, diferenciais matriciais, traços, determinantes e integrais fornecerão as ferramentas necessárias para formular problemas de otimização, estimação e transformação de variáveis nos capítulos seguintes.

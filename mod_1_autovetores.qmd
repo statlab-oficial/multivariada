@@ -21,11 +21,32 @@ $$
 \mathbb{R}^{p\times p}.
 $$
 
-Em uma base arbitrária, a matriz pode combinar diferentes coordenadas, dificultando a interpretação de sua ação. Algumas direções, entretanto, possuem um comportamento mais simples: todos os vetores contidos nessas direções permanecem no mesmo subespaço após a transformação.
+Vimos também que a matriz de um operador depende da base utilizada para representá-lo. Uma mudança de base pode produzir uma matriz mais simples, embora o operador linear permaneça o mesmo. Neste capítulo, procuraremos bases especialmente adaptadas à ação do operador.
 
-A identificação dessas direções conduz aos conceitos de autovalor, autovetor e autoespaço. Quando existem autovetores linearmente independentes em número suficiente, eles formam uma base na qual a matriz do operador é diagonal. Nessa representação, a transformação atua separadamente sobre cada coordenada.
+Algumas direções possuem um comportamento particularmente simples: quando um vetor pertence a uma dessas direções, sua imagem permanece na mesma reta que passa pela origem. A identificação dessas direções conduz aos conceitos de autovalor, autovetor e autoespaço.
 
-Para matrizes simétricas, essa simplificação possui propriedades adicionais. Seus autovalores são reais e existe uma base ortonormal de autovetores. A decomposição resultante permite interpretar formas quadráticas, matrizes positivas definidas, elipsoides, funções de matrizes e problemas de otimização. Essas estruturas também serão utilizadas posteriormente no estudo de covariâncias e decomposições matriciais.
+Quando existem autovetores linearmente independentes em número suficiente, eles formam uma base na qual a matriz do operador é diagonal. A diagonalização pode, portanto, ser interpretada como uma mudança para um sistema de coordenadas em que a transformação atua separadamente sobre cada direção da base.
+
+Para matrizes simétricas reais, essa simplificação possui propriedades adicionais: todos os autovalores são reais e existe uma base ortonormal de autovetores. A decomposição resultante permitirá interpretar formas quadráticas, matrizes positivas definidas, elipsoides, funções de matrizes e problemas de otimização. Essas estruturas serão retomadas nos capítulos de SVD, covariâncias e técnicas multivariadas.
+
+::: {.callout-note appearance="simple" icon="false"}
+## Convenções de notação
+
+Ao longo deste capítulo:
+
+- $\lambda$ representa um autovalor;
+- $\mathbf{v}$ representa um autovetor;
+- $\mathcal{E}_{\lambda}$ representa o autoespaço associado a $\lambda$;
+- $m_a(\lambda)$ e $m_g(\lambda)$ representam, respectivamente, as multiplicidades algébrica e geométrica;
+- $\mathcal{B}_{\mathbf{A}}$ representa uma base de autovetores de $\mathbf{A}$, quando tal base existe;
+- $\mathbf{B}_{\mathbf{A}}$ representa a matriz formada pelos vetores da base $\mathcal{B}_{\mathbf{A}}$;
+- $\boldsymbol{\Lambda}_{\mathbf{A}}$ representa a matriz diagonal dos autovalores correspondente à ordenação escolhida dos autovetores;
+- $\mathbf{Q}_{\mathbf{A}}$ representa uma matriz ortogonal de autovetores quando $\mathbf{A}$ é simétrica;
+- $\boldsymbol{\Pi}_{\lambda}$ representa o projetor espectral associado ao autoespaço de $\lambda$;
+- $\mathcal{R}_{\mathbf{A}}(\mathbf{x})$ representa o quociente de Rayleigh.
+
+Salvo indicação contrária, as interpretações geométricas serão desenvolvidas em espaços vetoriais reais. Autovalores e autovetores complexos serão considerados explicitamente quando necessário.
+:::
 
 ## Direções invariantes, autovalores e autoespaços
 
@@ -55,10 +76,10 @@ $$
 
 para todo $\mathbf{w}\in\mathcal{W}$.
 
-Uma reta que passa pela origem e é gerada por um vetor não nulo $\mathbf{v}$ possui a forma
+Uma reta que passa pela origem e é gerada por um vetor não nulo $\mathbf{v}$ é o subespaço
 
 $$
-\operatorname{span}(\mathbf{v})
+\operatorname{span}\{\mathbf{v}\}
 =
 \left\{
 c\mathbf{v}:
@@ -290,7 +311,7 @@ $$
 Logo, $\mathbf{x}$ não é um autovetor de $\mathbf{A}$. A transformação modifica seu comprimento e sua direção.
 :::
 
-A @fig-direcoes-invariantes compara as imagens dos autovetores $\mathbf{v}_1$ e $\mathbf{v}_2$ com a imagem do vetor genérico $\mathbf{x}$.
+A @fig-direcoes-invariantes compara as imagens dos autovetores $\mathbf{v}_1$ e $\mathbf{v}_2$ com a imagem do vetor genérico $\mathbf{x}$. As retas tracejadas em cinza representam as duas direções invariantes.
 
 ```{r}
 #| label: fig-direcoes-invariantes
@@ -350,67 +371,69 @@ imagens <- data.frame(
   y = imagens[, 2]
 )
 
-vetores_originais <- transform(
-  vetores,
-  tipo = "Vetor original"
-)
-
-vetores_transformados <- transform(
-  imagens,
-  tipo = "Vetor transformado"
-)
-
-dados_setas <- rbind(
-  vetores_originais,
-  vetores_transformados
-)
-
-dados_setas$tipo <- factor(
-  dados_setas$tipo,
-  levels = c(
-    "Vetor original",
-    "Vetor transformado"
-  )
+cores <- c(
+  "v1" = "#1f77b4",
+  "v2" = "#2ca02c",
+  "x" = "#d62728"
 )
 
 ggplot() +
   geom_hline(
     yintercept = 0,
     linewidth = 0.4,
-    colour = "grey65"
+    color = "gray65"
   ) +
   geom_vline(
     xintercept = 0,
     linewidth = 0.4,
-    colour = "grey65"
+    color = "gray65"
   ) +
   geom_abline(
     intercept = 0,
     slope = 1,
     linetype = "dashed",
     linewidth = 0.7,
-    colour = "grey60"
+    color = "gray60"
   ) +
   geom_abline(
     intercept = 0,
     slope = -1,
     linetype = "dashed",
     linewidth = 0.7,
-    colour = "grey60"
+    color = "gray60"
   ) +
   geom_segment(
-    data = dados_setas,
+    data = imagens,
     aes(
       x = 0,
       y = 0,
       xend = x,
       yend = y,
-      colour = tipo,
-      linewidth = tipo
+      color = nome
     ),
+    linewidth = 1.15,
     arrow = grid::arrow(
       length = grid::unit(
-        0.20,
+        0.18,
+        "cm"
+      ),
+      type = "closed"
+    )
+  ) +
+  geom_segment(
+    data = vetores,
+    aes(
+      x = 0,
+      y = 0,
+      xend = x,
+      yend = y,
+      color = nome
+    ),
+    linewidth = 0.8,
+    linetype = "dashed",
+    arrow = grid::arrow(
+      length = grid::unit(
+        0.16,
         "cm"
       ),
       type = "closed"
@@ -418,8 +441,8 @@ ggplot() +
   ) +
   annotate(
     "text",
-    x = 4.05,
-    y = 4.05,
+    x = 3.05,
+    y = 4.25,
     label = expression(
       A * v[1] == 4 * v[1]
     ),
@@ -456,17 +479,19 @@ ggplot() +
     hjust = 0,
     size = 4
   ) +
-  scale_colour_manual(
-    values = c(
-      "Vetor original" = "grey25",
-      "Vetor transformado" = "#2C7FB8"
-    )
-  ) +
-  scale_linewidth_manual(
-    values = c(
-      "Vetor original" = 0.9,
-      "Vetor transformado" = 1.2
-    )
+  scale_color_manual(
+    values = cores,
+    breaks = c(
+      "v1",
+      "v2",
+      "x"
+    ),
+    labels = c(
+      expression(bold(v)[1]),
+      expression(bold(v)[2]),
+      expression(bold(x))
+    ),
+    name = NULL
   ) +
   coord_equal(
     xlim = c(
@@ -481,11 +506,11 @@ ggplot() +
   ) +
   labs(
     x = NULL,
-    y = NULL,
-    colour = NULL,
-    linewidth = NULL
+    y = NULL
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(
+    base_size = 13
+  ) +
   theme(
     panel.grid.minor = element_blank(),
     legend.position = "bottom",
@@ -496,9 +521,10 @@ ggplot() +
 
 As retas tracejadas representam as direções geradas por $\mathbf{v}_1$ e $\mathbf{v}_2$. A transformação amplia os vetores por fatores diferentes, mas mantém cada um na reta correspondente. O vetor $\mathbf{x}$ não pertence a uma direção invariante e sua imagem ocupa outra direção.
 
-A equação de autovalor também mostra que um autovetor não possui um representante único.
+Um mesmo autoespaço unidimensional contém infinitos autovetores associados ao mesmo autovalor, pois qualquer múltiplo não nulo de um autovetor permanece na mesma direção e satisfaz a mesma equação de autovalor.
 
-::: {#thm-multiplos-autovetor}
+::: {#prp-multiplos-autovetor}
+
 ## Múltiplos de um autovetor
 
 Se $\mathbf{v}$ é um autovetor de $\mathbf{A}$ associado ao autovalor $\lambda$, então todo múltiplo
@@ -512,7 +538,7 @@ $$
 também é um autovetor associado a $\lambda$.
 :::
 
-::: proof
+::: {.proof}
 Como
 
 $$
@@ -616,13 +642,14 @@ $$
 
 é satisfeita para qualquer $\lambda$ e não identifica uma direção.
 
-::: {#thm-autoespaco-invariante}
+::: {#prp-autoespaco-invariante}
+
 ## Estrutura e invariância do autoespaço
 
 Se $\lambda$ é um autovalor de $\mathbf{A}$, então $\mathcal{E}_{\lambda}$ é um subespaço não trivial de $\mathbb{R}^p$ e é invariante sob $\mathbf{A}$.
 :::
 
-::: proof
+::: {.proof}
 Como
 
 $$
@@ -712,20 +739,20 @@ $$
 
 o autovalor está associado a várias direções linearmente independentes. Nesse caso, o objeto geométrico determinado pela matriz é todo o autoespaço. Uma base específica desse subespaço não é necessariamente única.
 
-A definição permite verificar se um vetor conhecido é um autovetor. Para determinar os autovalores a partir da matriz, é necessário identificar os valores de $\lambda$ para os quais o sistema
+A definição do autoespaço transforma a busca por autovetores em um problema de núcleo. Para um valor fixado de $\lambda$, existem autovetores associados precisamente quando
 
 $$
+\mathcal{N}
 \left(
 \mathbf{A}
 -
 \lambda\mathbf{I}_p
 \right)
-\mathbf{v}
-=
-\mathbf{0}
+\neq
+\{\mathbf{0}\}.
 $$
 
-possui soluções não triviais. Essa condição conduz à equação característica.
+Resta, portanto, determinar quais valores de $\lambda$ tornam esse núcleo não trivial. Essa condição equivale à singularidade de $\mathbf{A}-\lambda\mathbf{I}_p$ e conduz à equação característica.
 
 ## Equação característica, multiplicidades e diagonalização
 
@@ -779,7 +806,7 @@ $$
 $$
 :::
 
-::: proof
+::: {.proof}
 Se $\lambda$ é autovalor de $\mathbf{A}$, existe um vetor não nulo $\mathbf{v}$ tal que
 
 $$
@@ -883,8 +910,7 @@ p_{\mathbf{A}}(\lambda)
 0
 $$
 
-é denominada **equação característica** de $\mathbf{A}$.
-[@horn2013matrix]
+é denominada **equação característica** de $\mathbf{A}$. [@horn2013matrix]
 :::
 
 Também é possível definir o polinômio característico por
@@ -1194,7 +1220,7 @@ $$
 são linearmente independentes.
 :::
 
-::: proof
+::: {.proof}
 A demonstração será feita por indução sobre $r$.
 
 Para $r=1$, o resultado é imediato porque um autovetor é não nulo.
@@ -1547,7 +1573,7 @@ ggplot() +
       yend = yend
     ),
     linewidth = 0.85,
-    colour = "#2C7FB8",
+    colour = "#1f77b4",
     arrow = grid::arrow(
       length = grid::unit(
         0.16,
@@ -1586,7 +1612,7 @@ ggplot() +
     x = NULL,
     y = NULL
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
     axis.text = element_blank(),
@@ -1607,59 +1633,47 @@ As duas matrizes possuem o mesmo autovalor com a mesma multiplicidade algébrica
 
 ### Diagonalização
 
-Uma transformação assume uma representação particularmente simples quando existe uma base formada por autovetores.
+No capítulo anterior, vimos que a matriz de um operador depende da base utilizada para representá-lo. A diagonalização corresponde à escolha de uma base particularmente conveniente: uma base formada por autovetores.
 
-::: {#def-matriz-diagonalizavel}
-## Matriz diagonalizável
+Considere uma matriz
 
-Uma matriz
+$$\mathbf{A}\in\mathbb{R}^{p\times p}$$
 
-$$
-\mathbf{A}
-\in
-\mathbb{R}^{p\times p}
-$$
-
-é **diagonalizável sobre** $\mathbb{R}$ quando existem uma matriz invertível
+e suponha que exista uma base de $\mathbb{R}^p$ formada por autovetores de $\mathbf{A}$,
 
 $$
-\mathbf{P}_{\mathbf{A}}
-\in
-\mathbb{R}^{p\times p}
-$$
-
-e uma matriz diagonal
-
-$$
-\boldsymbol{\Lambda}_{\mathbf{A}}
-\in
-\mathbb{R}^{p\times p}
-$$
-
-tais que
-
-$$
-\mathbf{A}
+\mathcal{B}_{\mathbf{A}}
 =
-\mathbf{P}_{\mathbf{A}}
-\boldsymbol{\Lambda}_{\mathbf{A}}
-\mathbf{P}_{\mathbf{A}}^{-1}.
+\{
+\mathbf{v}_1,\ldots,\mathbf{v}_p
+\}.
 $$
-:::
 
-As colunas de $\mathbf{P}_{\mathbf{A}}$ são autovetores linearmente independentes:
+A matriz dessa base é
 
 $$
-\mathbf{P}_{\mathbf{A}}
+\mathbf{B}_{\mathbf{A}}
 =
 \begin{bmatrix}
 \mathbf{v}_1&
 \cdots&
 \mathbf{v}_p
-\end{bmatrix},
+\end{bmatrix}.
 $$
 
-e a matriz diagonal contém os autovalores correspondentes:
+Como os vetores da base são linearmente independentes, $\mathbf{B}_{\mathbf{A}}$ é invertível.
+
+Se
+
+$$
+\mathbf{A}\mathbf{v}_j
+=
+\lambda_j\mathbf{v}_j,
+\qquad
+j=1,\ldots,p,
+$$
+
+e
 
 $$
 \boldsymbol{\Lambda}_{\mathbf{A}}
@@ -1667,75 +1681,93 @@ $$
 \operatorname{diag}
 \left(
 \lambda_1,\ldots,\lambda_p
-\right).
-$$
-
-A ordem das colunas de $\mathbf{P}_{\mathbf{A}}$ deve coincidir com a ordem dos autovalores em $\boldsymbol{\Lambda}_{\mathbf{A}}$.
-
-Como
-
-$$
-\mathbf{A}\mathbf{v}_j
-=
-\lambda_j\mathbf{v}_j,
-$$
-
-tem-se
-
-$$
-\mathbf{A}\mathbf{P}_{\mathbf{A}}
-=
-\mathbf{P}_{\mathbf{A}}
-\boldsymbol{\Lambda}_{\mathbf{A}}.
-$$
-
-Multiplicando à direita por $\mathbf{P}_{\mathbf{A}}^{-1}$,
-
-$$
-\mathbf{A}
-=
-\mathbf{P}_{\mathbf{A}}
-\boldsymbol{\Lambda}_{\mathbf{A}}
-\mathbf{P}_{\mathbf{A}}^{-1}.
-$$
-
-Essa expressão é uma mudança de representação do operador. Conforme a @def-matrizes-semelhantes,
-
-$$
-\boldsymbol{\Lambda}_{\mathbf{A}}
-=
-\mathbf{P}_{\mathbf{A}}^{-1}
-\mathbf{A}
-\mathbf{P}_{\mathbf{A}}
-$$
-
-é a matriz do mesmo operador na base formada pelos autovetores.
-
-Se
-
-$$
-\mathbf{x}
-=
-\mathbf{P}_{\mathbf{A}}\mathbf{z},
+\right),
 $$
 
 então
 
 $$
-\begin{aligned}
-\mathbf{A}\mathbf{x}
-&=
-\mathbf{A}
-\mathbf{P}_{\mathbf{A}}
-\mathbf{z}\\
-&=
-\mathbf{P}_{\mathbf{A}}
-\boldsymbol{\Lambda}_{\mathbf{A}}
-\mathbf{z}.
-\end{aligned}
+\mathbf{A}\mathbf{B}_{\mathbf{A}}
+=
+\mathbf{B}_{\mathbf{A}}
+\boldsymbol{\Lambda}_{\mathbf{A}}.
 $$
 
-Nas coordenadas da base de autovetores, cada componente é transformada separadamente:
+Multiplicando à esquerda por $\mathbf{B}_{\mathbf{A}}^{-1}$,
+
+$$
+\mathbf{B}_{\mathbf{A}}^{-1}
+\mathbf{A}
+\mathbf{B}_{\mathbf{A}}
+=
+\boldsymbol{\Lambda}_{\mathbf{A}}.
+$$
+
+::: {#def-matriz-diagonalizavel}
+
+## Matriz diagonalizável
+
+Uma matriz
+
+$$\mathbf{A}\in\mathbb{R}^{p\times p}$$
+
+é **diagonalizável sobre $\mathbb{R}$** quando existe uma base $\mathcal{B}_{\mathbf{A}}$ de $\mathbb{R}^p$ formada por autovetores de $\mathbf{A}$.
+
+Equivalentemente, existem uma matriz invertível $\mathbf{B}_{\mathbf{A}}$ e uma matriz diagonal $\boldsymbol{\Lambda}_{\mathbf{A}}$ tais que
+
+$$
+\mathbf{A}
+=
+\mathbf{B}_{\mathbf{A}}
+\boldsymbol{\Lambda}_{\mathbf{A}}
+\mathbf{B}_{\mathbf{A}}^{-1}.
+$$
+:::
+
+A ordem das colunas de $\mathbf{B}_{\mathbf{A}}$ deve coincidir com a ordem dos autovalores em $\boldsymbol{\Lambda}_{\mathbf{A}}$.
+
+Pela notação de mudança de base desenvolvida no capítulo anterior,
+
+$$
+[T_{\mathbf{A}}]_{\mathcal{B}_{\mathbf{A}}\leftarrow\mathcal{B}_{\mathbf{A}}}
+=
+\mathbf{B}_{\mathbf{A}}^{-1}
+\mathbf{A}
+\mathbf{B}_{\mathbf{A}}
+=
+\boldsymbol{\Lambda}_{\mathbf{A}}.
+$$
+
+Assim, $\boldsymbol{\Lambda}_{\mathbf{A}}$ é a matriz do mesmo operador quando tanto o domínio quanto o contradomínio são representados na base de autovetores.
+
+Para qualquer vetor $\mathbf{x}\in\mathbb{R}^p$, suas coordenadas nessa base são
+
+$$
+\mathbf{z}
+=
+[\mathbf{x}]_{\mathcal{B}_{\mathbf{A}}}
+=
+\mathbf{B}_{\mathbf{A}}^{-1}\mathbf{x},
+$$
+
+de modo que
+
+$$
+\mathbf{x}
+=
+\mathbf{B}_{\mathbf{A}}\mathbf{z}.
+$$
+
+Nas coordenadas da base de autovetores,
+
+$$
+[T_{\mathbf{A}}(\mathbf{x})]_{\mathcal{B}_{\mathbf{A}}}
+=
+\boldsymbol{\Lambda}_{\mathbf{A}}
+[\mathbf{x}]_{\mathcal{B}_{\mathbf{A}}}.
+$$
+
+Como
 
 $$
 \boldsymbol{\Lambda}_{\mathbf{A}}
@@ -1745,8 +1777,12 @@ $$
 \lambda_1z_1\\
 \vdots\\
 \lambda_pz_p
-\end{bmatrix}.
+\end{bmatrix},
 $$
+
+a transformação atua separadamente sobre cada coordenada: a componente correspondente ao autovetor $\mathbf{v}_j$ é multiplicada por $\lambda_j$.
+
+A diagonalização é, portanto, uma mudança para um sistema de coordenadas no qual as direções da base são invariantes e a ação do operador deixa de misturar coordenadas.
 
 ::: {#thm-criterios-diagonalizacao}
 ## Critérios de diagonalização
@@ -1778,7 +1814,7 @@ São equivalentes:
     =
     m_a(\lambda).
     $$
-    
+
 [@horn2013matrix]
 :::
 
@@ -1834,9 +1870,9 @@ A representação diagonal também simplifica o cálculo de potências. Se
 $$
 \mathbf{A}
 =
-\mathbf{P}_{\mathbf{A}}
+\mathbf{B}_{\mathbf{A}}
 \boldsymbol{\Lambda}_{\mathbf{A}}
-\mathbf{P}_{\mathbf{A}}^{-1},
+\mathbf{B}_{\mathbf{A}}^{-1},
 $$
 
 então
@@ -1845,16 +1881,16 @@ $$
 \begin{aligned}
 \mathbf{A}^2
 &=
-\mathbf{P}_{\mathbf{A}}
+\mathbf{B}_{\mathbf{A}}
 \boldsymbol{\Lambda}_{\mathbf{A}}
-\mathbf{P}_{\mathbf{A}}^{-1}
-\mathbf{P}_{\mathbf{A}}
+\mathbf{B}_{\mathbf{A}}^{-1}
+\mathbf{B}_{\mathbf{A}}
 \boldsymbol{\Lambda}_{\mathbf{A}}
-\mathbf{P}_{\mathbf{A}}^{-1}\\
+\mathbf{B}_{\mathbf{A}}^{-1}\\
 &=
-\mathbf{P}_{\mathbf{A}}
+\mathbf{B}_{\mathbf{A}}
 \boldsymbol{\Lambda}_{\mathbf{A}}^2
-\mathbf{P}_{\mathbf{A}}^{-1}.
+\mathbf{B}_{\mathbf{A}}^{-1}.
 \end{aligned}
 $$
 
@@ -1863,9 +1899,9 @@ De forma geral, para todo inteiro $k\geq0$,
 $$
 \mathbf{A}^k
 =
-\mathbf{P}_{\mathbf{A}}
+\mathbf{B}_{\mathbf{A}}
 \boldsymbol{\Lambda}_{\mathbf{A}}^k
-\mathbf{P}_{\mathbf{A}}^{-1}.
+\mathbf{B}_{\mathbf{A}}^{-1}.
 $$
 
 Como $\boldsymbol{\Lambda}_{\mathbf{A}}$ é diagonal,
@@ -1879,7 +1915,7 @@ $$
 \right).
 $$
 
-A diagonalização reduz a aplicação repetida do operador à aplicação independente das potências dos autovalores em cada direção invariante.
+Assim, a aplicação repetida do operador pode ser analisada coordenada a coordenada na base de autovetores: após $k$ aplicações, a coordenada associada a $\mathbf{v}_j$ é multiplicada por $\lambda_j^k$.
 
 Para matrizes quadradas arbitrárias, a diagonalização pode falhar. Para matrizes simétricas reais, existe sempre uma base ortonormal de autovetores. Essa propriedade conduz a uma diagonalização que preserva a geometria euclidiana.
 
@@ -1949,11 +1985,11 @@ uma matriz simétrica. Então:
     \boldsymbol{\Lambda}_{\mathbf{A}}
     \mathbf{Q}_{\mathbf{A}}^{\top}.
     $$
-    
+
 [@horn2013matrix]
 :::
 
-::: proof
+::: {.proof}
 Para demonstrar que os autovalores são reais, considere um autovalor possivelmente complexo $\lambda$ e um autovetor complexo não nulo $\mathbf{z}$, de modo que
 
 $$
@@ -2116,9 +2152,9 @@ $$
 \mathcal{W}
 =
 \operatorname{span}
-\left(
+\left\{
 \mathbf{q}_1
-\right)^{\perp}.
+\right\}^{\perp}.
 $$
 
 Para qualquer $\mathbf{x}\in\mathcal{W}$,
@@ -2253,18 +2289,64 @@ $$
 \mathbf{Q}_{\mathbf{A}}^{\top}
 $$
 
-é denominada **decomposição espectral** de $\mathbf{A}$. Ela também pode ser interpretada como uma diagonalização ortogonal.
+é denominada **decomposição espectral** de $\mathbf{A}$. Ela é uma diagonalização ortogonal.
 
-Nas coordenadas determinadas pela base de autovetores,
+Considere a base ortonormal de autovetores
+
+$$
+\mathcal{B}_{\mathbf{A}}
+=
+\{
+\mathbf{q}_1,\ldots,\mathbf{q}_p
+\}.
+$$
+
+A matriz dessa base é
+
+$$
+\mathbf{Q}_{\mathbf{A}}
+=
+\begin{bmatrix}
+\mathbf{q}_1&
+\cdots&
+\mathbf{q}_p
+\end{bmatrix}.
+$$
+
+Assim, no caso simétrico, a matriz da base de autovetores introduzida na seção anterior pode ser escolhida ortogonal:
+
+$$
+\mathbf{B}_{\mathbf{A}}
+=
+\mathbf{Q}_{\mathbf{A}},
+$$
+
+com
+
+$$
+\mathbf{Q}_{\mathbf{A}}^{-1}
+=
+\mathbf{Q}_{\mathbf{A}}^{\top}.
+$$
+
+Pela notação de coordenadas desenvolvida no capítulo anterior,
+
+$$
+[\mathbf{x}]_{\mathcal{B}_{\mathbf{A}}}
+=
+\mathbf{Q}_{\mathbf{A}}^{\top}
+\mathbf{x}.
+$$
+
+Denotando
 
 $$
 \mathbf{z}
 =
-\mathbf{Q}_{\mathbf{A}}^{\top}
-\mathbf{x},
+[\mathbf{x}]_{\mathcal{B}_{\mathbf{A}}},
 $$
 
-o vetor original é recuperado por
+tem-se
 
 $$
 \mathbf{x}
@@ -2273,7 +2355,28 @@ $$
 \mathbf{z}.
 $$
 
-A transformação de $\mathbf{x}$ pode ser escrita como
+A matriz do operador nessa base é
+
+$$
+[T_{\mathbf{A}}]_{\mathcal{B}_{\mathbf{A}}\leftarrow\mathcal{B}_{\mathbf{A}}}
+=
+\mathbf{Q}_{\mathbf{A}}^{\top}
+\mathbf{A}
+\mathbf{Q}_{\mathbf{A}}
+=
+\boldsymbol{\Lambda}_{\mathbf{A}}.
+$$
+
+Consequentemente,
+
+$$
+[T_{\mathbf{A}}(\mathbf{x})]_{\mathcal{B}_{\mathbf{A}}}
+=
+\boldsymbol{\Lambda}_{\mathbf{A}}
+[\mathbf{x}]_{\mathcal{B}_{\mathbf{A}}}.
+$$
+
+Em coordenadas canônicas,
 
 $$
 \begin{aligned}
@@ -2290,13 +2393,13 @@ $$
 \end{aligned}
 $$
 
-A operação ocorre em três etapas:
+A ação da matriz pode ser interpretada em três etapas:
 
-1.  $\mathbf{Q}_{\mathbf{A}}^{\top}$ converte o vetor para as coordenadas da base ortonormal de autovetores;
-2.  $\boldsymbol{\Lambda}_{\mathbf{A}}$ multiplica separadamente cada coordenada pelo autovalor correspondente;
-3.  $\mathbf{Q}_{\mathbf{A}}$ converte o resultado para as coordenadas canônicas.
+1. $\mathbf{Q}_{\mathbf{A}}^{\top}$ converte o vetor para as coordenadas da base ortonormal de autovetores;
+2. $\boldsymbol{\Lambda}_{\mathbf{A}}$ multiplica separadamente cada coordenada pelo autovalor correspondente;
+3. $\mathbf{Q}_{\mathbf{A}}$ reconstrói o vetor nas coordenadas canônicas.
 
-A matriz simétrica atua, portanto, como um escalonamento independente em direções ortogonais.
+Assim, uma matriz simétrica atua por fatores escalares independentes em direções ortogonais. Quando algum autovalor é negativo, o escalonamento na direção correspondente inclui também a inversão do sentido.
 
 ### Decomposição espectral do exemplo condutor
 
@@ -2378,7 +2481,19 @@ $$
 \end{bmatrix}.
 $$
 
-A matriz ortogonal de autovetores é
+Portanto,
+
+$$
+\mathcal{B}_{\mathbf{A}}
+=
+\{
+\mathbf{q}_1,\mathbf{q}_2
+\}
+$$
+
+é uma base ortonormal de autovetores de $\mathbb{R}^2$.
+
+A matriz dessa base é a matriz ortogonal
 
 $$
 \mathbf{Q}_{\mathbf{A}}
@@ -2444,14 +2559,14 @@ $$
 Na direção de $\mathbf{q}_1$, a transformação multiplica o comprimento por 4. Na direção ortogonal $\mathbf{q}_2$, multiplica o comprimento por 2.
 :::
 
-A @fig-interpretacao-espectral mostra a esfera unitária em $\mathbb{R}^2$ e sua imagem pela matriz $\mathbf{A}$. Como os dois autovalores são positivos, a imagem é uma elipse cujos semieixos possuem comprimentos 4 e 2 e estão alinhados aos autovetores.
+A @fig-interpretacao-espectral mostra a circunferência unitária em $\mathbb{R}^2$ e sua imagem pela matriz $\mathbf{A}$. Como os dois autovalores são positivos, a imagem é uma elipse cujos semieixos possuem comprimentos 4 e 2 e estão alinhados aos autovetores.
 
 ```{r}
 #| label: fig-interpretacao-espectral
 #| echo: false
 #| warning: false
 #| message: false
-#| fig-cap: "A decomposição espectral identifica as direções ortogonais nas quais uma matriz simétrica atua por escalonamentos independentes."
+#| fig-cap: "A decomposição espectral identifica as direções ortogonais nas quais uma matriz simétrica atua por fatores escalares independentes."
 #| fig-width: 10
 #| fig-height: 5.2
 #| fig-align: center
@@ -2483,20 +2598,20 @@ theta <- seq(
   length.out = 361
 )
 
-circulo <- cbind(
+circunferencia <- cbind(
   cos(theta),
   sin(theta)
 )
 
 elipse <- t(
-  A %*% t(circulo)
+  A %*% t(circunferencia)
 )
 
 curvas <- rbind(
   data.frame(
-    x = circulo[, 1],
-    y = circulo[, 2],
-    painel = "Esfera unitária"
+    x = circunferencia[, 1],
+    y = circunferencia[, 2],
+    painel = "Circunferência unitária"
   ),
   data.frame(
     x = elipse[, 1],
@@ -2521,7 +2636,7 @@ eixos <- rbind(
       "q1",
       "q2"
     ),
-    painel = "Esfera unitária"
+    painel = "Circunferência unitária"
   ),
   data.frame(
     x = 0,
@@ -2556,7 +2671,7 @@ rotulos <- rbind(
       "bold(q)[1]",
       "bold(q)[2]"
     ),
-    painel = "Esfera unitária"
+    painel = "Circunferência unitária"
   ),
   data.frame(
     x = c(
@@ -2576,7 +2691,7 @@ rotulos <- rbind(
 )
 
 ordem_paineis <- c(
-  "Esfera unitária",
+  "Circunferência unitária",
   "Imagem pela transformação"
 )
 
@@ -2599,20 +2714,36 @@ ggplot() +
   geom_hline(
     yintercept = 0,
     linewidth = 0.35,
-    colour = "grey70"
+    color = "gray70"
   ) +
   geom_vline(
     xintercept = 0,
     linewidth = 0.35,
-    colour = "grey70"
+    color = "gray70"
   ) +
   geom_path(
-    data = curvas,
+    data = subset(
+      curvas,
+      painel == "Circunferência unitária"
+    ),
     aes(
       x = x,
       y = y
     ),
-    linewidth = 1
+    linewidth = 1,
+    color = "#1f77b4"
+  ) +
+  geom_path(
+    data = subset(
+      curvas,
+      painel == "Imagem pela transformação"
+    ),
+    aes(
+      x = x,
+      y = y
+    ),
+    linewidth = 1,
+    color = "#d62728"
   ) +
   geom_segment(
     data = eixos,
@@ -2621,9 +2752,9 @@ ggplot() +
       y = y,
       xend = xend,
       yend = yend,
-      linetype = direcao
+      color = direcao
     ),
-    linewidth = 0.9,
+    linewidth = 0.95,
     arrow = grid::arrow(
       length = grid::unit(
         0.18,
@@ -2646,6 +2777,21 @@ ggplot() +
     ~painel,
     nrow = 1
   ) +
+  scale_color_manual(
+    values = c(
+      "q1" = "#1f77b4",
+      "q2" = "#2ca02c"
+    ),
+    breaks = c(
+      "q1",
+      "q2"
+    ),
+    labels = c(
+      expression(bold(q)[1]),
+      expression(bold(q)[2])
+    ),
+    name = NULL
+  ) +
   coord_equal(
     xlim = c(
       -3.7,
@@ -2658,28 +2804,22 @@ ggplot() +
     expand = FALSE,
     clip = "off"
   ) +
-  scale_linetype_manual(
-    values = c(
-      "q1" = "solid",
-      "q2" = "dashed"
-    )
-  ) +
   labs(
     x = NULL,
-    y = NULL,
-    linetype = NULL
+    y = NULL
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(
+    base_size = 13
+  ) +
   theme(
     panel.grid.minor = element_blank(),
     axis.text = element_blank(),
     axis.ticks = element_blank(),
     strip.background = element_blank(),
     strip.text = element_text(
-      face = "bold",
-      size = 11
+      face = "bold"
     ),
-    legend.position = "none",
+    legend.position = "bottom",
     panel.spacing = grid::unit(
       1.2,
       "cm"
@@ -2689,7 +2829,7 @@ ggplot() +
 
 Na base canônica, a ação da matriz combina as duas coordenadas. Na base formada por $\mathbf{q}_1$ e $\mathbf{q}_2$, a transformação apenas multiplica as coordenadas por 4 e 2.
 
-Para uma matriz simétrica arbitrária, os comprimentos dos semieixos da imagem da esfera unitária são determinados por
+Para uma matriz simétrica arbitrária, os comprimentos dos semieixos da imagem da esfera unitária em $\mathbb{R}^p$ são determinados por
 
 $$
 |\lambda_1|,
@@ -2805,7 +2945,8 @@ $$
 
 Esse projetor não depende da base ortonormal escolhida dentro do autoespaço.
 
-::: {#thm-decomposicao-projetores-espectrais}
+::: {#prp-decomposicao-projetores-espectrais}
+
 ## Decomposição por projetores espectrais
 
 Se $\mathbf{A}$ é simétrica e possui autovalores distintos
@@ -2861,7 +3002,7 @@ $$
 [@horn2013matrix]
 :::
 
-::: proof
+::: {.proof}
 As colunas de $\mathbf{Q}_h$ são ortonormais. Portanto,
 
 $$
@@ -2871,7 +3012,7 @@ $$
 \mathbf{Q}_h^{\top}
 $$
 
-é o projetor ortogonal sobre o autoespaço associado a $\lambda^{(h)}$. Pela @thm-propriedades-matriz-projecao, ele é simétrico e idempotente.
+é o projetor ortogonal sobre o autoespaço associado a $\lambda^{(h)}$. Pela @prp-propriedades-matriz-projecao, ele é simétrico e idempotente.
 
 Autoespaços associados a autovalores distintos são ortogonais. Logo,
 
@@ -3004,7 +3145,8 @@ A representação diagonal permite obter propriedades da matriz diretamente de s
 
 ### Traço, determinante, posto e invertibilidade
 
-::: {#thm-consequencias-espectrais-basicas}
+::: {#prp-consequencias-espectrais-basicas}
+
 ## Consequências espectrais básicas
 
 Se $\mathbf{A}\in\mathbb{R}^{p\times p}$ é simétrica e possui autovalores
@@ -3060,7 +3202,7 @@ $$
 $$
 :::
 
-::: proof
+::: {.proof}
 Pela propriedade cíclica do traço,
 
 $$
@@ -3144,7 +3286,17 @@ $$
 \prod_{j=1}^{p}\lambda_j.
 $$
 
-As matrizes $\mathbf{A}$ e $\boldsymbol{\Lambda}_{\mathbf{A}}$ estão relacionadas por uma mudança de base invertível e possuem o mesmo posto. O posto de uma matriz diagonal é igual ao número de elementos diagonais não nulos. Portanto,
+As matrizes $\mathbf{A}$ e $\boldsymbol{\Lambda}_{\mathbf{A}}$ são semelhantes, pois
+
+$$
+\boldsymbol{\Lambda}_{\mathbf{A}}
+=
+\mathbf{Q}_{\mathbf{A}}^{\top}
+\mathbf{A}
+\mathbf{Q}_{\mathbf{A}}.
+$$
+
+Como a multiplicação à esquerda e à direita por matrizes invertíveis preserva o posto, $\mathbf{A}$ e $\boldsymbol{\Lambda}_{\mathbf{A}}$ possuem o mesmo posto. O posto de uma matriz diagonal é igual ao número de elementos diagonais não nulos. Portanto,
 
 $$
 \operatorname{posto}(\mathbf{A})
@@ -3184,7 +3336,8 @@ isso ocorre exatamente quando todos os autovalores são não nulos.
 
 Os autoespaços também fornecem descrições diretas do núcleo e da imagem.
 
-::: {#thm-nucleo-imagem-espectral}
+::: {#prp-nucleo-imagem-espectral}
+
 ## Núcleo e imagem em termos dos autovetores
 
 Se
@@ -3201,6 +3354,8 @@ $$
 é a decomposição espectral de uma matriz simétrica, então
 
 $$
+\ker(T_{\mathbf{A}})
+=
 \mathcal{N}(\mathbf{A})
 =
 \operatorname{span}
@@ -3213,6 +3368,8 @@ $$
 e
 
 $$
+\operatorname{Im}(T_{\mathbf{A}})
+=
 \mathcal{C}(\mathbf{A})
 =
 \operatorname{span}
@@ -3225,13 +3382,21 @@ $$
 Consequentemente,
 
 $$
+\operatorname{Im}(T_{\mathbf{A}})
+=
+\ker(T_{\mathbf{A}})^{\perp},
+$$
+
+ou, equivalentemente,
+
+$$
 \mathcal{C}(\mathbf{A})
 =
 \mathcal{N}(\mathbf{A})^{\perp}.
 $$
 :::
 
-::: proof
+::: {.proof}
 Todo vetor $\mathbf{x}\in\mathbb{R}^p$ pode ser escrito na base ortonormal de autovetores como
 
 $$
@@ -3320,10 +3485,10 @@ $$
 \right\}.
 $$
 
-Como os autovetores formam uma base ortonormal, os dois subespaços são complementos ortogonais.
+Como os autovetores associados a autovalores nulos são ortogonais aos autovetores associados a autovalores não nulos, e juntos formam uma base ortonormal de $\mathbb{R}^p$, os dois subespaços são complementos ortogonais.
 :::
 
-Cada autovalor nulo identifica uma direção eliminada pela transformação. Cada autovalor não nulo identifica uma direção que permanece representada na imagem.
+O autoespaço associado ao autovalor zero reúne exatamente as direções eliminadas pela transformação. Os autoespaços associados a autovalores não nulos constituem, em conjunto, a imagem da transformação.
 
 ### Formas quadráticas em coordenadas espectrais
 
@@ -3337,10 +3502,12 @@ q_{\mathbf{A}}(\mathbf{x})
 \mathbf{x}.
 $$
 
-Defina as coordenadas espectrais de $\mathbf{x}$ por
+As coordenadas de $\mathbf{x}$ na base espectral são
 
 $$
 \mathbf{z}
+=
+[\mathbf{x}]_{\mathcal{B}_{\mathbf{A}}}
 =
 \mathbf{Q}_{\mathbf{A}}^{\top}
 \mathbf{x}.
@@ -3387,7 +3554,7 @@ $$
 \lambda_jz_j^2.
 $$
 
-O sinal da forma quadrática é determinado pelos sinais dos autovalores.
+As possibilidades de sinal da forma quadrática são determinadas pelos sinais dos autovalores, enquanto o valor assumido para um vetor específico depende também de suas coordenadas espectrais $z_1,\ldots,z_p$.
 
 ::: {#thm-positividade-autovalores}
 ## Positividade e sinais dos autovalores
@@ -3431,7 +3598,7 @@ Seja $\mathbf{A}\in\mathbb{R}^{p\times p}$ uma matriz simétrica. Então:
 [@horn2013matrix]
 :::
 
-::: proof
+::: {.proof}
 Para qualquer $\mathbf{x}\in\mathbb{R}^p$, escreva
 
 $$
@@ -3724,17 +3891,15 @@ $$
 
 O elipsoide possui semieixo de comprimento
 
-$$
-\sqrt{2}
-$$
+$$\sqrt{2}$$
 
 na direção de $\mathbf{q}_1$ e semieixo de comprimento
 
-$$
-2
-$$
+$$2$$
 
 na direção de $\mathbf{q}_2$. A direção associada ao menor autovalor apresenta a maior extensão.
+
+O termo cruzado $2x_1x_2$ presente nas coordenadas canônicas desaparece nas coordenadas espectrais porque os eixos coordenados passam a coincidir com as direções principais da forma quadrática.
 :::
 
 A representação
@@ -3897,7 +4062,17 @@ $$
 \lambda_p.
 $$
 
-Escreva
+As coordenadas de $\mathbf{a}$ na base espectral são
+
+$$
+\mathbf{z}
+=
+[\mathbf{a}]_{\mathcal{B}_{\mathbf{A}}}
+=
+\mathbf{Q}_{\mathbf{A}}^{\top}\mathbf{a},
+$$
+
+de modo que
 
 $$
 \mathbf{a}
@@ -3959,15 +4134,11 @@ $$
 
 tem-se
 
-$$
-\omega_j\geq0
-$$
+$$\omega_j\geq0$$
 
 e
 
-$$
-\sum_{j=1}^{p}\omega_j=1.
-$$
+$$\sum_{j=1}^{p}\omega_j=1.$$
 
 Logo,
 
@@ -3978,7 +4149,9 @@ $$
 \omega_j\lambda_j.
 $$
 
-O quociente de Rayleigh é uma média ponderada dos autovalores. Os pesos medem a participação da direção de $\mathbf{a}$ em cada autoespaço.
+O quociente de Rayleigh é, portanto, uma média ponderada dos autovalores. Para uma base espectral fixada, $\omega_j$ mede a proporção do comprimento ao quadrado de $\mathbf{a}$ associada à direção $\mathbf{q}_j$.
+
+Quando um autovalor $\lambda$ possui multiplicidade maior que 1, a quantidade intrínseca ao autoespaço correspondente é a soma dos pesos associados aos vetores de uma base ortonormal desse autoespaço. Essa soma é igual à proporção do comprimento ao quadrado da projeção de $\mathbf{a}$ sobre $\mathcal{E}_{\lambda}$.
 
 ::: {#thm-extremos-quociente-rayleigh}
 ## Extremos do quociente de Rayleigh
@@ -4021,10 +4194,10 @@ $$
 \lambda_p.
 $$
 
-O máximo é atingido pelos autovetores associados a $\lambda_1$, e o mínimo é atingido pelos autovetores associados a $\lambda_p$. [@horn2013matrix]
+O máximo é atingido por todo vetor não nulo do autoespaço associado a $\lambda_1$, e o mínimo é atingido por todo vetor não nulo do autoespaço associado a $\lambda_p$. [@horn2013matrix]
 :::
 
-::: proof
+::: {.proof}
 Como
 
 $$
@@ -4081,10 +4254,10 @@ $$
 e o limite inferior também é atingido.
 :::
 
-Se o maior autovalor é simples, as direções que maximizam o quociente são
+Se o maior autovalor é simples, a reta que maximiza o quociente é
 
 $$
-\operatorname{span}(\mathbf{q}_1).
+\operatorname{span}\{\mathbf{q}_1\}.
 $$
 
 Se sua multiplicidade é maior que 1, todo vetor não nulo do autoespaço correspondente produz o mesmo valor máximo. Nesse caso, a solução é um subespaço, e não uma direção individual única.
@@ -4232,7 +4405,7 @@ $$
 \right)
 $$
 
-ao longo das direções da esfera unitária.
+ao longo das direções da circunferência unitária.
 
 ```{r}
 #| label: fig-quociente-rayleigh
@@ -4297,21 +4470,24 @@ ggplot(
     colour = "grey60"
   ) +
   geom_line(
-    linewidth = 1
-  ) +
-  geom_point(
-    data = pontos_extremos,
-    aes(
-      x = theta,
-      y = valor,
-      shape = tipo
-    ),
-    size = 3
-  ) +
+  linewidth = 1,
+  color = "gray35"
+) +
+geom_point(
+  data = pontos_extremos,
+  aes(
+    x = theta,
+    y = valor,
+    color = tipo,
+    shape = tipo
+  ),
+  size = 3.2
+) +
   annotate(
     "text",
     x = 0.08,
     y = 4.08,
+    color = "#1f77b4",
     label = expression(
       lambda[1] == 4
     ),
@@ -4322,6 +4498,7 @@ ggplot(
     "text",
     x = 0.08,
     y = 1.92,
+    color = "#2ca02c",
     label = expression(
       lambda[2] == 2
     ),
@@ -4370,6 +4547,12 @@ ggplot(
       "Mínimo" = 17
     )
   ) +
+  scale_color_manual(
+  values = c(
+    "Máximo" = "#1f77b4",
+    "Mínimo" = "#2ca02c"
+  )
+) +
   labs(
     x = expression(theta),
     y = expression(
@@ -4382,7 +4565,7 @@ ggplot(
     ),
     shape = NULL
   ) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
     legend.position = "bottom"
@@ -4417,19 +4600,7 @@ $$
 1.
 $$
 
-A restrição impede que a função objetivo seja aumentada apenas pela multiplicação de $\mathbf{a}$ por uma constante.
-
-Sem essa restrição, se existe um vetor para o qual
-
-$$
-\mathbf{a}^{\top}
-\mathbf{A}
-\mathbf{a}
->
-0,
-$$
-
-então
+A restrição de norma separa a escolha da **direção** da escolha da magnitude do vetor. De fato,
 
 $$
 (c\mathbf{a})^{\top}
@@ -4439,10 +4610,32 @@ $$
 c^2
 \mathbf{a}^{\top}
 \mathbf{A}
-\mathbf{a}
+\mathbf{a}.
 $$
 
-pode crescer indefinidamente à medida que $|c|$ aumenta.
+Portanto, sem uma normalização, o valor da forma quadrática pode ser alterado simplesmente pelo escalonamento do vetor, mesmo quando sua direção permanece a mesma.
+
+Se existe uma direção para a qual
+
+$$
+\mathbf{a}^{\top}\mathbf{A}\mathbf{a}>0,
+$$
+
+o problema de maximização sem restrição é ilimitado superiormente. Analogamente, se existe uma direção para a qual
+
+$$
+\mathbf{a}^{\top}\mathbf{A}\mathbf{a}<0,
+$$
+
+o problema de minimização sem restrição é ilimitado inferiormente.
+
+A condição
+
+$$
+\mathbf{a}^{\top}\mathbf{a}=1
+$$
+
+elimina esse efeito de escala e restringe a otimização às direções representadas por vetores unitários.
 
 ### Multiplicadores de Lagrange
 
@@ -4452,18 +4645,20 @@ $$
 \mathcal{L}
 \left(
 \mathbf{a},
-\lambda
+\eta
 \right)
 =
 \mathbf{a}^{\top}
 \mathbf{A}
 \mathbf{a}
 -
-\lambda
+\eta
 \left(
 \mathbf{a}^{\top}\mathbf{a}-1
-\right).
+\right),
 $$
+
+em que $\eta$ é o multiplicador de Lagrange.
 
 Como $\mathbf{A}$ é simétrica,
 
@@ -4503,7 +4698,7 @@ isto é,
 $$
 2\mathbf{A}\mathbf{a}
 -
-2\lambda\mathbf{a}
+2\eta\mathbf{a}
 =
 \mathbf{0}.
 $$
@@ -4513,10 +4708,12 @@ Portanto,
 $$
 \mathbf{A}\mathbf{a}
 =
-\lambda\mathbf{a}.
+\eta\mathbf{a}.
 $$
 
-As direções estacionárias do problema são autovetores de $\mathbf{A}$. Multiplicando a equação à esquerda por $\mathbf{a}^{\top}$ e utilizando
+Como a restrição impõe $\mathbf{a}\neq\mathbf{0}$, essa equação mostra que toda direção estacionária é um autovetor de $\mathbf{A}$ e que o multiplicador $\eta$ é o autovalor correspondente.
+
+Multiplicando a equação à esquerda por $\mathbf{a}^{\top}$ e utilizando
 
 $$
 \mathbf{a}^{\top}\mathbf{a}=1,
@@ -4530,18 +4727,34 @@ $$
 \mathbf{A}
 \mathbf{a}
 &=
-\lambda
+\eta
 \mathbf{a}^{\top}\mathbf{a}\\
 &=
-\lambda.
+\eta.
 \end{aligned}
 $$
 
-O valor da função objetivo em um autovetor unitário é o autovalor correspondente. Assim:
+Assim, no ponto estacionário, o valor da função objetivo coincide com o autovalor correspondente. Se esse autovalor for denotado por $\lambda$, então
 
--   o maior autovalor fornece o máximo global;
--   o menor autovalor fornece o mínimo global;
--   os demais autovalores correspondem a valores estacionários intermediários.
+$$
+\mathbf{A}\mathbf{a}
+=
+\lambda\mathbf{a}
+$$
+
+e
+
+$$
+\mathbf{a}^{\top}\mathbf{A}\mathbf{a}
+=
+\lambda.
+$$
+
+Consequentemente:
+
+- o maior autovalor fornece o máximo global;
+- o menor autovalor fornece o mínimo global;
+- os demais autovalores correspondem a valores estacionários intermediários.
 
 ::: {#thm-autovalores-otimizacao-restrita}
 ## Autovalores como valores estacionários
@@ -4562,7 +4775,7 @@ $$
 \mathbf{a}^{\top}\mathbf{a}=1
 $$
 
-são os autovetores unitários de $\mathbf{A}$. O valor da função objetivo em um autovetor associado a $\lambda$ é igual a $\lambda$.
+são exatamente os autovetores unitários de $\mathbf{A}$. O valor da função objetivo em qualquer autovetor unitário associado ao autovalor $\lambda$ é igual a $\lambda$.
 :::
 
 Esse resultado explica por que problemas de maximização de variância, separação ou associação conduzem frequentemente a equações de autovalores. Quando a função objetivo é uma forma quadrática e a restrição fixa o comprimento, as condições de primeira ordem produzem uma equação espectral.
@@ -4665,11 +4878,10 @@ j<k
 \mathbf{a}.
 $$
 
-O máximo é atingido por qualquer autovetor unitário associado a $\lambda_k$ que satisfaça as restrições. 
-[@horn2013matrix]
+O máximo é atingido por qualquer autovetor unitário associado a $\lambda_k$ que satisfaça as restrições. [@horn2013matrix]
 :::
 
-::: proof
+::: {.proof}
 Se $\mathbf{a}$ é ortogonal a
 
 $$
@@ -4730,7 +4942,7 @@ $$
 Portanto, o limite superior é atingido.
 :::
 
-Quando há autovalores repetidos, as direções sucessivas dentro do mesmo autoespaço não são individualmente determinadas. Qualquer base ortonormal desse autoespaço fornece o mesmo valor da função objetivo e descreve o mesmo subespaço ótimo.
+Quando há autovalores repetidos, as direções sucessivas dentro do mesmo autoespaço não são individualmente determinadas. Qualquer base ortonormal desse autoespaço fornece o mesmo valor da função objetivo e descreve o mesmo subespaço ótimo. Nesse caso, o subespaço espectral é intrínseco, enquanto a escolha de vetores individuais dentro dele não é única.
 
 A caracterização variacional relaciona três objetos:
 
@@ -4777,7 +4989,7 @@ $$
 \right).
 $$
 
-Se $f$ é uma função escalar definida em todos os autovalores de $\mathbf{A}$, pode-se aplicá-la aos elementos diagonais:
+Se $f$ é uma função escalar real definida em todos os autovalores de $\mathbf{A}$, pode-se aplicá-la aos elementos diagonais:
 
 $$
 f
@@ -4792,6 +5004,7 @@ f(\lambda_1),\ldots,f(\lambda_p)
 $$
 
 ::: {#def-funcao-espectral}
+
 ## Função espectral de uma matriz simétrica
 
 Seja
@@ -4804,7 +5017,7 @@ $$
 \mathbf{Q}_{\mathbf{A}}^{\top}
 $$
 
-uma matriz simétrica e seja $f$ uma função definida no espectro de $\mathbf{A}$.
+uma matriz simétrica e seja $f$ uma função real definida no espectro de $\mathbf{A}$.
 
 A **função espectral** $f(\mathbf{A})$ é definida por
 
@@ -4845,7 +5058,8 @@ Os projetores são determinados pelos autoespaços, independentemente da base or
 
 ### Ação sobre os autoespaços
 
-::: {#thm-funcao-espectral-autoespacos}
+::: {#prp-funcao-espectral-autoespacos}
+
 ## Ação de uma função espectral
 
 Se $\mathbf{v}$ pertence ao autoespaço de $\mathbf{A}$ associado ao autovalor $\lambda$, então
@@ -4859,7 +5073,7 @@ $$
 [@horn1991topics]
 :::
 
-::: proof
+::: {.proof}
 Como
 
 $$
@@ -4893,7 +5107,7 @@ f(\lambda)\mathbf{v}.
 $$
 :::
 
-Portanto, todo autovetor de $\mathbf{A}$ também é autovetor de $f(\mathbf{A})$, com autovalor transformado em $f(\lambda)$.
+Portanto, todo autovetor de $\mathbf{A}$ associado a $\lambda$ também é autovetor de $f(\mathbf{A})$, agora associado ao autovalor $f(\lambda)$. Mais geralmente, todo o autoespaço $\mathcal{E}_{\lambda}$ de $\mathbf{A}$ permanece invariante sob $f(\mathbf{A})$.
 
 A função pode fazer autovalores originalmente distintos assumirem o mesmo valor. Se
 
@@ -5206,7 +5420,26 @@ $$
 \right).
 $$
 
-Essa matriz satisfaz
+Como $\mathbf{A}\succ0$, a raiz quadrada principal é invertível e
+
+$$
+\mathbf{A}^{-1/2}
+=
+\left(
+\mathbf{A}^{1/2}
+\right)^{-1}.
+$$
+
+Além disso,
+
+$$
+\mathbf{A}^{-1}
+=
+\mathbf{A}^{-1/2}
+\mathbf{A}^{-1/2}
+$$
+
+e
 
 $$
 \mathbf{A}^{-1/2}
@@ -5246,7 +5479,7 @@ $$
 \mathbf{A}^{-1/2}\mathbf{x}
 $$
 
-remove os diferentes fatores de escala determinados por $\mathbf{A}$. Ela também converte a forma quadrática associada à inversa em uma norma euclidiana:
+reescalona as componentes espectrais de $\mathbf{x}$ segundo os fatores $1/\sqrt{\lambda_j}$. Além disso, converte a forma quadrática associada à inversa em uma norma euclidiana:
 
 $$
 \begin{aligned}
@@ -5265,7 +5498,18 @@ $$
 \end{aligned}
 $$
 
-Essa transformação será retomada posteriormente como uma operação de branqueamento quando $\mathbf{A}$ representar uma matriz de covariâncias.
+Quando $\mathbf{A}$ for uma matriz de covariâncias $\boldsymbol{\Sigma}\succ0$, essa construção será retomada no branqueamento. Para um vetor com média $\boldsymbol{\mu}$, a transformação correspondente será aplicada ao vetor centralizado,
+
+$$
+\mathbf{z}
+=
+\boldsymbol{\Sigma}^{-1/2}
+\left(
+\mathbf{x}-\boldsymbol{\mu}
+\right).
+$$
+
+Nesse caso, a distância de Mahalanobis será interpretada como uma distância euclidiana nas coordenadas branqueadas.
 
 ### Pseudoinversa espectral
 
@@ -5325,7 +5569,7 @@ $$
 $$
 :::
 
-A pseudoinversa divide a componente associada a cada autovalor não nulo por esse autovalor e anula as componentes pertencentes ao núcleo.
+A pseudoinversa atua separadamente sobre os autoespaços: nas direções associadas a autovalores não nulos, aplica o fator $1/\lambda$; no autoespaço associado ao autovalor zero, sua ação é nula. Assim, ela inverte a transformação sobre sua imagem e mantém eliminadas as componentes pertencentes ao núcleo.
 
 ::: {#exm-pseudoinversa-espectral}
 ## Pseudoinversa de uma matriz singular
@@ -5456,7 +5700,7 @@ $$
 \frac{\mathbf{A}^k}{k!}.
 $$
 
-Para uma matriz positiva definida, o logaritmo principal é
+Para uma matriz simétrica positiva definida, define-se o **logaritmo principal** por
 
 $$
 \log(\mathbf{A})
@@ -5497,19 +5741,21 @@ para toda matriz simétrica real.
 
 A @tbl-funcoes-espectrais reúne as principais funções desenvolvidas nesta seção.
 
-| Função              | Ação sobre $\lambda_j$                                  | Condição                       |
-|:-----------------------|:-----------------------|:-----------------------|
-| $\mathbf{A}^k$      | $\lambda_j^k$                                           | $k$ inteiro não negativo       |
-| $\mathbf{A}^{-1}$   | $1/\lambda_j$                                           | $\lambda_j\neq0$ para todo $j$ |
-| $\mathbf{A}^{1/2}$  | $\sqrt{\lambda_j}$                                      | $\mathbf{A}\succeq0$           |
-| $\mathbf{A}^{-1/2}$ | $1/\sqrt{\lambda_j}$                                    | $\mathbf{A}\succ0$             |
-| $\mathbf{A}^{+}$    | $1/\lambda_j$ se $\lambda_j\neq0$; $0$ se $\lambda_j=0$ | $\mathbf{A}$ simétrica         |
-| $\exp(\mathbf{A})$  | $e^{\lambda_j}$                                         | $\mathbf{A}$ simétrica         |
-| $\log(\mathbf{A})$  | $\log\lambda_j$                                         | $\mathbf{A}\succ0$             |
+| Função | Ação sobre $\lambda_j$ | Condição adicional |
+|:---|:---|:---|
+| $\mathbf{A}^k$ | $\lambda_j^k$ | $k\in\{0,1,2,\ldots\}$ |
+| $\mathbf{A}^{-1}$ | $1/\lambda_j$ | $\lambda_j\neq0$ para todo $j$ |
+| $\mathbf{A}^{1/2}$ | $\sqrt{\lambda_j}$ | $\mathbf{A}\succeq0$ |
+| $\mathbf{A}^{-1/2}$ | $1/\sqrt{\lambda_j}$ | $\mathbf{A}\succ0$ |
+| $\mathbf{A}^{+}$ | $1/\lambda_j$ se $\lambda_j\neq0$; $0$ se $\lambda_j=0$ | nenhuma além da simetria assumida na seção |
+| $\exp(\mathbf{A})$ | $e^{\lambda_j}$ | nenhuma além da simetria assumida na seção |
+| $\log(\mathbf{A})$ | $\log\lambda_j$ | $\mathbf{A}\succ0$ |
 
 : Principais funções espectrais de matrizes simétricas. {#tbl-funcoes-espectrais}
 
-As funções espectrais transformam separadamente cada autoespaço. As raízes quadradas e suas inversas também permitem converter problemas definidos por duas formas quadráticas em problemas espectrais ordinários. Essa construção conduz aos autovalores generalizados.
+As funções espectrais atuam separadamente sobre os autoespaços, transformando cada autovalor $\lambda$ no valor escalar $f(\lambda)$. Essa construção permite obter diretamente potências, inversas, raízes e pseudoinversas e mostra como certas transformações matriciais podem ser compreendidas como reescalonamentos das direções espectrais.
+
+Em particular, a raiz quadrada e a raiz quadrada inversa permitem converter problemas definidos por uma geometria induzida por uma matriz positiva definida em problemas euclidianos equivalentes. Essa ideia será utilizada imediatamente na formulação dos autovalores generalizados.
 
 ## Autovalores generalizados
 
@@ -5639,7 +5885,7 @@ $$
 \mathbf{0}.
 $$
 
-Para que existam soluções não triviais, é necessário que
+Existem soluções não triviais se, e somente se,
 
 $$
 \det
@@ -5652,7 +5898,7 @@ $$
 0.
 $$
 
-Essa equação determina os autovalores generalizados do par.
+Essa equação é a equação característica generalizada do par $(\mathbf{A},\mathbf{M})$ e determina seus autovalores generalizados.
 
 ### Quociente de Rayleigh generalizado
 
@@ -5741,22 +5987,24 @@ $$
 \mathcal{L}
 \left(
 \mathbf{a},
-\lambda
+\eta
 \right)
 =
 \mathbf{a}^{\top}
 \mathbf{A}
 \mathbf{a}
 -
-\lambda
+\eta
 \left(
 \mathbf{a}^{\top}
 \mathbf{M}
 \mathbf{a}
 -
 1
-\right).
+\right),
 $$
+
+em que $\eta$ é o multiplicador de Lagrange.
 
 Como $\mathbf{A}$ e $\mathbf{M}$ são simétricas,
 
@@ -5766,56 +6014,51 @@ $$
 =
 2\mathbf{A}\mathbf{a}
 -
-2\lambda\mathbf{M}\mathbf{a}.
+2\eta\mathbf{M}\mathbf{a}.
 $$
 
 A condição de primeira ordem produz
 
-$$
-\mathbf{A}\mathbf{a}
-=
-\lambda
-\mathbf{M}\mathbf{a}.
-$$
+$$\mathbf{A}\mathbf{a}=\eta\mathbf{M}\mathbf{a}.$$
 
-Portanto, os pontos estacionários do problema restrito são autovetores generalizados.
+Como $\mathbf{a}\neq\mathbf{0}$, o multiplicador $\eta$ é um autovalor generalizado e $\mathbf{a}$ é um autovetor generalizado correspondente.
 
-Multiplicando essa equação à esquerda por $\mathbf{a}^{\top}$,
+Multiplicando a equação à esquerda por $\mathbf{a}^{\top}$,
 
 $$
 \mathbf{a}^{\top}
 \mathbf{A}
 \mathbf{a}
 =
-\lambda
+\eta
 \mathbf{a}^{\top}
 \mathbf{M}
 \mathbf{a}.
 $$
 
-Se
+Sob a normalização
 
-$$
-\mathbf{a}^{\top}
-\mathbf{M}
-\mathbf{a}
-=
-1,
-$$
+$$\mathbf{a}^{\top}\mathbf{M}\mathbf{a}=1,$$
 
-então
+obtém-se
 
-$$
-\mathbf{a}^{\top}
-\mathbf{A}
-\mathbf{a}
-=
-\lambda.
-$$
+$$\mathbf{a}^{\top}\mathbf{A}\mathbf{a}=\eta.$$
 
-O autovalor generalizado é o valor assumido pela função objetivo na direção generalizada normalizada.
+Denotando o autovalor generalizado correspondente por $\lambda$, conclui-se que o valor da função objetivo em um autovetor generalizado normalizado é igual a $\lambda$.
 
 ### Redução a um problema espectral ordinário
+
+Como $\mathbf{M}\succ0$, a matriz $\mathbf{M}$ é invertível, e a equação generalizada também poderia ser escrita como
+
+$$
+\mathbf{M}^{-1}
+\mathbf{A}
+\mathbf{v}
+=
+\lambda\mathbf{v}.
+$$
+
+Entretanto, mesmo que $\mathbf{A}$ e $\mathbf{M}$ sejam simétricas, a matriz $\mathbf{M}^{-1}\mathbf{A}$ não precisa ser simétrica. Para preservar a estrutura simétrica e poder aplicar diretamente o Teorema Espectral, é preferível transformar o problema utilizando a raiz quadrada de $\mathbf{M}$.
 
 Como $\mathbf{M}\succ0$, existem as matrizes simétricas
 
@@ -5910,13 +6153,15 @@ $$
 \widetilde{\mathbf{A}}.
 $$
 
-Assim, o problema generalizado é convertido em um problema ordinário para uma matriz simétrica:
+Assim, o problema generalizado é convertido no problema espectral ordinário
 
 $$
 \widetilde{\mathbf{A}}\mathbf{u}
 =
-\lambda\mathbf{u}.
+\lambda\mathbf{u},
 $$
+
+para uma matriz simétrica. Consequentemente, todos os autovalores generalizados do par $(\mathbf{A},\mathbf{M})$ são reais e os resultados do Teorema Espectral podem ser aplicados à matriz $\widetilde{\mathbf{A}}$.
 
 Essa transformação também converte o quociente generalizado em um quociente ordinário. Como
 
@@ -5974,13 +6219,38 @@ $$
 
 A mudança de variáveis
 
+$$\mathbf{u}=\mathbf{M}^{1/2}\mathbf{a}$$
+
+transforma a geometria induzida por $\mathbf{M}$ em geometria euclidiana, pois
+
 $$
-\mathbf{u}
+\mathbf{a}^{\top}
+\mathbf{M}
+\mathbf{a}
 =
-\mathbf{M}^{1/2}\mathbf{v}
+\mathbf{u}^{\top}\mathbf{u}.
 $$
 
-converte a norma induzida por $\mathbf{M}$ na norma euclidiana. A matriz $\mathbf{M}^{-1/2}$ realiza a transformação inversa, levando as coordenadas euclidianas de $\mathbf{u}$ novamente às coordenadas originais de $\mathbf{v}$. O problema generalizado pode, então, ser analisado pelos resultados do Teorema Espectral e do quociente de Rayleigh ordinário.
+Equivalentemente,
+
+$$
+\mathbf{a}
+=
+\mathbf{M}^{-1/2}\mathbf{u}.
+$$
+
+Geometricamente, $\mathbf{M}^{-1/2}$ transforma a esfera unitária euclidiana no elipsoide
+
+$$
+\left\{
+\mathbf{a}\in\mathbb{R}^p:
+\mathbf{a}^{\top}\mathbf{M}\mathbf{a}=1
+\right\}.
+$$
+
+O problema generalizado pode, portanto, ser estudado como um problema de Rayleigh ordinário no sistema de coordenadas em que a métrica definida por $\mathbf{M}$ se torna euclidiana.
+
+Quando $\mathbf{M}$ representar posteriormente uma matriz de covariâncias, essa mesma estrutura estará relacionada ao branqueamento. Aqui, porém, $\mathbf{M}$ representa genericamente a matriz que define a geometria do problema.
 
 ::: {#thm-extremos-rayleigh-generalizado}
 ## Extremos do quociente de Rayleigh generalizado
@@ -6024,9 +6294,11 @@ $$
 =
 \lambda_p.
 $$
+
+O máximo é atingido por todo vetor não nulo do autoespaço generalizado associado a $\lambda_1$, e o mínimo é atingido por todo vetor não nulo do autoespaço generalizado associado a $\lambda_p$.
 :::
 
-::: proof
+::: {.proof}
 A transformação
 
 $$
@@ -6062,12 +6334,13 @@ Os autovalores ordinários de $\widetilde{\mathbf{A}}$ são os autovalores gener
 
 Os autovetores generalizados não precisam ser ortogonais segundo o produto interno euclidiano. Eles podem, entretanto, ser escolhidos ortonormais na geometria determinada por $\mathbf{M}$.
 
-::: {#thm-ortogonalidade-autovetores-generalizados}
-## Ortogonalidade de autovetores generalizados
+::: {#prp-ortogonalidade-autovetores-generalizados}
 
-Sejam $\mathbf{v}_i$ e $\mathbf{v}_j$ autovetores generalizados associados a autovalores distintos $\lambda_i$ e $\lambda_j$ do par $(\mathbf{A},\mathbf{M})$.
+## Ortogonalidade e base de autovetores generalizados
 
-Então,
+Sejam $\mathbf{A}$ simétrica e $\mathbf{M}\succ0$.
+
+Se $\mathbf{v}_i$ e $\mathbf{v}_j$ são autovetores generalizados associados a autovalores distintos $\lambda_i$ e $\lambda_j$, então
 
 $$
 \mathbf{v}_i^{\top}
@@ -6077,11 +6350,31 @@ $$
 0.
 $$
 
+Além disso, existe uma base de $\mathbb{R}^p$ formada por autovetores generalizados
+
+$$
+\mathcal{B}_g
+=
+\{
+\mathbf{v}_1,\ldots,\mathbf{v}_p
+\}
+$$
+
+que pode ser escolhida de modo que
+
+$$
+\mathbf{v}_i^{\top}
+\mathbf{M}
+\mathbf{v}_j
+=
+\delta_{ij}.
+$$
+
 [@horn2013matrix]
 :::
 
-::: proof
-Como
+::: {.proof}
+Para autovalores distintos,
 
 $$
 \mathbf{A}\mathbf{v}_i
@@ -6096,10 +6389,10 @@ $$
 \mathbf{A}\mathbf{v}_j
 =
 \lambda_j
-\mathbf{M}\mathbf{v}_j,
+\mathbf{M}\mathbf{v}_j.
 $$
 
-tem-se
+Como $\mathbf{A}$ é simétrica,
 
 $$
 \begin{aligned}
@@ -6128,7 +6421,7 @@ $$
 \end{aligned}
 $$
 
-Logo,
+Portanto,
 
 $$
 \left(
@@ -6150,50 +6443,70 @@ $$
 =
 0.
 $$
-:::
 
-Os autovetores podem ser normalizados para satisfazer
+Para mostrar a existência de uma base completa, considere
 
 $$
-\mathbf{v}_j^{\top}
-\mathbf{M}
+\widetilde{\mathbf{A}}
+=
+\mathbf{M}^{-1/2}
+\mathbf{A}
+\mathbf{M}^{-1/2}.
+$$
+
+Como $\widetilde{\mathbf{A}}$ é simétrica, o Teorema Espectral garante uma base ortonormal de autovetores
+
+$$
+\{
+\mathbf{u}_1,\ldots,\mathbf{u}_p
+\}.
+$$
+
+Defina
+
+$$
 \mathbf{v}_j
 =
-1.
+\mathbf{M}^{-1/2}
+\mathbf{u}_j.
 $$
 
-Assim, uma base de autovetores generalizados pode ser escolhida de modo que
+Esses vetores são autovetores generalizados e
 
 $$
+\begin{aligned}
 \mathbf{v}_i^{\top}
 \mathbf{M}
 \mathbf{v}_j
-=
-\begin{cases}
-1,
-&
-i=j,\\
-0,
-&
-i\neq j.
-\end{cases}
+&=
+\mathbf{u}_i^{\top}
+\mathbf{M}^{-1/2}
+\mathbf{M}
+\mathbf{M}^{-1/2}
+\mathbf{u}_j\\
+&=
+\mathbf{u}_i^{\top}\mathbf{u}_j\\
+&=
+\delta_{ij}.
+\end{aligned}
 $$
 
-Essa é a ortonormalidade na métrica induzida por $\mathbf{M}$.
+Assim, mesmo quando há autovalores generalizados repetidos, pode-se escolher uma base ortonormal segundo o produto interno induzido por $\mathbf{M}$.
+:::
 
 ### Diagonalização simultânea por congruência
 
-Seja
+Considere a decomposição espectral
 
 $$
 \widetilde{\mathbf{A}}
 =
 \mathbf{Q}_{g}
 \boldsymbol{\Lambda}_{g}
-\mathbf{Q}_{g}^{\top}
+\mathbf{Q}_{g}^{\top},
 $$
 
-a decomposição espectral da matriz transformada
+em que
 
 $$
 \widetilde{\mathbf{A}}
@@ -6206,17 +6519,19 @@ $$
 Defina
 
 $$
-\mathbf{P}_{g}
+\mathbf{B}_{g}
 =
 \mathbf{M}^{-1/2}
 \mathbf{Q}_{g}.
 $$
 
-As colunas de $\mathbf{P}_{g}$ são autovetores generalizados. De fato,
+Como $\mathbf{M}^{-1/2}$ é invertível e $\mathbf{Q}_g$ é ortogonal, $\mathbf{B}_g$ é invertível. Suas colunas formam uma base $\mathbf{M}$-ortonormal de autovetores generalizados.
+
+De fato,
 
 $$
 \begin{aligned}
-\mathbf{A}\mathbf{P}_{g}
+\mathbf{A}\mathbf{B}_{g}
 &=
 \mathbf{A}
 \mathbf{M}^{-1/2}
@@ -6231,7 +6546,7 @@ $$
 \boldsymbol{\Lambda}_{g}\\
 &=
 \mathbf{M}
-\mathbf{P}_{g}
+\mathbf{B}_{g}
 \boldsymbol{\Lambda}_{g}.
 \end{aligned}
 $$
@@ -6240,9 +6555,9 @@ Além disso,
 
 $$
 \begin{aligned}
-\mathbf{P}_{g}^{\top}
+\mathbf{B}_{g}^{\top}
 \mathbf{M}
-\mathbf{P}_{g}
+\mathbf{B}_{g}
 &=
 \mathbf{Q}_{g}^{\top}
 \mathbf{M}^{-1/2}
@@ -6261,9 +6576,9 @@ e
 
 $$
 \begin{aligned}
-\mathbf{P}_{g}^{\top}
+\mathbf{B}_{g}^{\top}
 \mathbf{A}
-\mathbf{P}_{g}
+\mathbf{B}_{g}
 &=
 \mathbf{Q}_{g}^{\top}
 \mathbf{M}^{-1/2}
@@ -6282,9 +6597,9 @@ $$
 Portanto,
 
 $$
-\mathbf{P}_{g}^{\top}
+\mathbf{B}_{g}^{\top}
 \mathbf{M}
-\mathbf{P}_{g}
+\mathbf{B}_{g}
 =
 \mathbf{I}_p
 $$
@@ -6292,37 +6607,74 @@ $$
 e
 
 $$
-\mathbf{P}_{g}^{\top}
+\mathbf{B}_{g}^{\top}
 \mathbf{A}
-\mathbf{P}_{g}
+\mathbf{B}_{g}
 =
 \boldsymbol{\Lambda}_{g}.
 $$
 
-As matrizes $\mathbf{A}$ e $\mathbf{M}$ são diagonalizadas simultaneamente por uma transformação de congruência. Essa operação difere da semelhança
+O par $(\mathbf{A},\mathbf{M})$ é, assim, reduzido simultaneamente por uma transformação de congruência:
 
 $$
-\mathbf{P}^{-1}
+(\mathbf{A},\mathbf{M})
+\longrightarrow
+(
+\boldsymbol{\Lambda}_g,
+\mathbf{I}_p
+).
+$$
+
+Essa operação deve ser distinguida da semelhança
+
+$$
+\mathbf{B}^{-1}
 \mathbf{A}
-\mathbf{P},
+\mathbf{B},
 $$
 
-utilizada para representar um único operador em outra base.
+utilizada para representar um único operador em outra base. Na congruência, as matrizes aparecem multiplicadas pela transposta da matriz de base à esquerda e pela própria matriz à direita.
 
-Na nova base:
+Como
 
--   a forma quadrática associada a $\mathbf{M}$ torna-se a norma euclidiana;
--   a forma quadrática associada a $\mathbf{A}$ torna-se diagonal.
+$$
+\mathbf{B}_{g}^{\top}
+\mathbf{M}
+\mathbf{B}_{g}
+=
+\mathbf{I}_p,
+$$
 
-Se
+segue que
+
+$$
+\mathbf{B}_{g}^{-1}
+=
+\mathbf{B}_{g}^{\top}
+\mathbf{M}.
+$$
+
+Assim, se
 
 $$
 \mathbf{a}
 =
-\mathbf{P}_{g}\mathbf{z},
+\mathbf{B}_{g}\mathbf{z},
 $$
 
-então
+então as coordenadas de $\mathbf a$ nessa base são
+
+$$
+\mathbf{z}
+=
+\mathbf{B}_{g}^{-1}\mathbf{a}
+=
+\mathbf{B}_{g}^{\top}
+\mathbf{M}
+\mathbf{a}.
+$$
+
+Nessas coordenadas,
 
 $$
 \mathbf{a}^{\top}
@@ -6350,14 +6702,13 @@ $$
 \mathcal{R}_{\mathbf{A},\mathbf{M}}(\mathbf{a})
 =
 \frac{
-\sum_{j=1}^{p}
-\lambda_jz_j^2
+\sum_{j=1}^{p}\lambda_jz_j^2
 }{
 \sum_{j=1}^{p}z_j^2
 }.
 $$
 
-O quociente generalizado assume, nessa base, a mesma forma do quociente de Rayleigh ordinário.
+O quociente generalizado assume, portanto, a mesma forma do quociente de Rayleigh ordinário quando expresso na base $\mathbf{M}$-ortonormal de autovetores generalizados.
 
 ### Exemplo numérico
 
@@ -6596,7 +6947,7 @@ $$
 Os autovetores generalizados normalizados são
 
 $$
-\mathbf{p}_{g,1}
+\mathbf{b}_{g,1}
 =
 \frac{1}{\sqrt{3}}
 \begin{bmatrix}
@@ -6608,7 +6959,7 @@ $$
 e
 
 $$
-\mathbf{p}_{g,2}
+\mathbf{b}_{g,2}
 =
 \frac{1}{\sqrt{6}}
 \begin{bmatrix}
@@ -6617,23 +6968,23 @@ $$
 \end{bmatrix}.
 $$
 
-Reunindo-os nas colunas de
+Reunindo-os nas colunas da matriz da base
 
 $$
-\mathbf{P}_{g}
+\mathbf{B}_{g}
 =
 \begin{bmatrix}
-\mathbf{p}_{g,1}&
-\mathbf{p}_{g,2}
+\mathbf{b}_{g,1}&
+\mathbf{b}_{g,2}
 \end{bmatrix},
 $$
 
 obtêm-se
 
 $$
-\mathbf{P}_{g}^{\top}
+\mathbf{B}_{g}^{\top}
 \mathbf{M}
-\mathbf{P}_{g}
+\mathbf{B}_{g}
 =
 \mathbf{I}_2
 $$
@@ -6641,9 +6992,9 @@ $$
 e
 
 $$
-\mathbf{P}_{g}^{\top}
+\mathbf{B}_{g}^{\top}
 \mathbf{A}
-\mathbf{P}_{g}
+\mathbf{B}_{g}
 =
 \begin{bmatrix}
 3&0\\
@@ -6672,30 +7023,13 @@ Os autovalores generalizados permitem comparar duas formas quadráticas em uma g
 
 ## Síntese do capítulo
 
-Um autovetor identifica uma direção invariante de uma transformação linear. Para
+Este capítulo desenvolveu a estrutura espectral das transformações lineares quadradas. O ponto de partida foi a identificação de direções invariantes, isto é, direções nas quais a ação de uma matriz reduz-se à multiplicação por um escalar.
 
-$$
-\mathbf{A}\mathbf{v}
-=
-\lambda\mathbf{v},
-$$
+Para
 
-o vetor não nulo $\mathbf{v}$ permanece no autoespaço associado, enquanto o autovalor $\lambda$ determina o escalonamento nessa direção.
+$$\mathbf{A}\mathbf{v}=\lambda\mathbf{v},$$
 
-Os autovalores são obtidos pela equação característica
-
-$$
-\det
-\left(
-\mathbf{A}
--
-\lambda\mathbf{I}_p
-\right)
-=
-0,
-$$
-
-e o autoespaço correspondente é
+com $\mathbf{v}\neq\mathbf{0}$, o escalar $\lambda$ é um autovalor e $\mathbf{v}$ é um autovetor correspondente. O conjunto formado pelo vetor nulo e por todos os autovetores associados a $\lambda$ constitui o autoespaço
 
 $$
 \mathcal{E}_{\lambda}
@@ -6708,19 +7042,99 @@ $$
 \right).
 $$
 
-A multiplicidade algébrica registra a repetição de um autovalor no polinômio característico. A multiplicidade geométrica é a dimensão de seu autoespaço. Uma matriz é diagonalizável quando possui uma base formada por autovetores:
+Os autovalores são determinados pela condição
+
+$$
+\det
+\left(
+\mathbf{A}
+-
+\lambda\mathbf{I}_p
+\right)
+=
+0.
+$$
+
+A multiplicidade algébrica $m_a(\lambda)$ registra a multiplicidade de $\lambda$ como raiz do polinômio característico, enquanto a multiplicidade geométrica
+
+$$
+m_g(\lambda)
+=
+\dim
+\left(
+\mathcal{E}_{\lambda}
+\right)
+$$
+
+mede a dimensão do autoespaço correspondente.
+
+Quando $\mathbf{A}$ possui $p$ autovetores linearmente independentes, eles formam uma base
+
+$$
+\mathcal{B}_{\mathbf{A}}
+=
+\{
+\mathbf{v}_1,\ldots,\mathbf{v}_p
+\},
+$$
+
+cuja matriz é
+
+$$
+\mathbf{B}_{\mathbf{A}}
+=
+\begin{bmatrix}
+\mathbf{v}_1&
+\cdots&
+\mathbf{v}_p
+\end{bmatrix}.
+$$
+
+Nessa base,
+
+$$
+[T_{\mathbf{A}}]_{\mathcal{B}_{\mathbf{A}}\leftarrow\mathcal{B}_{\mathbf{A}}}
+=
+\mathbf{B}_{\mathbf{A}}^{-1}
+\mathbf{A}
+\mathbf{B}_{\mathbf{A}}
+=
+\boldsymbol{\Lambda}_{\mathbf{A}},
+$$
+
+e, portanto,
 
 $$
 \mathbf{A}
 =
-\mathbf{P}_{\mathbf{A}}
+\mathbf{B}_{\mathbf{A}}
 \boldsymbol{\Lambda}_{\mathbf{A}}
-\mathbf{P}_{\mathbf{A}}^{-1}.
+\mathbf{B}_{\mathbf{A}}^{-1}.
 $$
 
-Nessa base, a transformação atua separadamente sobre cada coordenada.
+A diagonalização é, assim, uma mudança para coordenadas nas quais o operador atua separadamente sobre cada direção da base de autovetores.
 
-Para matrizes simétricas reais, o Teorema Espectral garante uma base ortonormal de autovetores e a decomposição
+Para matrizes simétricas reais, o Teorema Espectral garante uma base ortonormal de autovetores. Nesse caso, a matriz da base pode ser escolhida ortogonal,
+
+$$
+\mathbf{Q}_{\mathbf{A}}
+=
+\begin{bmatrix}
+\mathbf{q}_1&
+\cdots&
+\mathbf{q}_p
+\end{bmatrix},
+$$
+
+com
+
+$$
+\mathbf{Q}_{\mathbf{A}}^{-1}
+=
+\mathbf{Q}_{\mathbf{A}}^{\top},
+$$
+
+e obtém-se a decomposição espectral
 
 $$
 \mathbf{A}
@@ -6730,7 +7144,7 @@ $$
 \mathbf{Q}_{\mathbf{A}}^{\top}.
 $$
 
-A decomposição espectral permite escrever
+Equivalentemente,
 
 $$
 \mathbf{A}
@@ -6738,12 +7152,92 @@ $$
 \sum_{j=1}^{p}
 \lambda_j
 \mathbf{q}_j
-\mathbf{q}_j^{\top},
+\mathbf{q}_j^{\top}.
 $$
 
-mostrando que a matriz atua por escalonamentos independentes em direções ortogonais.
+Agrupando autovalores repetidos, essa representação pode ser escrita em termos dos projetores espectrais:
 
-Traço, determinante, posto, invertibilidade e positividade podem ser determinados pelos autovalores. Nas coordenadas espectrais,
+$$
+\mathbf{A}
+=
+\sum_{h}
+\lambda^{(h)}
+\boldsymbol{\Pi}_{\lambda^{(h)}}.
+$$
+
+Essa forma mostra que uma matriz simétrica atua projetando o vetor sobre autoespaços ortogonais e aplicando a cada componente o autovalor correspondente.
+
+A decomposição espectral também permite recuperar diretamente propriedades da matriz:
+
+$$
+\operatorname{tr}(\mathbf{A})
+=
+\sum_{j=1}^{p}\lambda_j,
+$$
+
+$$
+\det(\mathbf{A})
+=
+\prod_{j=1}^{p}\lambda_j,
+$$
+
+e
+
+$$
+\operatorname{posto}(\mathbf{A})
+=
+\#\{j:\lambda_j\neq0\},
+$$
+
+contando as multiplicidades.
+
+Além disso,
+
+$$
+\ker(T_{\mathbf{A}})
+=
+\mathcal{N}(\mathbf{A})
+=
+\operatorname{span}
+\left\{
+\mathbf{q}_j:
+\lambda_j=0
+\right\},
+$$
+
+enquanto
+
+$$
+\operatorname{Im}(T_{\mathbf{A}})
+=
+\mathcal{C}(\mathbf{A})
+=
+\operatorname{span}
+\left\{
+\mathbf{q}_j:
+\lambda_j\neq0
+\right\}.
+$$
+
+Para matrizes simétricas,
+
+$$
+\operatorname{Im}(T_{\mathbf{A}})
+=
+\ker(T_{\mathbf{A}})^{\perp}.
+$$
+
+A mesma decomposição simplifica as formas quadráticas. Se
+
+$$
+\mathbf{z}
+=
+[\mathbf{x}]_{\mathcal{B}_{\mathbf{A}}}
+=
+\mathbf{Q}_{\mathbf{A}}^{\top}\mathbf{x},
+$$
+
+então
 
 $$
 \mathbf{x}^{\top}
@@ -6751,10 +7245,10 @@ $$
 \mathbf{x}
 =
 \sum_{j=1}^{p}
-\lambda_jz_j^2,
+\lambda_jz_j^2.
 $$
 
-de modo que os sinais dos autovalores caracterizam o sinal da forma quadrática. Quando $\mathbf{A}\succ0$, suas superfícies de nível são elipsoides alinhados aos autovetores.
+As possibilidades de sinal da forma quadrática são, portanto, determinadas pelos sinais dos autovalores. Quando $\mathbf{A}\succ0$, suas superfícies de nível são elipsoides cujos eixos estão alinhados aos autovetores.
 
 O quociente de Rayleigh,
 
@@ -6770,7 +7264,35 @@ $$
 },
 $$
 
-assume valores entre o menor e o maior autovalor. Seus extremos são atingidos nos autoespaços correspondentes. A mesma estrutura surge ao otimizar uma forma quadrática sob uma restrição de norma, pois as condições de primeira ordem conduzem a
+é uma média ponderada dos autovalores. Para
+
+$$
+\lambda_1
+\geq
+\lambda_2
+\geq
+\cdots
+\geq
+\lambda_p,
+$$
+
+tem-se
+
+$$
+\lambda_p
+\leq
+\mathcal{R}_{\mathbf{A}}(\mathbf{a})
+\leq
+\lambda_1.
+$$
+
+O máximo e o mínimo são atingidos nos autoespaços associados aos autovalores extremos. A otimização de uma forma quadrática sob a restrição
+
+$$
+\mathbf{a}^{\top}\mathbf{a}=1
+$$
+
+conduz à condição
 
 $$
 \mathbf{A}\mathbf{a}
@@ -6778,7 +7300,9 @@ $$
 \lambda\mathbf{a}.
 $$
 
-A decomposição espectral também permite definir funções de matrizes:
+Autovalores e autovetores podem, portanto, ser interpretados também como valores e direções estacionárias de problemas de otimização quadrática.
+
+A decomposição espectral permite ainda definir funções de matrizes simétricas. Se $f$ está definida no espectro de $\mathbf{A}$,
 
 $$
 f(\mathbf{A})
@@ -6791,40 +7315,118 @@ f
 \mathbf{Q}_{\mathbf{A}}^{\top}.
 $$
 
-Potências, inversas, raízes quadradas, pseudoinversas, exponenciais e logaritmos são obtidos aplicando a função correspondente a cada autovalor.
+Equivalentemente,
 
-Quando a normalização é definida por uma matriz positiva definida $\mathbf{M}$, obtém-se o problema generalizado
+$$
+f(\mathbf{A})
+=
+\sum_h
+f
+\left(
+\lambda^{(h)}
+\right)
+\boldsymbol{\Pi}_{\lambda^{(h)}}.
+$$
+
+Assim, a função espectral preserva os autoespaços e transforma cada autovalor $\lambda$ no escalar $f(\lambda)$. Potências, inversas, raízes quadradas, raízes quadradas inversas, pseudoinversas, exponenciais e logaritmos são casos particulares dessa construção, sob as condições necessárias à definição de cada função.
+
+Quando a geometria do problema é determinada por uma matriz simétrica positiva definida $\mathbf{M}$, surge o problema de autovalores generalizados
 
 $$
 \mathbf{A}\mathbf{v}
 =
 \lambda
-\mathbf{M}\mathbf{v}.
+\mathbf{M}\mathbf{v},
 $$
 
-A mudança de variáveis determinada por $\mathbf{M}^{1/2}$ converte esse problema em um problema espectral ordinário para
+com $\mathbf{A}=\mathbf{A}^{\top}$ e $\mathbf{M}\succ0$.
+
+O quociente correspondente é
 
 $$
+\mathcal{R}_{\mathbf{A},\mathbf{M}}(\mathbf{a})
+=
+\frac{
+\mathbf{a}^{\top}
+\mathbf{A}
+\mathbf{a}
+}{
+\mathbf{a}^{\top}
+\mathbf{M}
+\mathbf{a}
+}.
+$$
+
+A transformação
+
+$$
+\mathbf{u}
+=
+\mathbf{M}^{1/2}\mathbf{a}
+$$
+
+converte esse problema em um problema de Rayleigh ordinário para a matriz simétrica
+
+$$
+\widetilde{\mathbf{A}}
+=
 \mathbf{M}^{-1/2}
 \mathbf{A}
 \mathbf{M}^{-1/2}.
 $$
 
-Os autovetores generalizados podem ser escolhidos ortonormais segundo a métrica de $\mathbf{M}$.
+Consequentemente, os autovalores generalizados são reais e pode-se escolher uma base de autovetores generalizados cuja matriz $\mathbf{B}_g$ satisfaz
 
-A @tbl-sintese-espectral reúne as expressões principais.
+$$
+\mathbf{B}_g^{\top}
+\mathbf{M}
+\mathbf{B}_g
+=
+\mathbf{I}_p
+$$
 
-| Objeto                 | Expressão                                                                                                 | Interpretação                                    |
-|:-----------------------|:-----------------------|:-----------------------|
-| Equação de autovalor   | $\mathbf{A}\mathbf{v}=\lambda\mathbf{v}$                                                                  | Identifica uma direção invariante                |
-| Autoespaço             | $\mathcal{E}_{\lambda}=\mathcal{N}(\mathbf{A}-\lambda\mathbf{I}_p)$                                       | Reúne os vetores associados a $\lambda$          |
-| Diagonalização         | $\mathbf{A}=\mathbf{P}_{\mathbf{A}}\boldsymbol{\Lambda}_{\mathbf{A}}\mathbf{P}_{\mathbf{A}}^{-1}$         | Representa o operador em uma base de autovetores |
-| Decomposição espectral | $\mathbf{A}=\mathbf{Q}_{\mathbf{A}}\boldsymbol{\Lambda}_{\mathbf{A}}\mathbf{Q}_{\mathbf{A}}^{\top}$       | Diagonaliza ortogonalmente uma matriz simétrica  |
-| Forma quadrática       | $\mathbf{x}^{\top}\mathbf{A}\mathbf{x}=\sum_j\lambda_jz_j^2$                                              | Separa as contribuições das direções espectrais  |
-| Quociente de Rayleigh  | $\mathcal{R}_{\mathbf{A}}(\mathbf{a})$                                                                    | Caracteriza os autovalores extremos              |
-| Função espectral       | $f(\mathbf{A})=\mathbf{Q}_{\mathbf{A}}f(\boldsymbol{\Lambda}_{\mathbf{A}})\mathbf{Q}_{\mathbf{A}}^{\top}$ | Aplica uma função aos autovalores                |
-| Problema generalizado  | $\mathbf{A}\mathbf{v}=\lambda\mathbf{M}\mathbf{v}$                                                        | Compara duas formas quadráticas                  |
+e
+
+$$
+\mathbf{B}_g^{\top}
+\mathbf{A}
+\mathbf{B}_g
+=
+\boldsymbol{\Lambda}_g.
+$$
+
+A @tbl-sintese-espectral reúne as expressões principais desenvolvidas no capítulo.
+
+| Objeto | Expressão | Interpretação |
+|:---|:---|:---|
+| Equação de autovalor | $\mathbf{A}\mathbf{v}=\lambda\mathbf{v}$ | Identifica direções invariantes |
+| Autoespaço | $\mathcal{E}_{\lambda}=\mathcal{N}(\mathbf{A}-\lambda\mathbf{I}_p)$ | Reúne os vetores associados a $\lambda$ |
+| Diagonalização | $\mathbf{A}=\mathbf{B}_{\mathbf{A}}\boldsymbol{\Lambda}_{\mathbf{A}}\mathbf{B}_{\mathbf{A}}^{-1}$ | Representa o operador em uma base de autovetores |
+| Decomposição espectral | $\mathbf{A}=\mathbf{Q}_{\mathbf{A}}\boldsymbol{\Lambda}_{\mathbf{A}}\mathbf{Q}_{\mathbf{A}}^{\top}$ | Diagonaliza ortogonalmente uma matriz simétrica |
+| Projetor espectral | $\boldsymbol{\Pi}_{\lambda}=\mathbf{Q}_{\lambda}\mathbf{Q}_{\lambda}^{\top}$ | Projeta sobre o autoespaço associado a $\lambda$ |
+| Forma quadrática | $\mathbf{x}^{\top}\mathbf{A}\mathbf{x}=\sum_j\lambda_jz_j^2$ | Separa as contribuições das direções espectrais |
+| Quociente de Rayleigh | $\mathcal{R}_{\mathbf{A}}(\mathbf{a})=\dfrac{\mathbf{a}^{\top}\mathbf{A}\mathbf{a}}{\mathbf{a}^{\top}\mathbf{a}}$ | Caracteriza valores e direções espectrais por otimização |
+| Função espectral | $f(\mathbf{A})=\mathbf{Q}_{\mathbf{A}}f(\boldsymbol{\Lambda}_{\mathbf{A}})\mathbf{Q}_{\mathbf{A}}^{\top}$ | Aplica uma função aos autovalores |
+| Problema generalizado | $\mathbf{A}\mathbf{v}=\lambda\mathbf{M}\mathbf{v}$ | Compara duas formas quadráticas |
+| Base generalizada | $\mathbf{B}_g^{\top}\mathbf{M}\mathbf{B}_g=\mathbf{I}_p$ | Define ortonormalidade na geometria induzida por $\mathbf{M}$ |
+| Diagonalização por congruência | $\mathbf{B}_g^{\top}\mathbf{A}\mathbf{B}_g=\boldsymbol{\Lambda}_g$ | Reduz simultaneamente as duas formas quadráticas |
 
 : Síntese dos principais objetos espectrais desenvolvidos no capítulo. {#tbl-sintese-espectral}
 
-A diagonalização depende da existência de uma base de autovetores, e a decomposição espectral é formulada para matrizes simétricas. O próximo capítulo apresenta uma decomposição aplicável a qualquer matriz real, inclusive matrizes retangulares e não simétricas. A Decomposição em Valores Singulares relacionará os espaços das linhas e das colunas, o posto, as normas matriciais e as aproximações de baixa dimensão.
+Ao final deste capítulo, o estudante deverá ser capaz de:
+
+- identificar autovalores, autovetores e autoespaços e interpretar seu significado geométrico;
+- distinguir multiplicidades algébrica e geométrica;
+- determinar quando uma matriz é diagonalizável;
+- interpretar a diagonalização como mudança para uma base de autovetores;
+- aplicar o Teorema Espectral a matrizes simétricas reais;
+- interpretar projetores e subespaços espectrais;
+- relacionar autovalores a traço, determinante, posto, núcleo, imagem e positividade;
+- representar formas quadráticas em coordenadas espectrais;
+- formular problemas de otimização por meio do quociente de Rayleigh;
+- construir e interpretar funções espectrais de matrizes;
+- compreender inversas, raízes e pseudoinversas pela ação sobre os autovalores;
+- formular e transformar problemas de autovalores generalizados;
+- distinguir ortogonalidade euclidiana de ortogonalidade segundo uma matriz positiva definida.
+
+A decomposição espectral fornece uma descrição particularmente simples para matrizes simétricas quadradas. Entretanto, matrizes de dados e muitas transformações de interesse são retangulares ou não simétricas e, portanto, não admitem diretamente essa decomposição. O próximo capítulo amplia essas ideias por meio da **Decomposição em Valores Singulares**, relacionando matrizes retangulares aos espectros de $\mathbf{A}^{\top}\mathbf{A}$ e $\mathbf{A}\mathbf{A}^{\top}$ e conectando valores singulares, espaços fundamentais, posto e aproximações de baixa dimensão.

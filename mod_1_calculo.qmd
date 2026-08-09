@@ -191,17 +191,17 @@ $$
 
 A @tbl-tipos-funcoes-calculo resume os tipos de funções utilizados no capítulo.
 
-| Função                    | Domínio                  | Contradomínio            | Objeto diferencial   |
-|:-----------------|:-----------------|:-----------------|:-----------------|
-| $f(x)$                    | $\mathbb{R}$             | $\mathbb{R}$             | Derivada escalar     |
-| $f(\mathbf{x})$           | $\mathbb{R}^{p}$         | $\mathbb{R}$             | Gradiente            |
-| $\mathbf{g}(\mathbf{x})$  | $\mathbb{R}^{p}$         | $\mathbb{R}^{q}$         | Jacobiana            |
-| $\phi(\mathbf{X})$        | $\mathbb{R}^{m\times n}$ | $\mathbb{R}$             | Gradiente matricial  |
-| $\mathcal{G}(\mathbf{X})$ | $\mathbb{R}^{m\times n}$ | $\mathbb{R}^{r\times s}$ | Operador diferencial |
+| Função                    | Domínio                  | Contradomínio            | Representação de primeira ordem |
+|:--------------------------|:-------------------------|:-------------------------|:--------------------------------|
+| $f(x)$                    | $\mathbb{R}$             | $\mathbb{R}$             | Derivada escalar                |
+| $f(\mathbf{x})$           | $\mathbb{R}^{p}$         | $\mathbb{R}$             | Gradiente                       |
+| $\mathbf{g}(\mathbf{x})$  | $\mathbb{R}^{p}$         | $\mathbb{R}^{q}$         | Jacobiana                       |
+| $\phi(\mathbf{X})$        | $\mathbb{R}^{m\times n}$ | $\mathbb{R}$             | Gradiente matricial             |
+| $\mathcal{G}(\mathbf{X})$ | $\mathbb{R}^{m\times n}$ | $\mathbb{R}^{r\times s}$ | Operador diferencial            |
 
 : Tipos de funções e objetos diferenciais correspondentes. {#tbl-tipos-funcoes-calculo}
 
-As dimensões do domínio e do contradomínio devem ser identificadas antes da diferenciação. Elas determinam a dimensão do gradiente, da Jacobiana ou do operador diferencial.
+As dimensões do domínio e do contradomínio devem ser identificadas antes da diferenciação. Elas determinam a forma da transformação linear que representa localmente a variação da função e, consequentemente, a dimensão do gradiente, da Jacobiana ou do operador diferencial utilizado para representá-la.
 
 ### Convenções de derivação
 
@@ -483,7 +483,17 @@ dx_p
 \end{bmatrix}
 $$
 
-representa uma perturbação infinitesimal do argumento. O diferencial é linear em relação a essa perturbação.
+representa o incremento utilizado como argumento da transformação linear que define o diferencial. Assim,
+
+$$
+df
+=
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}d\mathbf{x}
+$$
+
+é linear em $d\mathbf{x}$.
+
+A notação diferencial é frequentemente interpretada de maneira informal como uma variação infinitesimal. Formalmente, porém, o diferencial é a aplicação linear que fornece a parte de primeira ordem da variação da função.
 
 ::: {#exm-diferencial-funcao-linear}
 ## Diferencial de uma função linear
@@ -743,13 +753,13 @@ dados_aproximacao <- rbind(
 
 ggplot(
   dados_aproximacao,
-  aes(
-    x = t,
-    y = valor,
-    linetype = representacao
-  )
-) +
-  geom_line(
+aes(
+  x = t,
+  y = valor,
+  color = representacao,
+  linetype = representacao
+)
+) +   geom_line(
     linewidth = 1
   ) +
   geom_point(
@@ -769,14 +779,27 @@ ggplot(
     linetype = "dotted",
     linewidth = 0.6
   ) +
+  scale_color_manual(
+  values = c(
+    "Função exata" = "#1f77b4",
+    "Aproximação linear" = "#d62728"
+  )
+) +
+scale_linetype_manual(
+  values = c(
+    "Função exata" = "solid",
+    "Aproximação linear" = "dashed"
+  )
+) +
   labs(
     x = expression(t),
     y = expression(
       varphi(t) == f(x[0] + t * h)
     ),
-    linetype = NULL
+    color = NULL,
+linetype = NULL
   ) +
-  theme_minimal() +
+  theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank(),
     legend.position = "bottom"
@@ -891,7 +914,7 @@ $$
 
 e a aproximação linear é exata.
 
-Gradiente e Jacobiana representam a mesma ideia em contradomínios diferentes. O gradiente representa a parte linear da variação de uma função escalar. A Jacobiana representa a parte linear da variação de uma função vetorial.
+Gradiente e Jacobiana estão associados à mesma ideia de aproximação linear local, mas correspondem a contradomínios diferentes. Para uma função escalar, o gradiente fornece a representação vetorial da aplicação linear que define o diferencial. Para uma função vetorial, a Jacobiana fornece a representação matricial dessa aplicação linear.
 
 ## Gradiente, derivada direcional, Jacobiana e Hessiana
 
@@ -1009,7 +1032,7 @@ D_{\mathbf{u}}f(\mathbf{x})
 \cos\theta.
 $$
 
-::: {#thm-gradiente-crescimento}
+::: {#prp-gradiente-crescimento}
 ## Direções de maior crescimento e redução
 
 Se
@@ -1045,7 +1068,7 @@ $$
 }.
 $$
 
-A maior redução ocorre na direção oposta:
+A maior taxa de redução de primeira ordem ocorre na direção oposta:
 
 $$
 \mathbf{u}_{\min}
@@ -1075,7 +1098,7 @@ $$
 [@apostol1969calculus2]
 :::
 
-::: proof
+::: {.proof}
 Pela desigualdade de Cauchy--Schwarz,
 
 $$
@@ -1102,7 +1125,7 @@ D_{\mathbf{u}}f(\mathbf{x})
 \right\|.
 $$
 
-A igualdade ocorre quando $\mathbf{u}$ possui a mesma direção e o mesmo sentido do gradiente. A aplicação do mesmo argumento a $-\mathbf{u}$ fornece o resultado para a maior redução.
+A igualdade ocorre quando $\mathbf{u}$ possui a mesma direção e o mesmo sentido do gradiente. Aplicando o mesmo argumento à direção oposta, obtém-se o resultado para a maior taxa de redução de primeira ordem.
 :::
 
 Se
@@ -1113,7 +1136,7 @@ $$
 \mathbf{0},
 $$
 
-todas as derivadas direcionais de primeira ordem são nulas. Nesse caso, a aproximação linear não indica crescimento ou redução local.
+todas as derivadas direcionais de primeira ordem são nulas. Nesse caso, a aproximação de primeira ordem não distingue direções de crescimento ou redução, e o comportamento local passa a depender de termos de ordem superior.
 
 ### Gradiente e conjuntos de nível
 
@@ -1354,13 +1377,14 @@ ggplot(
   )
 ) +
   geom_contour(
-    breaks = seq(
-      0.5,
-      8,
-      by = 0.75
-    ),
-    linewidth = 0.6
-  ) +
+  breaks = seq(
+    0.5,
+    8,
+    by = 0.75
+  ),
+  linewidth = 0.6,
+  color = "gray60"
+) +
   geom_segment(
     data = reta_tangente,
     aes(
@@ -1370,8 +1394,9 @@ ggplot(
       yend = yend
     ),
     inherit.aes = FALSE,
-    linetype = "dashed",
-    linewidth = 0.9
+linetype = "dashed",
+linewidth = 0.9,
+color = "#2ca02c"
   ) +
   geom_segment(
     data = seta_gradiente,
@@ -1382,8 +1407,9 @@ ggplot(
       yend = yend
     ),
     inherit.aes = FALSE,
-    linewidth = 1,
-    arrow = grid::arrow(
+linewidth = 1,
+color = "#1f77b4",
+arrow = grid::arrow(
       length = grid::unit(
         0.22,
         "cm"
@@ -1400,21 +1426,24 @@ ggplot(
       y = x2
     ),
     inherit.aes = FALSE,
-    size = 2.8
+size = 2.8,
+color = "#d62728"
   ) +
   annotate(
     "text",
-    x = x0[1] + 0.72,
-    y = x0[2] + 0.58,
+    x = x0[1] + 0.42,
+    y = x0[2] + 0.78,
     label = "gradiente",
+    color = "#1f77b4",
     hjust = 0,
     size = 4
   ) +
   annotate(
     "text",
-    x = x0[1] - 0.72,
+    x = x0[1] - 0.62,
     y = x0[2] + 0.62,
     label = "direção tangente",
+    color = "#2ca02c",
     hjust = 0.5,
     size = 4
   ) +
@@ -1423,7 +1452,7 @@ ggplot(
     x = expression(x[1]),
     y = expression(x[2])
   ) +
-  theme_minimal() +
+  theme_minimal(base_size = 13) +
   theme(
     panel.grid.minor = element_blank()
   )
@@ -1631,7 +1660,7 @@ $$
 \mathbf{A}.
 $$
 
-O vetor $\mathbf{b}$ altera a posição da imagem, mas não altera a transformação linear local.
+Assim, a parte linear local de uma transformação afim é exatamente a matriz $\mathbf{A}$, enquanto o termo de translação desaparece na diferenciação.
 
 ### Regra da cadeia
 
@@ -1690,7 +1719,7 @@ $$
 r\times p.
 $$
 
-A ordem das matrizes acompanha a ordem inversa da aplicação das aproximações lineares: primeiro atua a Jacobiana de $\mathbf{g}$ e, depois, a Jacobiana de $\mathbf{h}$.
+A ordem do produto reflete a composição das aplicações lineares: sobre uma perturbação $\mathbf{h}_{\mathbf{x}}\in\mathbb{R}^p$, atua primeiro $\mathbf{J}_{\mathbf{g}}(\mathbf{x})$ e, sobre o resultado, atua $\mathbf{J}_{\mathbf{h}}(\mathbf{g}(\mathbf{x}))$. Por isso, na representação matricial, a Jacobiana de $\mathbf{h}$ aparece à esquerda.
 
 No caso de uma composição escalar
 
@@ -1817,7 +1846,7 @@ f:
 \mathbb{R}
 $$
 
-uma função duas vezes diferenciável. Sua matriz Hessiana é
+uma função com derivadas parciais de segunda ordem no ponto considerado. Sua matriz Hessiana é
 
 $$
 \nabla_{\mathbf{x}}^2f(\mathbf{x})
@@ -1887,6 +1916,7 @@ d\mathbf{x}^{\top}
 \nabla_{\mathbf{x}}^2f(\mathbf{x})
 d\mathbf{x}.
 $$
+O segundo diferencial é uma forma quadrática no incremento $d\mathbf{x}$ e descreve a contribuição local de segunda ordem da função.
 
 Para uma direção $\mathbf{u}$, considere novamente
 
@@ -1915,7 +1945,7 @@ $$
 \mathbf{u}.
 $$
 
-Essa forma quadrática representa a curvatura da função na direção $\mathbf{u}$.
+Essa forma quadrática representa a segunda taxa de variação de $f$ ao longo da reta que passa por $\mathbf{x}$ na direção $\mathbf{u}$ e fornece a medida de curvatura direcional utilizada neste capítulo.
 
 ::: {#exm-hessiana-funcao-quadratica}
 ## Hessiana de uma função quadrática
@@ -1989,7 +2019,7 @@ u_2
 \end{aligned}
 $$
 
-Ela é positiva para todo vetor não nulo. A curvatura é maior em direções com componente mais acentuada no segundo eixo.
+Ela é positiva para todo vetor não nulo. Para vetores unitários, a segunda taxa de variação é maior nas direções com maior componente em módulo no segundo eixo.
 :::
 
 Para a função quadrática
@@ -2230,9 +2260,9 @@ $$
 
 Os três termos possuem funções distintas:
 
--   $f(\mathbf{x}_0)$ determina o nível da aproximação;
--   o gradiente determina a inclinação local;
--   a Hessiana determina a curvatura local.
+- $f(\mathbf{x}_0)$ determina o nível da aproximação;
+- o gradiente determina a variação local de primeira ordem;
+- a Hessiana determina a variação local de segunda ordem.
 
 Quando
 
@@ -2242,7 +2272,7 @@ $$
 \mathbf{0},
 $$
 
-o termo linear desaparece e a forma quadrática associada à Hessiana passa a determinar o comportamento local dominante.
+o termo linear desaparece. Se a forma quadrática associada à Hessiana é não degenerada, ela fornece o termo dominante da variação local. Quando essa forma se anula em alguma direção, termos de ordem superior podem ser necessários para determinar o comportamento da função.
 
 ::: {#exm-taylor-segunda-ordem}
 ## Expansão de uma função quadrática
@@ -2313,7 +2343,24 @@ $$
 \mathbf{x}^{\star}
 $$
 
-é estacionário para uma função diferenciável $f$ quando
+Em um ponto estacionário, todas as derivadas direcionais de primeira ordem são nulas:
+
+$$
+D_{\mathbf{u}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+=
+0
+$$
+
+para toda direção $\mathbf{u}$.
+
+::: {#prp-condicao-primeira-ordem-extremo-local}
+
+## Condição necessária de primeira ordem
+
+Se $f$ é diferenciável em um ponto interior $\mathbf{x}^{\star}$ de seu domínio e possui nesse ponto um máximo ou mínimo local, então
 
 $$
 \nabla_{\mathbf{x}}f
@@ -2325,7 +2372,88 @@ $$
 $$
 :::
 
-Em um ponto estacionário, todas as derivadas direcionais de primeira ordem são nulas:
+::: {.proof}
+Se
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+\neq
+\mathbf{0},
+$$
+
+considere a direção unitária
+
+$$
+\mathbf{u}
+=
+\frac{
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+}{
+\left\|
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+\right\|
+}.
+$$
+
+Então,
+
+$$
+D_{\mathbf{u}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+=
+\left\|
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+\right\|
+>
+0,
+$$
+
+enquanto
+
+$$
+D_{-\mathbf{u}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+=
+-
+\left\|
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+\right\|
+<
+0.
+$$
+
+Assim, existem direções locais de aumento e de redução, o que contradiz a existência de um extremo local interior. Portanto,
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+=
+\mathbf{0}.
+$$
+:::
+
+A recíproca não é necessariamente verdadeira: um ponto estacionário pode ser mínimo, máximo ou ponto de sela.
 
 $$
 D_{\mathbf{u}}f
@@ -2345,7 +2473,7 @@ Todo ponto interior em que uma função diferenciável possui máximo ou mínimo
 ::: {#thm-classificacao-hessiana}
 ## Teste da Hessiana em um ponto estacionário
 
-Considere uma função duas vezes continuamente diferenciável e um ponto estacionário $\mathbf{x}^{\star}$.
+Considere uma função duas vezes continuamente diferenciável em uma vizinhança de um ponto estacionário $\mathbf{x}^{\star}$.
 
 Se
 
@@ -2371,10 +2499,23 @@ $$
 \mathbf{0},
 $$
 
-então $\mathbf{x}^{\star}$ é um máximo local estrito.Se a Hessiana é indefinida, então $\mathbf{x}^{\star}$ é um ponto de sela. Se a Hessiana é semidefinida positiva ou semidefinida negativa, o teste pode ser inconclusivo. [@apostol1969calculus2]
+então $\mathbf{x}^{\star}$ é um máximo local estrito.
+
+Se
+
+$$
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{\star}
+\right)
+$$
+
+é indefinida, então $\mathbf{x}^{\star}$ é um ponto de sela.
+
+Se a Hessiana é apenas semidefinida positiva ou semidefinida negativa, o teste pode ser inconclusivo. [@apostol1969calculus2]
 :::
 
-::: proof
+::: {.proof}
 Como
 
 $$
@@ -2410,18 +2551,105 @@ f
 o(\|\mathbf{h}\|^2).
 $$
 
-Se a Hessiana é positiva definida, a forma quadrática é positiva para todo $\mathbf{h}\neq\mathbf{0}$. Para perturbações suficientemente pequenas, o termo quadrático domina o restante, produzindo um mínimo local estrito.
-
-O argumento é análogo para uma Hessiana negativa definida.
-
-Se a Hessiana é indefinida, existem direções $\mathbf{u}_1$ e $\mathbf{u}_2$ tais que
+Considere inicialmente
 
 $$
-\mathbf{u}_1^{\top}
+\mathbf{H}
+=
 \nabla_{\mathbf{x}}^2f
 \left(
 \mathbf{x}^{\star}
 \right)
+\succ
+\mathbf{0}.
+$$
+
+Como $\mathbf{H}$ é simétrica e positiva definida, seu menor autovalor satisfaz
+
+$$
+\lambda_{\min}(\mathbf{H})
+>
+0.
+$$
+
+Portanto,
+
+$$
+\mathbf{h}^{\top}\mathbf{H}\mathbf{h}
+\geq
+\lambda_{\min}(\mathbf{H})
+\|\mathbf{h}\|^2.
+$$
+
+Além disso,
+
+$$
+o(\|\mathbf{h}\|^2)
+=
+\varepsilon(\mathbf{h})
+\|\mathbf{h}\|^2,
+$$
+
+com
+
+$$
+\varepsilon(\mathbf{h})
+\longrightarrow
+0
+$$
+
+quando $\mathbf{h}\to\mathbf{0}$.
+
+Logo, para $\mathbf{h}$ suficientemente pequeno,
+
+$$
+\left|
+\varepsilon(\mathbf{h})
+\right|
+<
+\frac14
+\lambda_{\min}(\mathbf{H}).
+$$
+
+Assim,
+
+$$
+\begin{aligned}
+f
+\left(
+\mathbf{x}^{\star}+\mathbf{h}
+\right)
+-
+f
+\left(
+\mathbf{x}^{\star}
+\right)
+&\geq
+\frac12
+\lambda_{\min}(\mathbf{H})
+\|\mathbf{h}\|^2
+-
+\frac14
+\lambda_{\min}(\mathbf{H})
+\|\mathbf{h}\|^2\\
+&=
+\frac14
+\lambda_{\min}(\mathbf{H})
+\|\mathbf{h}\|^2\\
+&>
+0
+\end{aligned}
+$$
+
+para todo $\mathbf{h}\neq\mathbf{0}$ suficientemente pequeno. Portanto, $\mathbf{x}^{\star}$ é um mínimo local estrito.
+
+O caso de Hessiana negativa definida é obtido aplicando o mesmo argumento a $-f$, produzindo um máximo local estrito.
+
+Se a Hessiana é indefinida, existem vetores unitários $\mathbf{u}_1$ e $\mathbf{u}_2$ tais que
+
+$$
+\mathbf{u}_1^{\top}
+\mathbf{H}
 \mathbf{u}_1
 >
 0
@@ -2431,16 +2659,54 @@ e
 
 $$
 \mathbf{u}_2^{\top}
-\nabla_{\mathbf{x}}^2f
-\left(
-\mathbf{x}^{\star}
-\right)
+\mathbf{H}
 \mathbf{u}_2
 <
 0.
 $$
 
-A função aumenta em algumas direções e diminui em outras. Portanto, o ponto é de sela.
+Considere perturbações da forma
+
+$$
+\mathbf{h}
+=
+t\mathbf{u}_j.
+$$
+
+Então,
+
+$$
+f
+\left(
+\mathbf{x}^{\star}
++
+t\mathbf{u}_j
+\right)
+-
+f
+\left(
+\mathbf{x}^{\star}
+\right)
+=
+\frac12
+t^2
+\mathbf{u}_j^{\top}
+\mathbf{H}
+\mathbf{u}_j
++
+o(t^2).
+$$
+
+Para $|t|$ suficientemente pequeno, o sinal dessa diferença coincide com o sinal da forma quadrática. Assim, a função assume valores maiores que
+
+$$
+f
+\left(
+\mathbf{x}^{\star}
+\right)
+$$
+
+em uma direção e menores em outra, arbitrariamente próximos de $\mathbf{x}^{\star}$. Portanto, $\mathbf{x}^{\star}$ é um ponto de sela.
 :::
 
 ::: {#exm-classificacao-pontos}
@@ -2584,13 +2850,17 @@ ggplot(
   )
 ) +
   geom_contour(
-    bins = 10,
-    linewidth = 0.55
-  ) +
+  aes(
+    color = tipo
+  ),
+  bins = 10,
+  linewidth = 0.55
+) +
   geom_point(
     data = data.frame(
       x1 = 0,
       x2 = 0,
+      color = "gray30",
       tipo = c(
         "Mínimo",
         "Máximo",
@@ -2604,6 +2874,13 @@ ggplot(
     inherit.aes = FALSE,
     size = 2.4
   ) +
+  scale_color_manual(
+  values = c(
+    "Mínimo" = "#1f77b4",
+    "Máximo" = "#2ca02c",
+    "Ponto de sela" = "#d62728"
+  )
+) +
   facet_wrap(
     ~tipo,
     nrow = 1
@@ -2613,8 +2890,9 @@ ggplot(
     x = expression(x[1]),
     y = expression(x[2])
   ) +
-  theme_minimal() +
+  theme_minimal(base_size = 13) +
   theme(
+    legend.position = "none",
     panel.grid.minor = element_blank()
   )
 ```
@@ -2712,7 +2990,7 @@ $$
 
 percorre o segmento de reta entre $\mathbf{x}$ e $\mathbf{y}$. Assim, um conjunto é convexo quando contém todos os segmentos que ligam seus pontos.
 
-Subespaços, hiperplanos, bolas, regiões elipsoidais da forma
+Subespaços, conjuntos afins como hiperplanos, bolas e regiões elipsoidais da forma
 
 $$
 \left\{
@@ -2805,6 +3083,7 @@ $$
 ### Caracterização pela Hessiana
 
 ::: {#thm-convexidade-hessiana}
+
 ## Critério da Hessiana para convexidade
 
 Considere uma função duas vezes continuamente diferenciável em um conjunto convexo aberto $\mathcal{C}$.
@@ -2834,27 +3113,48 @@ Se
 $$
 \nabla_{\mathbf{x}}^2f(\mathbf{x})
 \preceq
-\mathbf{0},
+\mathbf{0}
 $$
 
-a função é côncava.
+para todo $\mathbf{x}\in\mathcal{C}$, então $f$ é côncava.
 
 Se
 
 $$
 \nabla_{\mathbf{x}}^2f(\mathbf{x})
 \prec
-\mathbf{0},
+\mathbf{0}
 $$
 
-a função é estritamente côncava. [@boyd2004convex]
+para todo $\mathbf{x}\in\mathcal{C}$, então $f$ é estritamente côncava. [@boyd2004convex]
 :::
 
 A positividade da Hessiana deve ser verificada para todos os pontos do domínio considerado, e não somente em um ponto estacionário.
 
+A condição
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+\succ
+\mathbf{0}
+$$
+
+em todo o domínio é suficiente para convexidade estrita, mas não é necessária. Uma função estritamente convexa pode possuir Hessiana singular em pontos isolados. Por exemplo,
+
+$$
+f(x)=x^4
+$$
+
+é estritamente convexa em $\mathbb{R}$, embora
+
+$$
+f''(0)=0.
+$$
+
 ### Consequências para otimização
 
-::: {#thm-convexidade-minimizacao}
+::: {#prp-convexidade-minimizacao}
+
 ## Pontos estacionários de funções convexas
 
 Se $f$ é diferenciável e convexa em um conjunto convexo, qualquer ponto
@@ -2876,10 +3176,10 @@ $$
 
 é um mínimo global.
 
-Se $f$ é estritamente convexa, esse mínimo global é único. [@boyd2004convex]
+Se $f$ é estritamente convexa e existe um ponto estacionário $\mathbf{x}^{\star}$, então esse ponto é o único minimizador global. [@boyd2004convex]
 :::
 
-::: proof
+::: {.proof}
 Pela caracterização de primeira ordem,
 
 $$
@@ -3021,6 +3321,49 @@ $$
 
 a função é ilimitada inferiormente e não possui minimizador.
 
+De fato, como $\mathbf{A}$ é simétrica,
+
+$$
+\mathcal{C}(\mathbf{A})^{\perp}
+=
+\mathcal{N}(\mathbf{A}).
+$$
+
+Assim, existe
+
+$$
+\mathbf{z}
+\in
+\mathcal{N}(\mathbf{A})
+$$
+
+tal que
+
+$$
+\mathbf{b}^{\top}\mathbf{z}
+\neq
+0.
+$$
+
+Ao longo da reta
+
+$$
+\mathbf{x}=t\mathbf{z},
+$$
+
+o termo quadrático é nulo e
+
+$$
+f(t\mathbf{z})
+=
+-
+t\mathbf{b}^{\top}\mathbf{z}
++
+c,
+$$
+
+que pode tender a $-\infty$ escolhendo o sinal apropriado de $t$.
+
 ## Otimização sem restrições
 
 Um problema de minimização sem restrições possui a forma
@@ -3099,46 +3442,111 @@ f
 \end{aligned}
 $$
 
-O gradiente dessa aproximação em relação a $\mathbf{x}$ é
+Defina
 
 $$
+\mathbf{g}^{(t)}
+=
 \nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{(t)}
+\right)
+$$
+
+e
+
+$$
+\mathbf{H}^{(t)}
+=
+\nabla_{\mathbf{x}}^2f
+\left(
+\mathbf{x}^{(t)}
+\right).
+$$
+
+Escrevendo
+
+$$
+\mathbf{d}
+=
+\mathbf{x}
+-
+\mathbf{x}^{(t)},
+$$
+
+o modelo quadrático local pode ser representado por
+
+$$
+m_t(\mathbf{d})
+=
+f
 \left(
 \mathbf{x}^{(t)}
 \right)
 +
-\nabla_{\mathbf{x}}^2f
 \left(
-\mathbf{x}^{(t)}
-\right)
-\left(
-\mathbf{x}
--
-\mathbf{x}^{(t)}
-\right).
+\mathbf{g}^{(t)}
+\right)^{\top}
+\mathbf{d}
++
+\frac12
+\mathbf{d}^{\top}
+\mathbf{H}^{(t)}
+\mathbf{d}.
 $$
 
-Igualando a zero,
+Seu gradiente em relação a $\mathbf{d}$ é
 
 $$
-\nabla_{\mathbf{x}}^2f
-\left(
-\mathbf{x}^{(t)}
-\right)
-\left(
-\mathbf{x}
--
-\mathbf{x}^{(t)}
-\right)
+\nabla_{\mathbf{d}}m_t(\mathbf{d})
+=
+\mathbf{g}^{(t)}
++
+\mathbf{H}^{(t)}
+\mathbf{d}.
+$$
+
+Se
+
+$$
+\mathbf{H}^{(t)}
+\succ
+\mathbf{0},
+$$
+
+o modelo quadrático é estritamente convexo e possui um único minimizador. Esse minimizador, denominado **direção de Newton**, satisfaz
+
+$$
+\mathbf{H}^{(t)}
+\mathbf{d}^{(t)}
 =
 -
-\nabla_{\mathbf{x}}f
-\left(
-\mathbf{x}^{(t)}
-\right).
+\mathbf{g}^{(t)}.
 $$
 
-Se a Hessiana é invertível, obtém-se a atualização
+Quando $\mathbf{H}^{(t)}$ é invertível,
+
+$$
+\mathbf{d}^{(t)}
+=
+-
+\left(
+\mathbf{H}^{(t)}
+\right)^{-1}
+\mathbf{g}^{(t)}.
+$$
+
+A atualização de Newton com passo completo é
+
+$$
+\mathbf{x}^{(t+1)}
+=
+\mathbf{x}^{(t)}
++
+\mathbf{d}^{(t)},
+$$
+
+ou, equivalentemente,
 
 $$
 \mathbf{x}^{(t+1)}
@@ -3157,32 +3565,152 @@ $$
 \right).
 $$
 
-A direção de Newton é a solução do sistema linear
+Na implementação computacional, é preferível resolver o sistema linear
+
+$$
+\mathbf{H}^{(t)}
+\mathbf{d}^{(t)}
+=
+-
+\mathbf{g}^{(t)}
+$$
+
+sem calcular explicitamente a inversa da Hessiana.
+
+Se a Hessiana é apenas invertível, mas não positiva definida, a solução desse sistema é um ponto estacionário do modelo quadrático, mas pode não ser seu minimizador. Nesse caso, a direção de Newton também pode deixar de ser uma direção de descida para a função original.
+
+::: {#prp-direcao-newton-descida}
+
+## Direção de Newton como direção de descida
+
+Suponha que
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{(t)}
+\right)
+\neq
+\mathbf{0}
+$$
+
+e
 
 $$
 \nabla_{\mathbf{x}}^2f
 \left(
 \mathbf{x}^{(t)}
 \right)
-\mathbf{d}^{(t)}
-=
--
+\succ
+\mathbf{0}.
+$$
+
+Então a direção de Newton $\mathbf{d}^{(t)}$ é uma direção de descida para $f$ em $\mathbf{x}^{(t)}$, isto é,
+
+$$
 \nabla_{\mathbf{x}}f
 \left(
 \mathbf{x}^{(t)}
-\right).
+\right)^{\top}
+\mathbf{d}^{(t)}
+<
+0.
+$$
+:::
+
+::: {.proof}
+Como
+
+$$
+\mathbf{d}^{(t)}
+=
+-
+\left(
+\mathbf{H}^{(t)}
+\right)^{-1}
+\mathbf{g}^{(t)},
 $$
 
-Na implementação computacional, é preferível resolver esse sistema sem calcular explicitamente a inversa da Hessiana.
+tem-se
 
-O método depende de:
+$$
+\begin{aligned}
+\left(
+\mathbf{g}^{(t)}
+\right)^{\top}
+\mathbf{d}^{(t)}
+&=
+-
+\left(
+\mathbf{g}^{(t)}
+\right)^{\top}
+\left(
+\mathbf{H}^{(t)}
+\right)^{-1}
+\mathbf{g}^{(t)}.
+\end{aligned}
+$$
 
--   existência das derivadas de segunda ordem;
--   Hessiana invertível;
--   escolha adequada do ponto inicial;
--   comportamento local da função.
+Como $\mathbf{H}^{(t)}\succ\mathbf{0}$, também
 
-Longe da solução, uma etapa de Newton pode não reduzir a função. Métodos numéricos costumam combinar a direção de Newton com controle do comprimento da etapa [@boyd2004convex].
+$$
+\left(
+\mathbf{H}^{(t)}
+\right)^{-1}
+\succ
+\mathbf{0}.
+$$
+
+Logo, para $\mathbf{g}^{(t)}\neq\mathbf{0}$,
+
+$$
+\left(
+\mathbf{g}^{(t)}
+\right)^{\top}
+\left(
+\mathbf{H}^{(t)}
+\right)^{-1}
+\mathbf{g}^{(t)}
+>
+0,
+$$
+
+e, portanto,
+
+$$
+\left(
+\mathbf{g}^{(t)}
+\right)^{\top}
+\mathbf{d}^{(t)}
+<
+0.
+$$
+:::
+
+O passo completo corresponde a
+
+$$
+\alpha_t
+=
+1.
+$$
+
+Uma forma mais geral da atualização é
+
+$$
+\mathbf{x}^{(t+1)}
+=
+\mathbf{x}^{(t)}
++
+\alpha_t
+\mathbf{d}^{(t)},
+\qquad
+0<\alpha_t\leq1.
+$$
+
+A escolha de $\alpha_t<1$ produz um passo de Newton amortecido. Esse recurso pode ser utilizado quando o modelo quadrático local ainda não representa adequadamente a função ao longo de um passo completo.
+
+Assim, a construção da direção e a escolha do comprimento da etapa são operações distintas. Métodos numéricos de otimização costumam combinar a direção de Newton com procedimentos de controle da etapa [@boyd2004convex].
 
 ::: {#exm-newton-funcao-quadratica}
 ## Newton para uma função quadrática
@@ -3237,7 +3765,15 @@ $$
 \end{aligned}
 $$
 
-Assim, para uma função quadrática com Hessiana positiva definida, Newton encontra o minimizador em uma única etapa, independentemente do ponto inicial.
+Assim, para uma função quadrática com Hessiana constante e positiva definida, uma etapa completa de Newton conduz exatamente ao único minimizador,
+
+$$
+\mathbf{x}^{\star}
+=
+\mathbf{A}^{-1}\mathbf{b},
+$$
+
+independentemente do ponto inicial.
 :::
 
 ## Otimização com restrições de igualdade
@@ -3291,9 +3827,18 @@ $$
 \right\}.
 $$
 
-Em um ponto regular, os gradientes das restrições determinam as direções normais ao conjunto viável.
+Em um ponto regular, as linhas da Jacobiana das restrições são linearmente independentes. O espaço tangente ao conjunto viável é então
 
-Uma direção tangente $\mathbf{d}$ satisfaz
+$$
+\mathcal{T}_{\mathbf{x}}
+=
+\mathcal{N}
+\left(
+\mathbf{J}_{\mathbf{c}}(\mathbf{x})
+\right).
+$$
+
+Portanto, uma direção tangente $\mathbf{d}$ satisfaz
 
 $$
 \mathbf{J}_{\mathbf{c}}(\mathbf{x})
@@ -3302,32 +3847,82 @@ $$
 \mathbf{0}.
 $$
 
-Em um ótimo restrito, a derivada direcional de $f$ deve ser nula em todas as direções tangentes:
+O espaço normal correspondente é
 
 $$
-\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}
+\mathcal{T}_{\mathbf{x}}^{\perp}
+=
+\mathcal{C}
+\left(
+\mathbf{J}_{\mathbf{c}}(\mathbf{x})^{\top}
+\right),
+$$
+
+isto é, o espaço gerado pelos gradientes das restrições.
+
+Em um ótimo local regular $\mathbf{x}^{\star}$, a derivada direcional de $f$ deve ser nula em todas as direções tangentes:
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)^{\top}
 \mathbf{d}
 =
 0
 $$
 
-para todo $\mathbf{d}$ tal que
+para todo
 
 $$
-\mathbf{J}_{\mathbf{c}}(\mathbf{x})
 \mathbf{d}
-=
-\mathbf{0}.
+\in
+\mathcal{T}_{\mathbf{x}^{\star}}.
 $$
 
-Isso implica que o gradiente da função objetivo pertence ao espaço gerado pelos gradientes das restrições.
+Consequentemente,
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+\in
+\mathcal{T}_{\mathbf{x}^{\star}}^{\perp}
+=
+\mathcal{C}
+\left[
+\mathbf{J}_{\mathbf{c}}
+\left(
+\mathbf{x}^{\star}
+\right)^{\top}
+\right].
+$$
 
 ### Multiplicadores de Lagrange
 
 ::: {#thm-multiplicadores-lagrange}
 ## Condição de Lagrange
 
-Considere um ponto $\mathbf{x}^{\star}$ que é ótimo local do problema
+Considere funções continuamente diferenciáveis
+
+$$
+f:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}
+$$
+
+e
+
+$$
+\mathbf{c}:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{m}.
+$$
+
+Seja $\mathbf{x}^{\star}$ um ótimo local do problema
 
 $$
 \min_{\mathbf{x}}
@@ -3352,6 +3947,20 @@ $$
 $$
 
 sejam linearmente independentes.
+
+Essa condição equivale a
+
+$$
+\operatorname{posto}
+\left[
+\mathbf{J}_{\mathbf{c}}
+\left(
+\mathbf{x}^{\star}
+\right)
+\right]
+=
+m.
+$$
 
 Então existe um vetor
 
@@ -3381,6 +3990,121 @@ $$
 [@apostol1969calculus2]
 :::
 
+
+::: {.proof}
+Como $\mathbf{x}^{\star}$ é um ótimo local regular, a derivada direcional da função objetivo é nula em todas as direções tangentes ao conjunto viável. Portanto,
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)^{\top}
+\mathbf{d}
+=
+0
+$$
+
+para todo
+
+$$
+\mathbf{d}
+\in
+\mathcal{N}
+\left[
+\mathbf{J}_{\mathbf{c}}
+\left(
+\mathbf{x}^{\star}
+\right)
+\right].
+$$
+
+Logo,
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+\in
+\mathcal{N}
+\left[
+\mathbf{J}_{\mathbf{c}}
+\left(
+\mathbf{x}^{\star}
+\right)
+\right]^{\perp}.
+$$
+
+Pela relação entre núcleo e espaço linha,
+
+$$
+\mathcal{N}
+\left[
+\mathbf{J}_{\mathbf{c}}
+\left(
+\mathbf{x}^{\star}
+\right)
+\right]^{\perp}
+=
+\mathcal{C}
+\left[
+\mathbf{J}_{\mathbf{c}}
+\left(
+\mathbf{x}^{\star}
+\right)^{\top}
+\right].
+$$
+
+Assim, existe um vetor
+
+$$
+\boldsymbol{\mu}^{\star}
+\in
+\mathbb{R}^{m}
+$$
+
+tal que
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
+=
+\mathbf{J}_{\mathbf{c}}
+\left(
+\mathbf{x}^{\star}
+\right)^{\top}
+\boldsymbol{\mu}^{\star}.
+$$
+
+Definindo
+
+$$
+\boldsymbol{\lambda}^{\star}
+=
+-
+\boldsymbol{\mu}^{\star},
+$$
+
+obtém-se
+
+$$
+\nabla_{\mathbf{x}}f
+\left(
+\mathbf{x}^{\star}
+\right)
++
+\mathbf{J}_{\mathbf{c}}
+\left(
+\mathbf{x}^{\star}
+\right)^{\top}
+\boldsymbol{\lambda}^{\star}
+=
+\mathbf{0}.
+$$
+:::
+
 A função lagrangiana é
 
 $$
@@ -3396,7 +4120,7 @@ f(\mathbf{x})
 \mathbf{c}(\mathbf{x}).
 $$
 
-As condições de primeira ordem são
+Sob a condição de regularidade do teorema, as condições necessárias de primeira ordem podem ser escritas como
 
 $$
 \nabla_{\mathbf{x}}
@@ -3424,6 +4148,8 @@ $$
 \mathbf{0}.
 $$
 
+Essas condições identificam candidatos a ótimo restrito. No caso geral, elas não são suficientes para garantir mínimo ou máximo. A classificação exige condições adicionais sobre a função objetivo, as restrições e a variação de segunda ordem nas direções tangentes.
+
 Os multiplicadores ajustam a condição de gradiente nulo para levar em conta as direções que não estão disponíveis devido às restrições.
 
 ::: {#exm-lagrange-restricao-norma}
@@ -3433,7 +4159,15 @@ Considere
 
 $$
 \max_{\mathbf{x}}
-\mathbf{a}^{\top}\mathbf{x}
+\mathbf{a}^{\top}\mathbf{x},
+$$
+
+com
+
+$$
+\mathbf{a}
+\neq
+\mathbf{0},
 $$
 
 sujeito a
@@ -3524,6 +4258,8 @@ $$
 $$
 
 Esse resultado coincide com a igualdade na desigualdade de Cauchy--Schwarz.
+
+Se $\mathbf{a}=\mathbf{0}$, a função objetivo é constante e todo vetor unitário é uma solução ótima.
 :::
 
 ### Relação com problemas de autovalores
@@ -3578,9 +4314,27 @@ $$
 \lambda\mathbf{x}.
 $$
 
-O problema de otimização conduz, portanto, a um problema de autovalores. O maior valor da função objetivo é o maior autovalor de $\mathbf{A}$.
+Portanto, todo ponto regular estacionário do problema restrito é um autovetor de $\mathbf{A}$, e o valor da função objetivo nesse ponto é o autovalor correspondente.
 
-Essa relação foi desenvolvida no capítulo de decomposição espectral. Aqui, ela mostra como os multiplicadores de Lagrange produzem a equação de autovalores a partir de uma restrição de norma.
+Pelo @thm-extremos-quociente-rayleigh, desenvolvido no capítulo de decomposição espectral,
+
+$$
+\max_{\|\mathbf{x}\|=1}
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+=
+\lambda_{\max}(\mathbf{A}),
+$$
+
+e
+
+$$
+\min_{\|\mathbf{x}\|=1}
+\mathbf{x}^{\top}\mathbf{A}\mathbf{x}
+=
+\lambda_{\min}(\mathbf{A}).
+$$
+
+Assim, os multiplicadores de Lagrange produzem a equação de autovalores como condição de estacionariedade, enquanto o resultado espectral identifica quais desses pontos realizam os extremos globais.
 
 ### Restrições lineares
 
@@ -3602,7 +4356,29 @@ $$
 \mathbf{d},
 $$
 
-em que $\mathbf{A}$ é simétrica.
+em que
+
+$$
+\mathbf{A}
+\in
+\mathbb{R}^{p\times p}
+$$
+
+é simétrica,
+
+$$
+\mathbf{C}
+\in
+\mathbb{R}^{m\times p}
+$$
+
+e
+
+$$
+\mathbf{d}
+\in
+\mathbb{R}^{m}.
+$$
 
 A lagrangiana é
 
@@ -3663,7 +4439,51 @@ $$
 \end{bmatrix}.
 $$
 
-A solução exige condições de posto e invertibilidade compatíveis com a matriz do sistema.
+Esse sistema em blocos reúne as condições de primeira ordem do problema restrito.
+
+Se
+
+$$
+\mathbf{A}
+\succ
+\mathbf{0}
+$$
+
+e $\mathbf{C}$ possui posto linha completo, a função objetivo é estritamente convexa e o conjunto definido por
+
+$$
+\mathbf{C}\mathbf{x}
+=
+\mathbf{d}
+$$
+
+é afim. Quando esse conjunto é não vazio, as condições de primeira ordem identificam o único minimizador global.
+
+Mais geralmente, para uma matriz $\mathbf{A}$ semidefinida positiva, a unicidade depende de a forma quadrática ser positiva nas direções viáveis não nulas, isto é,
+
+$$
+\mathbf{z}^{\top}\mathbf{A}\mathbf{z}
+>
+0
+$$
+
+para todo
+
+$$
+\mathbf{z}
+\neq
+\mathbf{0}
+$$
+
+tal que
+
+$$
+\mathbf{C}\mathbf{z}
+=
+\mathbf{0}.
+$$
+
+Sem condições desse tipo, a resolução do sistema fornece apenas candidatos que satisfazem as condições de primeira ordem.
 
 As ferramentas desta seção serão aplicadas a funções de resíduos, critérios quadráticos e funções de parâmetros matriciais.
 
@@ -3895,7 +4715,7 @@ $$
 2\mathbf{A}.
 $$
 
-::: {#thm-derivadas-forma-quadratica}
+::: {#prp-derivadas-forma-quadratica}
 ## Derivadas de uma forma quadrática deslocada
 
 Se $\mathbf{A}$ é simétrica e
@@ -3938,7 +4758,7 @@ $$
 $$
 :::
 
-::: proof
+::: {.proof}
 Defina
 
 $$
@@ -4011,6 +4831,36 @@ $$
 \mathbf{x}
 =
 \boldsymbol{\mu}.
+$$
+
+Se
+
+$$
+\mathbf{A}
+\succeq
+\mathbf{0}
+$$
+
+é singular, todos os vetores da forma
+
+$$
+\mathbf{x}
+=
+\boldsymbol{\mu}
++
+\mathbf{z},
+\qquad
+\mathbf{z}
+\in
+\mathcal{N}(\mathbf{A}),
+$$
+
+também minimizam a função. Portanto, a unicidade ocorre quando
+
+$$
+\mathbf{A}
+\succ
+\mathbf{0}.
 $$
 
 ### Norma euclidiana
@@ -4157,6 +5007,34 @@ $$
 2\mathbf{A}^{\top}\mathbf{A}.
 $$
 
+A Hessiana é constante e não depende de $\mathbf{x}$. Além disso,
+
+$$
+\mathbf{z}^{\top}
+\mathbf{A}^{\top}\mathbf{A}
+\mathbf{z}
+=
+\|\mathbf{A}\mathbf{z}\|^2
+\geq
+0,
+$$
+
+para todo
+
+$$
+\mathbf{z}
+\in
+\mathbb{R}^{p}.
+$$
+
+Portanto,
+
+$$
+\mathbf{A}^{\top}\mathbf{A}
+\succeq
+\mathbf{0}.
+$$
+
 Como
 
 $$
@@ -4220,6 +5098,47 @@ $$
 
 Portanto, no ponto de mínimo, o vetor residual é ortogonal ao espaço coluna de $\mathbf{A}$.
 
+Equivalentemente,
+
+$$
+\mathbf{A}\widehat{\mathbf{x}}
+$$
+
+é a projeção ortogonal de $\mathbf{b}$ sobre
+
+$$
+\mathcal{C}(\mathbf{A}).
+$$
+
+Assim,
+
+$$
+\mathbf{b}
+=
+\mathbf{A}\widehat{\mathbf{x}}
++
+\widehat{\mathbf{r}},
+$$
+
+com
+
+$$
+\mathbf{A}\widehat{\mathbf{x}}
+\in
+\mathcal{C}(\mathbf{A})
+$$
+
+e
+
+$$
+\widehat{\mathbf{r}}
+\in
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right).
+$$
+
 Quando $\mathbf{A}$ possui posto coluna completo, a solução é única:
 
 $$
@@ -4231,7 +5150,15 @@ $$
 \mathbf{A}^{\top}\mathbf{b}.
 $$
 
-Quando $\mathbf{A}$ é deficiente em posto, as equações normais podem possuir várias soluções. A pseudoinversa fornece a solução de menor norma:
+Quando $\mathbf{A}$ não possui posto coluna completo,
+
+$$
+\operatorname{posto}(\mathbf{A})
+<
+p,
+$$
+
+as equações normais possuem mais de uma solução de mínimos quadrados. A pseudoinversa seleciona a solução de menor norma:
 
 $$
 \widehat{\mathbf{x}}^{\star}
@@ -4310,10 +5237,12 @@ a média aritmética é o único minimizador da soma dos quadrados dos desvios.
 
 ### Mínimos quadrados ponderados
 
-Considere pesos
+Considere pesos não negativos
 
 $$
 \omega_1,\ldots,\omega_q
+\geq
+0
 $$
 
 e a matriz diagonal
@@ -4345,7 +5274,7 @@ f_{\omega}(\mathbf{x})
 \right).
 $$
 
-Quando $\boldsymbol{\Omega}$ é simétrica,
+Como $\boldsymbol{\Omega}$ é diagonal e, portanto, simétrica,
 
 $$
 \nabla_{\mathbf{x}}f_{\omega}(\mathbf{x})
@@ -4393,6 +5322,29 @@ $$
 \boldsymbol{\Omega}
 \mathbf{b}.
 $$
+Equivalentemente,
+
+$$
+\mathbf{A}^{\top}
+\boldsymbol{\Omega}
+\mathbf{r}(\mathbf{x})
+=
+\mathbf{0}.
+$$
+
+Portanto, no minimizador, o resíduo é ortogonal ao espaço coluna de $\mathbf{A}$ segundo o produto interno ponderado
+
+$$
+\langle
+\mathbf{u},
+\mathbf{v}
+\rangle_{\boldsymbol{\Omega}}
+=
+\mathbf{u}^{\top}
+\boldsymbol{\Omega}
+\mathbf{v}.
+$$
+
 
 Se
 
@@ -4429,6 +5381,40 @@ $$
 
 A matriz $\boldsymbol{\Omega}$ modifica a importância relativa dos resíduos. Para uma matriz diagonal, cada observação recebe um peso próprio.
 
+Quando
+
+$$
+\boldsymbol{\Omega}
+\succ
+\mathbf{0},
+$$
+
+o critério pode ser escrito como
+
+$$
+f_{\omega}(\mathbf{x})
+=
+\|
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x}
+\|_{\boldsymbol{\Omega}}^2,
+$$
+
+em que
+
+$$
+\|
+\mathbf{z}
+\|_{\boldsymbol{\Omega}}^2
+=
+\mathbf{z}^{\top}
+\boldsymbol{\Omega}
+\mathbf{z}.
+$$
+
+Assim, os mínimos quadrados ponderados correspondem a uma projeção segundo a geometria induzida por $\boldsymbol{\Omega}$.
+
 ### Funções compostas de resíduos
 
 Considere uma função diferenciável
@@ -4448,7 +5434,7 @@ r_i(\mathbf{x}),
 i=1,\ldots,q.
 $$
 
-Uma função de ajuste pode ser escrita como
+Uma classe ampla de funções de ajuste pode ser escrita como
 
 $$
 f(\mathbf{x})
@@ -4495,7 +5481,7 @@ Essa formulação mostra que diferentes funções de perda modificam a contribui
 
 ### Mínimos quadrados não lineares
 
-Considere uma função residual diferenciável
+Considere uma função residual duas vezes diferenciável
 
 $$
 \mathbf{r}:
@@ -4520,7 +5506,7 @@ $$
 \mathbb{R}^{q\times p}.
 $$
 
-::: {#thm-gradiente-residuos-nao-lineares}
+::: {#prp-gradiente-residuos-nao-lineares}
 ## Derivadas de uma soma de quadrados não linear
 
 Para
@@ -4558,7 +5544,7 @@ r_i(\mathbf{x})
 $$
 :::
 
-::: proof
+::: {.proof}
 Pela regra da cadeia,
 
 $$
@@ -4594,6 +5580,23 @@ $$
 Somando sobre $i$, obtém-se a expressão da Hessiana.
 :::
 
+A Hessiana possui, portanto, duas parcelas com papéis distintos:
+
+$$
+\underbrace{
+2
+\mathbf{J}_{\mathbf{r}}(\mathbf{x})^{\top}
+\mathbf{J}_{\mathbf{r}}(\mathbf{x})
+}_{\text{parcela de primeira ordem dos resíduos}}
++
+\underbrace{
+2
+\sum_{i=1}^{q}
+r_i(\mathbf{x})
+\nabla_{\mathbf{x}}^2r_i(\mathbf{x})
+}_{\text{correção de não linearidade}}.
+$$
+
 O primeiro termo da Hessiana,
 
 $$
@@ -4602,7 +5605,7 @@ $$
 \mathbf{J}_{\mathbf{r}}(\mathbf{x}),
 $$
 
-é semidefinido positivo.
+é semidefinido positivo. Isso não implica, porém, que a função de mínimos quadrados não linear seja convexa, pois a segunda parcela da Hessiana pode ser indefinida.
 
 O segundo termo depende:
 
@@ -4610,7 +5613,7 @@ O segundo termo depende:
 -   das Hessianas das funções residuais;
 -   da não linearidade do modelo.
 
-Quando os resíduos são pequenos, pode-se aproximar a Hessiana por
+Quando os resíduos são pequenos ou quando as Hessianas das funções residuais têm contribuição reduzida na região considerada, a segunda parcela pode ser desprezada aproximadamente. Nesse caso,
 
 $$
 \nabla_{\mathbf{x}}^2f(\mathbf{x})
@@ -4618,6 +5621,32 @@ $$
 2
 \mathbf{J}_{\mathbf{r}}(\mathbf{x})^{\top}
 \mathbf{J}_{\mathbf{r}}(\mathbf{x}).
+$$
+No caso linear,
+
+$$
+\mathbf{r}(\mathbf{x})
+=
+\mathbf{b}
+-
+\mathbf{A}\mathbf{x},
+$$
+
+tem-se
+
+$$
+\nabla_{\mathbf{x}}^2r_i(\mathbf{x})
+=
+\mathbf{0}
+$$
+
+para todo $i$. Portanto, a segunda parcela desaparece exatamente e
+
+$$
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+=
+2
+\mathbf{A}^{\top}\mathbf{A}.
 $$
 
 Essa aproximação conduz ao método de Gauss--Newton. Seu desenvolvimento computacional não será necessário neste capítulo.
@@ -4660,7 +5689,7 @@ d\phi
 dx_{ij}.
 $$
 
-Defina o gradiente matricial por
+Retomando a convenção estabelecida no início do capítulo, o gradiente matricial é
 
 $$
 \nabla_{\mathbf{X}}\phi
@@ -4715,7 +5744,9 @@ d\mathbf{X}
 \right].
 $$
 
-Essa identidade será utilizada para reconhecer o gradiente após reorganizar o diferencial.
+Essa identidade será utilizada para reconhecer o gradiente após reorganizar o diferencial. 
+
+Assim como o gradiente de uma função escalar de vetor representa o diferencial segundo o produto interno euclidiano, o gradiente matricial representa o diferencial segundo o produto interno de Frobenius.
 
 ### Regras básicas do diferencial matricial
 
@@ -4959,7 +5990,8 @@ $$
 
 ### Função linear de uma matriz
 
-::: {#thm-gradiente-funcao-linear-matriz}
+::: {#prp-gradiente-funcao-linear-matriz}
+
 ## Gradiente de uma função matricial linear
 
 Se
@@ -4984,7 +6016,7 @@ $$
 [@magnus2019matrix]
 :::
 
-::: proof
+::: {.proof}
 O diferencial é
 
 $$
@@ -5141,6 +6173,17 @@ $$
 \mathbf{M}.
 $$
 
+De fato, essa função é estritamente convexa em $\mathbf{X}$, pois sua segunda variação em uma perturbação não nula $d\mathbf{X}$ é
+
+$$
+d^2\phi
+=
+2
+\|d\mathbf{X}\|_F^2
+>
+0.
+$$
+
 ### Funções quadráticas de uma matriz
 
 Considere
@@ -5276,6 +6319,14 @@ $$
 \mathbf{A}\mathbf{X}\boldsymbol{\Gamma}.
 $$
 
+A dimensão do gradiente coincide com a dimensão do argumento:
+
+$$
+\nabla_{\mathbf{X}}\phi
+\in
+\mathbb{R}^{m\times n}.
+$$
+
 ::: {#exm-forma-quadratica-matricial}
 ## Soma ponderada de produtos quadráticos
 
@@ -5313,7 +6364,9 @@ $$
 Se as colunas de $\mathbf{X}$ são
 
 $$
-\mathbf{x}_1,\ldots,\mathbf{x}_n,
+\mathbf{x}_{\cdot 1},
+\ldots,
+\mathbf{x}_{\cdot n},
 $$
 
 então
@@ -5322,17 +6375,17 @@ $$
 \phi(\mathbf{X})
 =
 \sum_{j=1}^{n}
-\mathbf{x}_j^{\top}
+\mathbf{x}_{\cdot j}^{\top}
 \mathbf{A}
-\mathbf{x}_j.
+\mathbf{x}_{\cdot j}.
 $$
 
 O gradiente reúne, em suas colunas, os gradientes das formas quadráticas individuais:
 
 $$
-2\mathbf{A}\mathbf{x}_1,
+2\mathbf{A}\mathbf{x}_{\cdot 1},
 \ldots,
-2\mathbf{A}\mathbf{x}_n.
+2\mathbf{A}\mathbf{x}_{\cdot n}.
 $$
 :::
 
@@ -5500,9 +6553,53 @@ $$
 \mathbf{X}^{\top}\mathbf{Y}.
 $$
 
-Cada coluna de $\widehat{\mathbf{B}}$ corresponde ao ajuste de uma coluna de $\mathbf{Y}$ sobre a mesma matriz de delineamento $\mathbf{X}$.
+Se $\mathbf{X}$ não possui posto coluna completo, os minimizadores não são únicos. A solução de mínimos quadrados de menor norma de Frobenius é
 
-::: {#thm-convexidade-minimos-quadrados-matriciais}
+$$
+\widehat{\mathbf{B}}^{\star}
+=
+\mathbf{X}^{+}\mathbf{Y}.
+$$
+
+Mais geralmente, todos os minimizadores podem ser escritos como
+
+$$
+\widehat{\mathbf{B}}
+=
+\mathbf{X}^{+}\mathbf{Y}
++
+\left(
+\mathbf{I}_k
+-
+\mathbf{X}^{+}\mathbf{X}
+\right)
+\mathbf{C},
+$$
+
+em que
+
+$$
+\mathbf{C}
+\in
+\mathbb{R}^{k\times p}
+$$
+
+é arbitrária.
+
+A parcela adicional pertence ao núcleo da transformação
+
+$$
+\mathbf{B}
+\longmapsto
+\mathbf{X}\mathbf{B}
+$$
+
+e, portanto, não altera os valores ajustados.
+
+Assim, quando o critério utilizado é simplesmente a norma de Frobenius dos resíduos, o problema matricial pode ser interpretado como $p$ problemas de mínimos quadrados que compartilham a mesma matriz de delineamento.
+
+::: {#prp-convexidade-minimos-quadrados-matriciais}
+
 ## Convexidade dos mínimos quadrados matriciais
 
 A função
@@ -5519,10 +6616,10 @@ $$
 
 é convexa em $\mathbf{B}$.
 
-Ela é estritamente convexa quando $\mathbf{X}$ possui posto coluna completo.
+Ela é estritamente convexa se, e somente se, $\mathbf{X}$ possui posto coluna completo.
 :::
 
-::: proof
+::: {.proof}
 Considere uma perturbação
 
 $$
@@ -5576,6 +6673,64 @@ d\mathbf{B}
 $$
 
 Assim, a segunda variação é positiva para toda perturbação não nula, e a função é estritamente convexa.
+
+Reciprocamente, se $\mathbf{X}$ não possui posto coluna completo, existe
+
+$$
+\mathbf{z}
+\neq
+\mathbf{0}
+$$
+
+tal que
+
+$$
+\mathbf{X}\mathbf{z}
+=
+\mathbf{0}.
+$$
+
+Escolha qualquer vetor não nulo
+
+$$
+\mathbf{c}
+\in
+\mathbb{R}^{p}
+$$
+
+e defina
+
+$$
+d\mathbf{B}
+=
+\mathbf{z}\mathbf{c}^{\top}.
+$$
+
+Então
+
+$$
+d\mathbf{B}
+\neq
+\mathbf{0},
+$$
+
+mas
+
+$$
+\mathbf{X}\,d\mathbf{B}
+=
+\mathbf{0}.
+$$
+
+Portanto,
+
+$$
+d^2Q
+=
+0
+$$
+
+em uma direção não nula, e a função não é estritamente convexa.
 :::
 
 ### Ponderação de observações e respostas
@@ -5614,8 +6769,37 @@ Q_{\Omega,\Sigma}(\mathbf{B})
 \boldsymbol{\mathcal E}(\mathbf{B})
 \right].
 $$
+Como
 
-A matriz $\boldsymbol{\Omega}$ pondera as linhas da matriz de resíduos. A matriz $\boldsymbol{\Sigma}^{-1}$ pondera as combinações entre as colunas.
+$$
+\boldsymbol{\Omega}
+\succeq
+\mathbf{0}
+$$
+
+e
+
+$$
+\boldsymbol{\Sigma}
+\succ
+\mathbf{0},
+$$
+
+o critério também pode ser escrito como
+
+$$
+Q_{\Omega,\Sigma}(\mathbf{B})
+=
+\left\|
+\boldsymbol{\Omega}^{1/2}
+\boldsymbol{\mathcal E}(\mathbf{B})
+\boldsymbol{\Sigma}^{-1/2}
+\right\|_F^2.
+$$
+
+Essa forma mostra que a ponderação atua simultaneamente nas duas dimensões da matriz residual.
+
+A matriz $\boldsymbol{\Omega}$ atua no espaço das observações e pondera as linhas da matriz de resíduos. A matriz $\boldsymbol{\Sigma}^{-1}$ atua no espaço das respostas e define a geometria utilizada para combinar as colunas da matriz de resíduos.
 
 Como $\boldsymbol{\Omega}$ e $\boldsymbol{\Sigma}^{-1}$ são simétricas,
 
@@ -5724,7 +6908,17 @@ $$
 \mathbf{X}
 $$
 
-é invertível, o minimizador é
+é invertível. 
+
+Essa condição equivale a exigir que as colunas de
+
+$$
+\boldsymbol{\Omega}^{1/2}\mathbf{X}
+$$
+
+sejam linearmente independentes.
+
+O minimizador é
 
 $$
 \widehat{\mathbf{B}}
@@ -5739,9 +6933,19 @@ $$
 \mathbf{Y}.
 $$
 
-Nesse critério, a ponderação invertível entre as respostas altera o valor da função e sua geometria, mas não altera o ponto de mínimo em relação a $\mathbf{B}$. A ponderação das observações, por outro lado, modifica as equações normais e o estimador.
+Para $\boldsymbol{\Sigma}$ fixa e positiva definida, a ponderação invertível no espaço das respostas altera o valor do critério e sua geometria, mas não altera o conjunto de minimizadores em relação a $\mathbf{B}$.
 
-As próximas identidades tratam funções que envolvem inversas e determinantes. Esses objetos aparecem em critérios definidos sobre o conjunto das matrizes positivas definidas.
+Isso ocorre porque
+
+$$
+\boldsymbol{\Sigma}^{-1}
+$$
+
+é invertível e pode ser eliminada da condição de primeira ordem.
+
+A ponderação das observações por $\boldsymbol{\Omega}$, por outro lado, permanece nas equações normais e pode modificar o estimador.
+
+Os diferenciais matriciais e as identidades de traço permitem agora tratar funções em que a própria matriz variável aparece no interior de uma inversa ou de um determinante. Essas estruturas são particularmente importantes quando o parâmetro pertence ao conjunto das matrizes positivas definidas.
 
 ## Derivadas de inversas, determinantes e log-determinantes
 
@@ -5767,7 +6971,7 @@ $$
 
 permite obter o diferencial da inversa.
 
-::: {#thm-diferencial-inversa}
+::: {#prp-diferencial-inversa}
 ## Diferencial da matriz inversa
 
 Se $\mathbf{X}$ é invertível, então
@@ -5789,7 +6993,7 @@ $$
 [@magnus2019matrix]
 :::
 
-::: proof
+::: {.proof}
 Diferenciando
 
 $$
@@ -5843,7 +7047,41 @@ d\mathbf{X}
 $$
 :::
 
-O sinal negativo indica que o aumento de uma matriz positiva definida em determinada direção produz redução de sua inversa na direção correspondente, segundo a ordem matricial apropriada.
+Quando $\mathbf{X}\succ\mathbf{0}$ e a perturbação
+
+$$
+d\mathbf{X}
+\succeq
+\mathbf{0},
+$$
+
+tem-se
+
+$$
+\mathbf{X}^{-1}
+d\mathbf{X}
+\mathbf{X}^{-1}
+\succeq
+\mathbf{0},
+$$
+
+e, portanto,
+
+$$
+d
+\left(
+\mathbf{X}^{-1}
+\right)
+=
+-
+\mathbf{X}^{-1}
+d\mathbf{X}
+\mathbf{X}^{-1}
+\preceq
+\mathbf{0}.
+$$
+
+Assim, a inversão reverte a ordem de Loewner: aumentos semidefinidos positivos da matriz produzem variações semidefinidas negativas de sua inversa.
 
 Para uma perturbação $d\mathbf{X}$,
 
@@ -5927,6 +7165,103 @@ d\det(\mathbf{X})
 $$ [@magnus2019matrix]
 :::
 
+::: {.proof}
+Considere uma perturbação $\mathbf{H}$ e a função
+
+$$
+g(t)
+=
+\det
+\left(
+\mathbf{X}
++
+t\mathbf{H}
+\right).
+$$
+
+Como $\mathbf{X}$ é invertível,
+
+$$
+\begin{aligned}
+g(t)
+&=
+\det(\mathbf{X})
+\det
+\left(
+\mathbf{I}_p
++
+t\mathbf{X}^{-1}\mathbf{H}
+\right).
+\end{aligned}
+$$
+
+Pela multilinearidade do determinante,
+
+$$
+\det
+\left(
+\mathbf{I}_p+t\mathbf{M}
+\right)
+=
+1
++
+t\operatorname{tr}(\mathbf{M})
++
+o(t).
+$$
+
+Aplicando essa expansão com
+
+$$
+\mathbf{M}
+=
+\mathbf{X}^{-1}\mathbf{H},
+$$
+
+obtém-se
+
+$$
+g(t)
+=
+\det(\mathbf{X})
+\left[
+1
++
+t
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}\mathbf{H}
+\right)
++
+o(t)
+\right].
+$$
+
+Logo,
+
+$$
+g'(0)
+=
+\det(\mathbf{X})
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}\mathbf{H}
+\right).
+$$
+
+Como $\mathbf{H}$ representa uma perturbação arbitrária,
+
+$$
+d\det(\mathbf{X})
+=
+\det(\mathbf{X})
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}d\mathbf{X}
+\right).
+$$
+:::
+
 Como
 
 $$
@@ -5989,7 +7324,25 @@ $$
 
 está bem definida.
 
-::: {#thm-diferencial-logdet}
+A restrição
+
+$$
+\mathbf{X}
+\succ
+\mathbf{0}
+$$
+
+garante simultaneamente que $\mathbf{X}$ é invertível e que
+
+$$
+\det(\mathbf{X})
+>
+0,
+$$
+
+de modo que o logaritmo real do determinante está bem definido.
+
+::: {#prp-diferencial-logdet}
 ## Diferencial do log-determinante
 
 Se $\mathbf{X}\succ\mathbf{0}$, então
@@ -6013,7 +7366,7 @@ $$
 $$
 :::
 
-::: proof
+::: {.proof}
 Pela regra da cadeia,
 
 $$
@@ -6054,22 +7407,42 @@ $$
 o que fornece o gradiente.
 :::
 
-Para uma matriz invertível não necessariamente simétrica, a função
+Para uma matriz real invertível, não necessariamente simétrica, pode-se considerar
 
 $$
-\log|\det(\mathbf{X})|
+\phi(\mathbf{X})
+=
+\log
+\left|
+\det(\mathbf{X})
+\right|.
 $$
 
-satisfaz
+Como o determinante não se anula no conjunto das matrizes invertíveis, seu sinal permanece constante em uma vizinhança suficientemente pequena de cada matriz invertível. Nesse domínio,
+
+$$
+d\log
+\left|
+\det(\mathbf{X})
+\right|
+=
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}d\mathbf{X}
+\right),
+$$
+
+e, portanto,
 
 $$
 \nabla_{\mathbf{X}}
-\log|\det(\mathbf{X})|
+\log
+\left|
+\det(\mathbf{X})
+\right|
 =
-\mathbf{X}^{-\top}
+\mathbf{X}^{-\top}.
 $$
-
-em qualquer região em que o sinal do determinante permaneça constante.
 
 ### Segunda variação do log-determinante
 
@@ -6115,36 +7488,6 @@ d\mathbf{X}
 \right).
 $$
 
-Como
-
-$$
-\mathbf{X}^{-1/2}
-d\mathbf{X}
-\mathbf{X}^{-1/2}
-$$
-
-é simétrica,
-
-$$
-\begin{aligned}
-\operatorname{tr}
-\left(
-\mathbf{X}^{-1}
-d\mathbf{X}
-\mathbf{X}^{-1}
-d\mathbf{X}
-\right)
-&=
-\left\|
-\mathbf{X}^{-1/2}
-d\mathbf{X}
-\mathbf{X}^{-1/2}
-\right\|_F^2\\
-&\geq
-0.
-\end{aligned}
-$$
-
 Logo,
 
 $$
@@ -6165,6 +7508,41 @@ $$
 $$
 
 é estritamente côncava no conjunto das matrizes simétricas positivas definidas. [@boyd2004convex]
+:::
+
+::: {.proof}
+O conjunto das matrizes simétricas positivas definidas é convexo. Para toda matriz
+
+$$
+\mathbf{X}
+\succ
+\mathbf{0}
+$$
+
+e toda direção simétrica não nula $\mathbf{H}$,
+
+$$
+d^2\phi[\mathbf{H},\mathbf{H}]
+=
+-
+\left\|
+\mathbf{X}^{-1/2}
+\mathbf{H}
+\mathbf{X}^{-1/2}
+\right\|_F^2
+<
+0.
+$$
+
+Logo, a restrição de $\phi$ a qualquer segmento não degenerado do cone positivo definido possui segunda derivada negativa. Portanto,
+
+$$
+\phi(\mathbf{X})
+=
+\log\det(\mathbf{X})
+$$
+
+é estritamente côncava nesse domínio.
 :::
 
 Consequentemente,
@@ -6240,6 +7618,13 @@ $$
 \mathbf{X}^{-\top}
 \mathbf{A}^{\top}
 \mathbf{X}^{-\top}.
+$$
+Observe que o gradiente possui a mesma dimensão de $\mathbf{X}$,
+
+$$
+\nabla_{\mathbf{X}}\phi
+\in
+\mathbb{R}^{p\times p}.
 $$
 
 Se $\mathbf{A}$ e $\mathbf{X}$ são simétricas,
@@ -6340,6 +7725,32 @@ $$
 
 Essa matriz é semidefinida negativa.
 
+Consequentemente, para uma perturbação
+
+$$
+\mathbf{H}
+\succeq
+\mathbf{0},
+$$
+
+tem-se
+
+$$
+d\phi[\mathbf{H}]
+=
+\operatorname{tr}
+\left[
+\left(
+\nabla_{\mathbf{X}}\phi
+\right)^{\top}
+\mathbf{H}
+\right]
+\leq
+0.
+$$
+
+Assim, aumentar $\mathbf{X}$ segundo a ordem de Loewner não aumenta a forma quadrática inversa.
+
 Se o vetor também varia, considere
 
 $$
@@ -6371,7 +7782,7 @@ $$
 
 ### Critério com log-determinante e traço
 
-Considere
+Considere $n>0$ e
 
 $$
 L(\boldsymbol{\Sigma})
@@ -6478,7 +7889,8 @@ $$
 \mathbf{G}\succ\mathbf{0}.
 $$
 
-::: {#thm-minimizador-criterio-covariancia}
+::: {#prp-minimizador-criterio-covariancia}
+
 ## Minimização do critério de covariância
 
 Se
@@ -6513,7 +7925,7 @@ $$
 $$
 :::
 
-::: proof
+::: {.proof}
 Defina
 
 $$
@@ -6618,6 +8030,26 @@ $$
 z=n.
 $$
 
+Como cada parcela
+
+$$
+z_j
+-
+n\log z_j
+$$
+
+possui mínimo único em $z_j=n$, o mínimo global exige
+
+$$
+z_1
+=
+\cdots
+=
+z_p
+=
+n.
+$$
+
 Portanto,
 
 $$
@@ -6642,7 +8074,42 @@ $$
 \frac1n\mathbf{G}
 $$
 
-não pertence ao domínio positivo definido. Nesse caso, o critério não possui minimizador interior. É possível fazer alguns autovalores de $\boldsymbol{\Sigma}$ tenderem a zero em direções pertencentes ao núcleo de $\mathbf{G}$, fazendo o log-determinante tender a $-\infty$ sem aumento compensatório no termo de traço.
+não pertence ao domínio positivo definido.
+
+Além disso, o critério é ilimitado inferiormente. De fato, escolhendo uma direção unitária
+
+$$
+\mathbf{u}
+\in
+\mathcal{N}(\mathbf{G}),
+$$
+
+pode-se fazer o autovalor de $\boldsymbol{\Sigma}$ associado a essa direção tender a zero. Nessa direção, o termo
+
+$$
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}^{-1}\mathbf{G}
+\right)
+$$
+
+não recebe contribuição, enquanto
+
+$$
+\log\det(\boldsymbol{\Sigma})
+\longrightarrow
+-\infty.
+$$
+
+Portanto,
+
+$$
+L(\boldsymbol{\Sigma})
+\longrightarrow
+-\infty,
+$$
+
+e o problema não possui minimizador no cone positivo definido.
 
 ### Parâmetros matriciais simétricos
 
@@ -6701,6 +8168,14 @@ Uma parametrização explícita dos elementos distintos será desenvolvida com o
 ## Vetorização, produto de Kronecker e parâmetros matriciais
 
 A vetorização transforma uma matriz em um vetor. Essa operação permite representar transformações matriciais por matrizes usuais e aplicar resultados de cálculo vetorial a parâmetros matriciais.
+
+Nesta seção, o núcleo necessário para os capítulos seguintes é formado por três ideias:
+
+- o operador $\operatorname{vec}$;
+- o produto de Kronecker;
+- a identidade que relaciona $\operatorname{vec}$ e produtos matriciais.
+
+As subseções posteriores sobre Hessianas vetorizadas, matriz de comutação, meia vetorização, matrizes de duplicação e eliminação e Jacobianas de transformações matriciais serão apresentadas como aprofundamento. Elas são úteis em desenvolvimentos mais avançados de cálculo matricial e inferência, mas não são necessárias para uma primeira leitura do restante do livro.
 
 ### Operador de vetorização
 
@@ -6971,7 +8446,7 @@ $$
 
 A relação entre vetorização e produto de Kronecker permite representar um produto matricial como uma transformação linear do vetor de elementos da matriz.
 
-::: {#thm-identidade-vec}
+::: {#prp-identidade-vec}
 ## Identidade fundamental da vetorização
 
 Considere
@@ -7062,6 +8537,28 @@ $$
 \right)
 \operatorname{vec}(\mathbf{X}).
 $$
+A identidade mostra que uma transformação que atua simultaneamente à esquerda e à direita de uma matriz pode ser representada como uma transformação linear usual sobre o vetor formado por seus elementos.
+
+Assim,
+
+$$
+\mathbf{X}
+\longmapsto
+\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}
+$$
+
+corresponde, após vetorização, a
+
+$$
+\operatorname{vec}(\mathbf{X})
+\longmapsto
+\left(
+\boldsymbol{\Gamma}^{\top}
+\otimes
+\mathbf{A}
+\right)
+\operatorname{vec}(\mathbf{X}).
+$$
 
 ::: {#exm-vec-produto-matricial}
 ## Vetorização de um produto matricial
@@ -7110,7 +8607,17 @@ $$
 $$
 :::
 
-### Gradiente matricial e gradiente vetorizado
+### Aprofundamento: derivadas vetorizadas e parâmetros matriciais
+
+::: {.callout-note appearance="simple" icon="false"}
+## Leitura de aprofundamento
+
+As subseções seguintes desenvolvem ferramentas úteis quando parâmetros matriciais precisam ser tratados explicitamente como vetores. Elas permitem representar Hessianas, transposições, parâmetros simétricos e Jacobianas matriciais por meio de $\operatorname{vec}$, produto de Kronecker e matrizes especiais.
+
+Esses resultados são importantes em desenvolvimentos avançados de inferência multivariada e cálculo matricial, mas podem ser omitidos em uma primeira leitura sem comprometer a continuidade dos capítulos seguintes.
+:::
+
+#### Gradiente matricial e gradiente vetorizado
 
 Considere
 
@@ -7172,7 +8679,7 @@ $$
 
 A forma matricial e a forma vetorizada representam a mesma derivada, organizadas em estruturas diferentes.
 
-### Hessiana de uma função matricial
+#### Hessiana de uma função matricial
 
 Para uma função escalar de matriz, a Hessiana vetorizada é definida por
 
@@ -7265,166 +8772,35 @@ $$
 \boldsymbol{\Gamma}\succeq\mathbf{0},
 $$
 
-a Hessiana é semidefinida positiva e a função é convexa.
-
-### Gradiente matricial e gradiente vetorizado
-
-Considere
-
-$$
-\phi:
-\mathbb{R}^{m\times n}
-\longrightarrow
-\mathbb{R}.
-$$
-
-Pela definição do gradiente matricial,
-
-$$
-d\phi
-=
-\operatorname{tr}
-\left[
-\left(
-\nabla_{\mathbf{X}}\phi
-\right)^{\top}
-d\mathbf{X}
-\right].
-$$
-
-Como
-
-$$
-\operatorname{tr}
-\left(
-\mathbf{A}^{\top}\mathbf{C}
-\right)
-=
-\operatorname{vec}(\mathbf{A})^{\top}
-\operatorname{vec}(\mathbf{C}),
-$$
-
-tem-se
-
-$$
-d\phi
-=
-\operatorname{vec}
-\left(
-\nabla_{\mathbf{X}}\phi
-\right)^{\top}
-d\operatorname{vec}(\mathbf{X}).
-$$
-
-Logo,
-
-$$
-\nabla_{\operatorname{vec}(\mathbf{X})}\phi
-=
-\operatorname{vec}
-\left(
-\nabla_{\mathbf{X}}\phi
-\right).
-$$
-
-A forma matricial e a forma vetorizada representam a mesma derivada, organizadas em estruturas diferentes.
-
-### Hessiana de uma função matricial
-
-Para uma função escalar de matriz, a Hessiana vetorizada é definida por
-
-$$
-\nabla_{\operatorname{vec}(\mathbf{X})}^2\phi
-=
-\frac{
-\partial
-\operatorname{vec}
-\left(
-\nabla_{\mathbf{X}}\phi
-\right)
-}{
-\partial
-\operatorname{vec}(\mathbf{X})^{\top}
-}.
-$$
-
-Considere
-
-$$
-\phi(\mathbf{X})
-=
-\operatorname{tr}
-\left(
-\mathbf{X}^{\top}
-\mathbf{A}
-\mathbf{X}
-\mathbf{C}
-\right),
-$$
-
-com $\mathbf{A}$ e $\mathbf{C}$ simétricas.
-
-Foi obtido que
-
-$$
-\nabla_{\mathbf{X}}\phi
-=
-2\mathbf{A}\mathbf{X}\mathbf{C}.
-$$
-
-Vetorizando,
-
-$$
-\begin{aligned}
-\operatorname{vec}
-\left(
-\nabla_{\mathbf{X}}\phi
-\right)
-&=
-2
-\operatorname{vec}
-\left(
-\mathbf{A}\mathbf{X}\mathbf{C}
-\right)\\
-&=
-2
-\left(
-\mathbf{C}
-\otimes
-\mathbf{A}
-\right)
-\operatorname{vec}(\mathbf{X}).
-\end{aligned}
-$$
-
-Portanto,
-
-$$
-\nabla_{\operatorname{vec}(\mathbf{X})}^2\phi
-=
-2
-\left(
-\mathbf{C}
-\otimes
-\mathbf{A}
-\right).
-$$
-
 Se
 
 $$
-\mathbf{A}\succeq\mathbf{0}
+\mathbf{A}
+\succ
+\mathbf{0}
 $$
 
 e
 
 $$
-\mathbf{C}\succeq\mathbf{0},
+\boldsymbol{\Gamma}
+\succ
+\mathbf{0},
 $$
 
-a Hessiana é semidefinida positiva e a função é convexa.
+então
 
-### Matriz de comutação
+$$
+\boldsymbol{\Gamma}
+\otimes
+\mathbf{A}
+\succ
+\mathbf{0},
+$$
+
+e a função é estritamente convexa.
+
+#### Matriz de comutação
 
 A vetorização de uma matriz e de sua transposta possui ordenações diferentes.
 
@@ -7545,7 +8921,7 @@ $$
 \mathbf{A}.
 $$
 
-### Meia vetorização de matrizes simétricas
+#### Meia vetorização de matrizes simétricas
 
 Uma matriz simétrica possui elementos repetidos acima e abaixo da diagonal. O operador $\operatorname{vech}$ conserva somente os elementos da parte triangular inferior.
 
@@ -7632,9 +9008,15 @@ p(p+1)
 }
 $$
 
-elementos.
+elementos. A redução ocorre porque uma matriz simétrica possui apenas
 
-### Matriz de duplicação
+$$
+\frac{p(p+1)}{2}
+$$
+
+elementos distintos. Assim, $\operatorname{vech}$ fornece uma parametrização sem redundância do espaço das matrizes simétricas.
+
+#### Matriz de duplicação
 
 ::: {#def-matriz-duplicacao}
 ## Matriz de duplicação
@@ -7720,7 +9102,7 @@ $$
 \end{bmatrix}.
 $$
 
-### Matriz de eliminação
+#### Matriz de eliminação
 
 ::: {#def-matriz-eliminacao}
 ## Matriz de eliminação
@@ -7765,11 +9147,23 @@ Em geral,
 $$
 \mathbf{D}_p^{\mathrm{dup}}
 \mathbf{L}_p^{\mathrm{elim}}
+\neq
+\mathbf{I}_{p^2}.
 $$
 
-não é a identidade em $\mathbb{R}^{p^2}$, pois o produto atua sobre vetores que podem representar matrizes não simétricas.
+A matriz $\mathbf{L}_p^{\mathrm{elim}}$ conserva apenas os elementos correspondentes à parte triangular inferior, enquanto $\mathbf{D}_p^{\mathrm{dup}}$ reconstrói uma matriz impondo simetria. Portanto, esse produto não recupera arbitrariamente uma matriz não simétrica.
 
-### Diferenciais de parâmetros simétricos
+Para uma matriz simétrica $\mathbf{S}$, entretanto,
+
+$$
+\mathbf{D}_p^{\mathrm{dup}}
+\mathbf{L}_p^{\mathrm{elim}}
+\operatorname{vec}(\mathbf{S})
+=
+\operatorname{vec}(\mathbf{S}).
+$$
+
+#### Diferenciais de parâmetros simétricos
 
 Se
 
@@ -7839,10 +9233,11 @@ $$
 \nabla_{\boldsymbol{\Sigma}}\phi
 \right).
 $$
+Como as perturbações admissíveis de um parâmetro simétrico também devem ser simétricas, os $p^2$ elementos de $\operatorname{vec}(\boldsymbol{\Sigma})$ não representam graus de liberdade independentes. A parametrização por $\operatorname{vech}(\boldsymbol{\Sigma})$ remove essa redundância.
 
 Essa expressão transforma o gradiente matricial em um gradiente relativo somente aos elementos distintos do parâmetro simétrico.
 
-### Jacobiana de transformações matriciais
+#### Jacobiana de transformações matriciais
 
 Considere uma transformação
 
@@ -8024,7 +9419,35 @@ A vetorização e o produto de Kronecker permitem representar derivadas matricia
 
 ## Integração múltipla e mudança de variáveis
 
-O cálculo integral permite obter probabilidades, esperanças e distribuições marginais. Para vetores aleatórios contínuos, as integrais são realizadas sobre subconjuntos de $\mathbb{R}^{p}$.
+O cálculo integral permite obter probabilidades, esperanças, momentos e distribuições marginais de vetores aleatórios contínuos. A mudança de variáveis permite, adicionalmente, transformar regiões de integração e determinar densidades após transformações do vetor aleatório.
+
+Para vetores aleatórios contínuos, as integrais são realizadas sobre subconjuntos de $\mathbb{R}^{p}$. Nesta seção, integrais múltiplas, marginalização, esperanças e mudança de variáveis constituem o núcleo necessário para os capítulos probabilísticos seguintes. A diferenciação sob o sinal de integração será apresentada posteriormente como aprofundamento.
+
+O bloco de aprofundamento mostrou como $\operatorname{vec}$ e o produto de Kronecker podem ser estendidos para representar derivadas de ordem superior e parâmetros matriciais com restrições estruturais.
+
+Para a continuidade do livro, as ideias essenciais a reter desta seção são
+
+$$
+\operatorname{vec}
+\left(
+\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}
+\right)
+=
+\left(
+\boldsymbol{\Gamma}^{\top}
+\otimes
+\mathbf{A}
+\right)
+\operatorname{vec}(\mathbf{X})
+$$
+
+e o fato de que matrizes simétricas possuem apenas
+
+$$
+\frac{p(p+1)}{2}
+$$
+
+elementos distintos.
 
 ### Integrais múltiplas
 
@@ -8095,6 +9518,34 @@ $$
 
 desde que sejam satisfeitas as condições que permitem a integração sucessiva.
 
+O produto cartesiano corresponde ao caso mais simples. Para regiões mais gerais, os limites de uma integral podem depender das demais variáveis. Em duas dimensões, por exemplo, uma região da forma
+
+$$
+\mathcal{D}
+=
+\left\{
+(x_1,x_2):
+a<x_1<b,
+\;
+c(x_1)<x_2<d(x_1)
+\right\}
+$$
+
+conduz a
+
+$$
+\int_{\mathcal{D}}
+f(x_1,x_2)
+\,dx_1\,dx_2
+=
+\int_a^b
+\int_{c(x_1)}^{d(x_1)}
+f(x_1,x_2)
+\,dx_2\,dx_1,
+$$
+
+quando as condições de integração correspondentes são satisfeitas.
+
 ### Teoremas de Tonelli e Fubini
 
 ::: {#thm-tonelli}
@@ -8137,7 +9588,7 @@ dx_2,
 \end{aligned}
 $$
 
-permitindo valores infinitos.[@axler2020measure]
+permitindo valores infinitos. [@axler2020measure]
 :::
 
 Para funções não negativas, a ordem de integração pode ser alterada mesmo quando a integral total não é finita.
@@ -8202,6 +9653,10 @@ $$
 \mathbb{R}^{p}.
 $$
 
+::: {#def-densidade-conjunta}
+
+## Densidade conjunta
+
 Uma função
 
 $$
@@ -8211,7 +9666,7 @@ f_{\boldsymbol{\mathsf X}}:
 [0,\infty)
 $$
 
-é uma densidade conjunta quando
+é uma densidade conjunta de $\boldsymbol{\mathsf X}$ quando
 
 $$
 f_{\boldsymbol{\mathsf X}}(\mathbf{x})
@@ -8226,8 +9681,11 @@ $$
 f_{\boldsymbol{\mathsf X}}(\mathbf{x})
 \,d\mathbf{x}
 =
-1.
+1,
 $$
+
+e as probabilidades de conjuntos mensuráveis são obtidas pela integração dessa função.
+:::
 
 Para um conjunto mensurável
 
@@ -8376,7 +9834,7 @@ $$
 As duas densidades integram 1 em seus respectivos domínios.
 :::
 
-### Esperanças de funções vetoriais
+### Esperanças de funções escalares, vetoriais e matriciais
 
 Se
 
@@ -8595,7 +10053,7 @@ $$
 \mathbf{g}^{-1}(\mathbf{y}),
 $$
 
-tem-se
+o elemento de volume transforma-se segundo
 
 $$
 d\mathbf{x}
@@ -8637,7 +10095,8 @@ $$
 
 ### Transformação de densidades
 
-::: {#thm-transformacao-densidade}
+::: {#prp-transformacao-densidade}
+
 ## Densidade de uma transformação invertível
 
 Considere um vetor aleatório contínuo $\boldsymbol{\mathsf X}$ com densidade $f_{\boldsymbol{\mathsf X}}$ e a transformação
@@ -8663,6 +10122,23 @@ f_{\boldsymbol{\mathsf X}}
 \det
 \mathbf{J}_{\mathbf{g}^{-1}}(\mathbf{y})
 \right|.
+$$
+A expressão vale para
+
+$$
+\mathbf{y}
+\in
+\mathcal{G}
+=
+\mathbf{g}(\mathcal{D}).
+$$
+
+Fora da imagem da transformação,
+
+$$
+f_{\boldsymbol{\mathsf Y}}(\mathbf{y})
+=
+0.
 $$
 :::
 
@@ -8694,7 +10170,9 @@ $$
 
 A densidade é reduzida em regiões expandidas pela transformação e aumentada em regiões contraídas, de modo que a probabilidade total permaneça igual a 1.
 
-Quando a transformação não é injetiva em todo o domínio, o domínio deve ser particionado em regiões de injetividade. As contribuições das diferentes pré-imagens são somadas.
+Quando a transformação não é globalmente injetiva, a fórmula anterior não pode ser aplicada diretamente com uma única inversa. Sob condições de regularidade, pode-se particionar o domínio em regiões nas quais a transformação seja injetiva e somar as contribuições correspondentes às diferentes pré-imagens.
+
+Esse caso não será desenvolvido em detalhe neste capítulo.
 
 ### Transformações afins
 
@@ -8957,12 +10435,18 @@ ggplot(
   aes(
     x = coord1,
     y = coord2,
-    group = linha
+    group = linha,
+    color = painel
   )
 ) +
   geom_path(
-    linewidth = 0.55,
-    colour = "#3366AA"
+    linewidth = 0.55
+  ) +
+  scale_color_manual(
+    values = c(
+      "Domínio" = "#1f77b4",
+      "Imagem" = "#d62728"
+    )
   ) +
   facet_wrap(
     ~painel,
@@ -8977,8 +10461,9 @@ ggplot(
     x = NULL,
     y = NULL
   ) +
-  theme_minimal() +
+  theme_minimal(base_size = 13) +
   theme(
+    legend.position = "none",
     panel.grid = element_blank(),
     strip.background = element_blank(),
     strip.text = element_text(
@@ -9087,7 +10572,7 @@ $$
 
 quando a função é integrável.
 
-O fator $r$ representa o aumento da área dos setores à medida que a distância à origem cresce.
+A parametrização polar não é uma transformação globalmente bijetiva em todas as escolhas possíveis de domínio: a origem possui representação angular não única e o ângulo é periódico. Para a aplicação da fórmula de mudança de variáveis, trabalha-se em regiões adequadas de injetividade; as fronteiras envolvidas possuem medida nula e não alteram o valor das integrais usuais.
 
 ### Transformações elipsoidais
 
@@ -9099,7 +10584,13 @@ $$
 \mathbb{R}^{p\times p}
 $$
 
-e uma transformação
+e sua raiz quadrada principal simétrica positiva definida
+
+$$
+\boldsymbol{\Sigma}^{1/2}.
+$$
+
+Considere a transformação
 
 $$
 \mathbf{x}
@@ -9192,7 +10683,15 @@ $$
 
 A transformação converte esferas no espaço de $\mathbf{z}$ em elipsoides no espaço de $\mathbf{x}$. Essa relação será utilizada na construção de densidades multivariadas.
 
-### Diferenciação sob o sinal de integração
+### Aprofundamento: diferenciação sob o sinal de integração
+
+::: {.callout-note appearance="simple" icon="false"}
+## Leitura de aprofundamento
+
+A diferenciação sob o sinal de integração é utilizada para justificar formalmente identidades envolvendo funções de verossimilhança, vetor escore e informação de Fisher.
+
+Esse conteúdo é importante para desenvolvimentos inferenciais mais formais, mas pode ser omitido em uma primeira leitura. Para a continuidade imediata dos capítulos probabilísticos, basta reter que a troca entre derivação e integração exige condições de regularidade e não pode ser realizada automaticamente.
+:::
 
 Considere um conjunto mensurável
 
@@ -9418,7 +10917,7 @@ h(\mathbf{x},\boldsymbol{\theta}_0)
 $$
 :::
 
-::: proof
+::: {.proof}
 Considere uma sequência arbitrária de números não nulos
 
 $$
@@ -9739,27 +11238,44 @@ $$
 Essa é a identidade de média nula do escore para uma observação. Sua validade depende do suporte comum e das condições de dominação que justificam a troca entre diferenciação e integração.
 :::
 
-As integrais múltiplas, a marginalização e a mudança de variáveis fornecem a base para o estudo das distribuições multivariadas. A diferenciação sob o sinal de integração conecta essas ferramentas às funções de verossimilhança, ao vetor escore e à informação de Fisher.
+As integrais múltiplas, a marginalização e a mudança de variáveis fornecem a base para o estudo das distribuições multivariadas. A parte de aprofundamento mostrou, adicionalmente, como condições de dominação podem justificar a diferenciação de integrais parametrizadas e identidades utilizadas posteriormente em inferência.
 
-## Aplicações à estimação e à inferência
+Para a continuidade do livro, as ideias centrais a reter são:
 
-As ferramentas de diferenciação permitem formular condições de estimação, construir aproximações locais e estudar transformações de estimadores. Nesta seção, essas aplicações serão apresentadas apenas em sua estrutura matemática.
+- probabilidades são obtidas por integração da densidade conjunta;
+- densidades marginais são obtidas integrando as componentes que se deseja eliminar;
+- esperanças de vetores e matrizes são calculadas componente a componente;
+- mudanças de variáveis exigem o determinante absoluto da Jacobiana;
+- transformações afins produzem fatores de volume constantes;
+- transformações elipsoidais convertem geometria esférica e elipsoidal.
+
+## Aprofundamento: aplicações à estimação e à inferência
+
+::: {.callout-note appearance="simple" icon="false"}
+## Leitura de aprofundamento
+
+As subseções seguintes mostram como as ferramentas de cálculo desenvolvidas neste capítulo aparecem em problemas de estimação e inferência.
+
+O objetivo é apresentar apenas a estrutura matemática dessas aplicações. As propriedades probabilísticas dos estimadores, as condições de regularidade, as distribuições assintóticas e os procedimentos inferenciais serão desenvolvidos nos capítulos específicos do Módulo 2.
+
+Este bloco pode ser omitido em uma primeira leitura sem comprometer a continuidade imediata do livro.
+:::
+
+As aplicações seguintes envolvem gradientes, Hessianas, expansões de Taylor, diferenciação sob o sinal de integração e cálculo matricial. Elas antecipam, em nível matemático, conceitos que serão retomados posteriormente.
 
 ### Log-verossimilhança e vetor escore
 
-Considere uma amostra
+Considere observações independentes
 
 $$
 \mathbf{x}_1,\ldots,\mathbf{x}_n
 $$
 
-de uma distribuição com função de densidade ou de probabilidade
+provenientes de um mesmo modelo paramétrico com função de densidade ou de probabilidade
 
 $$
 f(\mathbf{x};\boldsymbol{\theta}),
 $$
-
-em que
 
 $$
 \boldsymbol{\theta}
@@ -9771,7 +11287,7 @@ $$
 
 é o vetor de parâmetros.
 
-Sob independência, a função de verossimilhança é
+Nessas condições, a função de verossimilhança é
 
 $$
 L_n(\boldsymbol{\theta})
@@ -9830,7 +11346,7 @@ $$
 \end{bmatrix}.
 $$
 
-Um estimador de máxima verossimilhança interior deve satisfazer
+Se um estimador de máxima verossimilhança é um ponto interior do espaço paramétrico e a log-verossimilhança é diferenciável nesse ponto, então deve satisfazer
 
 $$
 \mathbf{s}_n
@@ -9864,7 +11380,18 @@ $$
 $$
 :::
 
-Quando
+Se
+
+$$
+\mathbf{s}_n
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+=
+\mathbf{0}
+$$
+
+e
 
 $$
 \mathcal{J}_n
@@ -9875,7 +11402,19 @@ $$
 \mathbf{0},
 $$
 
-a Hessiana da log-verossimilhança é negativa definida no ponto estimado, fornecendo uma condição suficiente de máximo local estrito.
+então
+
+$$
+\nabla_{\boldsymbol{\theta}}^2
+\ell_n
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+\prec
+\mathbf{0},
+$$
+
+e o teste da Hessiana fornece uma condição suficiente para que $\widehat{\boldsymbol{\theta}}$ seja um máximo local estrito da log-verossimilhança.
 
 A informação observada pode ser singular ou apenas semidefinida quando:
 
@@ -9901,7 +11440,7 @@ $$
 quando essa esperança existe. [@casella2002inference]
 :::
 
-Sob condições que permitem diferenciar a densidade sob o sinal de integração,
+Sob condições de regularidade que permitem diferenciar a densidade sob o sinal de integração,
 
 $$
 E_{\boldsymbol{\theta}}
@@ -9912,7 +11451,7 @@ E_{\boldsymbol{\theta}}
 \mathbf{0}.
 $$
 
-Sob condições adicionais de regularidade,
+Sob condições adicionais que permitem relacionar a primeira e a segunda derivadas da log-verossimilhança,
 
 $$
 \mathcal{I}_n(\boldsymbol{\theta})
@@ -9924,7 +11463,10 @@ E_{\boldsymbol{\theta}}
 \right].
 $$
 
-Essa identidade não deve ser utilizada sem verificar as condições de regularidade e a independência do suporte em relação ao parâmetro.
+Como o escore possui esperança nula nessas condições, essa segunda expressão também corresponde à matriz de covariâncias do vetor escore.
+
+Essas identidades não devem ser utilizadas automaticamente. Sua validade depende das condições de regularidade, incluindo a possibilidade de intercambiar derivação e integração e o comportamento do suporte em relação ao parâmetro.
+
 
 ### Newton--Raphson
 
@@ -10018,36 +11560,106 @@ $$
 
 Isso evita calcular explicitamente a inversa da informação observada.
 
-### Método do escore de Fisher
-
-O método do escore de Fisher substitui a informação observada pela informação esperada:
+Essa é a aplicação do método de Newton à equação
 
 $$
-\boldsymbol{\theta}^{(t+1)}
+\mathbf{s}_n(\boldsymbol{\theta})
 =
+\mathbf{0}.
+$$
+
+Quando
+
+$$
+\mathcal{J}_n
+\left(
 \boldsymbol{\theta}^{(t)}
-+
-\mathcal{I}_n
+\right)
+\succ
+\mathbf{0},
+$$
+
+a direção
+
+$$
+\mathbf{d}^{(t)}
+=
+\mathcal{J}_n
 \left(
 \boldsymbol{\theta}^{(t)}
 \right)^{-1}
 \mathbf{s}_n
 \left(
 \boldsymbol{\theta}^{(t)}
-\right).
+\right)
 $$
 
-Os dois métodos coincidem quando
+é uma direção local de aumento da log-verossimilhança, pois
 
 $$
-\mathcal{J}_n(\boldsymbol{\theta})
+\mathbf{s}_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right)^{\top}
+\mathbf{d}^{(t)}
+>
+0
+$$
+
+quando o escore é não nulo.
+
+Ainda assim, um passo completo pode não aumentar a log-verossimilhança quando o ponto atual está distante da solução. Em aplicações numéricas, podem ser utilizados controles do comprimento da etapa.
+
+### Método do escore de Fisher
+
+O método do escore de Fisher substitui a informação observada pela informação esperada. Quando
+
+$$
+\mathcal{I}_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right)
+$$
+
+é invertível, a direção $\mathbf{d}^{(t)}$ é obtida pela solução de
+
+$$
+\mathcal{I}_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right)
+\mathbf{d}^{(t)}
 =
-\mathcal{I}_n(\boldsymbol{\theta})
+\mathbf{s}_n
+\left(
+\boldsymbol{\theta}^{(t)}
+\right),
 $$
 
-ou quando essas matrizes produzem a mesma atualização.
+seguida da atualização
 
-### Expansão local de um estimador
+$$
+\boldsymbol{\theta}^{(t+1)}
+=
+\boldsymbol{\theta}^{(t)}
++
+\mathbf{d}^{(t)}.
+$$
+Newton--Raphson utiliza a curvatura observada da log-verossimilhança,
+
+$$
+\mathcal{J}_n(\boldsymbol{\theta}),
+$$
+
+enquanto o escore de Fisher utiliza sua curvatura esperada,
+
+$$
+\mathcal{I}_n(\boldsymbol{\theta}).
+$$
+
+As atualizações coincidem quando as duas matrizes são iguais no ponto considerado ou, mais geralmente, quando produzem a mesma solução para a equação que determina a direção da etapa.
+
+### Expansão local de uma raiz do escore
 
 Suponha que um estimador
 
@@ -10128,6 +11740,8 @@ $$
 \right).
 $$
 
+Essa expressão é uma aproximação local de primeira ordem. A obtenção de uma representação assintótica rigorosa exige controlar o termo restante da expansão e substituir a informação observada por um limite apropriado.
+
 Essa relação mostra que o erro do estimador pode ser aproximado pelo produto entre:
 
 -   a inversa da curvatura da log-verossimilhança;
@@ -10204,6 +11818,14 @@ $$
 [@vandervaart1998]
 :::
 
+A demonstração formal utiliza a aproximação de Taylor de primeira ordem juntamente com resultados probabilísticos sobre convergência em distribuição. Esses resultados serão desenvolvidos no módulo inferencial; neste capítulo interessa principalmente a origem diferencial da matriz
+
+$$
+\mathbf{J}_{\mathbf{g}}(\boldsymbol{\theta})
+\boldsymbol{\Xi}
+\mathbf{J}_{\mathbf{g}}(\boldsymbol{\theta})^{\top}.
+$$
+
 A aproximação de primeira ordem é
 
 $$
@@ -10225,7 +11847,16 @@ $$
 \right).
 $$
 
-A covariância aproximada é
+Quando a aproximação assintótica é utilizada para amostras grandes, a matriz de covariâncias de
+
+$$
+\mathbf{g}
+\left(
+\widehat{\boldsymbol{\theta}}
+\right)
+$$
+
+é aproximada por
 
 $$
 \operatorname{Cov}
@@ -10339,16 +11970,16 @@ $$
 \right)
 $$
 
-converge em distribuição para uma normal com variância
+converge em distribuição para uma normal com variância assintótica
 
 $$
-\nabla_{\boldsymbol{\theta}}g^{\top}
+\nabla_{\boldsymbol{\theta}}g(\boldsymbol{\theta})^{\top}
 \boldsymbol{\Xi}
-\nabla_{\boldsymbol{\theta}}g.
+\nabla_{\boldsymbol{\theta}}g(\boldsymbol{\theta}).
 $$
 :::
 
-### Estimação de um vetor de médias
+### Aplicação de referência: estimação de um vetor de médias
 
 Considere observações
 
@@ -10434,7 +12065,7 @@ $$
 
 Portanto, o vetor de médias amostrais é o único minimizador do critério.
 
-### Critério do modelo linear multivariado
+### Aplicação de referência: critério do modelo linear multivariado
 
 Considere
 
@@ -10534,6 +12165,8 @@ $$
 \mathbf{X}^{\top}\mathbf{Y}.
 $$
 
+Observe que, para $\boldsymbol{\Sigma}$ fixa e positiva definida, o minimizador em relação a $\mathbf{B}$ não depende de $\boldsymbol{\Sigma}$. Isso decorre do fato de que $\boldsymbol{\Sigma}^{-1}$ é invertível e desaparece da condição de primeira ordem.
+
 Defina a matriz de Gram dos resíduos
 
 $$
@@ -10587,13 +12220,89 @@ $$
 \mathbf{G}_{\mathcal E}\succ\mathbf{0}
 $$
 
-exige que a matriz residual possua posto coluna completo. Quando $\mathbf{G}_{\mathcal E}$ é singular, o critério não possui minimizador no interior do conjunto das matrizes positivas definidas.
+exige que a matriz residual possua posto coluna completo. Quando $\mathbf{G}_{\mathcal E}$ é singular, o critério é ilimitado inferiormente no cone das matrizes positivas definidas. Em particular, pode-se fazer um autovalor de $\boldsymbol{\Sigma}$ tender a zero em uma direção pertencente ao núcleo de $\mathbf{G}_{\mathcal E}$ sem produzir aumento compensatório no termo de traço.
 
-A interpretação probabilística desse critério e as propriedades dos estimadores serão desenvolvidas nos capítulos de estimação e modelo linear multivariado.
+Aqui o modelo foi utilizado apenas como uma aplicação conjunta de gradientes matriciais, log-determinante e diferenciação de funções envolvendo matrizes inversas.
+
+A interpretação probabilística do critério, as propriedades dos estimadores, suas distribuições e a formulação de hipóteses serão desenvolvidas posteriormente nos capítulos de estimação, modelo linear multivariado e inferência.
+
+O bloco de aprofundamento mostrou como as ferramentas de cálculo deste capítulo aparecem em problemas inferenciais:
+
+$$
+\text{gradiente}
+\longrightarrow
+\text{escore},
+$$
+
+$$
+\text{Hessiana}
+\longrightarrow
+\text{informação observada},
+$$
+
+$$
+\text{esperança da curvatura}
+\longrightarrow
+\text{informação de Fisher},
+$$
+
+$$
+\text{Taylor}
+\longrightarrow
+\text{aproximações locais e método delta},
+$$
+
+e
+
+$$
+\text{cálculo matricial}
+\longrightarrow
+\text{estimação de parâmetros vetoriais e matriciais}.
+$$
+
+Essas relações devem ser entendidas neste capítulo como aplicações das ferramentas matemáticas. Sua interpretação estatística completa será retomada no Módulo 2.
 
 ## Síntese do capítulo
 
-O cálculo diferencial descreve a variação local de funções escalares, vetoriais e matriciais. Para uma função escalar de vetor, o gradiente determina a aproximação linear:
+Este capítulo reuniu as principais ferramentas de cálculo utilizadas na formulação matemática da Estatística Multivariada.
+
+Para uma função escalar
+
+$$
+f:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R},
+$$
+
+o diferencial fornece a parte linear de sua variação:
+
+$$
+df
+=
+\nabla_{\mathbf{x}}f(\mathbf{x})^{\top}
+d\mathbf{x}.
+$$
+
+Para uma função vetorial
+
+$$
+\mathbf{g}:
+\mathbb{R}^{p}
+\longrightarrow
+\mathbb{R}^{q},
+$$
+
+a transformação linear local é representada pela Jacobiana:
+
+$$
+d\mathbf{g}
+=
+\mathbf{J}_{\mathbf{g}}(\mathbf{x})
+d\mathbf{x}.
+$$
+
+A Hessiana descreve a variação de segunda ordem de uma função escalar. A expansão de Taylor,
 
 $$
 f(\mathbf{x}+\mathbf{h})
@@ -10602,33 +12311,70 @@ f(\mathbf{x})
 +
 \nabla_{\mathbf{x}}f(\mathbf{x})^{\top}\mathbf{h}
 +
-o(\|\mathbf{h}\|).
+\frac12
+\mathbf{h}^{\top}
+\nabla_{\mathbf{x}}^2f(\mathbf{x})
+\mathbf{h}
++
+o(\|\mathbf{h}\|^2),
 $$
 
-A Jacobiana representa a transformação linear local de uma função vetorial:
+relaciona gradiente e Hessiana às aproximações locais utilizadas na otimização.
+
+Em um ponto estacionário,
 
 $$
-\mathbf{g}(\mathbf{x}+\mathbf{h})
+\nabla_{\mathbf{x}}f(\mathbf{x}^{\star})
 =
-\mathbf{g}(\mathbf{x})
-+
-\mathbf{J}_{\mathbf{g}}(\mathbf{x})\mathbf{h}
-+
-o(\|\mathbf{h}\|).
+\mathbf{0},
 $$
 
-A Hessiana descreve a curvatura de uma função escalar. Em um ponto estacionário, sua definitude permite distinguir mínimos, máximos e pontos de sela. Para funções convexas, qualquer ponto estacionário é um mínimo global.
+a definitude da Hessiana permite classificar mínimos locais estritos, máximos locais estritos e pontos de sela quando o teste de segunda ordem é conclusivo.
 
-A diferenciação de funções de resíduos conduz às equações normais. Para
+Para funções convexas, a condição
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x}^{\star})
+=
+\mathbf{0}
+$$
+
+é suficiente para que $\mathbf{x}^{\star}$ seja um minimizador global. Se a função é estritamente convexa, esse minimizador, quando existe, é único.
+
+Problemas de otimização com restrições de igualdade conduzem às condições de Lagrange. Para
+
+$$
+\mathbf{c}(\mathbf{x})
+=
+\mathbf{0},
+$$
+
+a condição de primeira ordem em um ponto regular pode ser escrita como
+
+$$
+\nabla_{\mathbf{x}}f(\mathbf{x}^{\star})
++
+\mathbf{J}_{\mathbf{c}}
+\left(
+\mathbf{x}^{\star}
+\right)^{\top}
+\boldsymbol{\lambda}^{\star}
+=
+\mathbf{0}.
+$$
+
+Geometricamente, o gradiente da função objetivo pertence ao espaço normal ao conjunto viável.
+
+Funções de resíduos constituem uma aplicação central dessas ferramentas. Para
 
 $$
 f(\mathbf{x})
 =
-\left\|
+\|
 \mathbf{b}
 -
 \mathbf{A}\mathbf{x}
-\right\|^2,
+\|^2,
 $$
 
 tem-se
@@ -10636,7 +12382,8 @@ tem-se
 $$
 \nabla_{\mathbf{x}}f(\mathbf{x})
 =
--2\mathbf{A}^{\top}
+-2
+\mathbf{A}^{\top}
 \left(
 \mathbf{b}
 -
@@ -10644,7 +12391,7 @@ $$
 \right),
 $$
 
-e a condição de primeira ordem é
+e a condição de primeira ordem produz as equações normais
 
 $$
 \mathbf{A}^{\top}\mathbf{A}\mathbf{x}
@@ -10652,7 +12399,27 @@ $$
 \mathbf{A}^{\top}\mathbf{b}.
 $$
 
-O cálculo matricial organiza derivadas de funções cujos argumentos são matrizes. O gradiente matricial é definido por
+No minimizador, o resíduo pertence a
+
+$$
+\mathcal{N}
+\left(
+\mathbf{A}^{\top}
+\right),
+$$
+
+de modo que o vetor ajustado corresponde à projeção de $\mathbf{b}$ sobre $\mathcal{C}(\mathbf{A})$.
+
+O cálculo matricial estende essas ideias a funções cujos argumentos são matrizes. Para
+
+$$
+\phi:
+\mathbb{R}^{m\times n}
+\longrightarrow
+\mathbb{R},
+$$
+
+o gradiente matricial é identificado por
 
 $$
 d\phi
@@ -10666,9 +12433,46 @@ d\mathbf{X}
 \right].
 $$
 
-Essa representação permite diferenciar normas de Frobenius, funções de resíduos matriciais, produtos quadráticos, inversas, determinantes e log-determinantes.
+Essa representação permite utilizar propriedades do traço para diferenciar normas de Frobenius, formas quadráticas matriciais, funções de resíduos e critérios envolvendo parâmetros matriciais.
 
-A vetorização transforma uma matriz em um vetor e permite representar transformações matriciais por produtos de Kronecker:
+Entre as identidades fundamentais envolvendo inversas e determinantes estão
+
+$$
+d
+\left(
+\mathbf{X}^{-1}
+\right)
+=
+-
+\mathbf{X}^{-1}
+(d\mathbf{X})
+\mathbf{X}^{-1}
+$$
+
+e
+
+$$
+d\log\det(\mathbf{X})
+=
+\operatorname{tr}
+\left(
+\mathbf{X}^{-1}d\mathbf{X}
+\right),
+\qquad
+\mathbf{X}
+\succ
+\mathbf{0}.
+$$
+
+Além disso,
+
+$$
+\log\det(\mathbf{X})
+$$
+
+é estritamente côncava no conjunto das matrizes simétricas positivas definidas.
+
+A vetorização e o produto de Kronecker permitem representar transformações matriciais como transformações lineares usuais. A identidade central é
 
 $$
 \operatorname{vec}
@@ -10677,54 +12481,141 @@ $$
 \right)
 =
 \left(
-\boldsymbol{\Gamma}^{\top}\otimes\mathbf{A}
+\boldsymbol{\Gamma}^{\top}
+\otimes
+\mathbf{A}
 \right)
 \operatorname{vec}(\mathbf{X}).
 $$
 
-Para matrizes simétricas, o operador $\operatorname{vech}$ elimina elementos repetidos. As matrizes de duplicação e eliminação relacionam as parametrizações por $\operatorname{vec}$ e $\operatorname{vech}$.
+Essa relação constitui o núcleo necessário para utilizar vetorização nos capítulos posteriores.
 
-O cálculo integral fornece probabilidades, esperanças e distribuições marginais. A mudança de variáveis incorpora o fator
+O cálculo integral completa o conjunto de ferramentas do capítulo. Para um vetor aleatório contínuo
 
 $$
+\boldsymbol{\mathsf{X}}
+\in
+\mathbb{R}^{p},
+$$
+
+probabilidades, momentos e distribuições marginais são obtidos por integrais múltiplas.
+
+Em uma transformação invertível
+
+$$
+\mathbf{y}
+=
+\mathbf{g}(\mathbf{x}),
+$$
+
+a densidade transformada envolve o determinante absoluto da Jacobiana da transformação inversa:
+
+$$
+f_{\boldsymbol{\mathsf{Y}}}(\mathbf{y})
+=
+f_{\boldsymbol{\mathsf{X}}}
+\left(
+\mathbf{g}^{-1}(\mathbf{y})
+\right)
 \left|
 \det
-\mathbf{J}_{\mathbf{g}}(\mathbf{x})
-\right|,
+\mathbf{J}_{\mathbf{g}^{-1}}(\mathbf{y})
+\right|.
 $$
 
-que representa a alteração local de volume produzida pela transformação.
+No caso afim,
 
-Na estimação, o gradiente da log-verossimilhança define o vetor escore, enquanto sua Hessiana negativa define a informação observada. Expansões de Taylor sustentam métodos iterativos de estimação e aproximações como o método delta.
+$$
+\mathbf{y}
+=
+\mathbf{A}\mathbf{x}
++
+\mathbf{b},
+$$
 
-A @tbl-identidades-calculo-tab reúne algumas das identidades utilizadas ao longo do capítulo.
+o determinante de $\mathbf{A}$ determina a alteração de volume produzida pela transformação.
 
-| Função                                                                                         | Derivada ou diferencial                                                                                                 |
-|:-----------------------------------|:-----------------------------------|
-| $f(\mathbf{x})=\mathbf{a}^{\top}\mathbf{x}$                                                    | $\nabla_{\mathbf{x}}f=\mathbf{a}$                                                                                       |
-| $f(\mathbf{x})=\mathbf{x}^{\top}\mathbf{A}\mathbf{x}$                                          | $\nabla_{\mathbf{x}}f=(\mathbf{A}+\mathbf{A}^{\top})\mathbf{x}$                                                         |
-| $f(\mathbf{x})=\|\mathbf{b}-\mathbf{A}\mathbf{x}\|^2$                                          | $\nabla_{\mathbf{x}}f=-2\mathbf{A}^{\top}(\mathbf{b}-\mathbf{A}\mathbf{x})$                                             |
-| $\phi(\mathbf{X})=\operatorname{tr}(\mathbf{A}^{\top}\mathbf{X})$                              | $\nabla_{\mathbf{X}}\phi=\mathbf{A}$                                                                                    |
-| $\phi(\mathbf{X})=\|\mathbf{X}\|_F^2$                                                          | $\nabla_{\mathbf{X}}\phi=2\mathbf{X}$                                                                                   |
+Uma aplicação particularmente importante ocorre nas transformações elipsoidais:
+
+$$
+\mathbf{x}
+=
+\boldsymbol{\mu}
++
+\boldsymbol{\Sigma}^{1/2}\mathbf{z},
+$$
+
+para as quais
+
+$$
+(\mathbf{x}-\boldsymbol{\mu})^{\top}
+\boldsymbol{\Sigma}^{-1}
+(\mathbf{x}-\boldsymbol{\mu})
+=
+\mathbf{z}^{\top}\mathbf{z}.
+$$
+
+Essa identidade conecta formas quadráticas, raízes matriciais, determinantes e mudança de variáveis e será fundamental no estudo das distribuições multivariadas.
+
+### Identidades principais
+
+A @tbl-identidades-calculo reúne algumas das identidades de uso recorrente.
+
+| Função ou transformação | Derivada ou diferencial |
+|:---|:---|
+| $f(\mathbf{x})=\mathbf{a}^{\top}\mathbf{x}$ | $\nabla_{\mathbf{x}}f=\mathbf{a}$ |
+| $f(\mathbf{x})=\mathbf{x}^{\top}\mathbf{A}\mathbf{x}$ | $\nabla_{\mathbf{x}}f=(\mathbf{A}+\mathbf{A}^{\top})\mathbf{x}$ |
+| $f(\mathbf{x})=\|\mathbf{b}-\mathbf{A}\mathbf{x}\|^2$ | $\nabla_{\mathbf{x}}f=-2\mathbf{A}^{\top}(\mathbf{b}-\mathbf{A}\mathbf{x})$ |
+| $\phi(\mathbf{X})=\operatorname{tr}(\mathbf{A}^{\top}\mathbf{X})$ | $\nabla_{\mathbf{X}}\phi=\mathbf{A}$ |
+| $\phi(\mathbf{X})=\|\mathbf{X}\|_F^2$ | $\nabla_{\mathbf{X}}\phi=2\mathbf{X}$ |
 | $\phi(\mathbf{X})=\operatorname{tr}(\mathbf{X}^{\top}\mathbf{A}\mathbf{X}\boldsymbol{\Gamma})$ | $\nabla_{\mathbf{X}}\phi=\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}+\mathbf{A}^{\top}\mathbf{X}\boldsymbol{\Gamma}^{\top}$ |
-| $\mathbf{X}\mapsto\mathbf{X}^{-1}$                                                             | $d(\mathbf{X}^{-1})=-\mathbf{X}^{-1}(d\mathbf{X})\mathbf{X}^{-1}$                                                       |
-| $\phi(\mathbf{X})=\log\det(\mathbf{X})$, $\mathbf{X}\succ\mathbf{0}$                           | $d\phi=\operatorname{tr}(\mathbf{X}^{-1}d\mathbf{X})$                                                                   |
-| $\phi(\mathbf{X})=\operatorname{tr}(\mathbf{A}\mathbf{X}^{-1})$                                | $\nabla_{\mathbf{X}}\phi=-\mathbf{X}^{-\top}\mathbf{A}^{\top}\mathbf{X}^{-\top}$                                        |
-| $\mathbf{Y}=\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}$                                           | $\operatorname{vec}(\mathbf{Y})=(\boldsymbol{\Gamma}^{\top}\otimes\mathbf{A})\operatorname{vec}(\mathbf{X})$            |
+| $\mathbf{X}\mapsto\mathbf{X}^{-1}$ | $d(\mathbf{X}^{-1})=-\mathbf{X}^{-1}(d\mathbf{X})\mathbf{X}^{-1}$ |
+| $\phi(\mathbf{X})=\log\det(\mathbf{X})$, $\mathbf{X}\succ\mathbf{0}$ | $d\phi=\operatorname{tr}(\mathbf{X}^{-1}d\mathbf{X})$ |
+| $\phi(\mathbf{X})=\operatorname{tr}(\mathbf{A}\mathbf{X}^{-1})$ | $\nabla_{\mathbf{X}}\phi=-\mathbf{X}^{-\top}\mathbf{A}^{\top}\mathbf{X}^{-\top}$ |
+| $\mathbf{Y}=\mathbf{A}\mathbf{X}\boldsymbol{\Gamma}$ | $\operatorname{vec}(\mathbf{Y})=(\boldsymbol{\Gamma}^{\top}\otimes\mathbf{A})\operatorname{vec}(\mathbf{X})$ |
 
-: Identidades selecionadas de cálculo vetorial e matricial. {#tbl-identidades-calculo-tab} 
+: Identidades selecionadas de cálculo vetorial e matricial. {#tbl-identidades-calculo}
 
-Ao final do capítulo, o estudante deverá ser capaz de:
+### Aprofundamentos
 
--   distinguir gradiente, Jacobiana, Hessiana e gradiente matricial;
--   construir aproximações de Taylor de primeira e segunda ordens;
--   classificar pontos estacionários por meio da Hessiana;
--   reconhecer condições de convexidade e concavidade;
--   formular condições de primeira ordem em problemas com e sem restrições;
--   diferenciar formas quadráticas, critérios de resíduos e funções matriciais;
--   utilizar diferenciais de inversas, determinantes e log-determinantes;
--   aplicar vetorização, produto de Kronecker e meia vetorização;
--   interpretar o determinante Jacobiano em mudanças de variáveis;
--   reconhecer o papel do cálculo em problemas de estimação e inferência.
+O capítulo também apresentou três blocos de aprofundamento.
 
-O próximo capítulo inicia o estudo probabilístico dos dados multivariados por meio das matrizes de covariâncias e correlações. Essas matrizes combinam expectativas, produtos cruzados, formas quadráticas e transformações lineares, reunindo os principais objetos desenvolvidos ao longo do Módulo 1.
+O primeiro desenvolveu ferramentas para parâmetros matriciais vetorizados, incluindo:
+
+- gradientes e Hessianas vetorizados;
+- matriz de comutação;
+- operador $\operatorname{vech}$;
+- matrizes de duplicação e eliminação;
+- diferenciação de parâmetros simétricos;
+- Jacobianas de transformações matriciais.
+
+O segundo tratou da diferenciação sob o sinal de integração e das condições necessárias para justificar formalmente a troca entre derivação e integração.
+
+O terceiro mostrou aplicações das ferramentas de cálculo à estimação e à inferência, incluindo vetor escore, informação observada, informação de Fisher, método de Newton--Raphson, escore de Fisher e método delta.
+
+Esses aprofundamentos funcionam como material de referência. Sua compreensão integral não é necessária para a primeira leitura dos capítulos seguintes.
+
+### Competências
+
+Ao final deste capítulo, o estudante deverá ser capaz de:
+
+- distinguir diferencial, gradiente, Jacobiana, Hessiana e gradiente matricial;
+- interpretar gradientes e Hessianas em termos de variação local;
+- construir aproximações de Taylor de primeira e segunda ordens;
+- classificar pontos estacionários quando o teste da Hessiana é conclusivo;
+- reconhecer condições de convexidade e concavidade;
+- formular condições de primeira ordem em problemas com e sem restrições;
+- compreender a construção da direção de Newton;
+- diferenciar formas lineares, quadráticas e funções de resíduos;
+- interpretar as equações normais como condições de projeção;
+- utilizar diferenciais e propriedades do traço em funções matriciais;
+- diferenciar funções envolvendo inversas, determinantes e log-determinantes;
+- utilizar $\operatorname{vec}$, produto de Kronecker e sua identidade fundamental;
+- calcular probabilidades, marginais e esperanças por integração múltipla;
+- aplicar o Teorema da Mudança de Variáveis;
+- interpretar o determinante Jacobiano como fator local de alteração de volume;
+- reconhecer o papel das transformações afins e elipsoidais na Estatística Multivariada.
+
+O Capítulo 7 encerra o **Módulo I — Fundamentos Matemáticos e Geométricos da Análise Multivariada**.
+
+O próximo capítulo inicia o **Módulo II — Fundamentos Probabilísticos e Inferenciais da Análise Multivariada** com o estudo das matrizes de covariâncias e correlações. Esses objetos combinam produtos cruzados, expectativas, formas quadráticas, transformações lineares e estruturas espectrais, estabelecendo a passagem dos fundamentos matemáticos para a descrição probabilística dos dados multivariados.
