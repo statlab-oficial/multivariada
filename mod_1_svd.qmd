@@ -1,4 +1,4 @@
-# Decomposição em Valores Singulares
+# Decomposição em Valores Singulares (EM REVISÃO -  NÃO LER AINDA)
 
 No capítulo anterior, a decomposição espectral foi utilizada para representar uma matriz simétrica real na forma
 
@@ -20,7 +20,7 @@ $$
 \mathbb{R}^{n\times p},
 $$
 
-cujas linhas representam observações e cujas colunas representam variáveis. Em geral,
+cujas linhas representam observações e colunas representam variáveis. Em geral,
 
 $$
 n\neq p,
@@ -177,14 +177,38 @@ Esses elementos são os **valores singulares** de $\mathbf{A}$. [@golub2013matri
 
 A demonstração será apresentada posteriormente, após a construção da SVD a partir das decomposições espectrais de $\mathbf{A}^{\top}\mathbf{A}$ e $\mathbf{A}\mathbf{A}^{\top}$.
 
-A matriz $\mathbf{D}$ é denominada diagonal retangular porque
+A matriz $\mathbf D\in\mathbb R^{q\times p}$ é denominada **diagonal retangular** porque seus elementos fora da diagonal principal são nulos.
+
+Se
 
 $$
-D_{ij}=0
-\qquad
-\text{quando }
-i\neq j.
+s=\min(q,p),
 $$
+
+e $d_1,\ldots,d_s$ denotam seus elementos diagonais, então, utilizando a delta de Kronecker definida anteriormente,
+
+$$
+D_{ij}
+=
+d_i\delta_{ij},
+\qquad
+i,j=1,\ldots,s,
+$$
+
+enquanto os elementos que não pertencem ao bloco diagonal de ordem $s$ são iguais a zero.
+
+Equivalentemente,
+
+$$
+D_{ij}
+=
+\begin{cases}
+d_i, & i=j\leq s,\\
+0, & \text{caso contrário}.
+\end{cases}
+$$
+
+Assim, a delta de Kronecker expressa de forma compacta que apenas os elementos da diagonal principal podem ser diferentes de zero.
 
 Se
 
@@ -192,7 +216,13 @@ $$
 q>p,
 $$
 
-a matriz $\mathbf{D}$ possui linhas nulas abaixo de sua parte diagonal. Se
+então $s=p$ e $\mathbf D$ possui $q-p$ linhas nulas abaixo de sua parte diagonal. Se
+
+$$
+p>q,
+$$
+
+então $s=q$ e $\mathbf D$ possui $p-q$ colunas nulas à direita de sua parte diagonal. Se
 
 $$
 p>q,
@@ -218,6 +248,8 @@ d_1 & 0 & \cdots & 0\\
 \mathbb{R}^{q\times p}.
 $$
 
+Nesse caso, a parte diagonal possui $p=\min(q,p)$ elementos e as $q-p$ linhas restantes são nulas.
+
 Quando $p>q$,
 
 $$
@@ -233,15 +265,25 @@ d_1 & 0 & \cdots & 0 & 0 & \cdots & 0\\
 \mathbb{R}^{q\times p}.
 $$
 
-Se
+Agora, a parte diagonal possui $q=\min(q,p)$ elementos e as $p-q$ colunas restantes são nulas.
+
+Definindo
+
+$$
+s
+=
+\min(q,p),
+$$
+
+a matriz $\mathbf D$ possui, portanto, $s$ posições diagonais. Se
 
 $$
 r
 =
-\operatorname{posto}(\mathbf{A}),
+\operatorname{posto}(\mathbf A),
 $$
 
-então exatamente $r$ valores singulares são positivos:
+então exatamente $r$ valores singulares são positivos. Ordenando-os de forma decrescente,
 
 $$
 d_1
@@ -255,19 +297,29 @@ d_r
 0,
 $$
 
-enquanto os demais valores singulares são iguais a zero.
+enquanto, quando $r<s$,
 
-Assim, o número de valores singulares positivos é exatamente a dimensão da imagem de $T_{\mathbf{A}}$, isto é,
+$$
+d_{r+1}
+=
+\cdots
+=
+d_s
+=
+0.
+$$
+
+Assim, o número de valores singulares positivos é exatamente o posto de $\mathbf A$ e, consequentemente, a dimensão da imagem da transformação linear associada:
 
 $$
 r
 =
+\operatorname{posto}(\mathbf A)
+=
 \dim
 \left(
-\operatorname{Im}(T_{\mathbf{A}})
-\right)
-=
-\operatorname{posto}(\mathbf{A}).
+\operatorname{Im}(T_{\mathbf A})
+\right).
 $$
 
 ### Vetores singulares
@@ -716,11 +768,313 @@ $$
 
 A matriz $\mathbf{A}_k$ é uma aproximação de posto $k$. Suas propriedades de otimalidade e os erros produzidos pelo truncamento serão desenvolvidos posteriormente.
 
-Alguns textos utilizam as expressões **SVD reduzida** ou **SVD econômica** para formas que não incluem todas as colunas das matrizes ortogonais. Como essa terminologia não é uniforme, neste capítulo serão utilizadas as expressões:
+A terminologia empregada para as diferentes formas da SVD não é uniforme na literatura. Dependendo da referência, aparecem expressões como **SVD reduzida**, **SVD fina** (*thin SVD*), **SVD econômica** (*economy-sized SVD*) e **SVD compacta**, nem sempre com exatamente o mesmo significado [@demmel2000svd; @sidi2017vector; @driscoll2022fnc].
 
--   **SVD completa**, para a representação com bases ortonormais completas;
--   **SVD compacta**, para a representação exata com os valores singulares positivos;
--   **SVD truncada**, para a aproximação que conserva apenas os $k<r$ maiores valores singulares.
+Para evitar ambiguidades, neste capítulo serão utilizadas as seguintes convenções:
+
+- **SVD completa**, para a representação que utiliza bases ortonormais completas dos espaços de origem e de chegada;
+- **SVD compacta**, para a representação exata que conserva somente os $r=\operatorname{posto}(\mathbf A)$ valores singulares positivos e os vetores singulares correspondentes;
+- **SVD truncada**, para a aproximação que conserva apenas os $k<r$ maiores valores singulares.
+
+::: {#exm-formas-svd-retangular}
+
+## SVD completa, compacta e truncada de uma matriz retangular
+
+Considere a matriz
+
+$$
+\mathbf A
+=
+\begin{bmatrix}
+2&1&0\\
+1&2&1\\
+0&1&2\\
+2&0&1\\
+1&1&1
+\end{bmatrix}
+\in
+\mathbb R^{5\times3}.
+$$
+
+A matriz possui posto
+
+$$
+r=3
+$$
+
+e seus valores singulares, em ordem decrescente, são aproximadamente
+
+$$
+d_1=4.1780,
+\qquad
+d_2=2.1600,
+\qquad
+d_3=1.3706.
+$$
+
+Os valores apresentados a seguir estão arredondados a quatro casas decimais. Por esse motivo, as decomposições numéricas devem ser interpretadas a menos de arredondamento.
+
+**SVD completa**
+
+Uma SVD completa de $\mathbf A$ é
+
+$$
+\mathbf A
+\approx
+\mathbf U
+\mathbf D
+\mathbf V^{\top},
+$$
+
+em que
+
+$$
+\mathbf U
+\approx
+\begin{bmatrix}
+ 0.4449 &  0.5397 &  0.3147 & -0.6014 & -0.2239\\
+ 0.5461 & -0.2239 &  0.5466 &  0.5614 & -0.1943\\
+ 0.3803 & -0.6954 & -0.3419 & -0.4142 & -0.2887\\
+ 0.4348 &  0.4111 & -0.6965 &  0.3743 & -0.1295\\
+ 0.4126 & -0.0779 & -0.0136 & -0.1073 &  0.9011
+\end{bmatrix}
+\in
+\mathbb R^{5\times5},
+$$
+
+$$
+\mathbf D
+\approx
+\begin{bmatrix}
+4.1780&0&0\\
+0&2.1600&0\\
+0&0&1.3706\\
+0&0&0\\
+0&0&0
+\end{bmatrix}
+\in
+\mathbb R^{5\times3},
+$$
+
+e
+
+$$
+\mathbf V
+\approx
+\begin{bmatrix}
+ 0.6506 &  0.7406 & -0.1682\\
+ 0.5576 & -0.3155 &  0.7678\\
+ 0.5156 & -0.5933 & -0.6182
+\end{bmatrix}
+\in
+\mathbb R^{3\times3}.
+$$
+
+As colunas de $\mathbf U$ são os vetores singulares à esquerda,
+
+$$
+\mathbf u_1,\ldots,\mathbf u_5,
+$$
+
+e as colunas de $\mathbf V$ são os vetores singulares à direita,
+
+$$
+\mathbf v_1,\mathbf v_2,\mathbf v_3.
+$$
+
+Os três primeiros pares de vetores singulares estão associados aos três valores singulares positivos:
+
+$$
+(\mathbf u_1,\mathbf v_1)
+\longleftrightarrow
+d_1=4.1780,
+$$
+
+$$
+(\mathbf u_2,\mathbf v_2)
+\longleftrightarrow
+d_2=2.1600,
+$$
+
+e
+
+$$
+(\mathbf u_3,\mathbf v_3)
+\longleftrightarrow
+d_3=1.3706.
+$$
+
+As duas últimas colunas de $\mathbf U$ completam uma base ortonormal de $\mathbb R^5$. Elas correspondem às duas linhas nulas de $\mathbf D$.
+
+**SVD compacta**
+
+Como
+
+$$
+r=\operatorname{posto}(\mathbf A)=3,
+$$
+
+a SVD compacta conserva somente os três valores singulares positivos e os vetores singulares correspondentes:
+
+$$
+\mathbf A
+\approx
+\mathbf U_3
+\mathbf D_3
+\mathbf V_3^{\top},
+$$
+
+com
+
+$$
+\mathbf U_3
+\approx
+\begin{bmatrix}
+ 0.4449 &  0.5397 &  0.3147\\
+ 0.5461 & -0.2239 &  0.5466\\
+ 0.3803 & -0.6954 & -0.3419\\
+ 0.4348 &  0.4111 & -0.6965\\
+ 0.4126 & -0.0779 & -0.0136
+\end{bmatrix}
+\in
+\mathbb R^{5\times3},
+$$
+
+$$
+\mathbf D_3
+\approx
+\begin{bmatrix}
+4.1780&0&0\\
+0&2.1600&0\\
+0&0&1.3706
+\end{bmatrix}
+\in
+\mathbb R^{3\times3},
+$$
+
+e
+
+$$
+\mathbf V_3
+=
+\mathbf V
+\approx
+\begin{bmatrix}
+ 0.6506 &  0.7406 & -0.1682\\
+ 0.5576 & -0.3155 &  0.7678\\
+ 0.5156 & -0.5933 & -0.6182
+\end{bmatrix}
+\in
+\mathbb R^{3\times3}.
+$$
+
+A representação continua sendo exata antes do arredondamento numérico. A SVD compacta elimina apenas as duas colunas adicionais de $\mathbf U$ e as duas linhas nulas correspondentes de $\mathbf D$.
+
+Como
+
+$$
+r=p=3,
+$$
+
+todos os vetores singulares à direita participam da SVD compacta. Por isso,
+
+$$
+\mathbf V_3=\mathbf V.
+$$
+
+**SVD truncada de posto $2$**
+
+Considere agora a conservação apenas dos dois maiores valores singulares,
+
+$$
+d_1=4.1780
+\qquad\text{e}\qquad
+d_2=2.1600.
+$$
+
+A SVD truncada de posto $2$ utiliza
+
+$$
+\mathbf U_2
+\approx
+\begin{bmatrix}
+ 0.4449 &  0.5397\\
+ 0.5461 & -0.2239\\
+ 0.3803 & -0.6954\\
+ 0.4348 &  0.4111\\
+ 0.4126 & -0.0779
+\end{bmatrix}
+\in
+\mathbb R^{5\times2},
+$$
+
+$$
+\mathbf D_2
+\approx
+\begin{bmatrix}
+4.1780&0\\
+0&2.1600
+\end{bmatrix}
+\in
+\mathbb R^{2\times2},
+$$
+
+e
+
+$$
+\mathbf V_2
+\approx
+\begin{bmatrix}
+ 0.6506 &  0.7406\\
+ 0.5576 & -0.3155\\
+ 0.5156 & -0.5933
+\end{bmatrix}
+\in
+\mathbb R^{3\times2}.
+$$
+
+Assim,
+
+$$
+\mathbf A_2
+=
+\mathbf U_2
+\mathbf D_2
+\mathbf V_2^{\top}
+$$
+
+é uma aproximação de posto $2$ da matriz original. Numericamente,
+
+$$
+\mathbf A_2
+\approx
+\begin{bmatrix}
+2.0726 & 0.6688 & 0.2667\\
+1.1260 & 1.4248 & 1.4631\\
+-0.0788 & 1.3598 & 1.7103\\
+1.8394 & 0.7330 & 0.4098\\
+0.9969 & 1.0143 & 0.9885
+\end{bmatrix}.
+$$
+
+Como o terceiro valor singular positivo foi descartado,
+
+$$
+\mathbf A_2
+\neq
+\mathbf A.
+$$
+
+As três formas podem ser comparadas pelas dimensões de seus fatores:
+
+| Forma | Matriz à esquerda | Matriz diagonal | Matriz à direita | Valores singulares mantidos | Resultado |
+|:--|:--:|:--:|:--:|:--:|:--|
+| SVD completa | $\mathbf U:5\times5$ | $\mathbf D:5\times3$ | $\mathbf V:3\times3$ | $d_1,d_2,d_3$ | Exato |
+| SVD compacta | $\mathbf U_3:5\times3$ | $\mathbf D_3:3\times3$ | $\mathbf V_3:3\times3$ | $d_1,d_2,d_3$ | Exato |
+| SVD truncada | $\mathbf U_2:5\times2$ | $\mathbf D_2:2\times2$ | $\mathbf V_2:3\times2$ | $d_1,d_2$ | Aproximado |
+
+A SVD completa apresenta bases ortonormais completas dos espaços de origem e de chegada. A SVD compacta mantém somente as direções associadas aos valores singulares positivos, sem perder informação necessária à reconstrução de $\mathbf A$. A SVD truncada conserva apenas parte dessas direções e, por isso, produz uma aproximação de posto menor.
+:::
 
 ### Não unicidade dos vetores singulares
 
@@ -860,9 +1214,11 @@ $$
 \mathbf{A}\mathbf{A}^{\top}.
 $$
 
+
+
 A próxima seção constrói essa relação e demonstra por que os quadrados dos valores singulares aparecem como autovalores dessas duas matrizes.
 
-## Construção da SVD e relação com a decomposição espectral
+## Construção da SVD e relação com a deomposição espectral
 
 A existência da SVD decorre das propriedades das duas matrizes de Gram associadas a $\mathbf{A}$:
 
@@ -1729,163 +2085,6 @@ Essa construção também explicita o papel dos três fatores:
 - as colunas de $\mathbf{V}_r$ formam uma base ortonormal das direções do domínio que não pertencem ao núcleo;
 - $\mathbf{D}_r$ contém os fatores de escalonamento positivos;
 - as colunas de $\mathbf{U}_r$ formam uma base ortonormal da imagem da transformação.
-
-### Demonstração da existência da SVD completa
-
-A construção anterior também demonstra o @thm-existencia-svd.
-
-::: {.proof}
-Os vetores
-
-$$
-\mathbf{v}_{r+1},\ldots,\mathbf{v}_p
-$$
-
-estão associados ao autovalor zero de
-
-$$
-\mathbf{A}^{\top}\mathbf{A}.
-$$
-
-Pelo @thm-espectros-gram-svd,
-
-$$
-\mathcal{N}
-\left(
-\mathbf{A}^{\top}\mathbf{A}
-\right)
-=
-\mathcal{N}(\mathbf{A}).
-$$
-
-Logo,
-
-$$
-\mathbf{A}\mathbf{v}_j
-=
-\mathbf{0},
-\qquad
-j=r+1,\ldots,p.
-$$
-
-Como mostrado na construção da SVD compacta, os vetores
-
-$$
-\mathbf{u}_1,\ldots,\mathbf{u}_r
-$$
-
-formam uma base ortonormal de
-
-$$
-\operatorname{Im}(T_{\mathbf{A}})
-=
-\mathcal{C}(\mathbf{A}).
-$$
-
-Pela ortogonalidade entre os espaços fundamentais,
-
-$$
-\mathcal{C}(\mathbf{A})^{\perp}
-=
-\mathcal{N}
-\left(
-\mathbf{A}^{\top}
-\right).
-$$
-
-Complete esse conjunto com uma base ortonormal
-
-$$
-\mathbf{u}_{r+1},\ldots,\mathbf{u}_q
-$$
-
-de
-
-$$
-\mathcal{N}
-\left(
-\mathbf{A}^{\top}
-\right).
-$$
-
-Defina
-
-$$
-\mathbf{U}
-=
-\begin{bmatrix}
-\mathbf{u}_1&
-\cdots&
-\mathbf{u}_q
-\end{bmatrix}
-$$
-
-e mantenha
-
-$$
-\mathbf{V}
-=
-\begin{bmatrix}
-\mathbf{v}_1&
-\cdots&
-\mathbf{v}_p
-\end{bmatrix}.
-$$
-
-As duas matrizes são ortogonais.
-
-Construa a matriz diagonal retangular
-
-$$
-\mathbf{D}
-\in
-\mathbb{R}^{q\times p}
-$$
-
-colocando
-
-$$
-d_1,\ldots,d_r
-$$
-
-em suas primeiras posições diagonais e zeros nas demais posições.
-
-Para $j\leq r$,
-
-$$
-\mathbf{A}\mathbf{v}_j
-=
-d_j\mathbf{u}_j.
-$$
-
-Para $j>r$,
-
-$$
-\mathbf{A}\mathbf{v}_j
-=
-\mathbf{0}.
-$$
-
-Essas relações podem ser reunidas em
-
-$$
-\mathbf{A}\mathbf{V}
-=
-\mathbf{U}\mathbf{D}.
-$$
-
-Multiplicando à direita por $\mathbf{V}^{\top}$,
-
-$$
-\mathbf{A}
-=
-\mathbf{U}
-\mathbf{D}
-\mathbf{V}^{\top}.
-$$
-
-Portanto, toda matriz real possui uma SVD completa.
-:::
 
 ### Decomposições espectrais associadas
 
