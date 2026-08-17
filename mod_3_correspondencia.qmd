@@ -1,0 +1,2489 @@
+# Formulação da Análise de Correspondência
+
+A Análise de Correspondência representa geometricamente a associação entre as categorias de duas variáveis qualitativas a partir de uma tabela de contingência. O ponto de partida não é uma matriz de covariâncias nem uma matriz geral de dissimilaridades, mas a distribuição conjunta das frequências observadas entre categorias de linhas e colunas.
+
+A técnica compara os perfis observados com a estrutura esperada sob independência. Essa comparação define uma geometria ponderada pelas frequências marginais das categorias. A matriz resultante é então decomposta por SVD, utilizando diretamente os resultados desenvolvidos no Módulo 1. O objetivo deste capítulo é formular essa construção e mostrar como os desvios da independência produzem distâncias, inércia e coordenadas para linhas e colunas [@greenacre2017ca].
+
+Os elementos da formulação são organizados na @tbl-estrutura-correspondencia.
+
+| Elemento | Objeto | Papel na análise |
+|---|---|---|
+| dados observados | tabela de contingência $\mathbf N$ | registra as frequências conjuntas |
+| distribuição observada | matriz $\mathbf P$ | expressa frequências relativas |
+| pesos marginais | massas $\mathbf r$ e $\mathbf c$ | determinam a importância relativa das categorias |
+| representação interna | perfis de linhas e de colunas | descreve distribuições condicionais |
+| referência | independência | fornece a estrutura sem associação |
+| geometria | distância qui-quadrado | compara perfis com ponderação pelas massas |
+| estrutura matricial | desvios padronizados $\mathbf Q_{\mathrm{CA}}$ | reúne os desvios da independência |
+| solução | SVD de $\mathbf Q_{\mathrm{CA}}$ | produz inércias e coordenadas |
+
+: Elementos da formulação da Análise de Correspondência. {#tbl-estrutura-correspondencia}
+
+## O problema de associação em uma tabela de contingência
+
+Considere duas variáveis qualitativas, uma com $I$ categorias e outra com $J$ categorias. As frequências observadas são organizadas na tabela
+
+$$
+\mathbf N
+=
+(n_{ij})
+\in
+\mathbb R^{I\times J},
+$$
+
+em que
+
+$$
+n_{ij}\geq0
+$$
+
+representa a frequência conjunta da categoria $i$ da variável das linhas com a categoria $j$ da variável das colunas.
+
+O total observado é
+
+$$
+n
+=
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+n_{ij}.
+$$ {#eq-total-correspondencia}
+
+A Análise de Correspondência trabalha com a matriz de frequências relativas
+
+$$
+\mathbf P
+=
+\frac{1}{n}\mathbf N
+=
+(p_{ij})
+\in
+\mathbb R^{I\times J}.
+$$ {#eq-matriz-frequencias-relativas-ca}
+
+Assim,
+
+$$
+p_{ij}
+=
+\frac{n_{ij}}{n}
+$$
+
+e
+
+$$
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+p_{ij}
+=
+1.
+$$
+
+A matriz $\mathbf P$ descreve a distribuição conjunta observada. A análise procura determinar como essa distribuição se afasta da estrutura correspondente à independência e representar esse afastamento em poucas dimensões.
+
+A tabela possui duas leituras complementares. Comparando as linhas, investigam-se diferenças entre as distribuições das categorias das colunas condicionadas a cada linha. Comparando as colunas, investigam-se diferenças entre as distribuições das categorias das linhas condicionadas a cada coluna.
+
+## Frequências marginais, massas e perfis
+
+Defina
+
+$$
+\mathbf r
+=
+\mathbf P\mathbf1_J
+=
+\begin{pmatrix}
+r_1\\
+\vdots\\
+r_I
+\end{pmatrix}
+$$ {#eq-massas-linhas-ca}
+
+e
+
+$$
+\mathbf c
+=
+\mathbf P^\top\mathbf1_I
+=
+\begin{pmatrix}
+c_1\\
+\vdots\\
+c_J
+\end{pmatrix}.
+$$ {#eq-massas-colunas-ca}
+
+Cada elemento satisfaz
+
+$$
+r_i
+=
+\sum_{j=1}^{J}p_{ij}
+$$
+
+e
+
+$$
+c_j
+=
+\sum_{i=1}^{I}p_{ij}.
+$$
+
+Como $\mathbf P$ possui soma total igual a $1$,
+
+$$
+\mathbf1_I^\top\mathbf r
+=
+1
+$$
+
+e
+
+$$
+\mathbf1_J^\top\mathbf c
+=
+1.
+$$
+
+::: {#def-massas-correspondencia}
+## Massas de linhas e colunas
+
+As **massas das linhas** são as frequências relativas marginais
+
+$$
+r_i,
+\qquad
+i=1,\ldots,I,
+$$
+
+e as **massas das colunas** são
+
+$$
+c_j,
+\qquad
+j=1,\ldots,J.
+$$
+
+As matrizes diagonais associadas são
+
+$$
+\mathbf D_r
+=
+\operatorname{diag}(r_1,\ldots,r_I)
+$$
+
+e
+
+$$
+\mathbf D_c
+=
+\operatorname{diag}(c_1,\ldots,c_J).
+$$
+:::
+
+Na formulação básica, considera-se
+
+$$
+r_i>0
+\qquad\text{e}\qquad
+c_j>0
+$$
+
+para todas as categorias ativas. Essa condição garante que os perfis estejam definidos e que as matrizes inversas utilizadas na ponderação existam.
+
+### Perfis de linhas e colunas
+
+A Análise de Correspondência compara distribuições condicionais, denominadas perfis.
+
+::: {#def-perfis-correspondencia}
+## Perfis de linhas e de colunas
+
+O **perfil da linha $i$** é
+
+$$
+\mathbf p_{i\mid\cdot}
+=
+\begin{pmatrix}
+\dfrac{p_{i1}}{r_i}\\
+\vdots\\
+\dfrac{p_{iJ}}{r_i}
+\end{pmatrix}
+\in
+\mathbb R^J.
+$$ {#eq-perfil-linha-ca}
+
+O **perfil da coluna $j$** é
+
+$$
+\mathbf p_{\cdot\mid j}
+=
+\begin{pmatrix}
+\dfrac{p_{1j}}{c_j}\\
+\vdots\\
+\dfrac{p_{Ij}}{c_j}
+\end{pmatrix}
+\in
+\mathbb R^I.
+$$ {#eq-perfil-coluna-ca}
+:::
+
+Cada perfil possui soma unitária:
+
+$$
+\mathbf1_J^\top
+\mathbf p_{i\mid\cdot}
+=
+1
+$$
+
+e
+
+$$
+\mathbf1_I^\top
+\mathbf p_{\cdot\mid j}
+=
+1.
+$$
+
+Os perfis de linhas podem ser reunidos na matriz
+
+$$
+\mathbf P^{(r)}
+=
+\mathbf D_r^{-1}\mathbf P
+\in
+\mathbb R^{I\times J},
+$$ {#eq-matriz-perfis-linhas-ca}
+
+enquanto os perfis de colunas são organizados em
+
+$$
+\mathbf P^{(c)}
+=
+\mathbf D_c^{-1}\mathbf P^\top
+\in
+\mathbb R^{J\times I}.
+$$ {#eq-matriz-perfis-colunas-ca}
+
+O perfil médio das linhas, ponderado pelas massas $r_i$, é
+
+$$
+\sum_{i=1}^{I}
+r_i
+\mathbf p_{i\mid\cdot}
+=
+\mathbf c,
+$$ {#eq-centro-perfis-linhas-ca}
+
+e, de forma dual,
+
+$$
+\sum_{j=1}^{J}
+c_j
+\mathbf p_{\cdot\mid j}
+=
+\mathbf r.
+$$ {#eq-centro-perfis-colunas-ca}
+
+Assim, $\mathbf c$ é o centro ponderado da nuvem dos perfis de linhas e $\mathbf r$ é o centro ponderado da nuvem dos perfis de colunas.
+
+### Independência como referência
+
+Sob independência,
+
+$$
+p_{ij}
+=
+r_ic_j,
+$$ {#eq-independencia-celula-ca}
+
+ou, em forma matricial,
+
+$$
+\mathbf P
+=
+\mathbf r\mathbf c^\top.
+$$ {#eq-independencia-matricial-ca}
+
+Nesse caso,
+
+$$
+\frac{p_{ij}}{r_i}
+=
+c_j,
+$$
+
+de modo que todos os perfis de linhas coincidem com $\mathbf c$. Analogamente, todos os perfis de colunas coincidem com $\mathbf r$.
+
+A independência corresponde, portanto, ao colapso de cada nuvem de perfis em seu respectivo centro.
+
+Quando
+
+$$
+\mathbf P
+\neq
+\mathbf r\mathbf c^\top,
+$$
+
+as diferenças
+
+$$
+p_{ij}-r_ic_j
+$$
+
+representam os desvios observados em relação à independência.
+
+## Geometria dos perfis
+
+A Análise de Correspondência compara os perfis utilizando uma geometria ponderada pelas massas marginais.
+
+No Módulo 1, o produto interno induzido e sua norma foram definidos em @def-produto-interno-induzido e @def-norma-induzida. Para os perfis de linhas, a matriz que define essa geometria é
+
+$$
+\mathbf D_c^{-1}.
+$$
+
+::: {#def-distancia-qui-quadrado-ca}
+## Distância qui-quadrado entre perfis
+
+A distância qui-quadrado entre as linhas $i$ e $i'$ é
+
+$$
+d_{\chi^2}^2(i,i')
+=
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf p_{i'\mid\cdot}
+\right)^\top
+\mathbf D_c^{-1}
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf p_{i'\mid\cdot}
+\right).
+$$ {#eq-distancia-qui-quadrado-linhas-ca}
+
+Equivalentemente,
+
+$$
+d_{\chi^2}^2(i,i')
+=
+\sum_{j=1}^{J}
+\frac{1}{c_j}
+\left(
+\frac{p_{ij}}{r_i}
+-
+\frac{p_{i'j}}{r_{i'}}
+\right)^2.
+$$
+
+Para duas colunas $j$ e $j'$,
+
+$$
+d_{\chi^2}^2(j,j')
+=
+\left(
+\mathbf p_{\cdot\mid j}
+-
+\mathbf p_{\cdot\mid j'}
+\right)^\top
+\mathbf D_r^{-1}
+\left(
+\mathbf p_{\cdot\mid j}
+-
+\mathbf p_{\cdot\mid j'}
+\right).
+$$ {#eq-distancia-qui-quadrado-colunas-ca}
+:::
+
+A distância de uma linha ao centro da nuvem é
+
+$$
+d_{\chi^2}^2(i,\mathbf c)
+=
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf c
+\right)^\top
+\mathbf D_c^{-1}
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf c
+\right),
+$$ {#eq-distancia-perfil-centro-ca}
+
+ou
+
+$$
+d_{\chi^2}^2(i,\mathbf c)
+=
+\sum_{j=1}^{J}
+\frac{
+(p_{ij}-r_ic_j)^2
+}{
+r_i^2c_j
+}.
+$$ {#eq-distancia-linha-independencia-ca}
+
+## Inércia e afastamento da independência
+
+::: {#def-inercia-correspondencia}
+## Inércia total
+
+A **inércia total** da tabela é
+
+$$
+\mathcal I
+=
+\sum_{i=1}^{I}
+r_i
+d_{\chi^2}^2(i,\mathbf c).
+$$ {#eq-inercia-linhas-ca}
+
+Equivalentemente,
+
+$$
+\mathcal I
+=
+\sum_{j=1}^{J}
+c_j
+d_{\chi^2}^2(j,\mathbf r).
+$$ {#eq-inercia-colunas-ca}
+:::
+
+Substituindo @eq-distancia-linha-independencia-ca,
+
+$$
+\mathcal I
+=
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+\frac{
+(p_{ij}-r_ic_j)^2
+}{
+r_ic_j
+}.
+$$ {#eq-inercia-celulas-ca}
+
+Sob massas positivas,
+
+$$
+\mathcal I=0
+$$
+
+se, e somente se,
+
+$$
+\mathbf P
+=
+\mathbf r\mathbf c^\top.
+$$
+
+## Matriz de desvios padronizados
+
+::: {#def-matriz-desvios-padronizados-ca}
+## Matriz de desvios padronizados
+
+A matriz de desvios padronizados da Análise de Correspondência é
+
+$$
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf D_r^{-1/2}
+\left(
+\mathbf P
+-
+\mathbf r\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}.
+$$ {#eq-matriz-desvios-padronizados-ca}
+
+Seu elemento $(i,j)$ é
+
+$$
+q_{ij}
+=
+\frac{
+p_{ij}-r_ic_j
+}{
+\sqrt{r_ic_j}
+}.
+$$ {#eq-elemento-desvio-padronizado-ca}
+:::
+
+A matriz $\mathbf Q_{\mathrm{CA}}$ representa, em coordenadas ponderadas, os desvios da distribuição observada em relação à independência.
+
+Além disso,
+
+$$
+\mathbf Q_{\mathrm{CA}}
+\mathbf D_c^{1/2}
+\mathbf1_J
+=
+\mathbf0
+$$ {#eq-nucleo-colunas-qca}
+
+e
+
+$$
+\mathbf Q_{\mathrm{CA}}^\top
+\mathbf D_r^{1/2}
+\mathbf1_I
+=
+\mathbf0.
+$$ {#eq-nucleo-linhas-qca}
+
+Consequentemente,
+
+$$
+\operatorname{rank}
+(\mathbf Q_{\mathrm{CA}})
+\leq
+\min(I-1,J-1).
+$$ {#eq-posto-maximo-ca}
+
+### Inércia como norma matricial
+
+Pela norma de Frobenius definida em @def-norma-frobenius,
+
+$$
+\left\|
+\mathbf Q_{\mathrm{CA}}
+\right\|_F^2
+=
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+\frac{
+(p_{ij}-r_ic_j)^2
+}{
+r_ic_j
+}.
+$$
+
+Logo,
+
+$$
+\mathcal I
+=
+\left\|
+\mathbf Q_{\mathrm{CA}}
+\right\|_F^2.
+$$ {#eq-inercia-frobenius-ca}
+
+::: {#prp-inercia-matriz-ca}
+## Formas equivalentes da inércia
+
+A inércia total pode ser expressa pela dispersão ponderada dos perfis de linhas,
+
+$$
+\mathcal I
+=
+\sum_{i=1}^{I}
+r_i
+d_{\chi^2}^2(i,\mathbf c),
+$$
+
+pela dispersão ponderada dos perfis de colunas,
+
+$$
+\mathcal I
+=
+\sum_{j=1}^{J}
+c_j
+d_{\chi^2}^2(j,\mathbf r),
+$$
+
+ou pela norma de Frobenius,
+
+$$
+\mathcal I
+=
+\left\|
+\mathbf Q_{\mathrm{CA}}
+\right\|_F^2.
+$$
+:::
+
+## Relação com a estatística qui-quadrado
+
+A estatística de Pearson é
+
+$$
+\chi^2
+=
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+\frac{
+(n_{ij}-nr_ic_j)^2
+}{
+nr_ic_j
+}.
+$$ {#eq-qui-quadrado-pearson-ca}
+
+Como
+
+$$
+n_{ij}=np_{ij},
+$$
+
+segue que
+
+$$
+\chi^2
+=
+n
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+\frac{
+(p_{ij}-r_ic_j)^2
+}{
+r_ic_j
+}.
+$$
+
+Portanto,
+
+$$
+\chi^2
+=
+n\mathcal I.
+$$ {#eq-qui-quadrado-inercia-ca}
+
+Neste ponto, a relação é uma identidade algébrica entre a estatística calculada da tabela e a inércia utilizada na representação geométrica. Sua interpretação inferencial exige um modelo amostral.
+
+## Formulação pela decomposição em valores singulares
+
+A matriz
+
+$$
+\mathbf Q_{\mathrm{CA}}
+\in
+\mathbb R^{I\times J}
+$$
+
+é, em geral, retangular. Sua decomposição utiliza diretamente a SVD já desenvolvida no Módulo 1.
+
+Se
+
+$$
+K
+=
+\operatorname{rank}
+(\mathbf Q_{\mathrm{CA}}),
+$$
+
+a SVD compacta de @def-svd-compacta fornece
+
+$$
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf U
+\mathbf D
+\mathbf V^\top,
+$$ {#eq-svd-correspondencia}
+
+com
+
+$$
+\mathbf U^\top\mathbf U
+=
+\mathbf I_K,
+\qquad
+\mathbf V^\top\mathbf V
+=
+\mathbf I_K,
+$$
+
+e
+
+$$
+\mathbf D
+=
+\operatorname{diag}(d_1,\ldots,d_K),
+$$
+
+em que
+
+$$
+d_1\geq\cdots\geq d_K>0.
+$$
+
+### Inércias principais
+
+::: {#def-inercia-principal-ca}
+## Inércia principal
+
+A inércia principal da dimensão $\ell$ é
+
+$$
+\lambda_\ell
+=
+d_\ell^2,
+\qquad
+\ell=1,\ldots,K.
+$$ {#eq-inercia-principal-ca}
+:::
+
+Como
+
+$$
+\mathcal I
+=
+\left\|
+\mathbf Q_{\mathrm{CA}}
+\right\|_F^2,
+$$
+
+segue que
+
+$$
+\mathcal I
+=
+\sum_{\ell=1}^{K}
+\lambda_\ell.
+$$ {#eq-decomposicao-inercia-ca}
+
+Consequentemente,
+
+$$
+\chi^2
+=
+n
+\sum_{\ell=1}^{K}
+\lambda_\ell.
+$$ {#eq-decomposicao-qui-quadrado-ca}
+
+A proporção da inércia associada à dimensão $\ell$ é
+
+$$
+\frac{
+\lambda_\ell
+}{
+\sum_{h=1}^{K}\lambda_h
+}.
+$$ {#eq-proporcao-inercia-ca}
+
+Para as primeiras $k$ dimensões,
+
+$$
+\frac{
+\sum_{\ell=1}^{k}\lambda_\ell
+}{
+\sum_{\ell=1}^{K}\lambda_\ell
+}
+$$ {#eq-inercia-acumulada-ca}
+
+é a proporção acumulada da inércia representada.
+
+### Representação em dimensão reduzida
+
+Para
+
+$$
+k<K,
+$$
+
+a SVD truncada fornece
+
+$$
+\mathbf Q_{\mathrm{CA},k}
+=
+\mathbf U_k
+\mathbf D_k
+\mathbf V_k^\top.
+$$ {#eq-svd-truncada-ca}
+
+Pelo Teorema de Eckart–Young–Mirsky em @thm-eckart-young-mirsky,
+
+$$
+\mathbf Q_{\mathrm{CA},k}
+$$
+
+é uma melhor aproximação de posto no máximo $k$ de $\mathbf Q_{\mathrm{CA}}$ em norma de Frobenius.
+
+O erro é
+
+$$
+\left\|
+\mathbf Q_{\mathrm{CA}}
+-
+\mathbf Q_{\mathrm{CA},k}
+\right\|_F^2
+=
+\sum_{\ell=k+1}^{K}
+\lambda_\ell.
+$$ {#eq-inercia-nao-representada-ca}
+
+A inércia representada é
+
+$$
+\mathcal I_k
+=
+\sum_{\ell=1}^{k}
+\lambda_\ell.
+$$ {#eq-inercia-representada-ca}
+
+O resultado de posto reduzido deve ser interpretado em relação ao objeto decomposto: na Análise de Correspondência, a SVD truncada aproxima a matriz ponderada de desvios da independência.
+
+## Coordenadas da Análise de Correspondência
+
+A geometria dos perfis é ponderada pelas massas. As coordenadas utilizadas na representação incorporam essa ponderação.
+
+### Coordenadas padrão
+
+::: {#def-coordenadas-padrao-ca}
+## Coordenadas padrão
+
+As coordenadas padrão das linhas são
+
+$$
+\mathbf A_r
+=
+\mathbf D_r^{-1/2}
+\mathbf U,
+$$ {#eq-coordenadas-padrao-linhas-ca}
+
+e as coordenadas padrão das colunas são
+
+$$
+\mathbf A_c
+=
+\mathbf D_c^{-1/2}
+\mathbf V.
+$$ {#eq-coordenadas-padrao-colunas-ca}
+:::
+
+Como
+
+$$
+\mathbf U^\top\mathbf U
+=
+\mathbf I_K,
+$$
+
+tem-se
+
+$$
+\mathbf A_r^\top
+\mathbf D_r
+\mathbf A_r
+=
+\mathbf I_K.
+$$ {#eq-ortonormalidade-padrao-linhas-ca}
+
+Da mesma forma,
+
+$$
+\mathbf A_c^\top
+\mathbf D_c
+\mathbf A_c
+=
+\mathbf I_K.
+$$ {#eq-ortonormalidade-padrao-colunas-ca}
+
+### Coordenadas principais
+
+::: {#def-coordenadas-principais-ca}
+## Coordenadas principais
+
+As coordenadas principais das linhas são
+
+$$
+\mathbf F_r
+=
+\mathbf A_r\mathbf D
+=
+\mathbf D_r^{-1/2}
+\mathbf U\mathbf D,
+$$ {#eq-coordenadas-principais-linhas-ca}
+
+e as coordenadas principais das colunas são
+
+$$
+\mathbf F_c
+=
+\mathbf A_c\mathbf D
+=
+\mathbf D_c^{-1/2}
+\mathbf V\mathbf D.
+$$ {#eq-coordenadas-principais-colunas-ca}
+:::
+
+Para as linhas,
+
+$$
+\mathbf F_r^\top
+\mathbf D_r
+\mathbf F_r
+=
+\mathbf D^2,
+$$ {#eq-dispersao-coordenadas-linhas-ca}
+
+de modo que
+
+$$
+\sum_{i=1}^{I}
+r_i
+\left(
+f_{i\ell}^{(r)}
+\right)^2
+=
+\lambda_\ell.
+$$ {#eq-inercia-eixo-linhas-ca}
+
+Analogamente,
+
+$$
+\mathbf F_c^\top
+\mathbf D_c
+\mathbf F_c
+=
+\mathbf D^2
+$$ {#eq-dispersao-coordenadas-colunas-ca}
+
+e
+
+$$
+\sum_{j=1}^{J}
+c_j
+\left(
+f_{j\ell}^{(c)}
+\right)^2
+=
+\lambda_\ell.
+$$ {#eq-inercia-eixo-colunas-ca}
+
+Cada inércia principal pode, portanto, ser obtida tanto pela dispersão ponderada das coordenadas das linhas quanto pela dispersão ponderada das coordenadas das colunas.
+
+### Distâncias entre perfis e coordenadas principais
+
+As coordenadas principais preservam a geometria qui-quadrado quando todas as dimensões não nulas da Análise de Correspondência são mantidas.
+
+Considere a matriz dos perfis de linhas,
+
+$$
+\mathbf P^{(r)}
+=
+\mathbf D_r^{-1}\mathbf P.
+$$
+
+Como
+
+$$
+\mathbf P
+-
+\mathbf r\mathbf c^\top
+=
+\mathbf D_r
+\left(
+\mathbf P^{(r)}
+-
+\mathbf1_I\mathbf c^\top
+\right),
+$$
+
+a matriz de desvios padronizados pode ser escrita como
+
+$$
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf D_r^{1/2}
+\left(
+\mathbf P^{(r)}
+-
+\mathbf1_I\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}.
+$$ {#eq-qca-perfis-linhas}
+
+Logo,
+
+$$
+\left(
+\mathbf P^{(r)}
+-
+\mathbf1_I\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}
+=
+\mathbf D_r^{-1/2}
+\mathbf Q_{\mathrm{CA}}.
+$$
+
+Substituindo a SVD de @eq-svd-correspondencia,
+
+$$
+\begin{aligned}
+\left(
+\mathbf P^{(r)}
+-
+\mathbf1_I\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}
+&=
+\mathbf D_r^{-1/2}
+\mathbf U
+\mathbf D
+\mathbf V^\top
+\\
+&=
+\mathbf F_r
+\mathbf V^\top.
+\end{aligned}
+$$ {#eq-perfis-coordenadas-principais-linhas}
+
+A linha $i$ da matriz à esquerda é
+
+$$
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf c
+\right)^\top
+\mathbf D_c^{-1/2},
+$$
+
+isto é, o perfil centralizado representado na geometria qui-quadrado.
+
+Para duas linhas $i$ e $i'$, a diferença entre essas representações é
+
+$$
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf p_{i'\mid\cdot}
+\right)^\top
+\mathbf D_c^{-1/2}.
+$$
+
+Sua norma euclidiana ao quadrado é
+
+$$
+\begin{aligned}
+&
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf p_{i'\mid\cdot}
+\right)^\top
+\mathbf D_c^{-1}
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf p_{i'\mid\cdot}
+\right)
+\\
+&\qquad =
+d_{\chi^2}^2
+\left(
+i,i'
+\right).
+\end{aligned}
+$$
+
+Por @eq-perfis-coordenadas-principais-linhas, essa mesma diferença pode ser escrita nas coordenadas principais das linhas. Como as colunas de $\mathbf V$ são ortonormais e contêm todas as direções não nulas da representação,
+
+$$
+d_{\chi^2}^2
+\left(
+i,i'
+\right)
+=
+\left\|
+\mathbf f_i^{(r)}
+-
+\mathbf f_{i'}^{(r)}
+\right\|^2,
+$$ {#eq-preservacao-distancias-linhas-ca}
+
+em que
+
+$$
+\mathbf f_i^{(r)}
+$$
+
+denota a linha $i$ de $\mathbf F_r$.
+
+De modo análogo,
+
+$$
+d_{\chi^2}^2
+\left(
+j,j'
+\right)
+=
+\left\|
+\mathbf f_j^{(c)}
+-
+\mathbf f_{j'}^{(c)}
+\right\|^2.
+$$ {#eq-preservacao-distancias-colunas-ca}
+
+::: {#prp-preservacao-distancias-ca}
+## Preservação das distâncias qui-quadrado
+
+Considere uma tabela com massas de linhas e colunas estritamente positivas e as coordenadas principais obtidas da SVD de $\mathbf Q_{\mathrm{CA}}$. Quando todas as dimensões associadas aos valores singulares positivos são mantidas, as distâncias euclidianas entre as coordenadas principais das linhas reproduzem exatamente as distâncias qui-quadrado entre seus perfis.
+
+O mesmo resultado vale para os perfis de colunas e suas coordenadas principais.
+:::
+
+O resultado explica por que a Análise de Correspondência pode representar uma geometria originalmente ponderada por meio de coordenadas euclidianas. A ponderação pelas massas é incorporada antes da SVD; depois dessa transformação, as distâncias entre os pontos podem ser medidas pela norma euclidiana usual.
+
+Quando apenas as primeiras $k<K$ dimensões são mantidas,
+
+$$
+\left\|
+\mathbf f_{i,k}^{(r)}
+-
+\mathbf f_{i',k}^{(r)}
+\right\|^2
+\leq
+d_{\chi^2}^2
+\left(
+i,i'
+\right),
+$$
+
+pois parte das coordenadas é descartada.
+
+A igualdade é recuperada quando todas as dimensões que contribuem para a diferença entre os dois perfis são mantidas.
+
+### Relações baricêntricas
+
+A representação das linhas e das colunas não resulta de duas análises separadas. As duas nuvens estão relacionadas pela mesma matriz $\mathbf P$ e pela mesma decomposição em valores singulares.
+
+Partindo de
+
+$$
+\mathbf Q_{\mathrm{CA}}
+\mathbf V
+=
+\mathbf U\mathbf D,
+$$
+
+tem-se
+
+$$
+\mathbf D_r^{-1/2}
+\left(
+\mathbf P-\mathbf r\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}
+\mathbf V
+=
+\mathbf U\mathbf D.
+$$
+
+Como
+
+$$
+\mathbf A_c
+=
+\mathbf D_c^{-1/2}
+\mathbf V,
+$$
+
+segue que
+
+$$
+\mathbf D_r^{-1/2}
+\left(
+\mathbf P-\mathbf r\mathbf c^\top
+\right)
+\mathbf A_c
+=
+\mathbf U\mathbf D.
+$$
+
+Para os vetores singulares associados aos valores singulares positivos,
+
+$$
+\mathbf c^\top
+\mathbf A_c
+=
+\mathbf0^\top.
+$$ {#eq-centro-coordenadas-padrao-colunas-ca}
+
+Logo,
+
+$$
+\mathbf D_r^{-1/2}
+\mathbf P
+\mathbf A_c
+=
+\mathbf U\mathbf D.
+$$
+
+Multiplicando à esquerda por $\mathbf D_r^{-1/2}$,
+
+$$
+\mathbf F_r
+=
+\mathbf D_r^{-1}
+\mathbf P
+\mathbf A_c.
+$$ {#eq-relacao-baricentrica-linhas-ca}
+
+De forma dual,
+
+$$
+\mathbf F_c
+=
+\mathbf D_c^{-1}
+\mathbf P^\top
+\mathbf A_r.
+$$ {#eq-relacao-baricentrica-colunas-ca}
+
+As equações @eq-relacao-baricentrica-linhas-ca e @eq-relacao-baricentrica-colunas-ca são denominadas **relações baricêntricas** ou relações de transição.
+
+Para a linha $i$, @eq-relacao-baricentrica-linhas-ca fornece
+
+$$
+\mathbf f_i^{(r)}
+=
+\sum_{j=1}^{J}
+\frac{p_{ij}}{r_i}
+\mathbf a_j^{(c)},
+$$ {#eq-baricentro-linha-ca}
+
+em que
+
+$$
+\mathbf a_j^{(c)}
+$$
+
+é o vetor de coordenadas padrão da coluna $j$.
+
+Como
+
+$$
+\sum_{j=1}^{J}
+\frac{p_{ij}}{r_i}
+=
+1,
+$$
+
+a coordenada principal da linha $i$ é o centro ponderado das coordenadas padrão das colunas, com pesos dados pelo próprio perfil da linha.
+
+Analogamente,
+
+$$
+\mathbf f_j^{(c)}
+=
+\sum_{i=1}^{I}
+\frac{p_{ij}}{c_j}
+\mathbf a_i^{(r)},
+$$ {#eq-baricentro-coluna-ca}
+
+em que $\mathbf a_i^{(r)}$ contém as coordenadas padrão da linha $i$.
+
+Assim, cada categoria de uma variável é posicionada em função da distribuição condicional das categorias da outra variável.
+
+Uma linha que concentra grande parte de seu perfil em determinadas colunas tende a ser posicionada na direção das coordenadas correspondentes dessas colunas. O mesmo raciocínio vale para as colunas em relação às linhas.
+
+A @fig-ca-relacao-baricentrica ilustra essa propriedade para uma tabela simples. As coordenadas principais de uma linha são mostradas no mesmo sistema das coordenadas padrão das colunas utilizadas em sua relação baricêntrica.
+
+```{r}
+#| label: fig-ca-relacao-baricentrica
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Relação baricêntrica entre uma linha e as coordenadas padrão das colunas. A posição da linha é a média ponderada das posições das colunas, com pesos dados pelo perfil da própria linha."
+#| fig-width: 7.5
+#| fig-height: 5.5
+#| fig-align: center
+
+library(ggplot2)
+
+N <- matrix(
+  c(
+    40, 15, 10,  5,
+    10, 35, 20,  5,
+     5, 15, 40, 20,
+    10, 10, 15, 35
+  ),
+  nrow = 4,
+  byrow = TRUE
+)
+
+rownames(N) <- paste0(
+  "L",
+  1:4
+)
+
+colnames(N) <- paste0(
+  "C",
+  1:4
+)
+
+P <- N / sum(
+  N
+)
+
+r <- rowSums(
+  P
+)
+
+c <- colSums(
+  P
+)
+
+Dr_menos_meio <- diag(
+  1 / sqrt(
+    r
+  )
+)
+
+Dc_menos_meio <- diag(
+  1 / sqrt(
+    c
+  )
+)
+
+Qca <- Dr_menos_meio %*%
+  (
+    P -
+      r %o% c
+  ) %*%
+  Dc_menos_meio
+
+decomp <- svd(
+  Qca
+)
+
+tol <- 1e-10
+
+K <- sum(
+  decomp$d > tol
+)
+
+U <- decomp$u[
+  ,
+  seq_len(K),
+  drop = FALSE
+]
+
+V <- decomp$v[
+  ,
+  seq_len(K),
+  drop = FALSE
+]
+
+D <- diag(
+  decomp$d[
+    seq_len(K)
+  ],
+  nrow = K
+)
+
+Ar <- Dr_menos_meio %*%
+  U
+
+Ac <- Dc_menos_meio %*%
+  V
+
+Fr <- Ar %*%
+  D
+
+linha_escolhida <- 1
+
+perfil <- P[
+  linha_escolhida,
+] / r[
+  linha_escolhida
+]
+
+colunas <- data.frame(
+  categoria = colnames(
+    N
+  ),
+  Dim1 = Ac[, 1],
+  Dim2 = Ac[, 2],
+  peso = perfil
+)
+
+linha <- data.frame(
+  categoria = rownames(
+    N
+  )[
+    linha_escolhida
+  ],
+  Dim1 = Fr[
+    linha_escolhida,
+    1
+  ],
+  Dim2 = Fr[
+    linha_escolhida,
+    2
+  ]
+)
+
+segmentos <- data.frame(
+  x = linha$Dim1,
+  y = linha$Dim2,
+  xend = colunas$Dim1,
+  yend = colunas$Dim2,
+  peso = colunas$peso
+)
+
+ggplot() +
+  geom_segment(
+    data = segmentos,
+    aes(
+      x = x,
+      y = y,
+      xend = xend,
+      yend = yend,
+      linewidth = peso
+    ),
+    color = "gray65",
+    show.legend = FALSE
+  ) +
+  geom_point(
+    data = colunas,
+    aes(
+      x = Dim1,
+      y = Dim2,
+      size = peso
+    ),
+    color = "#2ca02c",
+    show.legend = FALSE
+  ) +
+  geom_text(
+    data = colunas,
+    aes(
+      x = Dim1,
+      y = Dim2,
+      label = categoria
+    ),
+    nudge_y = 0.08,
+    color = "gray25"
+  ) +
+  geom_point(
+    data = linha,
+    aes(
+      x = Dim1,
+      y = Dim2
+    ),
+    size = 3.5,
+    color = "#1f77b4"
+  ) +
+  geom_text(
+    data = linha,
+    aes(
+      x = Dim1,
+      y = Dim2,
+      label = categoria
+    ),
+    nudge_y = -0.1,
+    fontface = "bold",
+    color = "gray20"
+  ) +
+  coord_equal() +
+  labs(
+    x = "Dimensão 1",
+    y = "Dimensão 2"
+  ) +
+  theme_minimal(
+    base_size = 13
+  ) +
+  theme(
+    panel.grid.minor = element_blank()
+  )
+```
+
+A figura não afirma que a distância entre uma linha e uma coluna seja uma distância qui-quadrado. Ela representa a relação de centro ponderado expressa em @eq-baricentro-linha-ca.
+
+### Reconstrução dos desvios da independência
+
+A SVD também permite reconstruir a matriz de frequências relativas a partir de sua estrutura de independência e dos termos de associação.
+
+De @eq-matriz-desvios-padronizados-ca,
+
+$$
+\mathbf P
+-
+\mathbf r\mathbf c^\top
+=
+\mathbf D_r^{1/2}
+\mathbf Q_{\mathrm{CA}}
+\mathbf D_c^{1/2}.
+$$
+
+Substituindo a SVD,
+
+$$
+\mathbf P
+-
+\mathbf r\mathbf c^\top
+=
+\mathbf D_r^{1/2}
+\mathbf U
+\mathbf D
+\mathbf V^\top
+\mathbf D_c^{1/2}.
+$$
+
+Como
+
+$$
+\mathbf U
+=
+\mathbf D_r^{1/2}
+\mathbf A_r
+$$
+
+e
+
+$$
+\mathbf V
+=
+\mathbf D_c^{1/2}
+\mathbf A_c,
+$$
+
+obtém-se
+
+$$
+\mathbf P
+-
+\mathbf r\mathbf c^\top
+=
+\mathbf D_r
+\mathbf A_r
+\mathbf D
+\mathbf A_c^\top
+\mathbf D_c.
+$$ {#eq-reconstrucao-desvios-ca}
+
+Elemento a elemento,
+
+$$
+p_{ij}
+-
+r_ic_j
+=
+r_ic_j
+\sum_{\ell=1}^{K}
+d_\ell
+a_{i\ell}^{(r)}
+a_{j\ell}^{(c)}.
+$$ {#eq-reconstrucao-celula-ca}
+
+Logo,
+
+$$
+p_{ij}
+=
+r_ic_j
+\left[
+1
++
+\sum_{\ell=1}^{K}
+d_\ell
+a_{i\ell}^{(r)}
+a_{j\ell}^{(c)}
+\right].
+$$ {#eq-reconstrucao-probabilidade-ca}
+
+A expressão separa duas estruturas:
+
+$$
+r_ic_j
+$$
+
+é a frequência relativa correspondente à independência, enquanto
+
+$$
+r_ic_j
+\sum_{\ell=1}^{K}
+d_\ell
+a_{i\ell}^{(r)}
+a_{j\ell}^{(c)}
+$$
+
+representa o desvio reconstruído pelas dimensões da associação.
+
+Quando apenas as primeiras $k$ dimensões são utilizadas,
+
+$$
+\widetilde p_{ij}^{(k)}
+=
+r_ic_j
+\left[
+1
++
+\sum_{\ell=1}^{k}
+d_\ell
+a_{i\ell}^{(r)}
+a_{j\ell}^{(c)}
+\right].
+$$ {#eq-reconstrucao-reduzida-ca}
+
+A expressão fornece a reconstrução de posto reduzido associada à aproximação de $\mathbf Q_{\mathrm{CA}}$ em @eq-svd-truncada-ca. Quando $k<K$, essa reconstrução é uma aproximação algébrica dos desvios da independência e não impõe, por si só, a não negatividade de todas as células. Por isso, $\widetilde p_{ij}^{(k)}$ não deve ser interpretado automaticamente como uma nova tabela de probabilidades.
+
+A redução dimensional possui, assim, duas leituras equivalentes: aproximar a matriz de desvios padronizados ou reconstruir a associação observada utilizando apenas as primeiras dimensões.
+
+## Representação conjunta de linhas e colunas
+
+A Análise de Correspondência fornece coordenadas para as duas margens da tabela. Para construir uma representação conjunta, é necessário definir quais sistemas de coordenadas serão exibidos para linhas e colunas.
+
+Três formas são particularmente úteis para compreender a geometria.
+
+| representação | linhas | colunas | propriedade principal |
+|---|---|---|---|
+| métrica das linhas | principais $\mathbf F_r$ | padrão $\mathbf A_c$ | preserva a geometria das linhas e explicita sua relação baricêntrica com as colunas |
+| métrica das colunas | padrão $\mathbf A_r$ | principais $\mathbf F_c$ | preserva a geometria das colunas e explicita sua relação baricêntrica com as linhas |
+| simétrica | principais $\mathbf F_r$ | principais $\mathbf F_c$ | coloca ambas as nuvens em escalas associadas às inércias principais |
+
+: Sistemas de coordenadas para representar linhas e colunas na Análise de Correspondência. {#tbl-escalas-representacao-ca}
+
+Na representação métrica das linhas, as distâncias entre pontos de linhas reproduzem as distâncias qui-quadrado quando todas as dimensões são utilizadas. As posições das colunas funcionam como coordenadas padrão associadas às relações baricêntricas.
+
+Na representação métrica das colunas ocorre o resultado dual.
+
+A representação simétrica é frequentemente útil para visualizar simultaneamente as duas nuvens, mas exige uma interpretação cuidadosa.
+
+### O significado das proximidades
+
+Dentro de uma mesma nuvem, a interpretação é direta:
+
+- linhas próximas possuem perfis de colunas semelhantes segundo a distância qui-quadrado;
+- colunas próximas possuem perfis de linhas semelhantes segundo a distância qui-quadrado.
+
+Entre uma linha e uma coluna, entretanto, a distância gráfica não é, em geral, uma distância qui-quadrado definida pela técnica.
+
+Assim, a proximidade visual entre uma categoria de linha e uma categoria de coluna não deve ser interpretada automaticamente como uma medida métrica de associação entre essas duas categorias.
+
+A relação entre linhas e colunas é melhor fundamentada pelas relações baricêntricas, pelos sinais e magnitudes das coordenadas nas dimensões e pela reconstrução dos desvios em @eq-reconstrucao-celula-ca.
+
+Essa distinção é especialmente importante em mapas simétricos, nos quais linhas e colunas são colocadas no mesmo plano para facilitar a leitura, embora pertençam originalmente a espaços de perfis diferentes.
+
+### Contribuição para as dimensões
+
+A igualdade em @eq-inercia-eixo-linhas-ca mostra que a inércia principal da dimensão $\ell$ pode ser decomposta entre as categorias de linhas:
+
+$$
+\lambda_\ell
+=
+\sum_{i=1}^{I}
+r_i
+\left(
+f_{i\ell}^{(r)}
+\right)^2.
+$$
+
+Isso permite definir a parcela da dimensão associada a cada categoria.
+
+::: {#def-contribuicao-ca}
+## Contribuição para uma dimensão
+
+A contribuição da linha $i$ para a dimensão $\ell$ é
+
+$$
+\operatorname{ctr}_{i\ell}^{(r)}
+=
+\frac{
+r_i
+\left(
+f_{i\ell}^{(r)}
+\right)^2
+}{
+\lambda_\ell
+}.
+$$ {#eq-contribuicao-linha-ca}
+
+A contribuição da coluna $j$ é
+
+$$
+\operatorname{ctr}_{j\ell}^{(c)}
+=
+\frac{
+c_j
+\left(
+f_{j\ell}^{(c)}
+\right)^2
+}{
+\lambda_\ell
+}.
+$$ {#eq-contribuicao-coluna-ca}
+:::
+
+Para cada dimensão,
+
+$$
+\sum_{i=1}^{I}
+\operatorname{ctr}_{i\ell}^{(r)}
+=
+1
+$$ {#eq-soma-contribuicoes-linhas-ca}
+
+e
+
+$$
+\sum_{j=1}^{J}
+\operatorname{ctr}_{j\ell}^{(c)}
+=
+1.
+$$ {#eq-soma-contribuicoes-colunas-ca}
+
+A contribuição mede quanto determinada categoria participa da inércia que define o eixo.
+
+Uma categoria pode possuir grande coordenada em uma dimensão e ainda apresentar contribuição moderada se sua massa for pequena. A contribuição combina, portanto, posição geométrica e peso marginal.
+
+O conceito não deve ser confundido com qualidade de representação. Uma categoria pode contribuir fortemente para construir um eixo e, ainda assim, possuir parte relevante de sua própria distância ao centro distribuída por outras dimensões.
+
+### Qualidade de representação
+
+Para uma linha $i$, a distância ao centro satisfaz, na representação completa,
+
+$$
+d_{\chi^2}^2
+\left(
+i,\mathbf c
+\right)
+=
+\sum_{\ell=1}^{K}
+\left(
+f_{i\ell}^{(r)}
+\right)^2.
+$$ {#eq-distancia-decomposta-linha-ca}
+
+A parcela dessa distância associada à dimensão $\ell$ é medida por
+
+::: {#def-cos2-ca}
+## Qualidade de representação por dimensão
+
+Para uma linha $i$ com
+
+$$
+d_{\chi^2}^2
+\left(
+i,\mathbf c
+\right)
+>
+0,
+$$
+
+define-se
+
+$$
+\cos^2_{i\ell}
+=
+\frac{
+\left(
+f_{i\ell}^{(r)}
+\right)^2
+}{
+d_{\chi^2}^2
+\left(
+i,\mathbf c
+\right)
+}.
+$$ {#eq-cos2-linha-ca}
+
+Para uma coluna $j$ com distância positiva ao centro,
+
+$$
+\cos^2_{j\ell}
+=
+\frac{
+\left(
+f_{j\ell}^{(c)}
+\right)^2
+}{
+d_{\chi^2}^2
+\left(
+j,\mathbf r
+\right)
+}.
+$$ {#eq-cos2-coluna-ca}
+:::
+
+Como
+
+$$
+\sum_{\ell=1}^{K}
+\cos^2_{i\ell}
+=
+1,
+$$
+
+o valor
+
+$$
+\cos^2_{i\ell}
+$$
+
+mede a parcela da distância quadrática da categoria ao centro representada pela dimensão $\ell$.
+
+Para as primeiras $k$ dimensões,
+
+$$
+\sum_{\ell=1}^{k}
+\cos^2_{i\ell}
+$$ {#eq-cos2-acumulado-ca}
+
+mede a parcela da distância da categoria representada pelo subespaço escolhido.
+
+As duas medidas possuem papéis distintos, como sintetiza a @tbl-contribuicao-cos2-ca.
+
+| Medida | Numerador | Referência | Interpretação |
+|---|---|---|---|
+| contribuição | $r_i(f_{i\ell}^{(r)})^2$ ou $c_j(f_{j\ell}^{(c)})^2$ | inércia do eixo $\lambda_\ell$ | participação da categoria na construção da dimensão |
+| $\cos^2$ | $(f_{i\ell}^{(r)})^2$ ou $(f_{j\ell}^{(c)})^2$ | distância da própria categoria ao centro | qualidade com que a dimensão representa a categoria |
+
+: Diferença entre contribuição e qualidade de representação na Análise de Correspondência. {#tbl-contribuicao-cos2-ca}
+
+A contribuição distribui a **inércia de uma dimensão entre as categorias**. O $\cos^2$ distribui a **distância de uma categoria entre as dimensões**.
+
+Essa diferença evita duas interpretações frequentes, mas distintas: identificar quais categorias determinam um eixo e avaliar se determinada categoria está bem representada por esse eixo.
+
+Critérios operacionais baseados em valores médios de contribuição, limiares de $\cos^2$ ou seleção automática de categorias pertencem à etapa de interpretação aplicada e não são necessários para a formulação matemática da técnica.
+
+## Formulação descritiva e inferencial
+
+A identidade
+
+$$
+\chi^2
+=
+n\mathcal I
+$$
+
+estabelecida em @eq-qui-quadrado-inercia-ca permite distinguir dois usos relacionados da mesma estrutura.
+
+Na Análise de Correspondência, a inércia
+
+$$
+\mathcal I
+$$
+
+é utilizada para descrever e decompor geometricamente o afastamento da independência observado na tabela. Essa construção pode ser realizada sem atribuir à tabela um modelo probabilístico específico.
+
+Para interpretar
+
+$$
+\chi^2
+$$
+
+como estatística de teste, é necessário introduzir um modelo de amostragem. Sob uma formulação apropriada para uma tabela de contingência, a hipótese de independência pode ser escrita como
+
+$$
+H_0:
+\pi_{ij}
+=
+\pi_{i\cdot}\pi_{\cdot j},
+$$ {#eq-hipotese-independencia-ca}
+
+em que $\pi_{ij}$ representa a probabilidade populacional da célula $(i,j)$.
+
+Sob um esquema de amostragem multinomial, ou uma formulação clássica equivalente para tabelas de contingência, considere $I$ e $J$ fixos e probabilidades marginais populacionais estritamente positivas. Sob $H_0$ e quando $n\to\infty$,
+
+$$
+\chi^2
+\overset{d}{\longrightarrow}
+\chi^2_{(I-1)(J-1)}.
+$$ {#eq-distribuicao-assintotica-qui-ca}
+
+A teoria geral de testes e aproximações assintóticas pertence ao Módulo 2. Neste capítulo, o resultado serve para delimitar a relação entre a decomposição geométrica e o problema inferencial de independência.
+
+A significância do teste global e a interpretação das dimensões da Análise de Correspondência são questões diferentes. Rejeitar
+
+$$
+H_0
+$$
+
+fornece evidência de associação entre as variáveis, mas não estabelece, por si só, que cada dimensão obtida pela SVD represente uma estrutura populacional distinta.
+
+Da mesma forma, uma associação estatisticamente detectável pode possuir pequena inércia quando o tamanho amostral é grande, pois
+
+$$
+\chi^2
+=
+n\mathcal I.
+$$
+
+Essa distinção pode ser vista replicando todas as frequências da tabela por um mesmo fator inteiro positivo $a$:
+
+$$
+a\in\mathbb N,
+\qquad
+a\geq1.
+$$
+
+$$
+\mathbf N^{*}
+=
+a\mathbf N.
+$$
+
+Nesse caso,
+
+$$
+n^{*}
+=
+an,
+$$
+
+mas
+
+$$
+\mathbf P^{*}
+=
+\frac{\mathbf N^{*}}{n^{*}}
+=
+\mathbf P.
+$$
+
+Consequentemente, permanecem inalterados:
+
+$$
+\mathbf r,
+\qquad
+\mathbf c,
+\qquad
+\mathbf Q_{\mathrm{CA}},
+\qquad
+\mathcal I
+$$
+
+e todas as coordenadas da representação.
+
+Por outro lado,
+
+$$
+\chi^{2*}
+=
+a\chi^2.
+$$
+
+A geometria descritiva depende das proporções observadas, enquanto a estatística de teste também incorpora o tamanho total da tabela.
+
+## Relações com a ACP e o MDS
+
+A Análise de Correspondência utiliza estruturas matemáticas que já apareceram em outras técnicas do Módulo 3. A semelhança algébrica permite estabelecer conexões, mas não elimina as diferenças entre os problemas estatísticos.
+
+### Relação com a Análise de Componentes Principais
+
+Considere novamente a matriz dos perfis de linhas,
+
+$$
+\mathbf P^{(r)}
+=
+\mathbf D_r^{-1}\mathbf P.
+$$
+
+A matriz de desvios padronizados pode ser escrita, conforme @eq-qca-perfis-linhas, como
+
+$$
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf D_r^{1/2}
+\left(
+\mathbf P^{(r)}
+-
+\mathbf1_I\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}.
+$$ {#eq-ca-matriz-perfis-ponderados}
+
+Essa expressão evidencia três operações:
+
+1. os perfis de linhas são centralizados em torno de $\mathbf c$;
+2. as linhas são ponderadas por suas massas por meio de $\mathbf D_r^{1/2}$;
+3. as coordenadas dos perfis são reescalonadas pelas massas das colunas por meio de $\mathbf D_c^{-1/2}$.
+
+A SVD é aplicada à matriz resultante.
+
+A relação com a ACP está na procura de uma representação de posto reduzido a partir de uma matriz centralizada e na decomposição da dispersão entre dimensões ortogonais. Entretanto, a geometria da Correspondência é determinada pelos pesos marginais da tabela.
+
+Na ACP usual, a medida de dispersão é construída a partir da geometria euclidiana das variáveis, ou da geometria correspondente à padronização quando a matriz de correlações é utilizada.
+
+Na Análise de Correspondência, a dispersão é
+
+$$
+\mathcal I
+=
+\sum_{i=1}^{I}
+r_i
+d_{\chi^2}^2
+\left(
+i,\mathbf c
+\right),
+$$
+
+com
+
+$$
+d_{\chi^2}^2
+\left(
+i,i'
+\right)
+=
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf p_{i'\mid\cdot}
+\right)^\top
+\mathbf D_c^{-1}
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf p_{i'\mid\cdot}
+\right).
+$$
+
+Assim, a Correspondência pode ser relacionada a uma análise espectral ponderada de perfis, mas não deve ser identificada simplesmente como uma ACP aplicada a dados qualitativos [@greenacre2017ca].
+
+A @tbl-relacao-acp-ca resume as diferenças.
+
+| Aspecto | ACP | Análise de Correspondência |
+|---|---|---|
+| objeto inicial | matriz de dados quantitativos ou matriz de covariâncias/correlações | tabela de contingência |
+| unidades representadas | observações e/ou variáveis | categorias de linhas e colunas |
+| centro | vetor de médias | perfis marginais $\mathbf c$ e $\mathbf r$ |
+| pesos das unidades | usualmente iguais na formulação básica | massas $r_i$ e $c_j$ |
+| geometria | euclidiana ou padronizada | qui-quadrado |
+| quantidade decomposta | variância | inércia |
+| ferramenta espectral | autovalores ou SVD | SVD dos desvios padronizados |
+
+: Relação entre a ACP e a Análise de Correspondência. {#tbl-relacao-acp-ca}
+
+### Relação com o Escalonamento Multidimensional
+
+O capítulo anterior mostrou que o MDS procura construir coordenadas que representem uma matriz de dissimilaridades.
+
+Na Análise de Correspondência, as dissimilaridades entre perfis não são fornecidas externamente. Elas são determinadas pela própria tabela por meio da distância qui-quadrado.
+
+Considere os perfis de linhas e defina
+
+$$
+\boldsymbol{\Delta}_{\chi^2}^{(r)}
+=
+\left(
+d_{\chi^2}(i,i')
+\right).
+$$
+
+Pela propriedade em @prp-preservacao-distancias-ca, as coordenadas principais completas das linhas satisfazem
+
+$$
+d_{\chi^2}
+\left(
+i,i'
+\right)
+=
+\left\|
+\mathbf f_i^{(r)}
+-
+\mathbf f_{i'}^{(r)}
+\right\|.
+$$
+
+Assim, a matriz
+
+$$
+\boldsymbol{\Delta}_{\chi^2}^{(r)}
+$$
+
+é uma matriz de distâncias euclidianas quando os perfis são considerados após a transformação determinada por $\mathbf D_c^{-1/2}$.
+
+Se o MDS clássico for aplicado a essas distâncias, ele produzirá uma configuração com a mesma geometria entre as linhas, até as indeterminações de translação e transformação ortogonal discutidas no capítulo anterior.
+
+O mesmo resultado pode ser formulado para as colunas.
+
+A diferença está novamente no ponto de partida. No MDS, uma matriz de dissimilaridades é o objeto fornecido à técnica. Na Correspondência, a geometria é derivada de uma tabela de contingência e possui uma ponderação específica determinada pelas massas.
+
+Além disso, a Correspondência constrói duas nuvens relacionadas, uma de linhas e outra de colunas. Essa dualidade não faz parte da formulação geral do MDS.
+
+A relação entre as três técnicas de representação é sintetizada na @tbl-acp-mds-ca.
+
+| Técnica | Estrutura representada | Geometria ou critério |
+|---|---|---|
+| ACP | variabilidade de observações quantitativas | variância e projeção |
+| MDS | relações de dissimilaridade entre objetos | fidelidade das distâncias ou dos produtos internos |
+| Correspondência | associação entre categorias de uma tabela | distância qui-quadrado e inércia |
+
+: Diferentes problemas de representação na ACP, no MDS e na Análise de Correspondência. {#tbl-acp-mds-ca}
+
+O uso de SVD, autovalores ou aproximações de posto reduzido não caracteriza sozinho uma técnica. A interpretação decorre do objeto que foi transformado e da medida que a decomposição procura representar.
+
+## Pressupostos e limites da representação
+
+A formulação da Análise de Correspondência é predominantemente geométrica, mas algumas condições determinam se os objetos utilizados pela técnica estão bem definidos e como seus resultados podem ser interpretados.
+
+### Massas positivas
+
+A formulação utilizada neste capítulo pressupõe
+
+$$
+r_i>0
+$$
+
+e
+
+$$
+c_j>0.
+$$
+
+Essa condição garante a existência de
+
+$$
+\mathbf D_r^{-1},
+\qquad
+\mathbf D_c^{-1},
+\qquad
+\mathbf D_r^{-1/2},
+\qquad
+\mathbf D_c^{-1/2}.
+$$
+
+Uma linha ou coluna com frequência marginal nula não possui perfil definido e deve ser retirada da tabela ativa.
+
+### Categorias de pequena massa
+
+Massas positivas muito pequenas não impedem matematicamente a análise, mas produzem pesos elevados na distância qui-quadrado:
+
+$$
+\frac1{r_i}
+\qquad\text{ou}\qquad
+\frac1{c_j}.
+$$
+
+Uma diferença envolvendo uma categoria rara pode, portanto, exercer influência elevada sobre a geometria.
+
+Essa característica decorre da própria métrica da técnica e deve ser considerada na interpretação da solução. Procedimentos de agregação ou tratamento de categorias raras pertencem à etapa aplicada da análise.
+
+### Frequências nulas
+
+Uma frequência celular
+
+$$
+n_{ij}=0
+$$
+
+não impede, por si só, a Análise de Correspondência quando as massas da linha e da coluna correspondentes são positivas.
+
+Nesse caso,
+
+$$
+p_{ij}=0
+$$
+
+representa uma ausência observada naquela combinação de categorias e participa normalmente do cálculo do desvio
+
+$$
+p_{ij}-r_ic_j.
+$$
+
+Zeros estruturais, para os quais determinada combinação é impossível por definição do problema, possuem outro significado. Eles modificam a estrutura de comparação com a independência e exigem uma formulação adequada ao mecanismo que gerou a tabela.
+
+### Dimensão da representação
+
+A dimensão máxima é
+
+$$
+K
+\leq
+\min
+\left(
+I-1,
+J-1
+\right).
+$$
+
+Quando apenas
+
+$$
+k<K
+$$
+
+dimensões são apresentadas, a representação contém somente a parcela
+
+$$
+\frac{
+\sum_{\ell=1}^{k}\lambda_\ell
+}{
+\sum_{\ell=1}^{K}\lambda_\ell
+}
+$$
+
+da inércia total.
+
+Uma representação bidimensional não implica que a associação observada possua exatamente duas dimensões. Ela é uma aproximação de posto reduzido quando existem outras inércias principais positivas.
+
+### Sinais e orientação dos eixos
+
+A SVD possui as indeterminações discutidas no Módulo 1. Para cada dimensão, multiplicar simultaneamente os vetores singulares correspondentes por $-1$ não altera
+
+$$
+\mathbf Q_{\mathrm{CA}}.
+$$
+
+Consequentemente, o sinal absoluto das coordenadas de um eixo não possui significado.
+
+O que permanece interpretável são:
+
+- posições relativas;
+- distâncias dentro de cada nuvem;
+- oposição entre categorias ao longo de uma dimensão;
+- contribuições;
+- qualidade de representação;
+- relações baricêntricas.
+
+Quando valores singulares são repetidos, a orientação de cada eixo individual dentro do subespaço correspondente também deixa de ser única. Nesse caso, o subespaço é o objeto geometricamente identificado.
+
+### Proximidade entre linhas e colunas
+
+As distâncias euclidianas entre linhas em coordenadas principais possuem interpretação como distâncias qui-quadrado entre seus perfis. O mesmo vale entre colunas.
+
+Essa propriedade não se estende diretamente à distância entre um ponto de linha e um ponto de coluna em um mapa conjunto.
+
+A @fig-ca-mapa-conjunto ilustra essa distinção.
+
+```{r}
+#| label: fig-ca-mapa-conjunto
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Representação conjunta das categorias de linhas e colunas. Distâncias dentro da mesma nuvem possuem interpretação geométrica própria; a distância entre uma linha e uma coluna não corresponde, em geral, a uma distância qui-quadrado."
+#| fig-width: 7.5
+#| fig-height: 5.8
+#| fig-align: center
+
+library(ggplot2)
+
+N <- matrix(
+  c(
+    40, 15, 10,  5,
+    10, 35, 20,  5,
+     5, 15, 40, 20,
+    10, 10, 15, 35
+  ),
+  nrow = 4,
+  byrow = TRUE
+)
+
+rownames(N) <- paste0(
+  "L",
+  1:4
+)
+
+colnames(N) <- paste0(
+  "C",
+  1:4
+)
+
+P <- N / sum(
+  N
+)
+
+r <- rowSums(
+  P
+)
+
+c <- colSums(
+  P
+)
+
+Dr_menos_meio <- diag(
+  1 / sqrt(
+    r
+  )
+)
+
+Dc_menos_meio <- diag(
+  1 / sqrt(
+    c
+  )
+)
+
+Qca <- Dr_menos_meio %*%
+  (
+    P -
+      r %o% c
+  ) %*%
+  Dc_menos_meio
+
+decomp <- svd(
+  Qca
+)
+
+tol <- 1e-10
+
+K <- sum(
+  decomp$d > tol
+)
+
+U <- decomp$u[
+  ,
+  seq_len(K),
+  drop = FALSE
+]
+
+V <- decomp$v[
+  ,
+  seq_len(K),
+  drop = FALSE
+]
+
+D <- diag(
+  decomp$d[
+    seq_len(K)
+  ],
+  nrow = K
+)
+
+Fr <- Dr_menos_meio %*%
+  U %*%
+  D
+
+Fc <- Dc_menos_meio %*%
+  V %*%
+  D
+
+linhas <- data.frame(
+  categoria = rownames(
+    N
+  ),
+  Dim1 = Fr[, 1],
+  Dim2 = Fr[, 2],
+  tipo = "Linhas"
+)
+
+colunas <- data.frame(
+  categoria = colnames(
+    N
+  ),
+  Dim1 = Fc[, 1],
+  Dim2 = Fc[, 2],
+  tipo = "Colunas"
+)
+
+dados_figura <- rbind(
+  linhas,
+  colunas
+)
+
+ggplot(
+  dados_figura,
+  aes(
+    x = Dim1,
+    y = Dim2
+  )
+) +
+  geom_hline(
+    yintercept = 0,
+    linewidth = 0.4,
+    color = "gray75"
+  ) +
+  geom_vline(
+    xintercept = 0,
+    linewidth = 0.4,
+    color = "gray75"
+  ) +
+  geom_point(
+    data = linhas,
+    size = 3,
+    color = "#1f77b4"
+  ) +
+  geom_text(
+    data = linhas,
+    aes(
+      label = categoria
+    ),
+    nudge_y = 0.08,
+    color = "#1f77b4"
+  ) +
+  geom_point(
+    data = colunas,
+    size = 3,
+    shape = 17,
+    color = "#2ca02c"
+  ) +
+  geom_text(
+    data = colunas,
+    aes(
+      label = categoria
+    ),
+    nudge_y = -0.08,
+    color = "#2ca02c"
+  ) +
+  coord_equal() +
+  labs(
+    x = "Dimensão 1",
+    y = "Dimensão 2"
+  ) +
+  theme_minimal(
+    base_size = 13
+  ) +
+  theme(
+    panel.grid.minor = element_blank()
+  )
+```
+
+O mapa permite examinar simultaneamente a estrutura das duas margens, mas a leitura deve respeitar a métrica associada a cada nuvem. A interpretação cruzada é sustentada principalmente pela estrutura dos perfis e pelas relações baricêntricas, e não pela distância gráfica direta entre símbolos de tipos diferentes.
+
+### Associação e causalidade
+
+A Análise de Correspondência descreve a estrutura de associação presente na tabela. A posição das categorias e a decomposição da inércia não estabelecem relações causais entre as variáveis.
+
+Da mesma forma, uma dimensão não constitui automaticamente uma variável latente substantiva. Seu significado depende dos contrastes entre perfis que produzem a inércia correspondente e do conhecimento sobre o problema analisado.
+
+## Síntese
+
+A Análise de Correspondência representa a associação entre as categorias de duas variáveis qualitativas a partir de uma tabela de contingência. A matriz de frequências relativas
+
+$$
+\mathbf P
+=
+\frac{1}{n}\mathbf N
+$$
+
+determina as massas e os perfis das linhas e das colunas. Sob independência,
+
+$$
+\mathbf P
+=
+\mathbf r\mathbf c^\top,
+$$
+
+de modo que todos os perfis de cada margem coincidem com seu respectivo perfil médio.
+
+O afastamento dessa estrutura é representado pela matriz
+
+$$
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf D_r^{-1/2}
+\left(
+\mathbf P-\mathbf r\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}.
+$$
+
+Sua norma de Frobenius ao quadrado é a inércia total,
+
+$$
+\mathcal I
+=
+\left\|
+\mathbf Q_{\mathrm{CA}}
+\right\|_F^2
+=
+\frac{\chi^2}{n}.
+$$
+
+A SVD de $\mathbf Q_{\mathrm{CA}}$ decompõe essa associação em dimensões ortogonais. Os quadrados dos valores singulares são as inércias principais, e as coordenadas resultantes fornecem representações euclidianas das geometrias qui-quadrado dos perfis.
+
+A técnica possui uma estrutura dual: linhas e colunas são construídas pela mesma decomposição e estão relacionadas por relações baricêntricas. Distâncias entre categorias da mesma margem possuem interpretação como distâncias qui-quadrado; a distância gráfica direta entre uma linha e uma coluna não possui, em geral, essa interpretação.
+
+A contribuição descreve a participação de uma categoria na construção de uma dimensão, enquanto o $\cos^2$ descreve quanto da posição dessa categoria é representado pelo eixo ou pelo subespaço escolhido.
+
+A formulação geométrica é predominantemente descritiva. A interpretação de $\chi^2$ como estatística de teste exige um modelo amostral e não transforma automaticamente cada dimensão da representação em um teste inferencial.
+
+O próximo capítulo muda o objeto estatístico. Na MANOVA, o problema deixa de ser representar desvios da independência em uma tabela e passa a ser comparar vetores de médias no modelo linear multivariado. As matrizes de hipótese e erro conduzirão então a um problema de autovalores generalizados.
