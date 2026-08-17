@@ -1,222 +1,183 @@
 # Problemas e estruturas das técnicas multivariadas
 
-Os Módulos 1 e 2 estabeleceram a base matemática, geométrica, probabilística e inferencial utilizada na Análise Multivariada. Vetores e matrizes permitem representar os dados; distâncias, produtos internos e projeções descrevem sua geometria; autovalores e valores singulares identificam estruturas relevantes; matrizes de covariâncias e correlações representam a variabilidade conjunta; e os modelos probabilísticos e inferenciais permitem estimar parâmetros e formular hipóteses sobre populações multivariadas.
+Os Módulos 1 e 2 estabeleceram a base matemática, geométrica, probabilística e inferencial utilizada na Análise Multivariada. Vetores e matrizes fornecem a representação dos dados; distâncias, produtos internos e projeções descrevem sua geometria; autovalores e valores singulares identificam direções e estruturas de baixa dimensão; matrizes de covariâncias e correlações representam a variabilidade conjunta; e os modelos probabilísticos e inferenciais permitem formular conclusões sobre populações multivariadas.
 
-Neste módulo, esses conhecimentos serão utilizados na formulação das principais técnicas multivariadas. O ponto de partida passa a ser o **problema estatístico** que se deseja resolver. Diferentes perguntas exigem diferentes representações dos dados, objetos matemáticos e critérios de solução.
+Neste módulo, esses conhecimentos serão combinados para formular as principais técnicas multivariadas. O ponto de partida passa a ser o **problema estatístico**. Redução de dimensionalidade, representação de estruturas latentes, formação de grupos, representação de dissimilaridades, análise de associações em tabelas de contingência, comparação de vetores de médias, discriminação de grupos, associação entre blocos de variáveis e decomposição de preferências exigem formulações distintas [@johnson2007].
 
-Reduzir a dimensão de um conjunto de variáveis, representar uma estrutura latente, identificar grupos, reconstruir uma configuração a partir de dissimilaridades, estudar associações em uma tabela de contingência, comparar vetores de médias, discriminar grupos conhecidos, relacionar dois conjuntos de variáveis e decompor preferências são problemas distintos. Embora utilizem fundamentos comuns, cada problema conduz a uma formulação própria.
+Uma mesma estrutura matemática pode aparecer em técnicas diferentes. A decomposição espectral pode identificar direções de maior variabilidade, fornecer coordenadas para uma representação geométrica ou participar da determinação de direções de separação entre grupos. O significado estatístico depende do objeto analisado e do critério utilizado.
 
-Uma mesma estrutura matemática pode aparecer em técnicas diferentes. A decomposição espectral, por exemplo, pode identificar direções de maior variabilidade, fornecer coordenadas para uma representação de baixa dimensão ou determinar direções que maximizam a separação entre grupos. O significado estatístico da solução depende do objeto analisado e do critério que definiu o problema.
+A formulação das técnicas deste módulo será organizada pelos elementos apresentados na @tbl-estrutura-formulacao-tecnicas.
 
-A formulação das técnicas desenvolvidas neste módulo será organizada pelos elementos apresentados na @tbl-estrutura-formulacao-tecnicas.
-
-| Elemento | Questão associada |
+| Elemento | Função na formulação |
 |---|---|
-| Problema estatístico | O que se pretende representar, explicar, comparar ou prever? |
-| Estrutura dos dados | Que tipo de informação está disponível e como ela está organizada? |
-| Objeto matemático | Qual matriz, vetor, distância, covariância ou outro objeto representa a informação relevante? |
-| Critério ou modelo | Qual propriedade deve ser maximizada, minimizada, decomposta ou modelada? |
-| Solução | Que direções, coordenadas, grupos, parâmetros ou funções resultam da formulação? |
-| Interpretação | Qual é o significado estatístico e geométrico da solução obtida? |
+| Problema estatístico | Define o objetivo da análise |
+| Estrutura dos dados | Estabelece a forma como a informação está organizada |
+| Objeto matemático | Representa a informação relevante para a técnica |
+| Critério ou modelo | Determina a propriedade otimizada, decomposta ou modelada |
+| Solução | Produz direções, coordenadas, grupos, parâmetros ou funções |
+| Interpretação | Atribui significado estatístico e geométrico à solução |
 
 : Elementos utilizados na formulação das técnicas multivariadas. {#tbl-estrutura-formulacao-tecnicas}
 
-Este capítulo organiza os principais problemas da Análise Multivariada e identifica as estruturas compartilhadas pelas técnicas que serão desenvolvidas nos capítulos seguintes. O objetivo é estabelecer uma visão conjunta das técnicas antes de estudar separadamente suas formulações matemáticas e estatísticas.
+O objetivo deste capítulo é organizar os principais problemas da Análise Multivariada e identificar as estruturas compartilhadas pelas técnicas que serão desenvolvidas nos capítulos seguintes.
 
-## Da pergunta estatística à técnica multivariada
+## Do problema estatístico à técnica multivariada
 
-A escolha de uma técnica multivariada começa pela pergunta que se pretende responder. A presença de várias variáveis em um conjunto de dados define o contexto multivariado, mas não determina o método a ser utilizado. É necessário identificar qual aspecto da estrutura conjunta deve ser representado, explicado, comparado ou utilizado para previsão.
+A presença de várias variáveis em um conjunto de dados caracteriza o contexto multivariado, mas não determina a técnica a ser utilizada. A escolha depende da estrutura que será analisada e do objetivo estabelecido.
 
-Considere, por exemplo, uma matriz de dados $\mathbf X$ como a definida em @def-matriz-dados. A mesma matriz pode ser utilizada para investigar perguntas distintas. Pode-se procurar poucas combinações lineares que preservem a maior parte da variabilidade, identificar grupos de observações semelhantes ou, quando os grupos são conhecidos, encontrar direções que os separem. O conjunto de dados pode ser o mesmo, mas o problema estatístico e o critério de solução são diferentes.
+Considere a matriz de dados $\mathbf X$ definida em @def-matriz-dados. A mesma matriz pode ser utilizada para construir combinações lineares que concentrem variabilidade, identificar grupos de observações semelhantes ou, quando os grupos são conhecidos, determinar direções que os separem. O conjunto de dados permanece o mesmo, enquanto o objeto de interesse e o critério de solução se modificam.
 
-Essa distinção pode ser feita antes de qualquer procedimento de cálculo. Para cada análise, devem ser identificados quatro elementos: a pergunta estatística, a informação dos dados relevante para essa pergunta, o objeto matemático que representa essa informação e o critério que define a solução. A @tbl-problemas-tecnicas apresenta essa correspondência para as técnicas estudadas neste módulo.
+A @tbl-problemas-tecnicas reúne as principais correspondências que serão desenvolvidas neste módulo.
 
-| Problema estatístico | Informação em foco | Objeto utilizado na formulação | Critério ou modelo | Técnica |
-|---|---|---|---|---|
-| Representar a variabilidade em menor dimensão | Variâncias e covariâncias entre variáveis | $\boldsymbol{\Sigma}$, $\mathbf S$, $\boldsymbol{\mathcal R}$, $\mathbf R$ ou matriz de dados centralizada | Maximização da variância e aproximação de posto reduzido | Análise de Componentes Principais |
-| Explicar as associações entre variáveis por dimensões não observadas | Estrutura de covariâncias | Matriz de covariâncias ou correlações | Modelo de fatores comuns | Análise Fatorial |
-| Formar grupos de objetos semelhantes | Proximidades entre observações | Matriz de dados ou matriz de dissimilaridades | Minimização da heterogeneidade intragrupos ou critérios de ligação | Análise de Agrupamentos |
-| Representar proximidades em poucas dimensões | Dissimilaridades entre objetos | Matriz de dissimilaridades e matriz de Gram associada | Preservação de distâncias, produtos internos ou ordenação das dissimilaridades | Escalonamento Multidimensional |
-| Representar associações entre categorias | Desvios em relação à independência | Tabela de contingência e matriz de resíduos padronizados | Decomposição da inércia associada ao qui-quadrado | Análise de Correspondência |
-| Comparar conjuntamente médias de várias respostas | Diferenças entre vetores de médias e variabilidade residual | Matrizes de hipótese e erro do modelo linear multivariado | Testes baseados nas raízes características do par hipótese--erro | MANOVA |
-| Separar grupos conhecidos e classificar observações | Diferenças entre grupos e variabilidade intragrupos | Matrizes de dispersão, médias e covariâncias dos grupos | Maximização da separação ou regra probabilística de classificação | Análise Discriminante |
-| Relacionar dois conjuntos de variáveis | Covariâncias dentro e entre dois blocos | Matriz de covariâncias particionada | Maximização da correlação entre combinações lineares | Correlação Canônica |
-| Explicar preferências por atributos de alternativas | Avaliações, ordenações ou escolhas | Matriz de delineamento dos perfis e respostas de preferência | Modelo de utilidade | Análise Conjunta |
+| Problema estatístico | Estrutura ou objeto central | Critério ou modelo | Técnica |
+|---|---|---|---|
+| Representar a variabilidade em menor dimensão | $\boldsymbol{\Sigma}$, $\mathbf S$, $\boldsymbol{\mathcal R}$, $\mathbf R$ ou matriz de dados centralizada | Maximização da variância e aproximação de posto reduzido | Análise de Componentes Principais |
+| Explicar associações por dimensões não observadas | Matriz de covariâncias ou correlações | Modelo de fatores comuns | Análise Fatorial |
+| Formar grupos de objetos semelhantes | Matriz de dados ou de dissimilaridades | Critérios de proximidade, dispersão ou ligação | Análise de Agrupamentos |
+| Representar proximidades em poucas dimensões | Matriz de dissimilaridades | Reconstrução geométrica ou minimização de discrepâncias | Escalonamento Multidimensional |
+| Representar associações entre categorias | Tabela de contingência | Geometria do qui-quadrado e decomposição da inércia | Análise de Correspondência |
+| Comparar conjuntamente várias respostas | Matrizes de hipótese e erro | Critérios multivariados de teste | MANOVA |
+| Separar grupos conhecidos e classificar observações | Médias, covariâncias e dispersões de grupos | Separação entre grupos ou regra probabilística | Análise Discriminante |
+| Relacionar dois conjuntos de variáveis | Covariâncias dentro e entre blocos | Maximização da correlação entre combinações lineares | Correlação Canônica |
+| Decompor preferências por atributos | Delineamento de perfis e respostas de preferência | Modelo de utilidade | Análise Conjunta |
 
-: Correspondência entre problemas estatísticos, objetos matemáticos e técnicas multivariadas. {#tbl-problemas-tecnicas}
+: Correspondência entre problemas, estruturas e técnicas multivariadas. {#tbl-problemas-tecnicas}
 
-A @tbl-problemas-tecnicas mostra que técnicas diferentes podem utilizar objetos matemáticos semelhantes. Matrizes de covariâncias aparecem na Análise de Componentes Principais, na Análise Fatorial, na Análise Discriminante e na Correlação Canônica, mas desempenham funções diferentes em cada formulação. Matrizes de distâncias aparecem em Agrupamentos e Escalonamento Multidimensional, embora uma técnica procure formar grupos e a outra procure construir uma representação geométrica.
+Os objetos utilizados nessa tabela já começaram a ser construídos nos módulos anteriores. A matriz de dados permite trabalhar diretamente com observações e variáveis. A matriz de covariâncias $\boldsymbol{\Sigma}$ e sua correspondente observada $\mathbf S$ descrevem a variabilidade conjunta. A matriz de correlações observada $\mathbf R$, definida em @def-matriz-correlacoes-observada, corresponde à estrutura obtida após a padronização marginal das variáveis.
 
-O critério de solução também diferencia métodos que compartilham a mesma estrutura de entrada. A Análise de Componentes Principais procura direções de máxima variabilidade. A Análise Fatorial especifica um modelo para explicar a estrutura de covariâncias. As duas técnicas podem partir de $\mathbf S$ ou $\mathbf R$, mas respondem a perguntas distintas.
+A escolha entre covariâncias e correlações modifica o problema. A matriz de covariâncias preserva as escalas originais, enquanto a matriz de correlações atribui variância unitária às variáveis. Essa diferença será retomada no Capítulo 14 ao formular a ACP a partir de $\mathbf S$ ou $\mathbf R$.
 
-Essa relação entre pergunta e critério será mantida nos capítulos seguintes. A formulação de cada técnica começará pelo problema que a origina e utilizará os resultados dos Módulos 1 e 2 somente quando forem necessários para construir sua solução.
+Outras técnicas utilizam estruturas diferentes. Agrupamentos e Escalonamento Multidimensional podem partir de dissimilaridades entre objetos. A Análise de Correspondência parte de frequências organizadas em uma tabela de contingência. A MANOVA utiliza a estrutura do modelo linear multivariado. A Correlação Canônica trabalha com dois blocos de variáveis. A Análise Conjunta utiliza perfis construídos pela combinação de atributos e níveis.
 
-## Estruturas de entrada das técnicas multivariadas
-
-Os dados multivariados podem chegar à análise em diferentes representações. Essas representações já foram construídas nos capítulos anteriores e passam agora a desempenhar funções específicas na formulação das técnicas.
-
-A matriz de dados $\mathbf X$, definida em @def-matriz-dados, mantém simultaneamente duas perspectivas. Suas linhas representam observações no espaço das variáveis, enquanto suas colunas representam variáveis no espaço das observações. Essa dualidade permite formular problemas orientados para relações entre objetos, relações entre variáveis ou ambas.
-
-Após a centralização, a informação sobre variabilidade e associação linear pode ser resumida pela matriz de covariâncias observada $\mathbf S$. Quando se deseja retirar o efeito das unidades de medida, utiliza-se a matriz de correlações $\mathbf R$, definida em @def-matriz-correlacoes-observada. No nível populacional, os objetos correspondentes são $\boldsymbol{\Sigma}$ e $\boldsymbol{\mathcal R}$.
-
-A substituição de $\mathbf S$ por $\mathbf R$ não representa apenas uma mudança de notação. A matriz $\mathbf S$ preserva as escalas das variáveis, enquanto $\mathbf R$ corresponde à análise das variáveis padronizadas. Como a padronização altera a geometria dos dados, técnicas baseadas nessas duas matrizes podem produzir soluções diferentes.
-
-Outros problemas não partem diretamente da covariância. Agrupamentos e Escalonamento Multidimensional podem utilizar uma matriz de dissimilaridades. A Análise de Correspondência parte de uma tabela de contingência. A MANOVA utiliza a estrutura do modelo linear multivariado desenvolvida no Capítulo 11. A Correlação Canônica requer a organização das variáveis em dois blocos. A Análise Conjunta utiliza perfis definidos por combinações de atributos e respostas que expressam preferência.
-
-A @tbl-estruturas-entrada resume essas formas de representação.
-
-| Estrutura de entrada | Informação representada | Técnicas em que aparece diretamente |
-|---|---|---|
-| Matriz de dados $\mathbf X$ | Valores das variáveis para cada observação | ACP, Agrupamentos, Análise Discriminante |
-| Matriz de covariâncias $\boldsymbol{\Sigma}$ ou $\mathbf S$ | Variâncias e covariâncias | ACP, Análise Fatorial, Correlação Canônica, Análise Discriminante |
-| Matriz de correlações $\boldsymbol{\mathcal R}$ ou $\mathbf R$ | Associações lineares após padronização marginal | ACP, Análise Fatorial, Correlação Canônica |
-| Matriz de dissimilaridades $\boldsymbol{\Delta}$ | Relações de proximidade entre pares de objetos | Agrupamentos, Escalonamento Multidimensional |
-| Tabela de contingência $\mathbf N$ | Frequências conjuntas de categorias | Análise de Correspondência |
-| Matrizes do modelo linear multivariado | Respostas, delineamento, parâmetros e resíduos | MANOVA |
-| Dois blocos de variáveis | Estrutura interna de cada bloco e associação entre blocos | Correlação Canônica |
-| Perfis de atributos e respostas de preferência | Características das alternativas e respostas dos indivíduos | Análise Conjunta |
-
-: Principais estruturas de entrada utilizadas pelas técnicas do Módulo 3. {#tbl-estruturas-entrada}
-
-A representação de entrada delimita quais relações podem ser preservadas ou modeladas. Uma matriz de covariâncias contém informação de segunda ordem entre variáveis, mas não conserva diretamente todas as posições das observações. Uma matriz de dissimilaridades preserva relações entre pares de objetos, mas pode não conter uma representação explícita das variáveis que produziram essas relações. Uma tabela de contingência descreve frequências entre categorias e exige uma geometria ponderada diferente daquela utilizada para variáveis quantitativas.
-
-A técnica deve ser compatível com a informação disponível e com a pergunta formulada. Essa compatibilidade explica por que métodos que produzem gráficos aparentemente semelhantes podem representar objetos estatísticos distintos.
+A estrutura de entrada delimita a informação disponível para a técnica. Uma matriz de covariâncias resume relações de segunda ordem entre variáveis. Uma matriz de dissimilaridades representa relações entre pares de objetos. Uma tabela de contingência registra frequências conjuntas entre categorias. A formulação deve preservar essa diferença.
 
 ## Classes de problemas multivariados
 
-As técnicas deste módulo podem ser organizadas pelo tipo de problema que procuram resolver. Essa classificação é mais informativa do que uma divisão baseada somente no tipo de algoritmo, pois mantém a pergunta estatística como ponto de partida.
+As técnicas deste módulo podem ser organizadas de acordo com o problema estatístico que resolvem. Essa classificação estabelece a função de cada método antes de sua formulação matemática.
 
 ### Redução de dimensionalidade
 
-Um problema de redução de dimensionalidade procura substituir uma representação de dimensão elevada por outra de menor dimensão, preservando uma propriedade especificada.
+A redução de dimensionalidade substitui uma representação de dimensão elevada por outra de menor dimensão, preservando uma característica definida da informação original.
 
-Na Análise de Componentes Principais, a propriedade preservada é a variabilidade. As novas dimensões são combinações lineares das variáveis originais e são escolhidas para concentrar sucessivamente a maior quantidade possível de variância. A decomposição espectral e a SVD estudadas no Módulo 1 fornecem as ferramentas para resolver esse problema.
+Na Análise de Componentes Principais, o critério é a variabilidade. As novas dimensões são combinações lineares escolhidas para concentrar sucessivamente a variância. A formulação utilizará projeções, decomposição espectral e SVD desenvolvidas no Módulo 1.
 
-A redução de dimensionalidade também aparece em outras técnicas, mas com critérios diferentes. No Escalonamento Multidimensional, o objetivo está relacionado à preservação de proximidades. Na Análise de Correspondência, a redução representa a associação entre perfis segundo a geometria do qui-quadrado. Portanto, obter uma representação com poucas dimensões não é suficiente para caracterizar a técnica; é necessário identificar **o que deve ser preservado** nessa representação.
+O mesmo objetivo geral de representar dados em poucas dimensões aparece em outras técnicas, com critérios diferentes. O Escalonamento Multidimensional preserva relações de proximidade, enquanto a Análise de Correspondência representa associações entre perfis. A propriedade preservada faz parte da definição do problema.
 
 ### Representação de estruturas latentes
 
-A Análise Fatorial parte de outra pergunta. O interesse está em explicar por que variáveis observadas apresentam determinada estrutura de covariâncias.
+A Análise Fatorial procura representar as associações entre variáveis observadas por meio de um número menor de fatores não observados.
 
-A formulação supõe que parte dessa associação pode ser atribuída a um número menor de fatores não observados. A matriz de covariâncias deixa de ser somente um objeto a ser decomposto e passa a ser uma estrutura que deve ser reproduzida por um modelo.
+Nesse caso, a matriz de covariâncias passa a ser objeto de um modelo. A formulação separa a parcela de variabilidade associada aos fatores comuns da parcela específica de cada variável.
 
-Essa diferença separa a Análise Fatorial da Análise de Componentes Principais. Na ACP, procura-se uma representação eficiente da variabilidade observada. Na Análise Fatorial, procura-se um modelo para a origem da covariação entre as variáveis.
+Essa estrutura distingue a Análise Fatorial da ACP. A ACP procura uma representação da variabilidade observada. A Análise Fatorial especifica um modelo para explicar a covariação entre as variáveis.
 
 ### Formação de grupos
 
-Na Análise de Agrupamentos, o problema é organizar objetos em grupos sem que as classes sejam conhecidas previamente. A solução depende da noção de proximidade adotada e do critério utilizado para definir um grupo.
+A Análise de Agrupamentos organiza objetos em grupos sem utilizar classes conhecidas previamente. A solução depende da representação dos objetos, da medida de proximidade e do critério que define a estrutura de grupos.
 
-As distâncias, dissimilaridades e geometrias induzidas desenvolvidas no Módulo 1 passam a determinar quais objetos são considerados próximos. A escolha da métrica modifica o próprio problema de agrupamento, pois altera a geometria na qual os grupos serão procurados.
+As distâncias e dissimilaridades desenvolvidas no Módulo 1 passam a determinar a geometria do problema. Métodos baseados em centroides, critérios de ligação ou outras estruturas podem produzir agrupamentos diferentes para os mesmos dados.
 
-Métodos diferentes podem formalizar a ideia de grupo de maneiras distintas. Alguns procuram grupos compactos em torno de centroides; outros constroem hierarquias a partir de critérios de ligação. A inexistência de uma única definição matemática de grupo explica por que soluções distintas podem ser obtidas para os mesmos dados.
+Sem um modelo probabilístico explícito, os grupos obtidos representam a solução do critério adotado e não correspondem automaticamente a populações distintas.
 
 ### Representação de dissimilaridades
 
-O Escalonamento Multidimensional parte das relações entre objetos e procura construir uma configuração de pontos cujas distâncias representem essas relações.
+O Escalonamento Multidimensional constrói uma configuração de pontos a partir de relações de proximidade entre objetos. O objetivo é obter coordenadas cujas distâncias representem, exatamente ou aproximadamente, as dissimilaridades disponíveis [@borg2018mds].
 
-O problema difere do agrupamento. Uma matriz de dissimilaridades pode ser usada nas duas técnicas, mas o agrupamento procura uma partição, enquanto o escalonamento procura coordenadas em um espaço de dimensão reduzida.
+No MDS clássico, a relação entre distâncias e produtos internos permite reconstruir uma matriz de Gram e obter coordenadas por decomposição espectral. Essa formulação utilizará diretamente os resultados do Módulo 1 sobre distâncias, centralização, matrizes de Gram e autovalores.
 
-No caso clássico, a relação entre distâncias e produtos internos desenvolvida no Módulo 1 permite obter uma matriz de Gram e, a partir dela, construir coordenadas por decomposição espectral. Em outras formulações, o critério pode avaliar diretamente a discrepância entre dissimilaridades e distâncias da configuração.
+A estrutura difere da Análise de Agrupamentos. O agrupamento procura uma partição ou hierarquia; o MDS procura uma configuração geométrica.
 
 ### Representação de associações em tabelas de contingência
 
-A Análise de Correspondência considera frequências observadas para combinações de categorias. O ponto de referência é a estrutura esperada sob independência.
+A Análise de Correspondência parte de uma tabela de frequências e representa os desvios em relação à independência entre suas categorias.
 
-A técnica procura representar os desvios em relação à independência em um espaço de baixa dimensão. As linhas e colunas são tratadas por meio de perfis e massas, e a distância utilizada é relacionada à estatística qui-quadrado.
+A técnica utiliza perfis, massas, distância qui-quadrado e uma decomposição de baixa dimensão baseada em SVD [@greenacre2017ca]. A geometria resultante difere daquela utilizada para dados quantitativos porque linhas e colunas possuem ponderações determinadas por suas frequências marginais.
 
-A SVD reaparece nessa formulação, mas é aplicada a uma matriz construída a partir dos desvios padronizados da independência. A estrutura matemática é semelhante à encontrada em outros métodos de baixa dimensão, enquanto o objeto estatístico e a métrica são diferentes.
+O capítulo específico mostrará como a inércia total está relacionada ao afastamento da independência e como sua decomposição produz as dimensões da representação.
 
 ### Comparação de vetores de médias
 
-Quando várias respostas são observadas nos mesmos indivíduos, diferenças entre grupos podem ser expressas como diferenças entre vetores de médias. O problema passa a ser inferencial quando se deseja avaliar se essas diferenças são compatíveis com a variabilidade amostral.
+A MANOVA considera conjuntamente várias respostas e formula hipóteses sobre efeitos representados no modelo linear multivariado.
 
-A MANOVA utiliza o modelo linear multivariado e as hipóteses lineares estudadas no Capítulo 11. A informação relevante é organizada nas matrizes de hipótese e de erro. A comparação considera simultaneamente várias combinações lineares das respostas, em vez de realizar uma coleção independente de testes univariados.
+O modelo definido em @def-modelo-linear-multivariado e a hipótese linear geral de @def-hipotese-linear-geral-multivariada fornecem a estrutura necessária. A formulação da MANOVA acrescentará os critérios construídos a partir das matrizes de hipótese e erro, sem reconstruir a teoria do modelo linear desenvolvida no Módulo 2.
 
-As raízes características e os problemas de autovalores generalizados estudados anteriormente permitem transformar a relação entre hipótese e erro em critérios multivariados de teste.
+A análise conjunta das respostas distingue a MANOVA de uma coleção de análises univariadas separadas.
 
 ### Discriminação e classificação
 
-Na Análise Discriminante, os grupos são conhecidos. O objetivo pode ser encontrar direções nas quais esses grupos apresentem maior separação ou construir uma regra para atribuir novas observações a uma das populações.
+A Análise Discriminante utiliza grupos conhecidos durante a construção da solução. Seu objetivo pode ser representar as direções de maior separação entre esses grupos ou construir regras de classificação para novas observações.
 
-Essa estrutura diferencia a Análise Discriminante da Análise de Agrupamentos. No agrupamento, os grupos fazem parte da solução. Na discriminação, a informação de grupo já existe e orienta a construção da solução.
+A formulação geométrica utiliza a relação entre dispersão entre grupos e dispersão dentro dos grupos. A formulação probabilística utiliza distribuições condicionais e regras de classificação. A distribuição normal multivariada e a distância de Mahalanobis estudadas no Módulo 2 fornecem parte dessa base.
 
-A formulação também pode ser vista por duas perspectivas. Uma perspectiva geométrica utiliza a relação entre dispersão entre grupos e dispersão intragrupos. Uma perspectiva probabilística utiliza distribuições condicionais aos grupos e regras de classificação. Os capítulos anteriores fornecem os elementos para as duas construções.
+A Análise Discriminante e a MANOVA compartilham estruturas de dispersão entre e dentro dos grupos, mas possuem objetivos diferentes [@huberty2006manova].
 
 ### Associação entre blocos de variáveis
 
-Alguns problemas envolvem dois conjuntos de variáveis observados nas mesmas unidades. O interesse está na associação entre os conjuntos considerados como blocos.
+A Correlação Canônica considera dois conjuntos de variáveis observados nas mesmas unidades. O objetivo é construir combinações lineares dos dois blocos que apresentem associação máxima.
 
-A Correlação Canônica procura duas combinações lineares, uma em cada bloco, cuja correlação seja máxima. As covariâncias intrablocos descrevem a estrutura interna de cada conjunto, enquanto a covariância cruzada contém a informação que relaciona os dois conjuntos.
+A matriz de covariância cruzada $\boldsymbol{\Sigma}_{XY}$, definida em @def-covariancia-cruzada, representa a associação entre os blocos. Sua correspondente observada $\mathbf S_{XY}$ foi definida em @def-covariancia-cruzada-observada.
 
-A técnica utiliza simultaneamente combinações lineares, matrizes de covariâncias particionadas, transformações de branqueamento e problemas espectrais. Esses elementos já foram desenvolvidos nos Módulos 1 e 2 e serão combinados no Capítulo 21.
+No Capítulo 21, essas matrizes serão combinadas às covariâncias internas de cada bloco para formular as variáveis e correlações canônicas.
 
 ### Decomposição de preferências
 
-A Análise Conjunta considera alternativas descritas por atributos e níveis. O problema consiste em relacionar as respostas de preferência às características que definem cada alternativa.
+A Análise Conjunta relaciona respostas de preferência às características que definem alternativas ou perfis.
 
-Em sua formulação aditiva, a preferência global é representada por contribuições associadas aos níveis dos atributos. A estrutura se aproxima de um modelo linear quando as respostas são métricas, mas outras formulações podem utilizar ordenações ou escolhas.
+Em uma formulação aditiva, a preferência é representada por contribuições associadas aos níveis dos atributos. Quando a resposta é métrica, essa estrutura pode ser formulada por meio de um modelo linear cuja matriz de delineamento registra a composição dos perfis.
 
-Nesse problema, o objeto de interesse deixa de ser uma matriz de covariâncias ou de distâncias. A construção depende do delineamento dos perfis apresentados e do modelo adotado para representar a preferência.
+O problema exige ainda condições de identificação decorrentes da codificação dos atributos e níveis. Esses elementos serão introduzidos no Capítulo 22.
 
 ## Diferentes formas de classificar as técnicas
 
-A classificação pelo problema estatístico é a principal organização utilizada neste módulo. Outras classificações ajudam a comparar as técnicas sob perspectivas diferentes. Elas não são equivalentes e não devem ser tratadas como divisões rígidas.
+A classificação pelo problema estatístico será a principal organização adotada neste módulo. Outras classificações permitem comparar diferentes características das técnicas.
 
 ### Interdependência e dependência
 
-A distinção entre técnicas de interdependência e de dependência considera se existe uma separação previamente estabelecida entre papéis desempenhados pelas variáveis ou pelas observações.
+Nas técnicas de interdependência, a análise não estabelece previamente uma variável resposta que será explicada pelas demais. ACP, Análise Fatorial, Agrupamentos, Escalonamento Multidimensional e Análise de Correspondência são exemplos usuais.
 
-Nas técnicas de interdependência, a estrutura é investigada sem especificar previamente uma variável resposta. ACP, Análise Fatorial, Agrupamentos, Escalonamento Multidimensional e Análise de Correspondência são exemplos usuais.
+Nas técnicas de dependência, alguma estrutura previamente definida orienta a análise. A MANOVA possui respostas e efeitos determinados pelo delineamento. A Análise Discriminante utiliza grupos conhecidos. A Análise Conjunta utiliza respostas de preferência.
 
-Nas técnicas de dependência, alguma estrutura externa define o que deve ser explicado, comparado ou previsto. Na MANOVA, há respostas e condições definidas pelo delineamento. Na Análise Discriminante, os grupos são conhecidos. Na Análise Conjunta, as preferências desempenham o papel de resposta.
-
-A Correlação Canônica mostra o limite dessa classificação. Os dois blocos possuem papéis distintos na formulação, mas o critério de correlação é simétrico: trocar os blocos não altera as correlações canônicas. Por isso, classificá-la exclusivamente como técnica de dependência pode ocultar parte de sua estrutura.
+A Correlação Canônica ocupa uma posição menos rígida nessa classificação. Os dois blocos são definidos previamente, mas o critério de associação é simétrico em relação a eles.
 
 ### Exploratórias, descritivas, preditivas e inferenciais
 
-Outra classificação considera a finalidade da análise.
+Uma técnica exploratória identifica padrões ou estruturas nos dados. Uma técnica descritiva resume uma configuração observada. Uma técnica preditiva produz uma regra aplicável a novas observações. Uma técnica inferencial utiliza a variabilidade amostral para formular conclusões sobre parâmetros ou populações.
 
-Uma técnica **exploratória** é utilizada para identificar estruturas ou padrões que não foram previamente especificados. Uma técnica **descritiva** resume a configuração observada por meio de dimensões, grupos, distâncias ou outras representações. Uma técnica **preditiva** produz uma regra que pode ser aplicada a novas observações. Uma técnica **inferencial** permite formular conclusões sobre parâmetros ou populações considerando a variabilidade amostral.
-
-Essas categorias podem coexistir na mesma técnica. A Análise Discriminante pode descrever as direções que separam grupos e também construir uma regra de classificação. A MANOVA possui finalidade inferencial, mas suas direções associadas às diferenças entre grupos também podem fornecer uma interpretação geométrica. A ACP é frequentemente utilizada de forma exploratória e descritiva, embora exista teoria inferencial para seus parâmetros populacionais.
+Essas finalidades podem coexistir. A ACP é predominantemente exploratória e descritiva em muitas aplicações, embora exista teoria inferencial para componentes populacionais. A Análise Discriminante descreve a separação entre grupos e também pode produzir regras de classificação. A MANOVA possui finalidade principalmente inferencial.
 
 ### Supervisionadas e não supervisionadas
 
-A distinção entre métodos supervisionados e não supervisionados depende da existência de informação externa que orienta a solução.
+Métodos supervisionados utilizam uma informação externa que orienta a construção da solução. Os rótulos dos grupos desempenham esse papel na Análise Discriminante, enquanto o delineamento define os efeitos avaliados na MANOVA.
 
-Na Análise Discriminante, os rótulos dos grupos são conhecidos e participam diretamente da construção das funções discriminantes. Na MANOVA, o delineamento define as condições ou grupos cujos vetores de médias serão comparados. Esses são exemplos de estruturas supervisionadas.
+Métodos não supervisionados constroem a estrutura diretamente a partir dos dados, sem utilizar classes ou respostas previamente especificadas. ACP e Análise de Agrupamentos são exemplos.
 
-Na ACP e nos métodos de agrupamento, nenhuma classe ou resposta conhecida orienta a obtenção da solução. A estrutura é construída a partir das relações presentes nos próprios dados.
+Essa classificação não descreve com a mesma precisão todas as técnicas do módulo. Análise Fatorial, Correspondência e MDS são caracterizadas de forma mais adequada pelo problema estatístico e pela estrutura que procuram representar.
 
-Essa classificação deve ser usada com atenção em métodos que não se ajustam perfeitamente ao vocabulário de aprendizagem supervisionada. A Análise Fatorial, a Análise de Correspondência e o Escalonamento Multidimensional possuem objetivos próprios de representação e modelagem que são descritos com maior precisão pela natureza do problema que resolvem.
+A @tbl-classificacoes-tecnicas resume essas classificações.
 
-A @tbl-classificacoes-tecnicas reúne essas classificações sem atribuir a elas caráter exclusivo.
-
-| Técnica | Problema predominante | Interdependência / dependência | Finalidade frequente | Supervisão |
+| Técnica | Problema predominante | Relação entre variáveis | Finalidade frequente | Estrutura de supervisão |
 |---|---|---|---|---|
 | ACP | Redução de dimensionalidade | Interdependência | Exploratória e descritiva | Não supervisionada |
-| Análise Fatorial | Estrutura latente | Interdependência | Exploratória ou inferencial, conforme a formulação | Não supervisionada na formulação exploratória |
+| Análise Fatorial | Estrutura latente | Interdependência | Exploratória ou inferencial | Sem resposta externa na formulação exploratória |
 | Análise de Agrupamentos | Formação de grupos | Interdependência | Exploratória e descritiva | Não supervisionada |
 | Escalonamento Multidimensional | Representação de dissimilaridades | Interdependência | Exploratória e descritiva | Não supervisionada |
 | Análise de Correspondência | Associação em tabelas | Interdependência | Exploratória e descritiva | Não supervisionada |
-| MANOVA | Comparação de vetores de médias | Dependência | Inferencial | Supervisionada pelo delineamento |
-| Análise Discriminante | Discriminação e classificação | Dependência | Descritiva e preditiva | Supervisionada |
-| Correlação Canônica | Associação entre blocos | Classificação depende da perspectiva adotada | Descritiva e inferencial | Estrutura em dois blocos previamente definida |
+| MANOVA | Comparação de vetores de médias | Dependência | Inferencial | Delineamento conhecido |
+| Análise Discriminante | Discriminação e classificação | Dependência | Descritiva e preditiva | Grupos conhecidos |
+| Correlação Canônica | Associação entre blocos | Estrutura simétrica entre dois blocos | Descritiva e inferencial | Blocos definidos previamente |
 | Análise Conjunta | Decomposição de preferências | Dependência | Explicativa e preditiva | Resposta de preferência observada |
 
 : Classificações complementares das técnicas estudadas no Módulo 3. {#tbl-classificacoes-tecnicas}
 
-A classificação por interdependência, dependência ou supervisão descreve aspectos da organização da informação. A classificação pelo problema estatístico informa diretamente **o que a técnica procura obter**. Por essa razão, os capítulos seguintes serão organizados prioritariamente pelo problema, pelo objeto matemático utilizado e pelo critério que produz a solução.
+A classificação pelo problema estatístico permanece mais diretamente ligada à formulação das técnicas. Por essa razão, os capítulos seguintes serão organizados pelo problema, pelo objeto matemático e pelo critério ou modelo utilizado.
 
 ## Estruturas matemáticas recorrentes
 
-As técnicas estudadas neste módulo utilizam repetidamente um conjunto relativamente pequeno de estruturas matemáticas. O que muda de uma técnica para outra é o papel atribuído a essas estruturas e o critério estatístico que determina a solução.
-
-Os resultados necessários já foram desenvolvidos nos Módulos 1 e 2. Nesta seção, eles são retomados apenas para estabelecer as conexões que serão utilizadas nos capítulos seguintes.
+As técnicas deste módulo reutilizam um conjunto relativamente pequeno de estruturas desenvolvidas anteriormente. O objetivo desta seção é estabelecer as conexões necessárias, sem repetir definições e demonstrações dos Módulos 1 e 2.
 
 ### Combinações lineares e projeções
 
-Uma parte importante das técnicas multivariadas procura novas direções a partir das variáveis originais. Essas direções são representadas por combinações lineares da forma
+Combinações lineares constroem novas variáveis e novas direções a partir das variáveis originais. Sua forma geral é
 
 $$
 Y
@@ -225,346 +186,126 @@ Y
 \boldsymbol{\mathsf X}.
 $$
 
-O vetor $\mathbf a$ determina a direção considerada e o critério da técnica determina como essa direção será escolhida.
+O significado de $\mathbf a$ depende do critério da técnica. Na ACP, seus coeficientes definem uma direção de variabilidade. Na Análise Discriminante, definem uma direção de separação entre grupos. Na Correlação Canônica, duas combinações são construídas simultaneamente, uma em cada bloco.
 
-Na Análise de Componentes Principais, procura-se uma direção de grande variabilidade. Na Análise Discriminante, procura-se uma direção que favoreça a separação entre grupos. Na Correlação Canônica, duas combinações lineares são construídas simultaneamente para maximizar a associação entre dois blocos de variáveis.
+As projeções ortogonais definidas em @def-projecao-ortogonal permitem representar observações em subespaços. Essa geometria será utilizada no Capítulo 14 para interpretar a ACP como projeção sobre um subespaço principal.
 
-As combinações lineares também possuem interpretação geométrica. Quando algumas direções são selecionadas e as demais são descartadas, os dados passam a ser representados em um subespaço de menor dimensão. As projeções ortogonais estudadas no Módulo 1, incluindo a projeção sobre uma direção definida em @def-projecao-direcao, fornecem a estrutura geométrica para essa representação.
+### Formas quadráticas e problemas espectrais
 
-Essa ideia será particularmente importante na ACP, em que a representação reduzida é obtida por projeção sobre o subespaço gerado pelas primeiras direções principais.
+A variância de uma combinação linear, as distâncias ponderadas e diferentes medidas de dispersão são expressas por formas quadráticas. Quando o critério depende da direção escolhida, surgem problemas de otimização espectral.
 
-### Formas quadráticas e problemas de otimização
+O quociente de Rayleigh definido em @def-quociente-rayleigh relaciona a otimização de uma forma quadrática aos autovalores de uma matriz simétrica. O resultado de @thm-extremos-quociente-rayleigh será aplicado no Capítulo 14 à matriz de covariâncias para formular as componentes principais.
 
-As formas quadráticas aparecem quando uma quantidade depende da direção escolhida. Para uma matriz simétrica $\mathbf A$,
+Quando duas formas quadráticas são comparadas, o quociente de Rayleigh generalizado de @def-quociente-rayleigh-generalizado conduz ao problema de autovalores generalizados descrito em @thm-extremos-rayleigh-generalizado. Essa estrutura será retomada na Análise Discriminante e na MANOVA.
 
-$$
-\mathbf a^\top
-\mathbf A
-\mathbf a
-$$
+A decomposição espectral, sintetizada em @tbl-sintese-espectral, fornece as direções e magnitudes associadas a uma matriz simétrica. A interpretação dessas direções depende da matriz que foi construída.
 
-atribui um valor à direção determinada por $\mathbf a$.
+### SVD e representações de baixa dimensão
 
-No contexto estatístico, a matriz $\mathbf A$ pode representar uma covariância, uma dispersão entre grupos, uma dispersão residual ou outro objeto construído a partir dos dados.
+A decomposição em valores singulares relaciona os espaços de linhas e colunas de uma matriz e permite construir aproximações de posto reduzido. Suas propriedades foram sintetizadas em @tbl-sintese-svd.
 
-Quando o comprimento do vetor precisa ser controlado, a otimização pode ser expressa pelo quociente de Rayleigh definido em @def-quociente-rayleigh:
+No Módulo 3, a SVD aparecerá em diferentes contextos. Na ACP, será aplicada à matriz de dados centralizada. Na Análise de Correspondência, será aplicada a uma matriz de desvios padronizados da independência. Na Correlação Canônica, poderá ser aplicada a uma matriz que representa a associação entre dois blocos após transformações determinadas por suas covariâncias.
 
-$$
-\mathcal R_{\mathbf A}(\mathbf a)
-=
-\frac{
-\mathbf a^\top
-\mathbf A
-\mathbf a
-}{
-\mathbf a^\top
-\mathbf a
-}.
-$$
+O mecanismo algébrico é compartilhado, mas a matriz decomposta e o significado estatístico de seus fatores são diferentes.
 
-O resultado apresentado em @thm-extremos-quociente-rayleigh estabelece que os valores extremos desse quociente são determinados pelos autovalores extremos de $\mathbf A$. Assim, problemas formulados como busca de uma direção ótima conduzem naturalmente à decomposição espectral.
+### Distâncias, matrizes de Gram e métricas
 
-Na ACP, essa estrutura aparece quando se maximiza a variância de uma combinação linear. A matriz envolvida é a matriz de covariâncias ou de correlações, e os autovetores determinam as direções principais.
+Distâncias e dissimilaridades organizam relações de proximidade entre observações. A matriz de Gram definida em @def-matriz-gram organiza produtos internos e estabelece a ligação entre coordenadas e distâncias.
 
-Em outros problemas, duas formas quadráticas precisam ser comparadas. A estrutura correspondente é o quociente de Rayleigh generalizado, definido em @def-quociente-rayleigh-generalizado:
+No MDS clássico, essa relação será utilizada no sentido inverso. A partir das distâncias, será construída uma matriz de Gram cuja decomposição espectral fornecerá coordenadas para os objetos.
 
-$$
-\mathcal R_{\mathbf A,\mathbf M}(\mathbf a)
-=
-\frac{
-\mathbf a^\top
-\mathbf A
-\mathbf a
-}{
-\mathbf a^\top
-\mathbf M
-\mathbf a
-}.
-$$
+Na Análise de Agrupamentos, as distâncias participam da definição dos grupos. A mesma matriz de dissimilaridades pode, portanto, alimentar técnicas com resultados diferentes.
 
-Quando $\mathbf M$ é positiva definida, @thm-extremos-rayleigh-generalizado mostra que os extremos são determinados pelos autovalores generalizados do par $(\mathbf A,\mathbf M)$.
-
-Essa estrutura será utilizada quando a direção procurada precisa apresentar grande valor segundo um critério e pequeno valor segundo outro. Na Análise Discriminante, por exemplo, interessa encontrar direções nas quais a dispersão entre grupos seja elevada em relação à dispersão dentro dos grupos. Na MANOVA, a relação entre a variabilidade associada à hipótese e a variabilidade residual também conduz a um problema generalizado.
-
-### Decomposição espectral
-
-A decomposição espectral de matrizes simétricas, sintetizada em @tbl-sintese-espectral, permite representar uma matriz por meio de direções ortogonais e dos valores associados a essas direções.
-
-Para
-
-$$
-\mathbf A
-=
-\mathbf Q
-\boldsymbol{\Lambda}
-\mathbf Q^\top,
-$$
-
-as colunas de $\mathbf Q$ determinam as direções espectrais e os elementos de $\boldsymbol{\Lambda}$ quantificam a importância de cada direção segundo o significado de $\mathbf A$.
-
-A interpretação depende da origem da matriz. Quando $\mathbf A$ é uma matriz de covariâncias, os autovalores representam variâncias segundo os eixos espectrais. Quando a matriz é construída a partir de distâncias, os autovalores participam da reconstrução de uma configuração geométrica. Quando duas matrizes de dispersão são comparadas, as raízes generalizadas quantificam relações entre diferentes fontes de variabilidade.
-
-Portanto, obter autovalores e autovetores não caracteriza uma técnica. A técnica é determinada pelo objeto que foi decomposto e pelo problema estatístico que levou à construção desse objeto.
-
-### Decomposição em valores singulares e aproximações de posto reduzido
-
-A SVD amplia a decomposição espectral para matrizes retangulares e permite estudar simultaneamente seus espaços de linhas e de colunas. As relações principais foram sintetizadas em @tbl-sintese-svd.
-
-Uma matriz de posto $r$ pode ser representada por
-
-$$
-\mathbf A
-=
-\sum_{j=1}^{r}
-d_j
-\mathbf u_j
-\mathbf v_j^\top.
-$$
-
-Quando apenas os primeiros $k<r$ termos são mantidos,
-
-$$
-\mathbf A_k
-=
-\mathbf U_k
-\mathbf D_k
-\mathbf V_k^\top
-$$
-
-fornece uma aproximação de posto reduzido. O resultado de Eckart--Young--Mirsky estudado no Capítulo 6 estabelece a optimalidade dessa aproximação segundo as normas consideradas naquele capítulo.
-
-No Módulo 3, essa propriedade será utilizada com significados diferentes.
-
-Na ACP, a SVD da matriz de dados centralizada fornece diretamente as direções principais, os escores e uma aproximação dos dados em dimensão reduzida. Na Análise de Correspondência, uma SVD é aplicada a uma matriz construída a partir dos desvios da independência. Na Correlação Canônica, uma SVD pode ser aplicada à covariância cruzada após transformação dos dois blocos.
-
-Esses casos compartilham o mesmo mecanismo algébrico, mas decompõem matrizes com significados estatísticos diferentes.
-
-### Distâncias e matrizes de Gram
-
-Os problemas orientados para relações entre observações utilizam diretamente a geometria estudada no Módulo 1. Distâncias e dissimilaridades determinam quais objetos são considerados próximos, enquanto produtos internos permitem representar ângulos, comprimentos e configurações.
-
-A matriz de Gram, definida em @def-matriz-gram, organiza os produtos internos entre um conjunto de vetores. Essa matriz estabelece uma ligação importante entre coordenadas e distâncias.
-
-No Escalonamento Multidimensional clássico, o ponto de partida é uma matriz de distâncias ou dissimilaridades. A partir dos quadrados das distâncias e de uma operação de dupla centralização, reconstrói-se uma matriz de Gram. A decomposição espectral dessa matriz fornece então coordenadas para os objetos.
-
-A direção da construção é, portanto, diferente daquela encontrada quando os dados originais já estão disponíveis. Em uma matriz de dados, produtos internos e distâncias podem ser calculados a partir das coordenadas. No MDS clássico, procura-se realizar o caminho inverso: obter coordenadas a partir das relações de distância.
-
-Na Análise de Agrupamentos, as distâncias possuem outra função. Elas não são utilizadas para reconstruir necessariamente uma configuração de baixa dimensão, mas para estabelecer proximidades que participam da formação dos grupos.
-
-Essa diferença ilustra novamente que uma mesma estrutura de entrada pode produzir problemas estatísticos distintos.
-
-### Métricas determinadas pela estrutura de dispersão
-
-A distância euclidiana atribui o mesmo peso a todas as direções do espaço. Em problemas estatísticos, essa geometria pode ser inadequada quando as variáveis apresentam escalas diferentes ou quando existe dependência entre elas.
-
-A distância de Mahalanobis introduz uma geometria determinada pela matriz de covariâncias. Como mostrado em @eq-mahalanobis-eixos-espectrais, o afastamento em cada direção espectral é ponderado pela variabilidade existente naquela direção.
-
-Essa estrutura aparece naturalmente em problemas de classificação e discriminação. Um afastamento deve ser interpretado em relação à dispersão da população, e não somente pelo comprimento euclidiano da diferença entre dois vetores.
-
-A ideia de modificar a geometria por uma matriz positiva definida também está relacionada aos autovalores generalizados. Quando a restrição utiliza uma forma quadrática $\mathbf a^\top\mathbf M\mathbf a$, a matriz $\mathbf M$ determina a geometria na qual o comprimento da direção está sendo medido.
+A distância de Mahalanobis acrescenta a estrutura de dispersão à geometria. A expressão em eixos espectrais apresentada em @eq-mahalanobis-eixos-espectrais mostra que o afastamento é ponderado pela variabilidade existente em cada direção. Essa estrutura será retomada na formulação probabilística da Análise Discriminante.
 
 ### Covariâncias entre blocos
 
-O Módulo 2 estendeu a covariância para dois vetores aleatórios por meio da matriz $\boldsymbol{\Sigma}_{XY}$ definida em @def-covariancia-cruzada. No nível observado, a estrutura correspondente é $\mathbf S_{XY}$, definida em @def-covariancia-cruzada-observada.
+A covariância cruzada representa a associação linear entre dois vetores aleatórios. O Módulo 2 definiu esse objeto em @def-covariancia-cruzada e apresentou sua versão observada em @def-covariancia-cruzada-observada.
 
-Essas matrizes são fundamentais quando as variáveis estão organizadas em dois conjuntos. Para combinações lineares
+Essa estrutura será utilizada diretamente na Correlação Canônica. As covariâncias internas dos blocos controlam a variabilidade de cada conjunto, enquanto a covariância cruzada representa a associação que será maximizada por combinações lineares.
 
-$$
-U
-=
-\mathbf a^\top
-\boldsymbol{\mathsf X}
-\qquad
-\text{e}
-\qquad
-V
-=
-\mathbf b^\top
-\boldsymbol{\mathsf Y},
-$$
+A formulação transforma um problema entre dois conjuntos de variáveis em um problema de associação entre dois espaços.
 
-a associação entre $U$ e $V$ depende simultaneamente das covariâncias dentro de cada bloco e da covariância cruzada entre os blocos.
+### Modelos lineares e probabilísticos
 
-Essa estrutura constitui a base da Correlação Canônica. O problema deixa de ser encontrar uma direção em um único espaço e passa a ser encontrar duas direções acopladas, uma para cada conjunto de variáveis.
+O modelo linear multivariado definido em @def-modelo-linear-multivariado organiza conjuntamente várias respostas, um delineamento e uma matriz de parâmetros. A hipótese linear geral de @def-hipotese-linear-geral-multivariada fornece a estrutura para testar combinações desses parâmetros.
 
-A SVD torna-se especialmente adequada nesse contexto porque relaciona naturalmente os espaços associados às linhas e às colunas de uma matriz retangular.
+A MANOVA será formulada diretamente a partir desses resultados. O novo conteúdo será a construção e interpretação dos critérios multivariados associados às matrizes de hipótese e erro.
 
-### Projeções, mínimos quadrados e modelos lineares
+A Análise Conjunta também poderá utilizar uma estrutura linear, mas com interpretação própria. A matriz de delineamento representa os níveis dos atributos que compõem os perfis, enquanto os coeficientes representam contribuições para a preferência.
 
-As projeções também aparecem quando o problema envolve ajuste de modelos. No modelo linear multivariado definido em @def-modelo-linear-multivariado,
+Outras técnicas partem de modelos probabilísticos específicos. A Análise Fatorial especifica um modelo para a matriz de covariâncias utilizando fatores comuns e variâncias específicas. A Análise Discriminante pode utilizar distribuições condicionais aos grupos para construir regras de classificação. Nessas formulações, os resultados do Módulo 2 sobre normal multivariada, estimação e inferência passam a desempenhar funções específicas.
 
-$$
-\boldsymbol{\mathcal Y}
-=
-\mathbf Z
-\mathbf B
-+
-\boldsymbol{\mathcal E},
-$$
+A @tbl-estruturas-recorrentes-tecnicas reúne essas conexões.
 
-a matriz de delineamento $\mathbf Z$ determina o subespaço no qual a parte sistemática das respostas é representada.
-
-A estimação de $\mathbf B$ está relacionada à projeção das respostas sobre o espaço coluna de $\mathbf Z$. A diferença entre os valores observados e ajustados produz a parte residual.
-
-No Capítulo 11, essa estrutura foi estendida às hipóteses lineares, aos contrastes e às matrizes de somas de quadrados e produtos cruzados. No presente módulo, esses resultados serão utilizados diretamente na formulação da MANOVA.
-
-A MANOVA não exige a construção de uma nova teoria de modelos lineares. Sua formulação utiliza o modelo já desenvolvido e acrescenta um problema específico: comparar a variabilidade associada a uma hipótese multivariada com a variabilidade residual.
-
-A Análise Conjunta também pode assumir uma estrutura de modelo linear quando as respostas de preferência são métricas. Nesse caso, a matriz de delineamento descreve os níveis dos atributos presentes em cada perfil e os parâmetros representam contribuições para a utilidade.
-
-### Modelos probabilísticos e verossimilhança
-
-Nem todas as técnicas são definidas exclusivamente por uma decomposição matricial ou por um problema geométrico de otimização. Algumas partem de um modelo probabilístico explícito.
-
-A Análise Fatorial é um exemplo importante. Sua formulação especifica uma estrutura para a matriz de covariâncias por meio de fatores comuns e componentes específicos. A solução não consiste simplesmente em decompor $\boldsymbol{\Sigma}$, mas em estimar parâmetros de um modelo que deve reproduzir sua estrutura.
-
-Sob hipóteses probabilísticas adicionais, a máxima verossimilhança permite estimar esses parâmetros e realizar inferência. As ferramentas de cálculo matricial, log-determinante, traço, matriz inversa e diferenciação estudadas no Módulo 1 passam a ser utilizadas nesse contexto.
-
-A Análise Discriminante fornece outro exemplo. Quando são especificadas distribuições condicionais aos grupos, a classificação pode ser formulada como um problema de decisão probabilística. A normal multivariada estudada no Capítulo 9 permite obter regras lineares ou quadráticas segundo a estrutura das matrizes de covariâncias dos grupos.
-
-Portanto, neste módulo devem ser distinguidas duas situações. Em algumas técnicas, a solução é definida principalmente por um critério geométrico ou algébrico. Em outras, a estrutura é definida por um modelo probabilístico e seus parâmetros. Algumas técnicas admitem as duas perspectivas.
-
-### Estruturas compartilhadas pelas técnicas
-
-A @tbl-estruturas-recorrentes-tecnicas reúne as principais conexões entre os resultados desenvolvidos nos Módulos 1 e 2 e as técnicas que serão formuladas neste módulo.
-
-| Estrutura já estudada | Papel na formulação | Técnicas em que aparece diretamente |
+| Estrutura desenvolvida anteriormente | Utilização no Módulo 3 | Técnicas diretamente relacionadas |
 |---|---|---|
-| Combinações lineares | Construir novas direções ou variáveis | ACP, Análise Discriminante, Correlação Canônica |
-| Projeções | Representar dados em subespaços e separar ajuste de resíduo | ACP, modelo linear multivariado, MANOVA |
-| Formas quadráticas | Medir variabilidade, afastamento ou separação segundo uma matriz | ACP, Análise Discriminante, MANOVA, normal multivariada |
-| Quociente de Rayleigh | Encontrar direções extremas de uma única forma quadrática | ACP |
-| Quociente de Rayleigh generalizado | Comparar duas formas quadráticas | Análise Discriminante, MANOVA |
-| Decomposição espectral | Obter direções e magnitudes associadas a matrizes simétricas | ACP, MDS clássico, MANOVA, Análise Discriminante |
-| SVD | Relacionar dois espaços e construir representações de posto reduzido | ACP, Análise de Correspondência, Correlação Canônica |
-| Aproximação de posto reduzido | Representar uma estrutura com poucas dimensões | ACP, Análise de Correspondência |
-| Distâncias e dissimilaridades | Representar proximidade entre objetos | Agrupamentos, MDS |
-| Matriz de Gram | Relacionar produtos internos, coordenadas e distâncias | MDS clássico |
-| Matrizes de covariâncias | Representar variabilidade e dependência linear | ACP, Análise Fatorial, Análise Discriminante, Correlação Canônica |
-| Covariâncias cruzadas | Representar associação entre dois blocos | Correlação Canônica |
-| Decomposição da dispersão por grupos | Separar variabilidade intragrupos e entre grupos | Agrupamentos, Análise Discriminante, MANOVA |
-| Modelo linear multivariado | Relacionar várias respostas a um delineamento | MANOVA |
-| Hipóteses lineares | Comparar combinações de parâmetros e respostas | MANOVA |
-| Normal multivariada | Construir modelos probabilísticos conjuntos | Análise Fatorial por máxima verossimilhança, Análise Discriminante, MANOVA |
-| Máxima verossimilhança | Estimar parâmetros de modelos probabilísticos | Análise Fatorial e formulações probabilísticas de outras técnicas |
-| Variáveis latentes | Representar estruturas não diretamente observadas | Análise Fatorial |
-| Modelos de utilidade | Relacionar preferência e atributos | Análise Conjunta |
+| Combinações lineares | Construção de novas direções ou variáveis | ACP, Discriminante, Correlação Canônica |
+| Projeções | Representação em subespaços | ACP |
+| Formas quadráticas | Medida de variabilidade, distância ou separação | ACP, Discriminante, MANOVA |
+| Autovalores | Direções extremas de matrizes simétricas | ACP, MDS clássico |
+| Autovalores generalizados | Comparação entre duas formas quadráticas | Discriminante, MANOVA |
+| SVD | Associação entre espaços e aproximação de baixa dimensão | ACP, Correspondência, Correlação Canônica |
+| Distâncias e dissimilaridades | Representação da proximidade entre objetos | Agrupamentos, MDS |
+| Matriz de Gram | Relação entre distâncias, produtos internos e coordenadas | MDS clássico |
+| Covariâncias e correlações | Representação da variabilidade conjunta | ACP, Fatorial, Discriminante, Correlação Canônica |
+| Covariância cruzada | Associação entre dois blocos | Correlação Canônica |
+| Dispersão dentro e entre grupos | Comparação da estrutura de grupos | Agrupamentos, Discriminante, MANOVA |
+| Modelo linear multivariado | Representação conjunta de respostas e efeitos | MANOVA |
+| Normal multivariada | Modelos probabilísticos conjuntos | Fatorial por máxima verossimilhança, Discriminante, MANOVA |
+| Variáveis latentes | Representação de estruturas não observadas | Análise Fatorial |
+| Modelo de utilidade | Representação das contribuições de atributos | Análise Conjunta |
 
-: Estruturas dos Módulos 1 e 2 utilizadas na formulação das técnicas multivariadas. {#tbl-estruturas-recorrentes-tecnicas}
+: Estruturas dos Módulos 1 e 2 reutilizadas na formulação das técnicas. {#tbl-estruturas-recorrentes-tecnicas}
 
-A tabela evidencia a unidade matemática do módulo. A mesma estrutura reaparece porque diferentes perguntas estatísticas podem ser convertidas em problemas de projeção, otimização, decomposição, reconstrução geométrica ou estimação.
+## Mesmas estruturas, diferentes interpretações
 
-Essa unidade não elimina as diferenças entre as técnicas. A ACP e a Análise Fatorial utilizam matrizes de covariâncias, mas uma busca direções que concentram variabilidade e a outra especifica um modelo para explicar a covariação. Agrupamentos e MDS utilizam proximidades entre objetos, mas um procura grupos e o outro procura coordenadas. MANOVA e Análise Discriminante utilizam informações sobre grupos, mas a primeira formula um problema de teste de hipóteses e a segunda um problema de separação e classificação.
+Uma operação matemática adquire significado estatístico a partir do objeto ao qual é aplicada.
 
-## O objeto matemático determina a solução, não sua interpretação
+A decomposição espectral de uma matriz de covariâncias fornece direções de variabilidade. A decomposição espectral de uma matriz de Gram reconstruída a partir de distâncias fornece coordenadas para uma configuração. Um problema de autovalores generalizados envolvendo duas matrizes de dispersão produz direções que comparam essas fontes de variabilidade.
 
-Uma característica importante da Análise Multivariada é que procedimentos algébricos semelhantes podem produzir objetos estatísticos com interpretações diferentes.
+A SVD apresenta a mesma característica. Aplicada à matriz de dados centralizada, participa da formulação da ACP. Aplicada aos desvios padronizados de uma tabela de contingência, produz os eixos da Análise de Correspondência. Aplicada a uma estrutura que relaciona dois blocos de variáveis, produz pares associados à Correlação Canônica.
 
-Considere a decomposição espectral. Aplicada a uma matriz de covariâncias, ela fornece direções de variabilidade. Aplicada a uma matriz de Gram reconstruída a partir de distâncias, fornece coordenadas para uma configuração. Em um problema de autovalores generalizados envolvendo matrizes de dispersão entre grupos e dentro dos grupos, fornece direções que contrastam duas fontes de variabilidade.
+A @tbl-mesma-operacao-significados resume essas diferenças.
 
-O mesmo ocorre com a SVD. Na matriz de dados centralizada, ela pode produzir uma representação equivalente à formulação amostral da ACP. Em uma matriz de desvios padronizados de uma tabela de contingência, produz os eixos da Análise de Correspondência. Em uma matriz construída a partir das covariâncias entre dois blocos transformados, fornece pares associados à Correlação Canônica.
-
-Portanto, não se interpreta um autovetor, um valor singular ou uma coordenada sem identificar a matriz da qual esse objeto foi obtido.
-
-A @tbl-mesma-operacao-significados resume alguns desses casos.
-
-| Operação matemática | Objeto ao qual é aplicada | Significado da solução |
+| Operação matemática | Objeto analisado | Significado da solução |
 |---|---|---|
 | Decomposição espectral | Matriz de covariâncias | Direções e variâncias principais |
 | Decomposição espectral | Matriz de Gram derivada de distâncias | Coordenadas de uma configuração |
-| Autovalores generalizados | Matrizes de dispersão entre e dentro dos grupos | Direções de separação |
+| Autovalores generalizados | Dispersão entre e dentro dos grupos | Direções de separação |
 | Autovalores generalizados | Matrizes de hipótese e erro | Dimensões associadas ao efeito multivariado |
-| SVD | Matriz de dados centralizada | Direções, escores e aproximação de baixa dimensão |
+| SVD | Matriz de dados centralizada | Direções, escores e representação de baixa dimensão |
 | SVD | Desvios padronizados da independência | Eixos de associação entre categorias |
-| SVD | Associação entre dois blocos transformados | Pares de direções canônicas |
+| SVD | Associação transformada entre dois blocos | Pares de direções canônicas |
 
-: Exemplos de uma mesma operação matemática com diferentes significados estatísticos. {#tbl-mesma-operacao-significados}
+: Exemplos de estruturas matemáticas com diferentes significados estatísticos. {#tbl-mesma-operacao-significados}
 
-Esse princípio será adotado nos capítulos seguintes. Cada formulação deverá identificar primeiro **qual matriz ou estrutura está sendo construída** e somente depois aplicar o resultado matemático correspondente.
+A interpretação de um autovetor, valor singular ou coordenada exige, portanto, a identificação da matriz de origem e do critério que definiu sua construção.
 
 ## Relações entre as técnicas
 
-As técnicas também podem ser comparadas pelas semelhanças e diferenças entre seus problemas. Algumas relações são especialmente importantes para evitar interpretações equivocadas.
+Algumas técnicas apresentam estruturas matemáticas próximas, mas resolvem problemas diferentes. A @tbl-relacoes-tecnicas reúne as distinções que serão retomadas ao longo do módulo.
 
-### ACP e Análise Fatorial
+| Técnicas relacionadas | Estrutura compartilhada | Diferença principal |
+|---|---|---|
+| ACP e Análise Fatorial | Covariâncias, correlações e baixa dimensão | ACP representa variabilidade; Fatorial modela covariação por fatores comuns |
+| Agrupamentos e Discriminante | Estrutura de grupos e medidas de separação | Agrupamentos constrói grupos; Discriminante utiliza grupos conhecidos |
+| Agrupamentos e MDS | Dissimilaridades entre objetos | Agrupamentos produz partições ou hierarquias; MDS produz coordenadas |
+| ACP e MDS clássico | Representações espectrais de baixa dimensão | ACP parte de variáveis e covariâncias; MDS parte de distâncias |
+| MANOVA e Discriminante | Dispersão entre e dentro dos grupos | MANOVA testa efeitos; Discriminante representa separação e classifica |
+| ACP e Correlação Canônica | Combinações lineares | ACP maximiza variância em um bloco; Canônica maximiza associação entre dois blocos |
+| ACP e Correspondência | Decomposições de baixa dimensão | ACP utiliza geometria de covariâncias; Correspondência utiliza perfis e geometria qui-quadrado |
 
-As duas técnicas podem produzir poucas dimensões a partir de muitas variáveis e podem utilizar a mesma matriz de correlações como entrada observada. O problema formulado, entretanto, é diferente.
+: Relações conceituais entre técnicas do Módulo 3. {#tbl-relacoes-tecnicas}
 
-A ACP procura combinações lineares que representem a variabilidade observada. A Análise Fatorial procura explicar as covariâncias por fatores comuns e variâncias específicas.
+A relação entre ACP e Análise Fatorial será retomada imediatamente após a formulação dessas técnicas. A conexão entre ACP e MDS aparecerá quando as dissimilaridades forem distâncias euclidianas derivadas de dados quantitativos. A relação entre MANOVA e Análise Discriminante será estabelecida a partir das estruturas de dispersão associadas aos grupos.
 
-A redução dimensional da ACP decorre de uma propriedade espectral. A dimensão reduzida da Análise Fatorial decorre da especificação de um modelo latente.
-
-### Agrupamentos e Análise Discriminante
-
-As duas técnicas tratam de grupos de observações, mas a informação disponível é diferente.
-
-Na Análise de Agrupamentos, os grupos são desconhecidos e constituem parte da solução. Na Análise Discriminante, os grupos são conhecidos e utilizados para construir direções de separação e regras de classificação.
-
-Uma técnica é orientada para descobrir uma organização nos dados; a outra utiliza uma organização previamente observada.
-
-### Agrupamentos e MDS
-
-As duas técnicas podem partir da mesma matriz de dissimilaridades.
-
-A Análise de Agrupamentos transforma essas relações em uma partição ou hierarquia. O MDS transforma as relações em coordenadas que procuram preservar determinada estrutura das dissimilaridades.
-
-Uma representação por MDS pode auxiliar a visualização de uma estrutura de grupos, mas essa representação não constitui, por si, um procedimento de agrupamento.
-
-### ACP e MDS clássico
-
-ACP e MDS clássico podem produzir representações de baixa dimensão por decomposição espectral. A diferença está no ponto de partida.
-
-A ACP parte de variáveis observadas e de sua estrutura de variabilidade. O MDS parte de distâncias ou dissimilaridades entre objetos.
-
-Quando as distâncias do MDS são distâncias euclidianas calculadas a partir dos mesmos dados centralizados, existe uma relação direta entre as duas representações. Essa relação será desenvolvida no capítulo dedicado ao Escalonamento Multidimensional.
-
-### MANOVA e Análise Discriminante
-
-As duas técnicas podem utilizar as mesmas informações sobre a separação entre grupos e a variabilidade interna.
-
-Na MANOVA, a pergunta central é inferencial: os vetores de médias diferem segundo a hipótese considerada?
-
-Na Análise Discriminante, a pergunta é estrutural ou preditiva: em quais direções os grupos se separam e como uma observação pode ser atribuída a um grupo?
-
-A proximidade algébrica entre as duas técnicas não torna seus objetivos equivalentes.
-
-### ACP e Correlação Canônica
-
-As duas técnicas constroem combinações lineares. Na ACP, as combinações pertencem a um único conjunto de variáveis e são escolhidas segundo sua variância. Na Correlação Canônica, são considerados dois blocos e o critério é a correlação entre uma combinação de cada bloco.
-
-A diferença está, portanto, no critério de otimização e na estrutura dos dados.
-
-### Correspondência, ACP e SVD
-
-ACP e Análise de Correspondência utilizam decomposições de baixa dimensão e podem produzir mapas com pontos e eixos. A semelhança gráfica não implica que as coordenadas possuam o mesmo significado.
-
-A ACP trabalha com variabilidade de variáveis quantitativas segundo uma geometria determinada pela covariância ou correlação. A Análise de Correspondência trabalha com perfis de frequências e com uma geometria ponderada pelas massas das categorias.
-
-A SVD fornece o mecanismo algébrico para ambas, mas a matriz de entrada determina a interpretação.
-
-## Visão integrada das técnicas do módulo
-
-As relações desenvolvidas neste capítulo podem ser reunidas na @tbl-visao-integrada-tecnicas.
-
-| Técnica | Pergunta principal | Estrutura central | Mecanismo predominante | Resultado da formulação |
-|---|---|---|---|---|
-| ACP | Como representar a variabilidade em poucas dimensões? | Covariância, correlação ou matriz de dados centralizada | Otimização espectral e SVD | Componentes e escores |
-| Análise Fatorial | Que estrutura latente pode explicar as covariâncias? | Modelo de covariâncias | Modelo latente e estimação | Fatores, cargas e variâncias específicas |
-| Agrupamentos | Como organizar objetos semelhantes em grupos? | Distâncias, dissimilaridades ou dados | Partição, proximidade e otimização | Grupos ou hierarquias |
-| MDS | Como representar dissimilaridades geometricamente? | Matriz de dissimilaridades | Reconstrução de Gram ou otimização de discrepâncias | Coordenadas |
-| Correspondência | Como representar a associação entre categorias? | Tabela de contingência | Geometria qui-quadrado e SVD | Coordenadas de linhas e colunas |
-| MANOVA | Há diferenças multivariadas associadas aos efeitos do modelo? | Modelo linear, hipótese e erro | Hipótese linear e autovalores generalizados | Estatísticas de teste multivariadas |
-| Análise Discriminante | Quais direções separam grupos conhecidos e como classificar? | Médias, covariâncias e dispersões de grupos | Razões de dispersão ou regra probabilística | Funções discriminantes e regras de classificação |
-| Correlação Canônica | Como dois blocos de variáveis se relacionam linearmente? | Covariâncias intra e entre blocos | Otimização e SVD | Variáveis e correlações canônicas |
-| Análise Conjunta | Como atributos contribuem para a preferência? | Delineamento de perfis e respostas | Modelo de utilidade | Utilidades parciais e efeitos dos atributos |
-
-: Visão integrada dos problemas, estruturas e resultados das técnicas do Módulo 3. {#tbl-visao-integrada-tecnicas}
+Essas conexões mostram por que a técnica deve ser identificada pelo problema estatístico e não pela operação matricial utilizada.
 
 ## Síntese
 
-As técnicas multivariadas estudadas neste módulo não constituem uma coleção independente de procedimentos. Cada uma utiliza os fundamentos dos Módulos 1 e 2 para transformar uma pergunta estatística em um problema matemático ou probabilístico específico.
+As técnicas multivariadas deste módulo utilizam os fundamentos construídos nos Módulos 1 e 2 para resolver problemas estatísticos específicos. A formulação de cada técnica combina uma estrutura de dados, um objeto matemático e um critério ou modelo.
 
-Combinações lineares constroem novas direções. Projeções permitem representar dados em subespaços. Formas quadráticas mensuram variabilidade e separação. Autovalores e autovalores generalizados resolvem problemas de otimização direcional. A SVD relaciona espaços e produz aproximações de posto reduzido. Distâncias e matrizes de Gram conectam proximidades e coordenadas. Matrizes de covariâncias descrevem dependência. Modelos lineares organizam respostas e efeitos. Modelos probabilísticos e variáveis latentes permitem representar mecanismos que não são definidos somente pela geometria dos dados.
+Combinações lineares e projeções produzem novas direções e representações. Formas quadráticas e problemas espectrais permitem otimizar variabilidade e separação. A SVD fornece representações de baixa dimensão e relaciona diferentes espaços. Distâncias e matrizes de Gram conectam proximidades e coordenadas. Matrizes de covariâncias representam dependência. Covariâncias cruzadas relacionam blocos. Modelos lineares organizam respostas e efeitos. Modelos probabilísticos e variáveis latentes acrescentam estruturas específicas para estimação e inferência.
 
-Nos capítulos seguintes, essas estruturas serão utilizadas sem reconstruir seus fundamentos. Para cada técnica, o desenvolvimento partirá do problema estatístico, identificará o objeto de entrada e estabelecerá o critério ou modelo que conduz à solução. Essa organização permitirá reconhecer tanto as relações entre as técnicas quanto as características que distinguem cada uma delas.
-
+Os capítulos seguintes utilizarão esses resultados sem reconstruir seus fundamentos. O Capítulo 14 inicia esse percurso com a Análise de Componentes Principais, formulada a partir da variância de combinações lineares, do quociente de Rayleigh, da decomposição espectral, das projeções e da SVD.

@@ -1,0 +1,2299 @@
+# Formulação da Análise Fatorial
+
+A Análise Fatorial procura representar as dependências entre variáveis observadas por meio de um número menor de variáveis latentes, denominadas **fatores comuns**. A técnica parte da hipótese de que uma parcela da covariação entre as variáveis pode ser atribuída a esses fatores, enquanto a variabilidade restante é específica de cada variável [@lawley1971factor].
+
+No capítulo anterior, a Análise de Componentes Principais foi formulada pela decomposição da variabilidade total em direções ortogonais. A distinção inicial entre ACP e Análise Fatorial foi sintetizada em @tbl-acp-fatorial-introducao. O problema agora é diferente. A matriz de covariâncias deixa de ser apenas decomposta e passa a ser representada por um **modelo estatístico**.
+
+Os fundamentos necessários já foram desenvolvidos nos Módulos 1 e 2. Matrizes e transformações lineares permitem representar a contribuição dos fatores; a matriz de covariâncias descreve a estrutura que será modelada; posto e decomposições matriciais permitem estudar a dimensão da parcela comum; a distribuição normal multivariada fornecerá posteriormente uma formulação probabilística para estimação e inferência.
+
+A estrutura central deste capítulo será
+
+$$
+\boldsymbol{\Sigma}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}
++
+\boldsymbol{\Psi},
+$$
+
+no modelo ortogonal, em que $\boldsymbol{\Lambda}\boldsymbol{\Lambda}^{\top}$ representa a parcela comum da covariância e $\boldsymbol{\Psi}$ representa a variabilidade específica.
+
+Essa formulação introduz elementos que não aparecem na ACP: fatores não observados, variâncias específicas, identificação do modelo e indeterminação rotacional. A Análise Fatorial será construída a partir desses elementos e, posteriormente, relacionada à estimação por máxima verossimilhança e à obtenção de escores fatoriais.
+
+## O problema da estrutura latente
+
+Considere o vetor aleatório
+
+$$
+\boldsymbol{\mathsf X}
+=
+\begin{pmatrix}
+X_1\\
+\vdots\\
+X_p
+\end{pmatrix}
+\in
+\mathbb R^p,
+$$
+
+com vetor de médias
+
+$$
+\boldsymbol{\mu}
+=
+E
+\left(
+\boldsymbol{\mathsf X}
+\right)
+$$
+
+e matriz de covariâncias populacional $\boldsymbol{\Sigma}$, definida em @def-matriz-covariancias-populacional.
+
+Os elementos fora da diagonal de $\boldsymbol{\Sigma}$ registram a associação linear entre pares de variáveis. Na Análise Fatorial, essas covariâncias são interpretadas a partir de uma hipótese estrutural: parte das relações entre as variáveis é produzida pela influência conjunta de um número menor de fatores não diretamente observados.
+
+Considere
+
+$$
+\boldsymbol{\mathsf F}
+=
+\begin{pmatrix}
+F_1\\
+\vdots\\
+F_m
+\end{pmatrix}
+\in
+\mathbb R^m,
+$$
+
+com
+
+$$
+m<p
+$$
+
+na formulação usual de baixa dimensão.
+
+As componentes de $\boldsymbol{\mathsf F}$ são variáveis aleatórias latentes. Elas não correspondem a colunas observadas da matriz de dados. Sua existência é postulada pelo modelo para explicar a estrutura de covariâncias entre as variáveis observadas.
+
+A redução de dimensão na Análise Fatorial possui, portanto, natureza diferente daquela obtida pela ACP. Na ACP, novas variáveis são construídas diretamente como combinações lineares das variáveis observadas. Na Análise Fatorial, as variáveis observadas são representadas como funções lineares de fatores latentes acrescidas de parcelas específicas.
+
+A estrutura pode ser expressa esquematicamente como
+
+$$
+\text{fatores comuns}
+\longrightarrow
+\text{variáveis observadas}
+\longleftarrow
+\text{componentes específicas}.
+$$
+
+Os fatores comuns explicam a dependência compartilhada. As componentes específicas representam a parcela de cada variável que não é atribuída aos fatores comuns.
+
+## Modelo de fatores comuns
+
+O modelo básico representa o vetor observado como a soma de três parcelas:
+
+1. localização média;
+2. contribuição dos fatores comuns;
+3. contribuição específica.
+
+::: {#def-modelo-fatores-comuns}
+## Modelo de fatores comuns
+
+Considere um vetor aleatório $\boldsymbol{\mathsf X}\in\mathbb R^p$ e um vetor de fatores comuns $\boldsymbol{\mathsf F}\in\mathbb R^m$. O **modelo de fatores comuns** é
+
+$$
+\boldsymbol{\mathsf X}
+=
+\boldsymbol{\mu}
++
+\boldsymbol{\Lambda}
+\boldsymbol{\mathsf F}
++
+\boldsymbol{\varepsilon},
+$$ {#eq-modelo-fatores-comuns}
+
+em que
+
+$$
+\boldsymbol{\Lambda}
+\in
+\mathbb R^{p\times m}
+$$
+
+é a matriz de cargas fatoriais e
+
+$$
+\boldsymbol{\varepsilon}
+=
+\begin{pmatrix}
+\varepsilon_1\\
+\vdots\\
+\varepsilon_p
+\end{pmatrix}
+\in
+\mathbb R^p
+$$
+
+é o vetor de componentes específicas.
+:::
+
+Os elementos do modelo são organizados na @tbl-elementos-modelo-fatorial.
+
+| Objeto | Dimensão | Função no modelo |
+|---|---:|---|
+| $\boldsymbol{\mathsf X}$ | $p\times1$ | Vetor de variáveis observadas |
+| $\boldsymbol{\mu}$ | $p\times1$ | Vetor de médias |
+| $\boldsymbol{\mathsf F}$ | $m\times1$ | Vetor de fatores comuns latentes |
+| $\boldsymbol{\Lambda}$ | $p\times m$ | Matriz de cargas fatoriais |
+| $\boldsymbol{\varepsilon}$ | $p\times1$ | Vetor de componentes específicas |
+| $\boldsymbol{\Psi}$ | $p\times p$ | Matriz das variâncias específicas |
+
+: Elementos do modelo de fatores comuns. {#tbl-elementos-modelo-fatorial}
+
+A $i$-ésima variável pode ser escrita como
+
+$$
+X_i
+=
+\mu_i
++
+\lambda_{i1}F_1
++
+\lambda_{i2}F_2
++
+\cdots
++
+\lambda_{im}F_m
++
+\varepsilon_i.
+$$ {#eq-modelo-fatorial-variavel}
+
+A linha $i$ da matriz de cargas será denotada por
+
+$$
+\boldsymbol{\lambda}_i^\top
+=
+\begin{pmatrix}
+\lambda_{i1}
+&
+\cdots
+&
+\lambda_{im}
+\end{pmatrix}.
+$$
+
+Assim,
+
+$$
+X_i-\mu_i
+=
+\boldsymbol{\lambda}_i^\top
+\boldsymbol{\mathsf F}
++
+\varepsilon_i.
+$$
+
+A carga $\lambda_{ij}$ representa o coeficiente associado ao fator $F_j$ na expressão linear da variável $X_i$. Sua interpretação depende da escala dos fatores, da escala das variáveis e da parametrização utilizada.
+
+A @fig-modelo-fatores-comuns representa a estrutura de um modelo com dois fatores e três variáveis observadas. As setas azuis representam as contribuições dos fatores comuns e as setas vermelhas representam as componentes específicas.
+
+```{r}
+#| label: fig-modelo-fatores-comuns
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Estrutura do modelo de fatores comuns: as variáveis observadas recebem contribuições dos fatores latentes e de componentes específicas."
+#| fig-width: 8
+#| fig-height: 5.8
+#| fig-align: center
+
+library(ggplot2)
+
+fatores <- data.frame(
+  nome = c(
+    "F1",
+    "F2"
+  ),
+  x = c(
+    0,
+    0
+  ),
+  y = c(
+    3.6,
+    1.4
+  )
+)
+
+variaveis <- data.frame(
+  nome = c(
+    "X1",
+    "X2",
+    "X3"
+  ),
+  x = c(
+    3,
+    3,
+    3
+  ),
+  y = c(
+    4.1,
+    2.5,
+    0.9
+  )
+)
+
+especificos <- data.frame(
+  nome = c(
+    "eps1",
+    "eps2",
+    "eps3"
+  ),
+  x = c(
+    5.5,
+    5.5,
+    5.5
+  ),
+  y = c(
+    4.1,
+    2.5,
+    0.9
+  )
+)
+
+ligacoes_fatores <- expand.grid(
+  fator = fatores$nome,
+  variavel = variaveis$nome,
+  stringsAsFactors = FALSE
+)
+
+ligacoes_fatores <- merge(
+  ligacoes_fatores,
+  fatores,
+  by.x = "fator",
+  by.y = "nome"
+)
+
+names(
+  ligacoes_fatores
+)[
+  names(
+    ligacoes_fatores
+  ) == "x"
+] <- "x0"
+
+names(
+  ligacoes_fatores
+)[
+  names(
+    ligacoes_fatores
+  ) == "y"
+] <- "y0"
+
+ligacoes_fatores <- merge(
+  ligacoes_fatores,
+  variaveis,
+  by.x = "variavel",
+  by.y = "nome"
+)
+
+ligacoes_especificas <- data.frame(
+  x0 = especificos$x,
+  y0 = especificos$y,
+  x = variaveis$x,
+  y = variaveis$y
+)
+
+ggplot() +
+  geom_segment(
+    data = ligacoes_fatores,
+    aes(
+      x = x0 + 0.22,
+      y = y0,
+      xend = x - 0.35,
+      yend = y
+    ),
+    linewidth = 0.9,
+    color = "#1f77b4",
+    alpha = 0.75,
+    arrow = grid::arrow(
+      length = grid::unit(
+        0.16,
+        "cm"
+      ),
+      type = "closed"
+    )
+  ) +
+  geom_segment(
+    data = ligacoes_especificas,
+    aes(
+      x = x0 - 0.28,
+      y = y0,
+      xend = x + 0.35,
+      yend = y
+    ),
+    linewidth = 0.9,
+    color = "#d62728",
+    alpha = 0.8,
+    arrow = grid::arrow(
+      length = grid::unit(
+        0.16,
+        "cm"
+      ),
+      type = "closed"
+    )
+  ) +
+  geom_label(
+    data = fatores,
+    aes(
+      x = x,
+      y = y,
+      label = nome
+    ),
+    size = 4.3,
+    label.size = 0.7,
+    color = "#1f77b4",
+    fill = "white"
+  ) +
+  geom_label(
+    data = variaveis,
+    aes(
+      x = x,
+      y = y,
+      label = nome
+    ),
+    size = 4.3,
+    label.size = 0.7,
+    color = "#2ca02c",
+    fill = "white"
+  ) +
+  geom_label(
+    data = especificos,
+    aes(
+      x = x,
+      y = y,
+      label = nome
+    ),
+    size = 4,
+    label.size = 0.7,
+    color = "#d62728",
+    fill = "white",
+    parse = FALSE
+  ) +
+  annotate(
+    "text",
+    x = 0,
+    y = 4.75,
+    label = "Fatores comuns",
+    size = 4.2,
+    fontface = "bold",
+    color = "gray35"
+  ) +
+  annotate(
+    "text",
+    x = 3,
+    y = 4.75,
+    label = "Variáveis observadas",
+    size = 4.2,
+    fontface = "bold",
+    color = "gray35"
+  ) +
+  annotate(
+    "text",
+    x = 5.5,
+    y = 4.75,
+    label = "Componentes específicas",
+    size = 4.2,
+    fontface = "bold",
+    color = "gray35"
+  ) +
+  coord_cartesian(
+    xlim = c(
+      -0.8,
+      6.3
+    ),
+    ylim = c(
+      0.2,
+      5.0
+    ),
+    expand = FALSE
+  ) +
+  labs(
+    x = NULL,
+    y = NULL
+  ) +
+  theme_void(
+    base_size = 13
+  )
+```
+
+A figura mostra que a associação entre as variáveis pode ser produzida pela presença de causas comuns no modelo. As componentes específicas atuam individualmente sobre cada variável e, na formulação básica, não produzem covariâncias entre variáveis distintas.
+
+## Hipóteses do modelo ortogonal
+
+A expressão em @eq-modelo-fatores-comuns ainda não determina a estrutura de covariâncias. Para isso, são estabelecidas condições sobre os fatores e as componentes específicas.
+
+Na formulação ortogonal padronizada dos fatores,
+
+$$
+E
+\left(
+\boldsymbol{\mathsf F}
+\right)
+=
+\mathbf0,
+$$
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F}
+\right)
+=
+\mathbf I_m.
+$$
+
+As componentes específicas satisfazem
+
+$$
+E
+\left(
+\boldsymbol{\varepsilon}
+\right)
+=
+\mathbf0
+$$
+
+e
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\varepsilon}
+\right)
+=
+\boldsymbol{\Psi},
+$$
+
+com
+
+$$
+\boldsymbol{\Psi}
+=
+\operatorname{diag}
+\left(
+\psi_1,\ldots,\psi_p
+\right),
+\qquad
+\psi_i\geq0.
+$$
+
+Além disso,
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F},
+\boldsymbol{\varepsilon}
+\right)
+=
+\mathbf0.
+$$
+
+Essas condições são reunidas na definição seguinte.
+
+::: {#def-modelo-fatorial-ortogonal}
+## Modelo fatorial ortogonal
+
+O modelo de fatores comuns em @eq-modelo-fatores-comuns é denominado **ortogonal** quando
+
+$$
+E
+\left(
+\boldsymbol{\mathsf F}
+\right)
+=
+\mathbf0,
+\qquad
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F}
+\right)
+=
+\mathbf I_m,
+$$
+
+$$
+E
+\left(
+\boldsymbol{\varepsilon}
+\right)
+=
+\mathbf0,
+\qquad
+\operatorname{Cov}
+\left(
+\boldsymbol{\varepsilon}
+\right)
+=
+\boldsymbol{\Psi},
+$$
+
+com $\boldsymbol{\Psi}$ diagonal, e
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F},
+\boldsymbol{\varepsilon}
+\right)
+=
+\mathbf0.
+$$
+:::
+
+A condição
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F}
+\right)
+=
+\mathbf I_m
+$$
+
+fixa a escala dos fatores e estabelece covariâncias nulas entre fatores distintos. A ortogonalidade, nesse contexto, refere-se à estrutura de covariâncias dos fatores.
+
+A diagonalidade de $\boldsymbol{\Psi}$ estabelece
+
+$$
+\operatorname{Cov}
+\left(
+\varepsilon_i,\varepsilon_j
+\right)
+=
+0,
+\qquad
+i\neq j.
+$$
+
+Consequentemente, a parte específica do modelo não acrescenta covariância entre variáveis distintas.
+
+Essa condição estabelece **não correlação** entre as componentes específicas. Independência entre elas exige hipóteses probabilísticas adicionais. Quando posteriormente for adotado um modelo normal conjunto com componentes específicas independentes, a interpretação poderá ser fortalecida para independência.
+
+A condição
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F},
+\boldsymbol{\varepsilon}
+\right)
+=
+\mathbf0
+$$
+
+separa, em termos de covariância, a parcela comum da parcela específica.
+
+Essas hipóteses são suficientes para obter a estrutura de segunda ordem que define o modelo fatorial básico. A normalidade multivariada não é necessária para essa decomposição da covariância. Seu papel aparecerá posteriormente na formulação por máxima verossimilhança e na distribuição condicional dos fatores.
+
+## Estrutura da matriz de covariâncias
+
+A consequência central do modelo pode ser obtida diretamente a partir das propriedades de covariância desenvolvidas no Módulo 2.
+
+De @eq-modelo-fatores-comuns,
+
+$$
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\mathsf F}
++
+\boldsymbol{\varepsilon}.
+$$
+
+Como
+
+$$
+E
+\left(
+\boldsymbol{\mathsf F}
+\right)
+=
+\mathbf0
+$$
+
+e
+
+$$
+E
+\left(
+\boldsymbol{\varepsilon}
+\right)
+=
+\mathbf0,
+$$
+
+segue que
+
+$$
+E
+\left(
+\boldsymbol{\mathsf X}
+\right)
+=
+\boldsymbol{\mu}.
+$$
+
+Para a matriz de covariâncias,
+
+$$
+\begin{aligned}
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}
+\right)
+&=
+\operatorname{Cov}
+\left(
+\boldsymbol{\Lambda}
+\boldsymbol{\mathsf F}
++
+\boldsymbol{\varepsilon}
+\right)\\
+&=
+\boldsymbol{\Lambda}
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F}
+\right)
+\boldsymbol{\Lambda}^{\top}
++
+\operatorname{Cov}
+\left(
+\boldsymbol{\varepsilon}
+\right)\\
+&\quad+
+\boldsymbol{\Lambda}
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F},
+\boldsymbol{\varepsilon}
+\right)
++
+\operatorname{Cov}
+\left(
+\boldsymbol{\varepsilon},
+\boldsymbol{\mathsf F}
+\right)
+\boldsymbol{\Lambda}^{\top}.
+\end{aligned}
+$$
+
+A regra de transformação da covariância utilizada na primeira parcela foi desenvolvida em @prp-transformacao-afim-covariancia.
+
+Pelas hipóteses do modelo ortogonal,
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F}
+\right)
+=
+\mathbf I_m,
+$$
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\varepsilon}
+\right)
+=
+\boldsymbol{\Psi}
+$$
+
+e
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F},
+\boldsymbol{\varepsilon}
+\right)
+=
+\mathbf0.
+$$
+
+Portanto,
+
+$$
+\boldsymbol{\Sigma}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}
++
+\boldsymbol{\Psi}.
+$$ {#eq-covariancia-modelo-fatorial}
+
+::: {#prp-covariancia-modelo-fatorial}
+## Estrutura de covariâncias do modelo fatorial ortogonal
+
+Sob as hipóteses de @def-modelo-fatorial-ortogonal, a matriz de covariâncias das variáveis observadas é
+
+$$
+\boldsymbol{\Sigma}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}
++
+\boldsymbol{\Psi}.
+$$
+:::
+
+A expressão em @eq-covariancia-modelo-fatorial é o núcleo matemático da Análise Fatorial.
+
+A matriz
+
+$$
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}
+$$
+
+é a **matriz de covariâncias comuns**. Como
+
+$$
+\boldsymbol{\Lambda}
+\in
+\mathbb R^{p\times m},
+$$
+
+tem-se
+
+$$
+\operatorname{posto}
+\left(
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}
+\right)
+\leq
+m.
+$$
+
+Assim, a estrutura comum é representada por uma matriz de posto limitado pelo número de fatores.
+
+A matriz
+
+$$
+\boldsymbol{\Psi}
+=
+\operatorname{diag}
+\left(
+\psi_1,\ldots,\psi_p
+\right)
+$$
+
+contém as variâncias específicas.
+
+A decomposição
+
+$$
+\boldsymbol{\Sigma}
+=
+\underbrace{
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}
+}_{\text{estrutura comum}}
++
+\underbrace{
+\boldsymbol{\Psi}
+}_{\text{estrutura específica}}
+$$
+
+mostra a diferença essencial em relação à ACP. A Análise Fatorial não procura uma decomposição espectral completa de $\boldsymbol{\Sigma}$. Ela procura explicar sua estrutura por uma matriz comum de baixa dimensão acrescida de uma matriz diagonal de variâncias específicas.
+
+### Covariâncias entre variáveis
+
+Considere duas variáveis distintas $X_i$ e $X_j$. Pelo modelo,
+
+$$
+X_i-\mu_i
+=
+\boldsymbol{\lambda}_i^\top
+\boldsymbol{\mathsf F}
++
+\varepsilon_i
+$$
+
+e
+
+$$
+X_j-\mu_j
+=
+\boldsymbol{\lambda}_j^\top
+\boldsymbol{\mathsf F}
++
+\varepsilon_j.
+$$
+
+Sob as hipóteses do modelo ortogonal,
+
+$$
+\operatorname{Cov}
+\left(
+X_i,X_j
+\right)
+=
+\boldsymbol{\lambda}_i^\top
+\boldsymbol{\lambda}_j,
+\qquad
+i\neq j.
+$$
+
+Equivalentemente,
+
+$$
+\sigma_{ij}
+=
+\sum_{h=1}^m
+\lambda_{ih}
+\lambda_{jh},
+\qquad
+i\neq j.
+$$ {#eq-covariancia-variaveis-fatorial}
+
+A covariância entre duas variáveis observadas é reproduzida pelo produto interno entre seus vetores de cargas.
+
+Esse resultado fornece uma interpretação geométrica importante. As linhas de $\boldsymbol{\Lambda}$ podem ser vistas como vetores em $\mathbb R^m$. Variáveis cujos vetores de cargas apresentam grande produto interno positivo possuem covariância comum positiva; vetores com produto interno negativo correspondem a covariância comum negativa; vetores ortogonais possuem covariância comum nula no modelo ortogonal.
+
+Essa geometria será representada mais adiante por meio dos vetores de cargas.
+
+### Variâncias das variáveis
+
+Para uma variável $X_i$,
+
+$$
+\begin{aligned}
+\operatorname{Var}
+\left(
+X_i
+\right)
+&=
+\operatorname{Var}
+\left(
+\boldsymbol{\lambda}_i^\top
+\boldsymbol{\mathsf F}
++
+\varepsilon_i
+\right)\\
+&=
+\boldsymbol{\lambda}_i^\top
+\boldsymbol{\lambda}_i
++
+\psi_i.
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+\sigma_{ii}
+=
+\sum_{h=1}^m
+\lambda_{ih}^2
++
+\psi_i.
+$$ {#eq-variancia-variavel-fatorial}
+
+A variância de cada variável é decomposta em uma parcela comum e uma parcela específica.
+
+## Comunalidades e especificidades
+
+A decomposição de @eq-variancia-variavel-fatorial permite definir duas quantidades próprias da Análise Fatorial.
+
+::: {#def-comunalidade}
+## Comunalidade
+
+No modelo fatorial ortogonal, a **comunalidade** da variável $X_i$ é
+
+$$
+h_i^2
+=
+\boldsymbol{\lambda}_i^\top
+\boldsymbol{\lambda}_i
+=
+\sum_{h=1}^m
+\lambda_{ih}^2.
+$$ {#eq-comunalidade}
+:::
+
+A comunalidade representa a parcela da variância de $X_i$ atribuída aos fatores comuns.
+
+::: {#def-especificidade}
+## Especificidade
+
+A **especificidade** da variável $X_i$ é
+
+$$
+\psi_i
+=
+\operatorname{Var}
+\left(
+\varepsilon_i
+\right).
+$$
+:::
+
+Assim,
+
+$$
+\operatorname{Var}
+\left(
+X_i
+\right)
+=
+h_i^2
++
+\psi_i.
+$$ {#eq-variancia-comum-especifica}
+
+A comunalidade e a especificidade pertencem à decomposição da variância de **cada variável**. Elas não correspondem à decomposição da variância total em componentes sucessivamente ordenadas, como ocorre na ACP.
+
+Quando as variáveis estão padronizadas,
+
+$$
+\operatorname{Var}
+\left(
+X_i
+\right)
+=
+1,
+$$
+
+e, portanto,
+
+$$
+1
+=
+h_i^2
++
+\psi_i.
+$$ {#eq-comunalidade-padronizada}
+
+Nesse caso,
+
+$$
+0
+\leq
+h_i^2
+\leq
+1
+$$
+
+e
+
+$$
+0
+\leq
+\psi_i
+\leq
+1.
+$$
+
+Uma comunalidade elevada indica que grande parcela da variabilidade da variável é representada pela estrutura comum do modelo. Uma comunalidade pequena indica que a maior parcela da variabilidade permanece específica da variável.
+
+A soma das comunalidades pode ser escrita como
+
+$$
+\sum_{i=1}^p
+h_i^2
+=
+\operatorname{tr}
+\left(
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}
+\right).
+$$
+
+Como
+
+$$
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}
+\right)
+=
+\operatorname{tr}
+\left(
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}
+\right)
++
+\operatorname{tr}
+\left(
+\boldsymbol{\Psi}
+\right),
+$$
+
+a variância total também admite a decomposição
+
+$$
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}
+\right)
+=
+\sum_{i=1}^p
+h_i^2
++
+\sum_{i=1}^p
+\psi_i.
+$$ {#eq-variancia-total-fatorial}
+
+A interpretação dessa identidade difere daquela utilizada na ACP. Na ACP, os autovalores distribuem a variância total entre componentes principais. Na Análise Fatorial, a decomposição separa a variabilidade atribuída à estrutura comum da variabilidade específica das variáveis.
+
+## Cargas fatoriais e associação com os fatores
+
+A matriz $\boldsymbol{\Lambda}$ ocupa uma posição central no modelo. Seus elementos aparecem tanto na representação das variáveis quanto na matriz de covariâncias reproduzida.
+
+No modelo ortogonal,
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X},
+\boldsymbol{\mathsf F}
+\right)
+=
+\operatorname{Cov}
+\left(
+\boldsymbol{\Lambda}
+\boldsymbol{\mathsf F}
++
+\boldsymbol{\varepsilon},
+\boldsymbol{\mathsf F}
+\right).
+$$
+
+Como
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F}
+\right)
+=
+\mathbf I_m
+$$
+
+e
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\varepsilon},
+\boldsymbol{\mathsf F}
+\right)
+=
+\mathbf0,
+$$
+
+segue que
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X},
+\boldsymbol{\mathsf F}
+\right)
+=
+\boldsymbol{\Lambda}.
+$$ {#eq-covariancia-variaveis-fatores}
+
+Portanto,
+
+$$
+\operatorname{Cov}
+\left(
+X_i,F_j
+\right)
+=
+\lambda_{ij}.
+$$
+
+Essa igualdade decorre da parametrização em que os fatores possuem variância unitária.
+
+A carga fatorial coincide com a correlação entre $X_i$ e $F_j$ somente quando a variável observada também possui variância unitária. De forma geral,
+
+$$
+\operatorname{Corr}
+\left(
+X_i,F_j
+\right)
+=
+\frac{
+\lambda_{ij}
+}{
+\sqrt{\sigma_{ii}}
+}.
+$$ {#eq-correlacao-variavel-fator}
+
+Para variáveis padronizadas,
+
+$$
+\sigma_{ii}=1,
+$$
+
+e então
+
+$$
+\operatorname{Corr}
+\left(
+X_i,F_j
+\right)
+=
+\lambda_{ij}.
+$$
+
+Essa distinção é semelhante àquela estabelecida no capítulo anterior entre coeficientes das componentes principais e correlações das variáveis com as componentes. Na Análise Fatorial, entretanto, as cargas são parâmetros do próprio modelo de covariâncias.
+
+A formulação construída até este ponto mostra que o problema da estrutura latente pode ser reduzido à representação
+
+$$
+\boldsymbol{\Sigma}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}
++
+\boldsymbol{\Psi}.
+$$
+
+O passo seguinte consiste em analisar a geometria da matriz de cargas e uma propriedade que distingue profundamente a Análise Fatorial da ACP: diferentes matrizes de cargas podem produzir exatamente a mesma estrutura de covariâncias. Essa indeterminação conduz ao problema de identificação e às rotações fatoriais.
+
+## Geometria das cargas fatoriais
+
+No modelo ortogonal, cada linha da matriz de cargas
+
+$$
+\boldsymbol{\lambda}_i^\top
+=
+\begin{pmatrix}
+\lambda_{i1}
+&
+\cdots
+&
+\lambda_{im}
+\end{pmatrix}
+$$
+
+pode ser representada como um vetor em $\mathbb R^m$.
+
+Essa representação reúne duas propriedades obtidas anteriormente:
+
+$$
+h_i^2
+=
+\boldsymbol{\lambda}_i^\top
+\boldsymbol{\lambda}_i
+=
+\left\|
+\boldsymbol{\lambda}_i
+\right\|^2
+$$
+
+e, para $i\neq j$,
+
+$$
+\sigma_{ij}
+=
+\boldsymbol{\lambda}_i^\top
+\boldsymbol{\lambda}_j.
+$$
+
+Portanto, o comprimento do vetor de cargas da variável $X_i$ determina sua comunalidade, enquanto o produto interno entre os vetores de cargas de duas variáveis determina a covariância comum reproduzida entre elas.
+
+Escrevendo
+
+$$
+\boldsymbol{\lambda}_i^\top
+\boldsymbol{\lambda}_j
+=
+\left\|
+\boldsymbol{\lambda}_i
+\right\|
+\left\|
+\boldsymbol{\lambda}_j
+\right\|
+\cos
+\left(
+\theta_{ij}
+\right),
+$$
+
+a covariância comum depende simultaneamente dos comprimentos dos vetores e do ângulo entre eles.
+
+Vetores próximos em direção produzem produto interno positivo. Vetores orientados em sentidos aproximadamente opostos produzem produto interno negativo. Vetores aproximadamente ortogonais produzem pequena covariância comum.
+
+A @fig-geometria-cargas-fatoriais representa quatro variáveis em um modelo com dois fatores. O comprimento de cada vetor está associado à comunalidade e sua orientação descreve a relação da variável com os fatores.
+
+```{r}
+#| label: fig-geometria-cargas-fatoriais
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Geometria das cargas em um modelo com dois fatores. O comprimento de cada vetor determina a comunalidade e o produto interno entre vetores determina a covariância comum entre as variáveis."
+#| fig-width: 7
+#| fig-height: 6.5
+#| fig-align: center
+
+library(ggplot2)
+
+cargas <- data.frame(
+  variavel = c(
+    "X1",
+    "X2",
+    "X3",
+    "X4"
+  ),
+  F1 = c(
+    0.88,
+    0.72,
+    0.18,
+    -0.20
+  ),
+  F2 = c(
+    0.22,
+    0.42,
+    0.84,
+    0.76
+  )
+)
+
+cores <- c(
+  "X1" = "#1f77b4",
+  "X2" = "#2ca02c",
+  "X3" = "#d62728",
+  "X4" = "#9467bd"
+)
+
+circulo <- data.frame(
+  angulo = seq(
+    0,
+    2 * pi,
+    length.out = 400
+  )
+)
+
+circulo$x <- cos(
+  circulo$angulo
+)
+
+circulo$y <- sin(
+  circulo$angulo
+)
+
+ggplot() +
+  geom_hline(
+    yintercept = 0,
+    linewidth = 0.4,
+    color = "gray70"
+  ) +
+  geom_vline(
+    xintercept = 0,
+    linewidth = 0.4,
+    color = "gray70"
+  ) +
+  geom_path(
+    data = circulo,
+    aes(
+      x = x,
+      y = y
+    ),
+    linewidth = 0.55,
+    linetype = "dashed",
+    color = "gray65"
+  ) +
+  geom_segment(
+    data = cargas,
+    aes(
+      x = 0,
+      y = 0,
+      xend = F1,
+      yend = F2,
+      color = variavel
+    ),
+    linewidth = 1.1,
+    arrow = grid::arrow(
+      length = grid::unit(
+        0.17,
+        "cm"
+      ),
+      type = "closed"
+    )
+  ) +
+  geom_text(
+    data = cargas,
+    aes(
+      x = 1.10 * F1,
+      y = 1.10 * F2,
+      label = variavel,
+      color = variavel
+    ),
+    size = 4.2,
+    show.legend = FALSE
+  ) +
+  scale_color_manual(
+    values = cores,
+    name = NULL
+  ) +
+  coord_equal(
+    xlim = c(
+      -1.1,
+      1.1
+    ),
+    ylim = c(
+      -1.1,
+      1.1
+    ),
+    expand = FALSE
+  ) +
+  labs(
+    x = expression(F[1]),
+    y = expression(F[2])
+  ) +
+  theme_minimal(
+    base_size = 13
+  ) +
+  theme(
+    panel.grid.minor = element_blank(),
+    legend.position = "none"
+  )
+```
+
+Os vetores de $X_1$ e $X_2$ apresentam orientações semelhantes e, portanto, produto interno positivo. A variável $X_3$ está mais associada à segunda direção fatorial. A posição de $X_4$ mostra que uma variável pode apresentar sinais diferentes de associação com os dois fatores.
+
+O círculo unitário fornece uma referência geométrica para variáveis padronizadas. Nesse caso,
+
+$$
+h_i^2
+\leq
+1,
+$$
+
+de modo que os vetores de cargas permanecem no interior ou sobre a circunferência.
+
+Essa representação não transforma os fatores em variáveis observadas. Ela representa os parâmetros que relacionam cada variável observada às dimensões latentes especificadas pelo modelo.
+
+## Matriz de covariâncias comuns
+
+A estrutura fatorial pode ser isolada pela diferença entre a matriz total de covariâncias e a matriz de especificidades.
+
+Defina
+
+$$
+\boldsymbol{\Sigma}_{\mathrm{com}}
+=
+\boldsymbol{\Sigma}
+-
+\boldsymbol{\Psi}.
+$$
+
+Pela @eq-covariancia-modelo-fatorial,
+
+$$
+\boldsymbol{\Sigma}_{\mathrm{com}}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}.
+$$ {#eq-matriz-covariancias-comuns}
+
+::: {#def-matriz-covariancias-comuns}
+## Matriz de covariâncias comuns
+
+No modelo fatorial ortogonal, a **matriz de covariâncias comuns** é
+
+$$
+\boldsymbol{\Sigma}_{\mathrm{com}}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}.
+$$
+
+Seus elementos diagonais são as comunalidades e seus elementos fora da diagonal são as covariâncias reproduzidas pelos fatores comuns.
+:::
+
+A diagonal de $\boldsymbol{\Sigma}_{\mathrm{com}}$ é
+
+$$
+\operatorname{diag}
+\left(
+\boldsymbol{\Sigma}_{\mathrm{com}}
+\right)
+=
+\begin{pmatrix}
+h_1^2\\
+\vdots\\
+h_p^2
+\end{pmatrix},
+$$
+
+enquanto, para $i\neq j$,
+
+$$
+\left(
+\boldsymbol{\Sigma}_{\mathrm{com}}
+\right)_{ij}
+=
+\sigma_{ij}.
+$$
+
+Na formulação populacional exata do modelo básico, toda covariância entre variáveis distintas é atribuída aos fatores comuns. As variâncias possuem uma parcela adicional representada por $\boldsymbol{\Psi}$.
+
+Quando as variáveis são padronizadas,
+
+$$
+\boldsymbol{\Sigma}
+=
+\boldsymbol{\mathcal R},
+$$
+
+e a matriz comum possui diagonal formada pelas comunalidades:
+
+$$
+\boldsymbol{\mathcal R}_{\mathrm{com}}
+=
+\boldsymbol{\mathcal R}
+-
+\boldsymbol{\Psi}.
+$$
+
+Assim, a matriz comum difere da matriz de correlações principalmente pela substituição das variâncias unitárias da diagonal pelas comunalidades.
+
+A dimensão da estrutura comum é limitada pelo número de fatores. Como
+
+$$
+\operatorname{posto}
+\left(
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}
+\right)
+\leq
+m,
+$$
+
+a Análise Fatorial procura explicar uma matriz de covariâncias de dimensão $p$ por uma estrutura comum cujo posto é, no máximo, $m<p$.
+
+Essa redução de posto pertence apenas à parcela comum. A matriz total
+
+$$
+\boldsymbol{\Sigma}
+=
+\boldsymbol{\Sigma}_{\mathrm{com}}
++
+\boldsymbol{\Psi}
+$$
+
+pode continuar apresentando posto completo porque as variâncias específicas acrescentam variabilidade nas direções das variáveis observadas.
+
+Esse ponto distingue novamente a Análise Fatorial da aproximação de posto reduzido utilizada na ACP. Uma aproximação espectral truncada de $\boldsymbol{\Sigma}$ produz diretamente uma matriz de posto reduzido. O modelo fatorial acrescenta uma matriz diagonal e procura preservar a estrutura específica de cada variável.
+
+## Identificação do modelo fatorial
+
+A equação
+
+$$
+\boldsymbol{\Sigma}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}
++
+\boldsymbol{\Psi}
+$$
+
+não determina automaticamente uma única matriz de cargas.
+
+A identificação do modelo envolve determinar quais características dos parâmetros podem ser recuperadas de forma única a partir da distribuição das variáveis observadas.
+
+Três fontes de indeterminação aparecem diretamente na representação fatorial:
+
+1. escala dos fatores;
+2. sinal dos fatores;
+3. orientação dos eixos fatoriais.
+
+### Escala dos fatores
+
+Considere, inicialmente, um único fator:
+
+$$
+\boldsymbol{\mathsf X}
+=
+\boldsymbol{\mu}
++
+\boldsymbol{\lambda}F
++
+\boldsymbol{\varepsilon}.
+$$
+
+Para qualquer constante não nula $c$,
+
+$$
+\boldsymbol{\lambda}F
+=
+\left(
+c\boldsymbol{\lambda}
+\right)
+\left(
+\frac{F}{c}
+\right).
+$$
+
+Logo, sem uma restrição adicional, a escala da carga e a escala do fator podem ser modificadas simultaneamente sem alterar a parte comum do modelo.
+
+No modelo ortogonal, a condição
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F}
+\right)
+=
+\mathbf I_m
+$$
+
+fixa a variância de cada fator e remove essa indeterminação de escala.
+
+### Indeterminação do sinal
+
+Se uma coluna de $\boldsymbol{\Lambda}$ e o fator correspondente tiverem seus sinais invertidos simultaneamente, o produto permanece inalterado.
+
+Para o fator $F_j$,
+
+$$
+\boldsymbol{\lambda}_{\cdot j}F_j
+=
+\left(
+-\boldsymbol{\lambda}_{\cdot j}
+\right)
+\left(
+-F_j
+\right).
+$$
+
+Portanto, o sinal de um fator não é identificado pelo modelo.
+
+Essa propriedade é semelhante à indeterminação de sinal dos autovetores observada na ACP, mas sua origem pertence agora à representação do produto entre carga e fator latente.
+
+### Indeterminação rotacional
+
+A indeterminação mais importante ocorre quando
+
+$$
+m\geq2.
+$$
+
+Considere uma matriz ortogonal
+
+$$
+\mathbf T
+\in
+\mathbb R^{m\times m},
+$$
+
+definida conforme @def-matriz-ortogonal, de modo que
+
+$$
+\mathbf T^\top
+\mathbf T
+=
+\mathbf I_m.
+$$
+
+Defina
+
+$$
+\boldsymbol{\Lambda}^{*}
+=
+\boldsymbol{\Lambda}
+\mathbf T
+$$
+
+e
+
+$$
+\boldsymbol{\mathsf F}^{*}
+=
+\mathbf T^\top
+\boldsymbol{\mathsf F}.
+$$
+
+Então,
+
+$$
+\begin{aligned}
+\boldsymbol{\Lambda}^{*}
+\boldsymbol{\mathsf F}^{*}
+&=
+\boldsymbol{\Lambda}
+\mathbf T
+\mathbf T^\top
+\boldsymbol{\mathsf F}\\
+&=
+\boldsymbol{\Lambda}
+\boldsymbol{\mathsf F}.
+\end{aligned}
+$$
+
+Além disso,
+
+$$
+\begin{aligned}
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F}^{*}
+\right)
+&=
+\mathbf T^\top
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F}
+\right)
+\mathbf T\\
+&=
+\mathbf T^\top
+\mathbf T\\
+&=
+\mathbf I_m.
+\end{aligned}
+$$
+
+A nova representação continua sendo ortogonal.
+
+Para a matriz de covariâncias comuns,
+
+$$
+\begin{aligned}
+\boldsymbol{\Lambda}^{*}
+\boldsymbol{\Lambda}^{*\top}
+&=
+\boldsymbol{\Lambda}
+\mathbf T
+\mathbf T^\top
+\boldsymbol{\Lambda}^{\top}\\
+&=
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}.
+\end{aligned}
+$$
+
+Portanto,
+
+$$
+\boldsymbol{\Lambda}^{*}
+\boldsymbol{\Lambda}^{*\top}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}.
+$$ {#eq-invariancia-rotacao-fatorial}
+
+::: {#prp-indeterminacao-rotacional-fatorial}
+## Indeterminação rotacional do modelo fatorial ortogonal
+
+Se $\boldsymbol{\Lambda}$ é uma matriz de cargas de um modelo fatorial ortogonal e $\mathbf T$ é qualquer matriz ortogonal de ordem $m$, então
+
+$$
+\boldsymbol{\Lambda}^{*}
+=
+\boldsymbol{\Lambda}\mathbf T
+$$
+
+produz a mesma matriz de covariâncias comuns:
+
+$$
+\boldsymbol{\Lambda}^{*}
+\boldsymbol{\Lambda}^{*\top}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top}.
+$$
+
+Assim, a matriz de covariâncias não determina uma orientação ortogonal única para os fatores.
+:::
+
+O resultado utiliza diretamente a preservação do produto interno por transformações ortogonais, desenvolvida em @thm-preservacao-produto-interno.
+
+A indeterminação rotacional significa que o modelo identifica a estrutura comum representada por
+
+$$
+\boldsymbol{\Lambda}
+\boldsymbol{\Lambda}^{\top},
+$$
+
+mas não determina, sem restrições adicionais, uma única orientação para as colunas de $\boldsymbol{\Lambda}$.
+
+## Rotação dos eixos fatoriais
+
+A rotação modifica a representação das cargas em relação aos eixos fatoriais, mas pode preservar exatamente a matriz de covariâncias reproduzida.
+
+A @fig-rotacao-cargas-fatoriais compara uma matriz de cargas com uma solução obtida por uma rotação ortogonal. Os vetores mudam de coordenadas em relação aos eixos, mas seus comprimentos e produtos internos são preservados.
+
+```{r}
+#| label: fig-rotacao-cargas-fatoriais
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Uma rotação ortogonal modifica as coordenadas das cargas, mas preserva comprimentos, produtos internos, comunalidades e a matriz de covariâncias comuns."
+#| fig-width: 9
+#| fig-height: 4.8
+#| fig-align: center
+
+library(ggplot2)
+
+Lambda <- matrix(
+  c(
+    0.88, 0.22,
+    0.72, 0.42,
+    0.18, 0.84,
+   -0.20, 0.76
+  ),
+  nrow = 4,
+  byrow = TRUE
+)
+
+theta <- 35 * pi / 180
+
+T_rot <- matrix(
+  c(
+     cos(theta), -sin(theta),
+     sin(theta),  cos(theta)
+  ),
+  nrow = 2,
+  byrow = TRUE
+)
+
+Lambda_rot <- Lambda %*% T_rot
+
+dados_original <- data.frame(
+  variavel = c(
+    "X1",
+    "X2",
+    "X3",
+    "X4"
+  ),
+  F1 = Lambda[, 1],
+  F2 = Lambda[, 2],
+  painel = "Antes da rotação"
+)
+
+dados_rotacao <- data.frame(
+  variavel = c(
+    "X1",
+    "X2",
+    "X3",
+    "X4"
+  ),
+  F1 = Lambda_rot[, 1],
+  F2 = Lambda_rot[, 2],
+  painel = "Após rotação ortogonal"
+)
+
+dados <- rbind(
+  dados_original,
+  dados_rotacao
+)
+
+dados$painel <- factor(
+  dados$painel,
+  levels = c(
+    "Antes da rotação",
+    "Após rotação ortogonal"
+  )
+)
+
+circulo <- data.frame(
+  angulo = seq(
+    0,
+    2 * pi,
+    length.out = 400
+  )
+)
+
+circulo$x <- cos(
+  circulo$angulo
+)
+
+circulo$y <- sin(
+  circulo$angulo
+)
+
+cores <- c(
+  "X1" = "#1f77b4",
+  "X2" = "#2ca02c",
+  "X3" = "#d62728",
+  "X4" = "#9467bd"
+)
+
+ggplot() +
+  geom_hline(
+    yintercept = 0,
+    linewidth = 0.4,
+    color = "gray70"
+  ) +
+  geom_vline(
+    xintercept = 0,
+    linewidth = 0.4,
+    color = "gray70"
+  ) +
+  geom_path(
+    data = circulo,
+    aes(
+      x = x,
+      y = y
+    ),
+    linewidth = 0.5,
+    linetype = "dashed",
+    color = "gray65"
+  ) +
+  geom_segment(
+    data = dados,
+    aes(
+      x = 0,
+      y = 0,
+      xend = F1,
+      yend = F2,
+      color = variavel
+    ),
+    linewidth = 1.05,
+    arrow = grid::arrow(
+      length = grid::unit(
+        0.16,
+        "cm"
+      ),
+      type = "closed"
+    )
+  ) +
+  geom_text(
+    data = dados,
+    aes(
+      x = 1.10 * F1,
+      y = 1.10 * F2,
+      label = variavel,
+      color = variavel
+    ),
+    size = 4,
+    show.legend = FALSE
+  ) +
+  facet_wrap(
+    vars(painel)
+  ) +
+  scale_color_manual(
+    values = cores,
+    name = NULL
+  ) +
+  coord_equal(
+    xlim = c(
+      -1.1,
+      1.1
+    ),
+    ylim = c(
+      -1.1,
+      1.1
+    ),
+    expand = FALSE
+  ) +
+  labs(
+    x = "Primeira coordenada fatorial",
+    y = "Segunda coordenada fatorial"
+  ) +
+  theme_minimal(
+    base_size = 13
+  ) +
+  theme(
+    panel.grid.minor = element_blank(),
+    legend.position = "none",
+    strip.text = element_text(
+      face = "bold"
+    )
+  )
+```
+
+A rotação altera os coeficientes individuais da matriz de cargas. As comunalidades permanecem invariantes porque
+
+$$
+\left\|
+\boldsymbol{\lambda}_i^\top
+\mathbf T
+\right\|^2
+=
+\left\|
+\boldsymbol{\lambda}_i
+\right\|^2.
+$$
+
+As covariâncias comuns também permanecem invariantes porque
+
+$$
+\left(
+\boldsymbol{\lambda}_i^\top
+\mathbf T
+\right)
+\left(
+\boldsymbol{\lambda}_j^\top
+\mathbf T
+\right)^\top
+=
+\boldsymbol{\lambda}_i^\top
+\boldsymbol{\lambda}_j.
+$$
+
+Assim, a rotação modifica a parametrização das cargas sem alterar o ajuste da estrutura comum no modelo ortogonal.
+
+A rotação deve ser distinguida da estimação inicial. Primeiro é obtida uma solução que reproduz a estrutura de covariâncias segundo determinado critério. Depois, uma transformação pode ser aplicada às cargas para selecionar outra orientação dentro da classe de soluções equivalentes.
+
+O objetivo de uma rotação interpretativa é escolher, entre representações equivalentes ou relacionadas, uma estrutura de cargas cuja organização seja mais adequada à interpretação. Os critérios computacionais de rotação não fazem parte da formulação desenvolvida neste capítulo.
+
+## Contagem de parâmetros e identificação
+
+A matriz simétrica $\boldsymbol{\Sigma}$ possui
+
+$$
+\frac{
+p(p+1)
+}{
+2
+}
+$$
+
+elementos distintos.
+
+No modelo ortogonal com $m$ fatores, a matriz de cargas possui
+
+$$
+pm
+$$
+
+elementos e a matriz diagonal $\boldsymbol{\Psi}$ possui
+
+$$
+p
+$$
+
+variâncias específicas.
+
+Uma contagem direta produziria
+
+$$
+pm+p
+$$
+
+parâmetros. Essa contagem inclui, entretanto, diferentes matrizes de cargas relacionadas por rotações ortogonais que produzem a mesma matriz de covariâncias.
+
+Uma matriz ortogonal de ordem $m$ possui
+
+$$
+\frac{
+m(m-1)
+}{
+2
+}
+$$
+
+graus de liberdade associados à rotação. Assim, o número de parâmetros estruturalmente distintos na formulação exploratória ortogonal pode ser contado como
+
+$$
+pm
++
+p
+-
+\frac{
+m(m-1)
+}{
+2
+}.
+$$ {#eq-numero-parametros-fatorial}
+
+Uma condição necessária de contagem é, portanto,
+
+$$
+pm
++
+p
+-
+\frac{
+m(m-1)
+}{
+2
+}
+\leq
+\frac{
+p(p+1)
+}{
+2
+}.
+$$ {#eq-condicao-contagem-fatorial}
+
+Essa desigualdade é uma condição necessária de disponibilidade de informação, mas não constitui, isoladamente, uma condição suficiente de identificação.
+
+::: {.callout-caution appearance="simple" icon="false"}
+## Contagem de parâmetros e identificação
+
+Ter número de elementos observáveis igual ou superior ao número de parâmetros livres não garante, por si só, identificação do modelo. A identificação também depende da estrutura das cargas, das restrições impostas e da posição do parâmetro no espaço paramétrico.
+:::
+
+Para produzir uma parametrização única, podem ser impostas restrições adicionais às cargas ou à orientação dos fatores. Essas restrições podem assumir diferentes formas, dependendo do tipo de modelo e do objetivo da análise.
+
+Na Análise Fatorial Exploratória, a indeterminação rotacional é reconhecida como parte da estrutura da técnica. Em modelos fatoriais confirmatórios, restrições previamente especificadas sobre cargas e covariâncias fatoriais passam a desempenhar papel explícito na identificação.
+
+O desenvolvimento completo de condições algébricas de identificação pertence à teoria de modelos de variáveis latentes e não é necessário para a formulação deste capítulo.
+
+## Fatores ortogonais e fatores oblíquos
+
+A formulação desenvolvida até aqui utilizou fatores com matriz de covariâncias
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F}
+\right)
+=
+\mathbf I_m.
+$$
+
+Essa hipótese define o modelo ortogonal.
+
+A estrutura pode ser generalizada permitindo associação entre os fatores.
+
+::: {#def-modelo-fatorial-obliquo}
+## Modelo fatorial oblíquo
+
+No **modelo fatorial oblíquo**,
+
+$$
+\boldsymbol{\mathsf X}
+=
+\boldsymbol{\mu}
++
+\boldsymbol{\Lambda}
+\boldsymbol{\mathsf F}
++
+\boldsymbol{\varepsilon},
+$$
+
+com
+
+$$
+E
+\left(
+\boldsymbol{\mathsf F}
+\right)
+=
+\mathbf0,
+$$
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F}
+\right)
+=
+\boldsymbol{\Phi},
+$$
+
+$$
+E
+\left(
+\boldsymbol{\varepsilon}
+\right)
+=
+\mathbf0,
+$$
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\varepsilon}
+\right)
+=
+\boldsymbol{\Psi},
+$$
+
+e
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F},
+\boldsymbol{\varepsilon}
+\right)
+=
+\mathbf0.
+$$
+
+A matriz $\boldsymbol{\Phi}$ é a matriz de covariâncias dos fatores.
+:::
+
+Quando a escala de cada fator é fixada em variância unitária,
+
+$$
+\operatorname{diag}
+\left(
+\boldsymbol{\Phi}
+\right)
+=
+\mathbf1_m,
+$$
+
+e $\boldsymbol{\Phi}$ passa a ser a matriz de correlações entre os fatores.
+
+A matriz de covariâncias das variáveis observadas torna-se
+
+$$
+\boldsymbol{\Sigma}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\Phi}
+\boldsymbol{\Lambda}^{\top}
++
+\boldsymbol{\Psi}.
+$$ {#eq-covariancia-modelo-fatorial-obliquo}
+
+No caso particular
+
+$$
+\boldsymbol{\Phi}
+=
+\mathbf I_m,
+$$
+
+recupera-se o modelo ortogonal.
+
+A comparação é sintetizada na @tbl-fatores-ortogonais-obliquos.
+
+| Aspecto | Modelo ortogonal | Modelo oblíquo |
+|---|---|---|
+| Covariância dos fatores | $\mathbf I_m$ | $\boldsymbol{\Phi}$ |
+| Associação entre fatores | Covariâncias nulas | Pode haver covariâncias diferentes de zero |
+| Covariância comum | $\boldsymbol{\Lambda}\boldsymbol{\Lambda}^\top$ | $\boldsymbol{\Lambda}\boldsymbol{\Phi}\boldsymbol{\Lambda}^\top$ |
+| Comunalidade de $X_i$ | $\boldsymbol{\lambda}_i^\top\boldsymbol{\lambda}_i$ | $\boldsymbol{\lambda}_i^\top\boldsymbol{\Phi}\boldsymbol{\lambda}_i$ |
+| Covariância variável--fator | $\boldsymbol{\Lambda}$ | $\boldsymbol{\Lambda}\boldsymbol{\Phi}$ |
+
+: Estruturas dos modelos fatoriais ortogonal e oblíquo. {#tbl-fatores-ortogonais-obliquos}
+
+No modelo oblíquo, a comunalidade é
+
+$$
+h_i^2
+=
+\boldsymbol{\lambda}_i^\top
+\boldsymbol{\Phi}
+\boldsymbol{\lambda}_i.
+$$ {#eq-comunalidade-obliqua}
+
+A expressão
+
+$$
+h_i^2
+=
+\sum_{j=1}^m
+\lambda_{ij}^2
+$$
+
+é, portanto, específica do modelo ortogonal com fatores de variância unitária.
+
+## Matriz de padrões e matriz de estrutura
+
+Quando os fatores são correlacionados, duas matrizes passam a desempenhar funções diferentes.
+
+A matriz
+
+$$
+\boldsymbol{\Lambda}
+$$
+
+continua contendo os coeficientes que aparecem diretamente no modelo
+
+$$
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\mathsf F}
++
+\boldsymbol{\varepsilon}.
+$$
+
+Ela é denominada **matriz de padrões**.
+
+Por outro lado,
+
+$$
+\begin{aligned}
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X},
+\boldsymbol{\mathsf F}
+\right)
+&=
+\operatorname{Cov}
+\left(
+\boldsymbol{\Lambda}
+\boldsymbol{\mathsf F}
++
+\boldsymbol{\varepsilon},
+\boldsymbol{\mathsf F}
+\right)\\
+&=
+\boldsymbol{\Lambda}
+\boldsymbol{\Phi}.
+\end{aligned}
+$$
+
+Defina
+
+$$
+\boldsymbol{\Gamma}
+=
+\boldsymbol{\Lambda}
+\boldsymbol{\Phi}.
+$$ {#eq-matriz-estrutura-fatorial}
+
+::: {#def-matriz-padroes-estrutura-fatorial}
+## Matrizes de padrões e de estrutura
+
+No modelo fatorial oblíquo:
+
+- $\boldsymbol{\Lambda}$ é a **matriz de padrões**, formada pelos coeficientes das variáveis em relação aos fatores no modelo linear;
+- $\boldsymbol{\Gamma}=\boldsymbol{\Lambda}\boldsymbol{\Phi}$ é a **matriz de estrutura**, formada pelas covariâncias entre variáveis e fatores quando os fatores possuem variância unitária.
+:::
+
+Se as variáveis observadas também estiverem padronizadas, os elementos de $\boldsymbol{\Gamma}$ correspondem às correlações entre as variáveis e os fatores.
+
+No modelo ortogonal,
+
+$$
+\boldsymbol{\Phi}
+=
+\mathbf I_m,
+$$
+
+de modo que
+
+$$
+\boldsymbol{\Gamma}
+=
+\boldsymbol{\Lambda}.
+$$
+
+Por isso, matriz de padrões e matriz de estrutura coincidem na solução ortogonal.
+
+No modelo oblíquo, elas geralmente diferem. Uma associação observada entre uma variável e determinado fator pode resultar tanto do coeficiente direto daquela variável no fator quanto da correlação desse fator com outros fatores.
+
+Essa distinção impede que as cargas de uma solução oblíqua sejam interpretadas da mesma forma que as cargas de uma solução ortogonal.
+
+A formulação ortogonal oferece eixos fatoriais não correlacionados. A formulação oblíqua permite que as dimensões latentes compartilhem associação. A escolha entre essas estruturas modifica o modelo estatístico e não deve ser tratada somente como uma escolha gráfica de orientação.
+
+O próximo passo consiste em passar da estrutura populacional para a amostra. A matriz $\boldsymbol{\Sigma}$ será substituída pela informação contida em $\mathbf S$ ou $\mathbf R$, e o problema passará a ser estimar $\boldsymbol{\Lambda}$, $\boldsymbol{\Psi}$ e, quando necessário, $\boldsymbol{\Phi}$ de modo que a estrutura fatorial reproduza adequadamente as covariâncias observadas.
+
