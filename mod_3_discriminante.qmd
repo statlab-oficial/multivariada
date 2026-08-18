@@ -1,0 +1,1814 @@
+# Formulação da Análise Discriminante
+
+A Análise Discriminante estuda problemas em que os grupos de interesse são previamente conhecidos e cada unidade é descrita por um vetor de características quantitativas. Seu objetivo pode assumir duas formas relacionadas: construir representações que evidenciem a separação entre os grupos ou estabelecer uma regra para classificar novas observações.
+
+Esses dois objetivos conduzem a formulações complementares. Na formulação probabilística, as classes são descritas por distribuições condicionais e a classificação é construída como um problema de decisão. Na formulação geométrica de Fisher, procuram-se combinações lineares das variáveis que apresentem grande separação entre os grupos relativamente à dispersão existente dentro deles [@anderson2003; @johnson2007; @rencher2012].
+
+A distinção entre essas formulações deve ser preservada. Uma direção que separa grupos conhecidos não constitui, por si só, uma regra de classificação, e uma regra de classificação não precisa ser obtida por uma projeção de Fisher. Sob determinadas condições, as duas construções apresentam relações matemáticas diretas.
+
+Os elementos centrais do capítulo são sintetizados na @tbl-estrutura-discriminante.
+
+| Formulação | Objeto de partida | Problema | Resultado |
+|---|---|---|---|
+| probabilística | densidades condicionais, probabilidades a priori e perdas | decidir a classe de uma nova observação | regra discriminante |
+| normal com covariância comum | $\boldsymbol{\mu}_g$, $\boldsymbol{\Sigma}$ e $\pi_g$ | comparar probabilidades posteriores | funções discriminantes lineares |
+| normal com covariâncias distintas | $\boldsymbol{\mu}_g$, $\boldsymbol{\Sigma}_g$ e $\pi_g$ | comparar probabilidades posteriores | funções discriminantes quadráticas |
+| geométrica de Fisher | dispersões intragrupos e entre grupos | maximizar separação relativa | direções e coordenadas discriminantes |
+
+: Formulações complementares da Análise Discriminante. {#tbl-estrutura-discriminante}
+
+## O problema de discriminação e classificação
+
+Considere uma variável de classe
+
+$$
+\mathsf G
+\in
+\{1,\ldots,G\}
+$$
+
+e um vetor aleatório de características
+
+$$
+\boldsymbol{\mathsf X}
+=
+\begin{pmatrix}
+X_1\\
+\vdots\\
+X_p
+\end{pmatrix}
+\in
+\mathbb R^p.
+$$
+
+Cada grupo $g$ possui uma distribuição condicional para $\boldsymbol{\mathsf X}$. Uma observação
+
+$$
+\mathbf x
+\in
+\mathbb R^p
+$$
+
+é, portanto, um ponto no espaço das características, enquanto seu rótulo informa a população à qual pertence.
+
+Na etapa de construção da técnica, os rótulos das observações utilizadas para caracterizar os grupos são conhecidos. Essa informação distingue a Análise Discriminante de técnicas de agrupamento, nas quais a própria estrutura de grupos precisa ser construída a partir dos dados.
+
+Há três problemas relacionados.
+
+A **discriminação** procura identificar características ou combinações das variáveis que distingam os grupos.
+
+A **representação discriminante** procura construir coordenadas de menor dimensão nas quais a separação entre grupos seja evidenciada.
+
+A **classificação** procura definir uma regra
+
+$$
+\psi:
+\mathbb R^p
+\longrightarrow
+\{1,\ldots,G\}
+$$
+
+que atribua uma nova observação $\mathbf x$ a uma das classes.
+
+Neste capítulo, a avaliação preditiva de uma regra estimada não será confundida com sua formulação. Taxas de erro amostrais, validação cruzada e outros procedimentos de avaliação pertencem à etapa metodológica posterior.
+
+## Classificação como problema de decisão
+
+A teoria geral de decisão já foi desenvolvida no Módulo II. Em particular, `@def-regra-bayes` estabelece que uma regra de Bayes minimiza a perda posterior esperada.
+
+Para o problema de classificação, seja
+
+$$
+\pi_g
+=
+P(\mathsf G=g),
+\qquad
+g=1,\ldots,G,
+$$
+
+a probabilidade a priori da classe $g$, e denote por
+
+$$
+f_g(\mathbf x)
+=
+f
+\left(
+\mathbf x
+\mid
+\mathsf G=g
+\right)
+$$
+
+a densidade condicional das características nessa classe.
+
+Pelo teorema de Bayes,
+
+$$
+P
+\left(
+\mathsf G=g
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right)
+=
+\frac{
+\pi_g f_g(\mathbf x)
+}{
+\displaystyle
+\sum_{h=1}^{G}
+\pi_h f_h(\mathbf x)
+}.
+$$ {#eq-posterior-classe-discriminante}
+
+As probabilidades posteriores combinam duas fontes de informação. A densidade
+
+$$
+f_g(\mathbf x)
+$$
+
+mede a compatibilidade de $\mathbf x$ com a distribuição da classe $g$, enquanto
+
+$$
+\pi_g
+$$
+
+incorpora a frequência ou importância atribuída à classe antes da observação das características.
+
+Se os erros de classificação possuem a mesma perda, a regra de Bayes já desenvolvida no Módulo II reduz-se à escolha da classe de maior probabilidade posterior.
+
+Como o denominador de @eq-posterior-classe-discriminante é comum a todas as classes,
+
+$$
+\psi_{\mathrm B}(\mathbf x)
+=
+\underset{
+g\in\{1,\ldots,G\}
+}{
+\operatorname{arg\,max}
+}
+\;
+\pi_g f_g(\mathbf x).
+$$ {#eq-regra-bayes-classificacao-discriminante}
+
+A expressão
+
+$$
+\pi_g f_g(\mathbf x)
+$$
+
+pode ser substituída por qualquer transformação estritamente crescente que preserve sua ordenação entre as classes. Em particular, quando as densidades são positivas, é conveniente trabalhar com
+
+$$
+\log\pi_g
++
+\log f_g(\mathbf x).
+$$ {#eq-escore-log-bayes-discriminante}
+
+Quando as perdas diferem entre os tipos de erro, a regra de maior posterior deixa de ser necessariamente ótima. Nesse caso, utiliza-se diretamente o risco condicional já construído no Módulo II. O efeito dos custos sobre as fronteiras de decisão decorre, portanto, da teoria de decisão e não de uma modificação da geometria de Fisher.
+
+## Discriminação linear sob normalidade
+
+Considere agora o modelo
+
+$$
+\boldsymbol{\mathsf X}
+\mid
+\mathsf G=g
+\sim
+N_p
+\left(
+\boldsymbol{\mu}_g,
+\boldsymbol{\Sigma}
+\right),
+\qquad
+g=1,\ldots,G,
+$$ {#eq-modelo-normal-lda}
+
+em que os grupos possuem vetores de médias próprios,
+
+$$
+\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_G,
+$$
+
+mas compartilham a mesma matriz de covariâncias positiva definida,
+
+$$
+\boldsymbol{\Sigma}\succ\mathbf0.
+$$
+
+O Capítulo sobre a distribuição normal multivariada já mostrou, em @eq-log-razao-normal-covariancia-comum, que a comparação entre duas log-densidades com covariância comum é uma função afim de $\mathbf x$. A formulação discriminante acrescenta a essa comparação as probabilidades a priori e transforma o resultado em uma regra de decisão.
+
+Para a classe $g$, o logaritmo de
+
+$$
+\pi_g f_g(\mathbf x)
+$$
+
+contém o termo
+
+$$
+-\frac12
+(\mathbf x-\boldsymbol{\mu}_g)^\top
+\boldsymbol{\Sigma}^{-1}
+(\mathbf x-\boldsymbol{\mu}_g)
++
+\log\pi_g,
+$$
+
+além de termos que são comuns a todos os grupos.
+
+Expandindo a forma quadrática,
+
+$$
+\begin{aligned}
+&
+-\frac12
+(\mathbf x-\boldsymbol{\mu}_g)^\top
+\boldsymbol{\Sigma}^{-1}
+(\mathbf x-\boldsymbol{\mu}_g)
+\\
+&=
+-\frac12
+\mathbf x^\top
+\boldsymbol{\Sigma}^{-1}
+\mathbf x
++
+\mathbf x^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_g
+-
+\frac12
+\boldsymbol{\mu}_g^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_g.
+\end{aligned}
+$$
+
+O primeiro termo,
+
+$$
+-\frac12
+\mathbf x^\top
+\boldsymbol{\Sigma}^{-1}
+\mathbf x,
+$$
+
+não depende da classe. Ele pode ser retirado da comparação sem alterar a decisão.
+
+::: {#def-funcao-discriminante-linear}
+## Função discriminante linear
+
+Sob o modelo normal em @eq-modelo-normal-lda, a **função discriminante linear** da classe $g$ é
+
+$$
+\delta_g(\mathbf x)
+=
+\mathbf x^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_g
+-
+\frac12
+\boldsymbol{\mu}_g^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_g
++
+\log\pi_g.
+$$ {#eq-funcao-discriminante-linear}
+:::
+
+A regra discriminante linear classifica $\mathbf x$ na classe que apresenta maior valor de $\delta_g(\mathbf x)$:
+
+$$
+\psi_{\mathrm{LDA}}(\mathbf x)
+=
+\underset{
+g\in\{1,\ldots,G\}
+}{
+\operatorname{arg\,max}
+}
+\;
+\delta_g(\mathbf x).
+$$ {#eq-regra-classificacao-lda}
+
+A sigla LDA, de *Linear Discriminant Analysis*, refere-se aqui à regra discriminante obtida sob normalidade e covariância comum.
+
+O termo **linear** decorre da dependência de $\delta_g(\mathbf x)$ em relação às componentes de $\mathbf x$. Os termos
+
+$$
+-\frac12
+\boldsymbol{\mu}_g^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_g
++
+\log\pi_g
+$$
+
+dependem da classe, mas não da observação a ser classificada.
+
+### Fronteiras entre classes
+
+Considere duas classes $g$ e $h$. A fronteira de decisão é formada pelos pontos nos quais
+
+$$
+\delta_g(\mathbf x)
+=
+\delta_h(\mathbf x).
+$$
+
+Utilizando @eq-funcao-discriminante-linear,
+
+$$
+\begin{aligned}
+0
+&=
+\mathbf x^\top
+\boldsymbol{\Sigma}^{-1}
+\left(
+\boldsymbol{\mu}_g
+-
+\boldsymbol{\mu}_h
+\right)
+\\
+&\quad
+-
+\frac12
+\left(
+\boldsymbol{\mu}_g^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_g
+-
+\boldsymbol{\mu}_h^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_h
+\right)
++
+\log
+\frac{\pi_g}{\pi_h}.
+\end{aligned}
+$$ {#eq-fronteira-linear-discriminante}
+
+A equação é afim em $\mathbf x$. Consequentemente, a fronteira entre duas classes é um hiperplano.
+
+Seu vetor normal é proporcional a
+
+$$
+\boldsymbol{\Sigma}^{-1}
+\left(
+\boldsymbol{\mu}_g
+-
+\boldsymbol{\mu}_h
+\right).
+$$ {#eq-normal-fronteira-lda}
+
+A separação entre os centroides é, portanto, ajustada pela estrutura de variâncias e covariâncias comum às classes.
+
+As probabilidades a priori modificam o termo independente da fronteira por meio de
+
+$$
+\log
+\frac{\pi_g}{\pi_h}.
+$$
+
+Assim, alterar as probabilidades a priori pode deslocar o hiperplano de decisão sem modificar sua orientação quando os demais parâmetros permanecem fixos.
+
+### Relação com a distância de Mahalanobis
+
+A distância de Mahalanobis já foi definida em @def-distancia-mahalanobis. Para a classe $g$,
+
+$$
+d_M^2
+\left(
+\mathbf x,
+\boldsymbol{\mu}_g;
+\boldsymbol{\Sigma}
+\right)
+=
+(\mathbf x-\boldsymbol{\mu}_g)^\top
+\boldsymbol{\Sigma}^{-1}
+(\mathbf x-\boldsymbol{\mu}_g).
+$$
+
+A expressão que determina a regra de Bayes pode ser escrita como
+
+$$
+-\frac12
+d_M^2
+\left(
+\mathbf x,
+\boldsymbol{\mu}_g;
+\boldsymbol{\Sigma}
+\right)
++
+\log\pi_g.
+$$ {#eq-lda-mahalanobis-priori}
+
+Portanto,
+
+$$
+\psi_{\mathrm{LDA}}(\mathbf x)
+=
+\underset{g}{
+\operatorname{arg\,min}
+}
+\left\{
+d_M^2
+\left(
+\mathbf x,
+\boldsymbol{\mu}_g;
+\boldsymbol{\Sigma}
+\right)
+-
+2\log\pi_g
+\right\}.
+$$ {#eq-regra-lda-mahalanobis}
+
+Se todas as classes possuem a mesma probabilidade a priori,
+
+$$
+\pi_1
+=
+\cdots
+=
+\pi_G,
+$$
+
+o termo envolvendo $\pi_g$ é comum a todas elas, e a regra reduz-se a
+
+$$
+\psi_{\mathrm{LDA}}(\mathbf x)
+=
+\underset{g}{
+\operatorname{arg\,min}
+}
+\;
+d_M^2
+\left(
+\mathbf x,
+\boldsymbol{\mu}_g;
+\boldsymbol{\Sigma}
+\right).
+$$ {#eq-lda-centroide-mahalanobis}
+
+Sob essas condições, classificar pela regra normal linear equivale a escolher o centroide de menor distância de Mahalanobis.
+
+Essa equivalência conecta diretamente a regra discriminante à geometria já construída no Módulo II: a proximidade relevante não é a distância euclidiana aos centroides, mas a distância corrigida pelas variâncias, escalas e correlações representadas por $\boldsymbol{\Sigma}$.
+
+## Discriminação quadrática
+
+A estrutura linear depende da hipótese de que todos os grupos compartilham a mesma matriz de covariâncias.
+
+Considere agora
+
+$$
+\boldsymbol{\mathsf X}
+\mid
+\mathsf G=g
+\sim
+N_p
+\left(
+\boldsymbol{\mu}_g,
+\boldsymbol{\Sigma}_g
+\right),
+$$ {#eq-modelo-normal-qda}
+
+com
+
+$$
+\boldsymbol{\Sigma}_g
+\succ
+\mathbf0,
+\qquad
+g=1,\ldots,G.
+$$
+
+O Capítulo da distribuição normal multivariada já mostrou em @eq-log-razao-normal-covariancias-distintas que, quando as matrizes de covariâncias diferem, os termos quadráticos em $\mathbf x$ não se cancelam.
+
+Aplicando a regra de Bayes à população normal da classe $g$, os termos que dependem da classe são
+
+$$
+-\frac12
+\log
+\left|
+\boldsymbol{\Sigma}_g
+\right|
+-
+\frac12
+(\mathbf x-\boldsymbol{\mu}_g)^\top
+\boldsymbol{\Sigma}_g^{-1}
+(\mathbf x-\boldsymbol{\mu}_g)
++
+\log\pi_g.
+$$
+
+::: {#def-funcao-discriminante-quadratica}
+## Função discriminante quadrática
+
+Sob o modelo em @eq-modelo-normal-qda, a **função discriminante quadrática** da classe $g$ é
+
+$$
+\delta_g^{Q}(\mathbf x)
+=
+-\frac12
+\log
+\left|
+\boldsymbol{\Sigma}_g
+\right|
+-
+\frac12
+(\mathbf x-\boldsymbol{\mu}_g)^\top
+\boldsymbol{\Sigma}_g^{-1}
+(\mathbf x-\boldsymbol{\mu}_g)
++
+\log\pi_g.
+$$ {#eq-funcao-discriminante-quadratica}
+:::
+
+A regra discriminante quadrática é
+
+$$
+\psi_{\mathrm{QDA}}(\mathbf x)
+=
+\underset{
+g\in\{1,\ldots,G\}
+}{
+\operatorname{arg\,max}
+}
+\;
+\delta_g^{Q}(\mathbf x).
+$$ {#eq-regra-classificacao-qda}
+
+A sigla QDA, de *Quadratic Discriminant Analysis*, decorre da presença de formas quadráticas específicas de cada grupo.
+
+Duas características da função possuem interpretações diferentes.
+
+O termo
+
+$$
+(\mathbf x-\boldsymbol{\mu}_g)^\top
+\boldsymbol{\Sigma}_g^{-1}
+(\mathbf x-\boldsymbol{\mu}_g)
+$$
+
+mede o afastamento da observação ao centro da classe segundo a geometria própria daquela população.
+
+O termo
+
+$$
+\log
+\left|
+\boldsymbol{\Sigma}_g
+\right|
+$$
+
+incorpora o volume associado à dispersão da classe. Duas populações podem produzir a mesma distância de Mahalanobis para determinado ponto e ainda assim receber escores diferentes porque suas concentrações espaciais são distintas.
+
+### Fronteiras quadráticas
+
+Entre duas classes $g$ e $h$, a fronteira satisfaz
+
+$$
+\delta_g^{Q}(\mathbf x)
+=
+\delta_h^{Q}(\mathbf x).
+$$
+
+Como
+
+$$
+\boldsymbol{\Sigma}_g^{-1}
+\neq
+\boldsymbol{\Sigma}_h^{-1}
+$$
+
+em geral, a diferença entre as duas funções contém um termo da forma
+
+$$
+\mathbf x^\top
+\left(
+\boldsymbol{\Sigma}_h^{-1}
+-
+\boldsymbol{\Sigma}_g^{-1}
+\right)
+\mathbf x.
+$$
+
+A fronteira deixa, portanto, de ser necessariamente um hiperplano e passa a pertencer, em geral, à família das superfícies quadráticas.
+
+Se
+
+$$
+\boldsymbol{\Sigma}_1
+=
+\cdots
+=
+\boldsymbol{\Sigma}_G
+=
+\boldsymbol{\Sigma},
+$$
+
+os termos quadráticos e os log-determinantes comuns cancelam-se. A QDA reduz-se então à estrutura linear de @eq-funcao-discriminante-linear.
+
+A @fig-comparacao-distribuicoes-normais, construída no Módulo II, antecipa geometricamente essa diferença: covariância comum produz populações com mesma forma e orientação, enquanto covariâncias distintas permitem que cada classe possua geometria própria.
+
+## O que as regras probabilísticas resolvem
+
+As funções em @eq-funcao-discriminante-linear e @eq-funcao-discriminante-quadratica surgem de um problema de decisão. Seu objetivo é comparar classes para uma observação $\mathbf x$ e produzir uma regra de classificação.
+
+A estrutura pode ser sintetizada na @tbl-lda-qda.
+
+| Aspecto | LDA | QDA |
+|---|---|---|
+| modelo condicional | $N_p(\boldsymbol{\mu}_g,\boldsymbol{\Sigma})$ | $N_p(\boldsymbol{\mu}_g,\boldsymbol{\Sigma}_g)$ |
+| covariância | comum a todas as classes | específica de cada classe |
+| função discriminante | afim em $\mathbf x$ | quadrática em $\mathbf x$ |
+| fronteira entre duas classes | hiperplano | superfície quadrática em geral |
+| geometria de distância | uma única métrica de Mahalanobis | uma métrica de Mahalanobis para cada classe |
+| probabilidades a priori | entram por $\log\pi_g$ | entram por $\log\pi_g$ |
+| resultado imediato | regra de classificação | regra de classificação |
+
+: Comparação entre as formulações discriminantes linear e quadrática sob normalidade. {#tbl-lda-qda}
+
+A construção probabilística não procura uma direção única que maximize a separação entre os grupos. Ela compara diretamente os modelos condicionais das classes no espaço original das características.
+
+A formulação geométrica de Fisher parte de outro problema. Nela, os rótulos conhecidos são utilizados para decompor a dispersão dos dados em parcelas intragrupos e entre grupos e procurar combinações lineares que maximizem a separação relativa. Essa formulação retoma diretamente as matrizes de dispersão já desenvolvidas no Módulo II e o mesmo problema de autovalores generalizados utilizado no capítulo de MANOVA.
+
+## Formulação geométrica de Fisher
+
+A formulação probabilística produz uma regra para decidir a classe de uma nova observação. A formulação de Fisher parte de outro objetivo: construir combinações lineares das características que evidenciem a separação entre grupos previamente conhecidos.
+
+Considere uma amostra dividida em $G$ grupos, com $n_g$ observações no grupo $g$. As matrizes de dispersão intragrupos e entre grupos já foram definidas no Módulo II em @def-sscp-intragrupos e @def-sscp-entre-grupos:
+
+$$
+\mathbf T_{\mathrm{intra}}
+=
+\sum_{g=1}^{G}
+\sum_{i=1}^{n_g}
+\left(
+\mathbf x_{ig}
+-
+\overline{\mathbf x}_g
+\right)
+\left(
+\mathbf x_{ig}
+-
+\overline{\mathbf x}_g
+\right)^\top
+$$
+
+e
+
+$$
+\mathbf T_{\mathrm{entre}}
+=
+\sum_{g=1}^{G}
+n_g
+\left(
+\overline{\mathbf x}_g
+-
+\overline{\mathbf x}
+\right)
+\left(
+\overline{\mathbf x}_g
+-
+\overline{\mathbf x}
+\right)^\top.
+$$
+
+O Módulo II também estabeleceu em @thm-decomposicao-dispersao-grupos a decomposição
+
+$$
+\mathbf T
+=
+\mathbf T_{\mathrm{intra}}
++
+\mathbf T_{\mathrm{entre}}.
+$$
+
+Esses resultados não precisam ser reconstruídos neste capítulo. A Análise Discriminante utiliza as duas parcelas da decomposição para definir um problema de projeção supervisionada.
+
+### Dispersão depois de uma projeção
+
+Considere uma direção
+
+$$
+\mathbf a
+\in
+\mathbb R^p,
+\qquad
+\mathbf a\neq\mathbf0,
+$$
+
+e a combinação linear
+
+$$
+Z
+=
+\mathbf a^\top\boldsymbol{\mathsf X}.
+$$ {#eq-combinacao-fisher-discriminante}
+
+Depois da projeção, a dispersão existente dentro dos grupos é
+
+$$
+\mathbf a^\top
+\mathbf T_{\mathrm{intra}}
+\mathbf a,
+$$ {#eq-dispersao-intra-projetada-discriminante}
+
+enquanto a dispersão entre os centroides projetados é
+
+$$
+\mathbf a^\top
+\mathbf T_{\mathrm{entre}}
+\mathbf a.
+$$ {#eq-dispersao-entre-projetada-discriminante}
+
+A primeira quantidade será grande quando as observações permanecerem muito dispersas em torno de seus respectivos centroides depois da projeção. A segunda será grande quando os centroides dos grupos permanecerem afastados na direção escolhida.
+
+Uma direção adequada para discriminação deve, portanto, produzir grande separação entre grupos relativamente à dispersão que permanece dentro deles.
+
+::: {#def-criterio-fisher-discriminante}
+## Critério de Fisher
+
+Suponha que
+
+$$
+\mathbf T_{\mathrm{intra}}
+\succ
+\mathbf0.
+$$
+
+O **critério de Fisher** para uma direção não nula $\mathbf a$ é
+
+$$
+J_F(\mathbf a)
+=
+\frac{
+\mathbf a^\top
+\mathbf T_{\mathrm{entre}}
+\mathbf a
+}{
+\mathbf a^\top
+\mathbf T_{\mathrm{intra}}
+\mathbf a
+}.
+$$ {#eq-criterio-fisher-discriminante}
+:::
+
+O numerador mede separação entre grupos; o denominador mede dispersão interna. Assim, maximizar $J_F(\mathbf a)$ não significa simplesmente procurar uma direção em que os centroides estejam afastados. A distância entre eles é avaliada relativamente à variabilidade observada na mesma direção.
+
+Essa distinção separa Fisher da ACP. Na ACP, a direção é escolhida para explicar grande variabilidade da nuvem total. Em Fisher, a informação dos grupos entra explicitamente na função objetivo.
+
+## Direções discriminantes
+
+O critério em @eq-criterio-fisher-discriminante é o quociente de Rayleigh generalizado definido em @def-quociente-rayleigh-generalizado, aplicado ao par
+
+$$
+\left(
+\mathbf T_{\mathrm{entre}},
+\mathbf T_{\mathrm{intra}}
+\right).
+$$
+
+A teoria geral já desenvolvida no Módulo I fornece diretamente os extremos desse quociente. Assim, as direções estacionárias satisfazem
+
+$$
+\mathbf T_{\mathrm{entre}}
+\mathbf a
+=
+\lambda
+\mathbf T_{\mathrm{intra}}
+\mathbf a.
+$$ {#eq-autovalor-generalizado-fisher}
+
+A formulação conduz ao mesmo tipo de problema espectral utilizado no capítulo anterior para a MANOVA. A diferença está no uso das soluções: na MANOVA, as raízes são agregadas para testar uma hipótese; na formulação de Fisher, os autovetores são utilizados para construir direções de separação.
+
+::: {#def-direcoes-discriminantes-fisher}
+## Direções discriminantes de Fisher
+
+Suponha
+
+$$
+\mathbf T_{\mathrm{entre}}
+\succeq
+\mathbf0
+$$
+
+e
+
+$$
+\mathbf T_{\mathrm{intra}}
+\succ
+\mathbf0.
+$$
+
+As **direções discriminantes de Fisher** são os autovetores generalizados
+
+$$
+\mathbf a_1,\ldots,\mathbf a_s
+$$
+
+associados às raízes positivas
+
+$$
+\lambda_1
+\geq
+\lambda_2
+\geq
+\cdots
+\geq
+\lambda_s
+>
+0
+$$
+
+do problema
+
+$$
+\mathbf T_{\mathrm{entre}}
+\mathbf a_j
+=
+\lambda_j
+\mathbf T_{\mathrm{intra}}
+\mathbf a_j.
+$$
+:::
+
+A primeira direção maximiza
+
+$$
+J_F(\mathbf a),
+$$
+
+e
+
+$$
+J_F(\mathbf a_1)
+=
+\lambda_1.
+$$
+
+As direções subsequentes representam separações adicionais entre os grupos. Pelo resultado de ortogonalidade para autovetores generalizados em @prp-ortogonalidade-autovetores-generalizados, elas podem ser escolhidas de modo que
+
+$$
+\mathbf a_j^\top
+\mathbf T_{\mathrm{intra}}
+\mathbf a_\ell
+=
+0,
+\qquad
+j\neq\ell.
+$$ {#eq-ortogonalidade-fisher}
+
+Essa é uma ortogonalidade definida pela dispersão intragrupos. Duas direções discriminantes não precisam ser ortogonais segundo o produto interno euclidiano usual.
+
+Uma normalização conveniente é
+
+$$
+\mathbf a_j^\top
+\mathbf T_{\mathrm{intra}}
+\mathbf a_j
+=
+1.
+$$ {#eq-normalizacao-fisher}
+
+Sob essa normalização,
+
+$$
+\mathbf a_j^\top
+\mathbf T_{\mathrm{entre}}
+\mathbf a_j
+=
+\lambda_j.
+$$ {#eq-raiz-separacao-fisher}
+
+Portanto, cada raiz $\lambda_j$ quantifica a separação entre grupos presente na correspondente direção depois que a dispersão intragrupos nessa direção foi normalizada.
+
+### Número de direções discriminantes
+
+O posto da matriz de dispersão entre grupos já foi delimitado no Módulo II:
+
+$$
+\operatorname{rank}
+\left(
+\mathbf T_{\mathrm{entre}}
+\right)
+\leq
+\min(p,G-1).
+$$
+
+Quando
+
+$$
+\mathbf T_{\mathrm{intra}}
+\succ\mathbf0,
+$$
+
+o problema generalizado possui exatamente
+
+$$
+s
+=
+\operatorname{rank}
+\left(
+\mathbf T_{\mathrm{entre}}
+\right)
+$$
+
+raízes positivas. Assim,
+
+$$
+s
+\leq
+\min(p,G-1).
+$$ {#eq-numero-direcoes-discriminantes}
+
+O resultado possui uma consequência direta. Mesmo que a observação original tenha muitas características, a separação entre $G$ grupos pode ser representada por no máximo
+
+$$
+G-1
+$$
+
+direções discriminantes.
+
+Para dois grupos,
+
+$$
+G=2,
+$$
+
+existe no máximo uma direção discriminante.
+
+Para três grupos, existem no máximo duas.
+
+A redução dimensional produzida por Fisher é, portanto, limitada pela estrutura dos rótulos, e não apenas pela dimensão original $p$.
+
+## Coordenadas discriminantes
+
+As direções
+
+$$
+\mathbf a_1,\ldots,\mathbf a_s
+$$
+
+definem um novo sistema de coordenadas para representar as observações.
+
+::: {#def-coordenadas-discriminantes}
+## Coordenadas discriminantes
+
+A coordenada discriminante $j$ de uma observação $\mathbf x$ é
+
+$$
+z_j(\mathbf x)
+=
+\mathbf a_j^\top
+\left(
+\mathbf x-\overline{\mathbf x}
+\right),
+\qquad
+j=1,\ldots,s.
+$$ {#eq-coordenada-discriminante}
+
+O vetor de coordenadas discriminantes é
+
+$$
+\mathbf z(\mathbf x)
+=
+\begin{pmatrix}
+z_1(\mathbf x)\\
+\vdots\\
+z_s(\mathbf x)
+\end{pmatrix}.
+$$ {#eq-vetor-coordenadas-discriminantes}
+:::
+
+A centralização em torno de $\overline{\mathbf x}$ fixa a média global na origem da representação. O uso de
+
+$$
+\mathbf a_j^\top\mathbf x
+$$
+
+sem centralização produz as mesmas diferenças entre observações e entre centroides; altera apenas a origem das coordenadas.
+
+O centroide discriminante do grupo $g$ na dimensão $j$ é
+
+$$
+\overline z_{gj}
+=
+\mathbf a_j^\top
+\left(
+\overline{\mathbf x}_g
+-
+\overline{\mathbf x}
+\right).
+$$ {#eq-centroide-discriminante}
+
+Assim, a representação discriminante transforma a nuvem original em um espaço de dimensão
+
+$$
+s
+\leq
+\min(p,G-1),
+$$
+
+construído especificamente para preservar direções de separação entre grupos.
+
+Essa redução é supervisionada: alterar os rótulos dos grupos altera
+
+$$
+\mathbf T_{\mathrm{intra}},
+\qquad
+\mathbf T_{\mathrm{entre}}
+$$
+
+e, consequentemente, as próprias direções discriminantes.
+
+A interpretação dos eixos deve considerar esse objetivo. Uma variável com coeficiente elevado em determinada direção participa da combinação que separa os grupos naquela dimensão, mas a magnitude isolada dos coeficientes depende da escala e da correlação entre as características. Procedimentos detalhados para interpretar coeficientes, correlações estruturais e contribuições das variáveis pertencem à etapa metodológica posterior.
+
+## Geometria pela dispersão intragrupos
+
+A formulação pode ser colocada na geometria euclidiana utilizando a mesma transformação empregada para problemas de autovalores generalizados.
+
+Como
+
+$$
+\mathbf T_{\mathrm{intra}}
+\succ
+\mathbf0,
+$$
+
+defina
+
+$$
+\mathbf u
+=
+\mathbf T_{\mathrm{intra}}^{1/2}
+\mathbf a.
+$$
+
+Então,
+
+$$
+\mathbf a
+=
+\mathbf T_{\mathrm{intra}}^{-1/2}
+\mathbf u,
+$$
+
+e o problema em @eq-autovalor-generalizado-fisher transforma-se em
+
+$$
+\mathbf T_{\mathrm{intra}}^{-1/2}
+\mathbf T_{\mathrm{entre}}
+\mathbf T_{\mathrm{intra}}^{-1/2}
+\mathbf u
+=
+\lambda
+\mathbf u.
+$$ {#eq-fisher-branqueado}
+
+Defina
+
+$$
+\mathbf K_F
+=
+\mathbf T_{\mathrm{intra}}^{-1/2}
+\mathbf T_{\mathrm{entre}}
+\mathbf T_{\mathrm{intra}}^{-1/2}.
+$$ {#eq-matriz-fisher-branqueada}
+
+A matriz $\mathbf K_F$ é simétrica e semidefinida positiva. Seus autovalores positivos são as raízes discriminantes
+
+$$
+\lambda_1,\ldots,\lambda_s.
+$$
+
+A transformação
+
+$$
+\mathbf T_{\mathrm{intra}}^{-1/2}
+$$
+
+remove a anisotropia associada à dispersão dentro dos grupos. Nesse espaço, a comparação passa a ser realizada sobre a dispersão entre os centroides depois de padronizada pela geometria intragrupos.
+
+A interpretação é análoga à utilizada na MANOVA: primeiro se incorpora a variabilidade residual ou intragrupos à métrica; depois se procura a estrutura de separação que permanece.
+
+A coincidência não é acidental. Para a comparação simples entre grupos,
+
+$$
+\mathbf E
+=
+\mathbf T_{\mathrm{intra}}
+$$
+
+e
+
+$$
+\mathbf H
+=
+\mathbf T_{\mathrm{entre}}.
+$$ {#eq-correspondencia-manova-fisher}
+
+Portanto, o problema espectral
+
+$$
+\mathbf H\mathbf a
+=
+\lambda
+\mathbf E\mathbf a
+$$
+
+da MANOVA e o problema
+
+$$
+\mathbf T_{\mathrm{entre}}
+\mathbf a
+=
+\lambda
+\mathbf T_{\mathrm{intra}}
+\mathbf a
+$$
+
+de Fisher possuem as mesmas raízes e os mesmos subespaços discriminantes quando representam o mesmo problema de grupos.
+
+O que muda é o objetivo estatístico. Na MANOVA, as raízes sustentam critérios de inferência sobre diferenças entre os grupos. Em Fisher, os autovetores são utilizados para representar as direções nas quais essas diferenças aparecem.
+
+## O caso de dois grupos
+
+Quando
+
+$$
+G=2,
+$$
+
+a matriz de dispersão entre grupos possui posto no máximo $1$. Logo, existe no máximo uma direção discriminante positiva.
+
+Defina
+
+$$
+\mathbf d
+=
+\overline{\mathbf x}_1
+-
+\overline{\mathbf x}_2.
+$$ {#eq-diferenca-medias-fisher}
+
+Para dois grupos,
+
+$$
+\mathbf T_{\mathrm{entre}}
+=
+\frac{
+n_1n_2
+}{
+n_1+n_2
+}
+\mathbf d\mathbf d^\top.
+$$ {#eq-tentre-dois-grupos-fisher}
+
+Substituindo em @eq-autovalor-generalizado-fisher,
+
+$$
+\frac{
+n_1n_2
+}{
+n_1+n_2
+}
+\mathbf d\mathbf d^\top
+\mathbf a
+=
+\lambda
+\mathbf T_{\mathrm{intra}}
+\mathbf a.
+$$
+
+O lado esquerdo é proporcional a $\mathbf d$. Assim, para a raiz positiva,
+
+$$
+\mathbf T_{\mathrm{intra}}
+\mathbf a_1
+\propto
+\mathbf d,
+$$
+
+e, se
+
+$$
+\mathbf T_{\mathrm{intra}}
+\succ\mathbf0,
+$$
+
+segue que
+
+$$
+\mathbf a_1
+\propto
+\mathbf T_{\mathrm{intra}}^{-1}
+\left(
+\overline{\mathbf x}_1
+-
+\overline{\mathbf x}_2
+\right).
+$$ {#eq-direcao-fisher-dois-grupos}
+
+A direção não depende de uma normalização específica, pois multiplicar $\mathbf a_1$ por uma constante não altera o subespaço de projeção.
+
+A expressão em @eq-direcao-fisher-dois-grupos mostra os dois componentes da solução:
+
+$$
+\overline{\mathbf x}_1
+-
+\overline{\mathbf x}_2
+$$
+
+fornece a direção bruta de separação entre os centroides, enquanto
+
+$$
+\mathbf T_{\mathrm{intra}}^{-1}
+$$
+
+corrige essa separação de acordo com a variabilidade e as associações existentes dentro dos grupos.
+
+## Relação entre Fisher e a discriminação linear normal
+
+A formulação probabilística e a formulação de Fisher partem de problemas diferentes, mas se relacionam diretamente em condições específicas.
+
+Considere duas populações normais,
+
+$$
+\boldsymbol{\mathsf X}
+\mid
+\mathsf G=g
+\sim
+N_p
+\left(
+\boldsymbol{\mu}_g,
+\boldsymbol{\Sigma}
+\right),
+\qquad
+g=1,2,
+$$
+
+com matriz de covariâncias comum.
+
+Pela formulação probabilística, o vetor normal à fronteira linear em @eq-normal-fronteira-lda é
+
+$$
+\boldsymbol{\Sigma}^{-1}
+\left(
+\boldsymbol{\mu}_1
+-
+\boldsymbol{\mu}_2
+\right).
+$$ {#eq-direcao-populacional-lda}
+
+Na formulação populacional de Fisher, a dispersão intragrupos é proporcional a
+
+$$
+\boldsymbol{\Sigma},
+$$
+
+e a dispersão entre grupos possui direção determinada por
+
+$$
+\boldsymbol{\mu}_1-\boldsymbol{\mu}_2.
+$$
+
+Consequentemente, a direção populacional de Fisher satisfaz
+
+$$
+\mathbf a_F
+\propto
+\boldsymbol{\Sigma}^{-1}
+\left(
+\boldsymbol{\mu}_1
+-
+\boldsymbol{\mu}_2
+\right).
+$$ {#eq-direcao-populacional-fisher}
+
+As equações @eq-direcao-populacional-lda e @eq-direcao-populacional-fisher mostram que, para dois grupos com covariância comum, a orientação da fronteira da regra normal linear e a direção de máxima separação de Fisher são determinadas pelo mesmo vetor.
+
+Na amostra, a matriz de covariâncias agrupada dentro dos grupos satisfaz
+
+$$
+\mathbf S_p
+=
+\frac{
+1
+}{
+n-G
+}
+\mathbf T_{\mathrm{intra}}.
+$$ {#eq-covariancia-agrupada-fisher}
+
+Como a multiplicação por um escalar positivo não altera a direção,
+
+$$
+\mathbf S_p^{-1}
+\left(
+\overline{\mathbf x}_1-\overline{\mathbf x}_2
+\right)
+\propto
+\mathbf T_{\mathrm{intra}}^{-1}
+\left(
+\overline{\mathbf x}_1-\overline{\mathbf x}_2
+\right).
+$$
+
+Assim, o estimador da orientação da fronteira LDA coincide com a direção amostral de Fisher até um fator de escala.
+
+Essa equivalência não torna as duas formulações idênticas.
+
+A regra LDA utiliza ainda:
+
+$$
+-\frac12
+\boldsymbol{\mu}_g^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_g
+$$
+
+e
+
+$$
+\log\pi_g
+$$
+
+para determinar a posição da fronteira e, portanto, a decisão de classificação.
+
+O critério de Fisher, por sua vez, utiliza apenas a separação relativa entre e dentro dos grupos para determinar uma direção.
+
+Probabilidades a priori diferentes podem deslocar a fronteira LDA sem alterar a direção de Fisher. Da mesma forma, custos de classificação podem modificar a regra de decisão sem modificar o problema geométrico de maximização em @eq-criterio-fisher-discriminante.
+
+Para mais de dois grupos, Fisher produz um subespaço de dimensão
+
+$$
+s
+\leq
+\min(p,G-1),
+$$
+
+enquanto a LDA compara diretamente as funções
+
+$$
+\delta_1(\mathbf x),
+\ldots,
+\delta_G(\mathbf x)
+$$
+
+para classificar uma nova observação.
+
+A ligação entre as duas construções permanece na utilização da mesma estrutura de covariância intragrupos e das diferenças entre os centroides, mas projeção discriminante e regra de decisão continuam sendo objetos estatísticos distintos.
+
+## Existência e singularidade
+
+As formulações desenvolvidas até aqui utilizam inversas de matrizes de dispersão ou covariância. A existência dessas inversas deve ser distinguida das hipóteses probabilísticas utilizadas para derivar as regras de classificação.
+
+### Formulação de Fisher
+
+Na formulação clássica de Fisher foi assumido
+
+$$
+\mathbf T_{\mathrm{intra}}
+\succ
+\mathbf0.
+$$
+
+Essa condição garante que
+
+$$
+\mathbf T_{\mathrm{intra}}^{-1}
+$$
+
+e
+
+$$
+\mathbf T_{\mathrm{intra}}^{-1/2}
+$$
+
+existam e que
+
+$$
+\mathbf a^\top
+\mathbf T_{\mathrm{intra}}
+\mathbf a
+>
+0
+$$
+
+para toda direção não nula.
+
+A matriz intragrupos pode ser escrita como a soma das dispersões internas dos $G$ grupos. Seu posto satisfaz
+
+$$
+\operatorname{rank}
+\left(
+\mathbf T_{\mathrm{intra}}
+\right)
+\leq
+\min(p,n-G).
+$$ {#eq-posto-tintra-discriminante}
+
+Portanto, uma condição necessária para sua não singularidade é
+
+$$
+n-G
+\geq
+p.
+$$ {#eq-condicao-dimensao-fisher}
+
+Essa condição, porém, não é suficiente por si só. Também é necessário que não exista dependência linear exata que reduza o posto das observações centralizadas dentro dos grupos.
+
+Quando
+
+$$
+\mathbf T_{\mathrm{intra}}
+$$
+
+é singular, a formulação clássica baseada em sua inversa deixa de estar definida. Pseudoinversas, redução preliminar de dimensão e regularização modificam o problema original e pertencem ao tratamento metodológico posterior.
+
+### Formulações LDA e QDA
+
+Na formulação populacional da LDA foi assumido
+
+$$
+\boldsymbol{\Sigma}
+\succ
+\mathbf0.
+$$
+
+Essa condição garante a existência da densidade normal usual em $\mathbb R^p$, da distância de Mahalanobis associada à covariância comum e da função discriminante em @eq-funcao-discriminante-linear.
+
+Na aplicação amostral, a matriz de covariâncias comum é substituída por uma estimativa agrupada. Como
+
+$$
+\mathbf S_p
+=
+\frac{1}{n-G}
+\mathbf T_{\mathrm{intra}},
+$$
+
+sua não singularidade está sujeita às mesmas limitações de posto da matriz intragrupos.
+
+Na QDA, cada população possui sua própria matriz
+
+$$
+\boldsymbol{\Sigma}_g.
+$$
+
+A formulação clássica requer
+
+$$
+\boldsymbol{\Sigma}_g
+\succ
+\mathbf0,
+\qquad
+g=1,\ldots,G.
+$$
+
+Quando essas matrizes são estimadas separadamente, cada grupo precisa fornecer informação suficiente para estimar uma matriz de covariâncias de posto completo. Para a covariância amostral usual do grupo $g$,
+
+$$
+\operatorname{rank}
+(\mathbf S_g)
+\leq
+\min(p,n_g-1),
+$$
+
+de modo que
+
+$$
+n_g-1
+\geq
+p
+$$ {#eq-condicao-dimensao-qda}
+
+é uma condição necessária para a não singularidade de $\mathbf S_g$.
+
+A QDA exige, portanto, mais informação por grupo do que a LDA para estimar as matrizes de covariâncias sem regularização.
+
+## Pressupostos e limites
+
+A Análise Discriminante reúne uma formulação geométrica e formulações probabilísticas. As condições associadas a essas construções não são as mesmas.
+
+A @tbl-pressupostos-discriminante separa os principais requisitos.
+
+| Condição | Fisher geométrico | LDA normal | QDA normal |
+|---|---|---|---|
+| grupos previamente definidos | necessária | necessária | necessária |
+| normalidade multivariada | não é necessária para definir o critério | utilizada na derivação probabilística | utilizada na derivação probabilística |
+| covariância comum entre grupos | não é requisito do critério geométrico | assumida | não assumida |
+| matriz de dispersão/covariância não singular | $\mathbf T_{\mathrm{intra}}\succ\mathbf0$ na solução clássica | $\boldsymbol{\Sigma}\succ\mathbf0$ | $\boldsymbol{\Sigma}_g\succ\mathbf0$ para cada grupo |
+| probabilidades a priori | não participam do critério | participam da regra | participam da regra |
+| função de perda | não participa do critério | pode alterar a decisão | pode alterar a decisão |
+
+: Condições associadas às formulações de Fisher, LDA e QDA. {#tbl-pressupostos-discriminante}
+
+### Grupos previamente definidos
+
+A Análise Discriminante utiliza rótulos conhecidos para caracterizar as populações.
+
+Na formulação de Fisher, os rótulos determinam diretamente
+
+$$
+\mathbf T_{\mathrm{intra}}
+$$
+
+e
+
+$$
+\mathbf T_{\mathrm{entre}}.
+$$
+
+Na formulação probabilística, eles determinam quais observações são utilizadas para caracterizar cada distribuição condicional.
+
+Assim, a interpretação da técnica depende do significado dos grupos previamente estabelecidos. A Análise Discriminante não fornece, por si só, evidência de que esses rótulos correspondam a classes naturais existentes na população.
+
+### Normalidade e estrutura de covariâncias
+
+A normalidade multivariada não é necessária para calcular o critério de Fisher ou obter suas direções a partir das matrizes amostrais de dispersão.
+
+Ela entra na derivação das regras LDA e QDA como regras de Bayes para populações normais.
+
+Na LDA,
+
+$$
+\boldsymbol{\Sigma}_1
+=
+\cdots
+=
+\boldsymbol{\Sigma}_G
+=
+\boldsymbol{\Sigma}.
+$$
+
+Essa igualdade é a razão pela qual os termos quadráticos em $\mathbf x$ se cancelam e as fronteiras se tornam lineares.
+
+Na QDA, cada grupo possui
+
+$$
+\boldsymbol{\Sigma}_g,
+$$
+
+e os termos quadráticos permanecem na comparação.
+
+Portanto, a diferença entre LDA e QDA decorre diretamente do modelo de covariâncias adotado, e não apenas da escolha de uma forma algébrica diferente para a regra de classificação.
+
+### Probabilidades a priori e perdas
+
+As probabilidades
+
+$$
+\pi_g
+$$
+
+representam a informação disponível sobre a ocorrência das classes antes da observação de $\mathbf x$.
+
+Como aparecem nas funções discriminantes por meio de
+
+$$
+\log\pi_g,
+$$
+
+elas participam da posição das fronteiras de decisão.
+
+As perdas cumprem outro papel. Quando tipos diferentes de erro possuem consequências distintas, a decisão ótima é aquela que minimiza o risco condicional definido no Módulo II, e não necessariamente a classe de maior probabilidade posterior.
+
+Probabilidades a priori e perdas pertencem, portanto, ao problema de **decisão**. Elas não alteram o critério geométrico de Fisher.
+
+### Sobreposição entre as populações
+
+Uma regra de classificação não precisa produzir separação perfeita mesmo quando o modelo populacional e seus parâmetros são conhecidos.
+
+Se duas densidades condicionais atribuem probabilidade positiva a uma mesma região do espaço,
+
+$$
+f_g(\mathbf x)>0
+$$
+
+e
+
+$$
+f_h(\mathbf x)>0
+$$
+
+podem ocorrer simultaneamente para os mesmos valores de $\mathbf x$.
+
+Nessa região, a classe de origem de uma observação não é determinada unicamente por suas características. A regra de Bayes escolhe a decisão de menor risco esperado, mas pode ainda produzir erro.
+
+A existência de erro de classificação não implica, por si só, falha da técnica. Parte desse erro pode decorrer da sobreposição inerente às distribuições das populações.
+
+A avaliação empírica do desempenho de uma regra estimada, por meio de amostras de validação, validação cruzada ou outras estratégias, constitui um problema adicional e não será desenvolvida neste capítulo.
+
+## Relações com outras técnicas
+
+### MANOVA
+
+A relação mais direta é com a MANOVA.
+
+No caso de comparação entre grupos,
+
+$$
+\mathbf H
+=
+\mathbf T_{\mathrm{entre}}
+$$
+
+e
+
+$$
+\mathbf E
+=
+\mathbf T_{\mathrm{intra}}.
+$$
+
+Assim, os dois capítulos utilizam o mesmo problema de autovalores generalizados,
+
+$$
+\mathbf T_{\mathrm{entre}}
+\mathbf a
+=
+\lambda
+\mathbf T_{\mathrm{intra}}
+\mathbf a.
+$$
+
+A diferença está na função atribuída às soluções.
+
+Na MANOVA, as raízes
+
+$$
+\lambda_1,\ldots,\lambda_s
+$$
+
+são combinadas nos critérios de Wilks, Pillai, Hotelling--Lawley e Roy para avaliar uma hipótese sobre os grupos.
+
+Na Análise Discriminante de Fisher, os autovetores
+
+$$
+\mathbf a_1,\ldots,\mathbf a_s
+$$
+
+definem as direções usadas para representar a separação entre esses mesmos grupos.
+
+A MANOVA formula um problema de **inferência sobre diferenças**. Fisher formula um problema de **projeção para separação**.
+
+A formulação probabilística da Análise Discriminante acrescenta ainda um terceiro objeto que não é produzido pela MANOVA: uma regra para classificar novas observações.
+
+### Análise de Componentes Principais
+
+ACP e Fisher constroem combinações lineares das variáveis, porém otimizam critérios diferentes.
+
+Na ACP, uma primeira direção $\mathbf v$ é escolhida para maximizar a variância total projetada,
+
+$$
+\mathbf v^\top
+\mathbf S
+\mathbf v,
+$$
+
+sob uma normalização apropriada.
+
+Em Fisher, a direção é escolhida para maximizar
+
+$$
+\frac{
+\mathbf a^\top
+\mathbf T_{\mathrm{entre}}
+\mathbf a
+}{
+\mathbf a^\top
+\mathbf T_{\mathrm{intra}}
+\mathbf a
+}.
+$$
+
+A ACP não utiliza rótulos de grupos para construir suas direções. Uma direção de grande variância total pode refletir variabilidade existente dentro dos grupos e produzir pouca separação entre seus centroides.
+
+Fisher utiliza os rótulos explicitamente e procura direções nas quais a separação entre grupos seja grande relativamente à dispersão interna.
+
+A distinção é sintetizada na @tbl-acp-fisher.
+
+| Aspecto | ACP | Fisher |
+|---|---|---|
+| informação sobre grupos | não utilizada | utilizada |
+| critério | variância total | separação entre grupos relativa à dispersão intragrupos |
+| tipo de redução | não supervisionada em relação aos grupos | supervisionada |
+| dimensão máxima | determinada pelo posto da matriz de dados/covariâncias | no máximo $\min(p,G-1)$ |
+| interpretação das direções | variabilidade | separação |
+
+: Diferença entre as projeções da ACP e de Fisher. {#tbl-acp-fisher}
+
+### Análise de Agrupamentos
+
+Análise Discriminante e Análise de Agrupamentos podem utilizar distâncias, centroides e matrizes de dispersão, mas partem de informações diferentes.
+
+Na Análise de Agrupamentos, os rótulos dos grupos não são conhecidos. O objetivo é construir uma partição ou outra representação da estrutura de grupos a partir das características observadas.
+
+Na Análise Discriminante, os grupos já estão definidos e seus rótulos participam da construção da solução.
+
+Essa diferença modifica o próprio problema estatístico:
+
+- Agrupamentos utiliza as características para **construir grupos**;
+- Discriminante utiliza grupos conhecidos para **caracterizar separações e construir regras de classificação**.
+
+A proximidade entre as duas técnicas é, portanto, operacional e geométrica, mas não equivale a identidade de objetivos.
+
+## Síntese
+
+A Análise Discriminante reúne dois problemas relacionados.
+
+Na formulação probabilística, cada grupo é caracterizado por uma densidade condicional
+
+$$
+f_g(\mathbf x)
+$$
+
+e uma probabilidade a priori
+
+$$
+\pi_g.
+$$
+
+Sob perdas iguais, a regra de Bayes escolhe a classe que maximiza
+
+$$
+\pi_gf_g(\mathbf x).
+$$
+
+Para populações normais com covariância comum, essa comparação conduz à função discriminante linear
+
+$$
+\delta_g(\mathbf x)
+=
+\mathbf x^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_g
+-
+\frac12
+\boldsymbol{\mu}_g^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_g
++
+\log\pi_g.
+$$
+
+Com covariâncias específicas,
+
+$$
+\boldsymbol{\Sigma}_g,
+$$
+
+a função discriminante torna-se quadrática.
+
+Na formulação geométrica de Fisher, as dispersões intragrupos e entre grupos já desenvolvidas no Módulo II são combinadas no critério
+
+$$
+J_F(\mathbf a)
+=
+\frac{
+\mathbf a^\top
+\mathbf T_{\mathrm{entre}}
+\mathbf a
+}{
+\mathbf a^\top
+\mathbf T_{\mathrm{intra}}
+\mathbf a
+}.
+$$
+
+Sua maximização conduz ao problema
+
+$$
+\mathbf T_{\mathrm{entre}}
+\mathbf a
+=
+\lambda
+\mathbf T_{\mathrm{intra}}
+\mathbf a.
+$$
+
+Os autovetores generalizados definem as direções discriminantes, e o número de direções com separação não nula satisfaz
+
+$$
+s
+\leq
+\min(p,G-1).
+$$
+
+Para dois grupos, a direção de Fisher é proporcional a
+
+$$
+\mathbf T_{\mathrm{intra}}^{-1}
+\left(
+\overline{\mathbf x}_1
+-
+\overline{\mathbf x}_2
+\right).
+$$
+
+Sob normalidade e covariância comum, essa direção coincide, até escala, com a orientação determinada pela regra discriminante linear. A coincidência das direções não elimina a diferença entre os problemas: Fisher constrói uma projeção de separação, enquanto a formulação de Bayes constrói uma regra de decisão.
+
+A conexão com a MANOVA decorre das mesmas matrizes de dispersão e do mesmo problema espectral. A conexão com a ACP decorre do uso de combinações lineares, embora os critérios de otimização sejam diferentes. A distinção em relação à Análise de Agrupamentos decorre do conhecimento prévio dos rótulos.
+
+No próximo capítulo, o problema muda novamente. A Correlação Canônica também construirá combinações lineares, mas agora de dois blocos de variáveis, escolhidas para maximizar a associação entre eles.

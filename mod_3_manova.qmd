@@ -23,7 +23,7 @@ Os elementos da formulação são resumidos na @tbl-estrutura-manova.
 | respostas | $\boldsymbol{\mathcal Y}$ | reúne as respostas multivariadas |
 | delineamento | $\mathbf Z$ | representa grupos, tratamentos, covariáveis e demais termos |
 | parâmetros | $\mathbf B$ | determina os vetores de médias condicionais |
-| hipótese | $\mathbf C\mathbf B\mathbf M=\boldsymbol{\Theta}_0$ | especifica a comparação de interesse |
+| hipótese | $\mathbf C\mathbf B=\boldsymbol{\Theta}_0$ | especifica a comparação sobre as respostas originais |
 | variação atribuída à hipótese | $\mathbf H$ | mede o afastamento observado em relação a $H_0$ |
 | variação residual | $\mathbf E$ | mede a variabilidade não explicada pelo modelo |
 | comparação direcional | $\mathbf a^\top\mathbf H\mathbf a/\mathbf a^\top\mathbf E\mathbf a$ | compara hipótese e erro para uma combinação das respostas |
@@ -138,8 +138,15 @@ H_0:
 =
 \boldsymbol{\Theta}_0.
 $$ {#eq-hipotese-manova-respostas-originais}
+Essa será a formulação utilizada no restante deste capítulo. A hipótese mais geral
 
-Essa será a formulação utilizada inicialmente. O caso com $\mathbf M\neq\mathbf I_p$ segue a mesma construção aplicada às respostas transformadas.
+$$
+\mathbf C\mathbf B\mathbf M
+=
+\boldsymbol{\Theta}_0
+$$
+
+já foi desenvolvida no Módulo 2 e conduz à mesma construção quando aplicada às respostas transformadas por $\mathbf M$.
 
 No problema de comparação entre $G$ grupos, uma matriz $\mathbf C$ adequada pode expressar a igualdade entre seus vetores de médias. Assim, a formulação por grupos é incorporada à hipótese linear geral, permitindo que a mesma estrutura seja utilizada em delineamentos mais amplos.
 
@@ -370,18 +377,12 @@ $$
 \geq
 \cdots
 \geq
-\lambda_s
->
+\lambda_p
+\geq
 0
 $$
 
-do par $(\mathbf H,\mathbf E)$, isto é, os valores positivos para os quais existe
-
-$$
-\mathbf a_j\neq\mathbf0
-$$
-
-satisfazendo
+do par $(\mathbf H,\mathbf E)$, isto é, os valores para os quais existe um vetor não nulo $\mathbf a_j$ satisfazendo
 
 $$
 \mathbf H\mathbf a_j
@@ -389,13 +390,47 @@ $$
 \lambda_j
 \mathbf E\mathbf a_j.
 $$
-:::
 
-O número de raízes positivas é limitado pelo posto da matriz de hipótese:
+Se
 
 $$
 s
-\leq
+=
+\operatorname{rank}(\mathbf H),
+$$
+
+então exatamente $s$ dessas raízes são positivas. Quando $s<p$,
+
+$$
+\lambda_1
+\geq
+\cdots
+\geq
+\lambda_s
+>
+0
+=
+\lambda_{s+1}
+=
+\cdots
+=
+\lambda_p.
+$$
+:::
+
+Como
+
+$$
+s
+=
+\operatorname{rank}(\mathbf H),
+$$
+
+o número de raízes características positivas satisfaz
+
+$$
+s
+=
 \operatorname{rank}(\mathbf H)
 \leq
 p.
@@ -409,10 +444,12 @@ $$
 G-1,
 $$
 
-de modo que
+e, portanto,
 
 $$
 s
+=
+\operatorname{rank}(\mathbf H)
 \leq
 \min(p,G-1).
 $$ {#eq-numero-raizes-grupos-manova}
@@ -830,10 +867,28 @@ $$
 =
 \lambda_1
 =
-\max_{1\leq j\leq s}
+\max_{1\leq j\leq p}
 \lambda_j.
 $$ {#eq-maior-raiz-roy-manova}
 :::
+
+Como todas as raízes são não negativas, se
+
+$$
+\mathbf H=\mathbf0,
+$$
+
+então
+
+$$
+\lambda_1=\cdots=\lambda_p=0
+$$
+
+e, consequentemente,
+
+$$
+\Theta_{\mathrm R}=0.
+$$
 
 Pela caracterização do quociente de Rayleigh generalizado,
 
@@ -929,19 +984,57 @@ N_p
 \right).
 $$ {#eq-normalidade-erros-manova}
 
-Sob essas condições, o Módulo 2 estabeleceu as distribuições matriciais das SSCP utilizadas nos testes do modelo linear multivariado.
-
-Sob $H_0$, a SSCP da hipótese possui distribuição de Wishart central com matriz de escala determinada por
+Sob essas condições, o Módulo 2 estabeleceu as distribuições matriciais das SSCP utilizadas nos testes do modelo linear multivariado. Para distinguir os objetos aleatórios de suas realizações observadas $\mathbf H$ e $\mathbf E$, denote as SSCP aleatórias por
 
 $$
-\boldsymbol{\Sigma},
+\boldsymbol{\mathsf H}
 $$
 
-e a SSCP residual possui distribuição de Wishart com a mesma matriz de escala e seus respectivos graus de liberdade. Esses resultados foram estabelecidos em @prp-distribuicao-sscp-hipotese-nula e @prp-distribuicao-sscp-residual-modelo-normal.
+e
 
-A estrutura probabilística é, portanto, composta por duas matrizes aleatórias que possuem a mesma matriz de covariâncias populacional como escala, mas representam fontes distintas de variação.
+$$
+\boldsymbol{\mathsf E}_{\mathrm{res}}.
+$$
 
-A independência entre a estimação dos parâmetros e a SSCP residual, desenvolvida no Módulo 2, é a base para a construção das distribuições dos critérios clássicos sob a hipótese nula.
+Na formulação sobre as $p$ respostas originais, sob $H_0$,
+
+$$
+\boldsymbol{\mathsf H}
+\mid
+\mathbf Z
+\sim
+W_p
+\left(
+g,
+\boldsymbol{\Sigma}
+\right),
+$$
+
+$$
+\boldsymbol{\mathsf E}_{\mathrm{res}}
+\mid
+\mathbf Z
+\sim
+W_p
+\left(
+\nu_E,
+\boldsymbol{\Sigma}
+\right),
+$$
+
+e
+
+$$
+\boldsymbol{\mathsf H}
+\perp
+\boldsymbol{\mathsf E}_{\mathrm{res}}
+\mid
+\mathbf Z,
+$$
+
+em que $g$ é o número de restrições paramétricas independentes da hipótese e $\nu_E$ são os graus de liberdade residuais. Esses resultados foram estabelecidos em @prp-distribuicao-sscp-hipotese-nula e @prp-distribuicao-sscp-residual-modelo-normal.
+
+A igualdade da matriz de escala $\boldsymbol{\Sigma}$ e a independência entre as duas SSCP fornecem a base probabilística dos critérios clássicos sob a hipótese nula.
 
 Neste capítulo não serão rederivadas as distribuições exatas ou as aproximações $F$ e $\chi^2$ associadas aos quatro critérios. A formulação da técnica requer identificar:
 
@@ -1171,6 +1264,95 @@ Na comparação clássica de duas populações normais com matriz de covariânci
 
 A relação mostra que o $T^2$ não é um procedimento isolado da MANOVA. Ele representa o caso em que a hipótese de grupos possui somente uma direção independente de comparação.
 
+Se
+
+$$
+\mathbf d
+=
+\bar{\mathbf y}_1
+-
+\bar{\mathbf y}_2
+$$
+
+e
+
+$$
+\mathbf S_p
+$$
+
+é a matriz de covariâncias combinada dentro dos grupos, então
+
+$$
+\mathbf E
+=
+(n_1+n_2-2)
+\mathbf S_p
+$$
+
+e
+
+$$
+\mathbf H
+=
+\frac{
+n_1n_2
+}{
+n_1+n_2
+}
+\mathbf d\mathbf d^\top.
+$$
+
+Como $\mathbf H$ possui posto no máximo $1$, a única raiz potencialmente positiva é
+
+$$
+\lambda_1
+=
+\frac{
+n_1n_2
+}{
+n_1+n_2
+}
+\mathbf d^\top
+\mathbf E^{-1}
+\mathbf d.
+$$
+
+A estatística de Hotelling para duas amostras independentes é
+
+$$
+T^2
+=
+\frac{
+n_1n_2
+}{
+n_1+n_2
+}
+\mathbf d^\top
+\mathbf S_p^{-1}
+\mathbf d.
+$$
+
+Consequentemente,
+
+$$
+\lambda_1
+=
+\frac{
+T^2
+}{
+n_1+n_2-2
+}.
+$$ {#eq-relacao-raiz-t2-manova}
+
+A direção correspondente é proporcional a
+
+$$
+\mathbf E^{-1}
+\left(
+\bar{\mathbf y}_1-\bar{\mathbf y}_2
+\right).
+$$
+
 Com três ou mais grupos, ou com hipóteses de posto superior a $1$, várias raízes podem ser positivas. É nesse ponto que as diferentes formas de agregação utilizadas por Wilks, Pillai, Hotelling--Lawley e Roy passam a distinguir-se efetivamente.
 
 ## Geometria da MANOVA
@@ -1381,7 +1563,7 @@ $$
 possuem as mesmas raízes características.
 :::
 
-::: proof
+::: {.proof}
 As raízes generalizadas satisfazem
 
 $$
@@ -1802,7 +1984,7 @@ Essa distinção será central no próximo capítulo. A MANOVA utiliza a separa�
 
 ## Síntese
 
-A MANOVA é formulada dentro do modelo linear multivariado
+Na formulação sobre as respostas originais utilizada neste capítulo, a MANOVA é construída dentro do modelo linear multivariado
 
 $$
 \boldsymbol{\mathcal Y}
@@ -1816,10 +1998,20 @@ e testa hipóteses da forma
 
 $$
 H_0:
-\mathbf C\mathbf B\mathbf M
+\mathbf C\mathbf B
 =
 \boldsymbol{\Theta}_0.
 $$
+
+A formulação mais geral,
+
+$$
+\mathbf C\mathbf B\mathbf M
+=
+\boldsymbol{\Theta}_0,
+$$
+
+já foi estabelecida no Módulo 2 e conduz à mesma estrutura quando aplicada às respostas transformadas por $\mathbf M$.
 
 A hipótese produz uma matriz $\mathbf H$, enquanto a variabilidade residual é representada por $\mathbf E$. Para uma combinação linear das respostas determinada por $\mathbf a$, a comparação entre essas duas fontes é
 
