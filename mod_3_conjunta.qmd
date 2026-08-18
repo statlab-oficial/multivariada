@@ -1,0 +1,2313 @@
+# Formulação da Análise Conjunta
+
+A Análise Conjunta estuda como avaliações, preferências ou escolhas referentes a alternativas podem ser relacionadas às características que descrevem essas alternativas. O problema parte de objetos apresentados como combinações de **atributos** e **níveis** e procura representar a contribuição de cada característica para a preferência global [@green1971conjoint; @green1978conjoint].
+
+Considere uma alternativa descrita por $m$ atributos. O perfil $i$ pode ser representado por
+
+$$
+\mathbf x_i
+=
+\begin{pmatrix}
+x_{i1}\\
+\vdots\\
+x_{im}
+\end{pmatrix},
+$$
+
+em que $x_{ij}$ indica o nível assumido pelo atributo $j$ no perfil $i$.
+
+A informação observada sobre esse perfil pode assumir diferentes formas. Um participante pode atribuir uma avaliação quantitativa, ordenar várias alternativas, comparar dois perfis ou escolher uma alternativa entre várias disponíveis.
+
+Embora essas respostas exijam formulações estatísticas diferentes, o objetivo comum é decompor a preferência associada a uma alternativa em contribuições atribuídas às características que a definem.
+
+Na formulação clássica, essa decomposição é representada por uma função de utilidade. Cada nível de cada atributo recebe uma contribuição e a utilidade do perfil resulta da combinação dessas contribuições.
+
+A estrutura da técnica pode ser resumida pela @tbl-estrutura-analise-conjunta.
+
+| Elemento | Representação | Papel |
+|---|---|---|
+| alternativa ou perfil | $\mathbf x_i$ | combinação específica dos níveis dos atributos |
+| atributo | $j=1,\ldots,m$ | dimensão utilizada para descrever a alternativa |
+| nível | $x_{ij}$ | valor ou categoria do atributo $j$ no perfil $i$ |
+| utilidade parcial | $u_j(x_{ij})$ | contribuição do nível para a preferência |
+| utilidade total | $U_i$ | representação global da preferência pelo perfil |
+| delineamento | $\mathbf Z$ | representação matricial dos níveis presentes nos perfis |
+| parâmetros | $\boldsymbol{\beta}$ | efeitos ou utilidades parciais associados à codificação |
+| resultado | utilidades e contrastes | decomposição das preferências segundo atributos e níveis |
+
+: Elementos da formulação da Análise Conjunta. {#tbl-estrutura-analise-conjunta}
+
+A Análise Conjunta distingue-se das técnicas anteriores deste módulo pelo objeto matemático que ocupa a formulação principal. ACP, Correspondência e Correlação Canônica utilizam decomposições matriciais para encontrar direções. MANOVA e Análise Discriminante utilizam matrizes de dispersão e problemas de autovalores generalizados. Na Análise Conjunta, a estrutura principal é um **modelo para respostas de preferência construído a partir de uma matriz de delineamento**.
+
+## O problema da decomposição de preferências
+
+Considere $m$ atributos,
+
+$$
+A_1,\ldots,A_m,
+$$
+
+em que o atributo $A_j$ possui um conjunto de níveis
+
+$$
+\mathcal L_j
+=
+\left\{
+\ell_{j1},
+\ldots,
+\ell_{jL_j}
+\right\}.
+$$
+
+Uma alternativa corresponde a uma combinação
+
+$$
+\mathbf x_i
+=
+(x_{i1},\ldots,x_{im})^\top
+\in
+\mathcal L_1
+\times
+\cdots
+\times
+\mathcal L_m.
+$$ {#eq-perfil-analise-conjunta}
+
+Por exemplo, uma alternativa pode ser descrita por três atributos:
+
+| Atributo | Níveis possíveis |
+|---|---|
+| $A_1$: tipo | nível 1, nível 2 |
+| $A_2$: tamanho | pequeno, médio, grande |
+| $A_3$: preço | baixo, intermediário, alto |
+
+: Exemplo abstrato de atributos e níveis na formação de perfis. {#tbl-atributos-niveis-conjunta}
+
+Um perfil específico poderia ser formado por
+
+$$
+\mathbf x_i
+=
+(
+\text{nível 2},
+\text{médio},
+\text{baixo}
+)^\top.
+$$
+
+A resposta dada a esse perfil é global: o participante avalia a alternativa como um todo. Entretanto, o interesse estatístico está em decompor essa avaliação para compreender como os atributos e seus níveis participaram da preferência observada.
+
+Essa passagem distingue duas informações:
+
+- **o perfil apresentado**, determinado pelos níveis dos atributos;
+- **a resposta ao perfil**, que contém informação sobre a preferência.
+
+O perfil constitui a estrutura explicativa. A resposta fornece a informação utilizada para estimar como essa estrutura se relaciona à preferência.
+
+### Atributos, níveis e perfis
+
+Um **atributo** representa uma dimensão utilizada para diferenciar alternativas. Seus **níveis** são os valores ou categorias considerados no estudo.
+
+Um **perfil** é uma combinação específica de níveis, contendo exatamente um nível de cada atributo.
+
+::: {#def-perfil-analise-conjunta}
+## Perfil
+
+Se os atributos são $A_1,\ldots,A_m$, um **perfil** é um elemento do produto cartesiano
+
+$$
+\mathcal L_1
+\times
+\cdots
+\times
+\mathcal L_m.
+$$
+
+Cada perfil especifica um nível para cada atributo.
+:::
+
+Se todos os perfis possíveis forem considerados, o número total de combinações é
+
+$$
+N_{\mathrm{perf}}
+=
+\prod_{j=1}^{m}
+L_j.
+$$ {#eq-numero-perfis-completo-conjunta}
+
+Esse crescimento multiplicativo explica por que a construção dos perfis é parte integrante do problema. Mesmo um número moderado de atributos e níveis pode produzir um conjunto de alternativas grande demais para ser apresentado integralmente a cada participante.
+
+A escolha dos perfis determina quais combinações de atributos serão observadas e, posteriormente, quais efeitos poderão ser separados pelo modelo.
+
+## Preferência e utilidade
+
+A preferência estabelece uma comparação entre alternativas. A utilidade fornece uma representação numérica dessa comparação.
+
+Considere dois perfis,
+
+$$
+\mathbf x_i
+\qquad\text{e}\qquad
+\mathbf x_h.
+$$
+
+Uma representação de preferência por utilidade satisfaz
+
+$$
+U(\mathbf x_i)
+>
+U(\mathbf x_h)
+$$
+
+quando o perfil $\mathbf x_i$ é preferido ao perfil $\mathbf x_h$.
+
+A utilidade permite, portanto, substituir comparações entre alternativas por comparações entre números.
+
+::: {#def-utilidade-analise-conjunta}
+## Utilidade
+
+A **utilidade** é uma representação numérica da preferência atribuída às alternativas consideradas no problema.
+
+Valores maiores representam alternativas mais preferidas segundo a orientação adotada para a escala.
+:::
+
+A utilidade deve ser interpretada relativamente ao problema estudado. Seu valor numérico depende dos atributos, dos níveis, da forma de resposta e da parametrização utilizada.
+
+Por isso, uma afirmação como
+
+$$
+U(\mathbf x_i)=8
+$$
+
+não possui, isoladamente, interpretação absoluta. O significado estatístico aparece nas diferenças e comparações, como
+
+$$
+U(\mathbf x_i)-U(\mathbf x_h).
+$$
+
+A forma exata da indeterminação de localização ou escala depende do modelo utilizado. Em avaliações quantitativas, a escala observada impõe uma estrutura diferente daquela de uma resposta puramente ordinal ou de um modelo probabilístico de escolha. Essas situações serão distinguidas posteriormente.
+
+## Utilidades parciais
+
+A Análise Conjunta procura decompor a utilidade total em contribuições relacionadas aos atributos. A representação aditiva possui sua base clássica na teoria de mensuração conjunta [@luce1964conjoint].
+
+Para o atributo $j$, denote por
+
+$$
+u_j(x_{ij})
+$$
+
+a contribuição associada ao nível $x_{ij}$ presente no perfil $i$.
+
+::: {#def-utilidade-parcial}
+## Utilidade parcial
+
+A **utilidade parcial** de um nível representa sua contribuição para a utilidade de uma alternativa dentro da estrutura de atributos e níveis considerada.
+
+Para o atributo $j$, essa contribuição é representada por
+
+$$
+u_j(x_{ij}).
+$$
+:::
+
+A utilidade parcial não descreve um nível isolado de todo o contexto do estudo. Ela é definida em relação:
+
+- aos demais níveis do mesmo atributo;
+- aos outros atributos incluídos;
+- à codificação utilizada;
+- ao tipo de resposta observado.
+
+A comparação entre níveis de um mesmo atributo é especialmente informativa. Para dois níveis $a$ e $b$ do atributo $j$,
+
+$$
+u_j(a)-u_j(b)
+$$ {#eq-diferenca-utilidades-parciais}
+
+representa a diferença de contribuição atribuída à substituição de $b$ por $a$, mantida a estrutura prevista pelo modelo.
+
+## Modelo aditivo de utilidade
+
+A formulação clássica supõe que a utilidade sistemática de um perfil pode ser decomposta como soma das contribuições associadas aos seus atributos.
+
+::: {#def-modelo-aditivo-utilidade}
+## Modelo aditivo de utilidade
+
+Para um perfil
+
+$$
+\mathbf x_i
+=
+(x_{i1},\ldots,x_{im})^\top,
+$$
+
+a estrutura aditiva de utilidade é
+
+$$
+V_i
+=
+\beta_0
++
+\sum_{j=1}^{m}
+u_j(x_{ij}),
+$$ {#eq-utilidade-sistematica-aditiva}
+
+em que:
+
+- $\beta_0$ representa uma constante comum aos perfis;
+- $u_j(x_{ij})$ representa a contribuição do nível observado no atributo $j$;
+- $V_i$ representa a parte sistemática da utilidade atribuída ao perfil.
+:::
+
+A notação $V_i$ é utilizada para distinguir a parte explicada pela estrutura dos atributos de uma eventual parcela não explicada ou aleatória.
+
+Para uma resposta quantitativa, uma formulação estatística inicial é
+
+$$
+Y_i
+=
+V_i
++
+\varepsilon_i,
+$$
+
+ou, equivalentemente,
+
+$$
+Y_i
+=
+\beta_0
++
+\sum_{j=1}^{m}
+u_j(x_{ij})
++
+\varepsilon_i.
+$$ {#eq-modelo-aditivo-conjunta}
+
+Nesse caso, $Y_i$ é a avaliação observada e $\varepsilon_i$ representa a parcela da resposta que não é explicada pela estrutura aditiva incluída no modelo.
+
+A equação @eq-modelo-aditivo-conjunta estabelece a conexão entre o problema de preferência e o modelo linear desenvolvido anteriormente no livro. O conteúdo específico da Análise Conjunta está na forma como os perfis são construídos e como as funções
+
+$$
+u_j(\cdot)
+$$
+
+são representadas pelos níveis dos atributos.
+
+### Aditividade
+
+A hipótese de aditividade significa que a contribuição total é obtida pela soma das contribuições dos atributos.
+
+Para dois atributos $A$ e $B$,
+
+$$
+V(a,b)
+=
+\beta_0
++
+u_A(a)
++
+u_B(b).
+$$ {#eq-aditividade-dois-atributos}
+
+A diferença produzida pela substituição de $a$ por $a'$ é
+
+$$
+\begin{aligned}
+V(a',b)-V(a,b)
+&=
+u_A(a')-u_A(a).
+\end{aligned}
+$$ {#eq-efeito-aditivo-conjunta}
+
+O lado direito não depende do nível $b$ do outro atributo.
+
+Assim, no modelo aditivo, o efeito atribuído à mudança de nível em um atributo é constante em relação aos níveis dos demais atributos.
+
+Essa é uma hipótese **definidora** da formulação aditiva clássica: ela determina o significado da decomposição em utilidades parciais.
+
+### Compensação entre atributos
+
+A estrutura aditiva admite que contribuições positivas e negativas ocorram simultaneamente.
+
+Considere dois perfis
+
+$$
+\mathbf x_i
+\qquad\text{e}\qquad
+\mathbf x_h.
+$$
+
+A diferença entre suas utilidades sistemáticas é
+
+$$
+V_i-V_h
+=
+\sum_{j=1}^{m}
+\left[
+u_j(x_{ij})
+-
+u_j(x_{hj})
+\right].
+$$ {#eq-diferenca-utilidades-perfis}
+
+Uma alternativa pode possuir menor contribuição em um atributo e, ao mesmo tempo, maior contribuição em outro. A preferência final depende da soma dessas diferenças.
+
+Essa propriedade é denominada **compensação**: uma perda relativa de utilidade em determinada característica pode ser compensada por ganhos em outras características.
+
+A compensação decorre da forma aditiva. Ela não deve ser assumida automaticamente quando a estrutura substantiva do problema impõe restrições, limiares ou características não compensatórias.
+
+### Interações entre atributos
+
+A aditividade pode ser insuficiente quando o efeito de um atributo depende do nível assumido por outro.
+
+Para dois atributos, uma extensão é
+
+$$
+V(a,b)
+=
+\beta_0
++
+u_A(a)
++
+u_B(b)
++
+u_{AB}(a,b),
+$$ {#eq-interacao-utilidade-conjunta}
+
+em que
+
+$$
+u_{AB}(a,b)
+$$
+
+representa uma contribuição específica da combinação dos níveis $a$ e $b$.
+
+Agora,
+
+$$
+\begin{aligned}
+V(a',b)-V(a,b)
+&=
+u_A(a')
+-
+u_A(a)
+\\
+&\quad+
+u_{AB}(a',b)
+-
+u_{AB}(a,b),
+\end{aligned}
+$$
+
+e a diferença pode variar com $b$.
+
+A interação modifica, portanto, a interpretação das utilidades parciais: a contribuição associada a um nível deixa de ser suficiente para caracterizar seu efeito independentemente dos demais atributos.
+
+A @fig-aditividade-interacao-conjunta ilustra essa diferença. No modelo aditivo, a diferença entre os níveis do primeiro atributo permanece constante para os diferentes níveis do segundo. Com interação, essa diferença se modifica.
+
+```{r}
+#| label: fig-aditividade-interacao-conjunta
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Aditividade e interação entre dois atributos. Linhas paralelas representam um efeito do atributo A que não depende do nível de B; linhas não paralelas indicam interação."
+#| fig-width: 9
+#| fig-height: 4.8
+#| fig-align: center
+
+library(ggplot2)
+
+dados_aditivos <- data.frame(
+  A = factor(
+    rep(
+      c(
+        "A1",
+        "A2"
+      ),
+      each = 2
+    ),
+    levels = c(
+      "A1",
+      "A2"
+    )
+  ),
+  B = factor(
+    rep(
+      c(
+        "B1",
+        "B2"
+      ),
+      times = 2
+    )
+  ),
+  utilidade = c(
+    3,
+    5,
+    6,
+    8
+  ),
+  estrutura = "Modelo aditivo"
+)
+
+dados_interacao <- data.frame(
+  A = factor(
+    rep(
+      c(
+        "A1",
+        "A2"
+      ),
+      each = 2
+    ),
+    levels = c(
+      "A1",
+      "A2"
+    )
+  ),
+  B = factor(
+    rep(
+      c(
+        "B1",
+        "B2"
+      ),
+      times = 2
+    )
+  ),
+  utilidade = c(
+    3,
+    6,
+    7,
+    7
+  ),
+  estrutura = "Modelo com interação"
+)
+
+dados_figura <- rbind(
+  dados_aditivos,
+  dados_interacao
+)
+
+ggplot(
+  dados_figura,
+  aes(
+    x = A,
+    y = utilidade,
+    group = B,
+    linetype = B,
+    shape = B
+  )
+) +
+  geom_line(
+    linewidth = 0.9
+  ) +
+  geom_point(
+    size = 2.5
+  ) +
+  facet_wrap(
+    ~ estrutura
+  ) +
+  labs(
+    x = "Nível do atributo A",
+    y = "Utilidade sistemática",
+    linetype = "Nível de B",
+    shape = "Nível de B"
+  ) +
+  theme_minimal(
+    base_size = 12
+  ) +
+  theme(
+    legend.position = "bottom"
+  )
+```
+
+No painel aditivo, a mudança de $A_1$ para $A_2$ produz a mesma diferença de utilidade para $B_1$ e $B_2$. No painel com interação, o efeito de alterar o nível de $A$ depende do nível de $B$.
+
+A inclusão de interações aumenta o número de parâmetros e modifica as exigências impostas ao conjunto de perfis. O delineamento precisa conter informação suficiente para separar os efeitos que se pretende representar. Por isso, aditividade, codificação, posto e construção dos perfis estão diretamente relacionados.
+
+## Da utilidade à representação matricial
+
+O modelo em @eq-modelo-aditivo-conjunta ainda está escrito em termos das funções
+
+$$
+u_j(x_{ij}).
+$$
+
+Para estimar essas contribuições a partir das respostas observadas, os níveis dos atributos precisam ser transformados em colunas de uma matriz.
+
+Essa representação será feita pela **matriz de delineamento**
+
+$$
+\mathbf Z,
+$$
+
+na qual cada linha descreve um perfil segundo uma codificação previamente escolhida.
+
+Depois dessa codificação, o modelo aditivo poderá ser escrito como
+
+$$
+\mathbf y
+=
+\mathbf Z
+\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon},
+$$
+
+conectando a Análise Conjunta diretamente à teoria do modelo linear, do posto e das funções estimáveis desenvolvida no Módulo II.
+
+A particularidade da técnica estará na interpretação de $\boldsymbol{\beta}$: seus componentes representarão utilidades parciais ou contrastes entre níveis dos atributos.
+
+## Representação matricial do modelo
+
+A formulação aditiva pode ser escrita como um modelo linear depois que os níveis dos atributos são representados numericamente.
+
+Considere $N$ avaliações quantitativas de perfis. Para o perfil $i$, seja
+
+$$
+\mathbf z_i^\top
+$$
+
+o vetor que contém o intercepto e os valores definidos pela codificação dos níveis presentes nesse perfil.
+
+Reunindo as $N$ linhas, obtém-se a matriz de delineamento
+
+$$
+\mathbf Z
+=
+\begin{pmatrix}
+\mathbf z_1^\top\\
+\vdots\\
+\mathbf z_N^\top
+\end{pmatrix}
+\in
+\mathbb R^{N\times d},
+$$ {#eq-matriz-delineamento-conjunta}
+
+em que $d$ é o número de parâmetros da parametrização utilizada.
+
+Se
+
+$$
+\boldsymbol{\beta}
+=
+\begin{pmatrix}
+\beta_1\\
+\vdots\\
+\beta_d
+\end{pmatrix},
+$$
+
+a utilidade sistemática dos perfis pode ser reunida em
+
+$$
+\mathbf V
+=
+\mathbf Z
+\boldsymbol{\beta},
+$$ {#eq-utilidades-matriciais-conjunta}
+
+com
+
+$$
+\mathbf V
+=
+\begin{pmatrix}
+V_1\\
+\vdots\\
+V_N
+\end{pmatrix}.
+$$
+
+Para respostas quantitativas,
+
+$$
+\mathbf y
+=
+\mathbf Z
+\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon}.
+$$ {#eq-modelo-linear-conjunta}
+
+A forma em @eq-modelo-linear-conjunta é o modelo linear já desenvolvido no Módulo II. A Análise Conjunta não exige uma nova teoria de mínimos quadrados. Sua especificidade está na construção de $\mathbf Z$ a partir dos atributos e níveis e na interpretação de $\boldsymbol{\beta}$ em termos de utilidades parciais e contrastes de preferência.
+
+## Codificação dos níveis
+
+Atributos categóricos com mais de dois níveis precisam ser representados por mais de uma coluna da matriz de delineamento.
+
+Considere um atributo $A_j$ com
+
+$$
+L_j
+$$
+
+níveis. A escolha de uma codificação determina como esses níveis são expressos pelos parâmetros, mas não modifica necessariamente as utilidades ajustadas dos perfis.
+
+Duas parametrizações são particularmente úteis para compreender essa distinção:
+
+- codificação por categoria de referência;
+- codificação por efeitos.
+
+### Categoria de referência
+
+Escolha um dos níveis do atributo como referência. Se $A_j$ possui $L_j$ níveis, são necessárias
+
+$$
+L_j-1
+$$
+
+colunas indicadoras.
+
+Suponha, por exemplo, que o atributo $A$ tenha três níveis,
+
+$$
+A_1,
+\qquad
+A_2,
+\qquad
+A_3,
+$$
+
+e que $A_1$ seja a categoria de referência.
+
+Podem ser definidas as colunas
+
+$$
+z_{A2}
+=
+\begin{cases}
+1,
+&
+A=A_2,
+\\
+0,
+&
+\text{caso contrário},
+\end{cases}
+$$
+
+e
+
+$$
+z_{A3}
+=
+\begin{cases}
+1,
+&
+A=A_3,
+\\
+0,
+&
+\text{caso contrário}.
+\end{cases}
+$$
+
+A contribuição desse atributo para o modelo pode ser escrita como
+
+$$
+\beta_{A2}z_{A2}
++
+\beta_{A3}z_{A3}.
+$$
+
+O nível $A_1$ não possui coluna própria. Sua contribuição está incorporada ao intercepto e às escolhas de referência dos demais atributos.
+
+Nessa parametrização,
+
+$$
+\beta_{A2}
+$$
+
+representa a diferença entre as utilidades dos níveis $A_2$ e $A_1$, enquanto
+
+$$
+\beta_{A3}
+$$
+
+representa a diferença entre $A_3$ e $A_1$.
+
+Assim,
+
+$$
+\beta_{A2}
+=
+u_A(A_2)-u_A(A_1)
+$$ {#eq-coeficiente-referencia-a2}
+
+e
+
+$$
+\beta_{A3}
+=
+u_A(A_3)-u_A(A_1).
+$$ {#eq-coeficiente-referencia-a3}
+
+Considere agora dois atributos:
+
+- $A$, com níveis $A_1,A_2,A_3$;
+- $B$, com níveis $B_1,B_2$.
+
+Usando $A_1$ e $B_1$ como referências, a matriz de delineamento de todos os seis perfis pode ser representada pela @tbl-codificacao-referencia-conjunta.
+
+| Perfil | $A$ | $B$ | intercepto | $z_{A2}$ | $z_{A3}$ | $z_{B2}$ |
+|---:|:---:|:---:|---:|---:|---:|---:|
+| 1 | $A_1$ | $B_1$ | 1 | 0 | 0 | 0 |
+| 2 | $A_1$ | $B_2$ | 1 | 0 | 0 | 1 |
+| 3 | $A_2$ | $B_1$ | 1 | 1 | 0 | 0 |
+| 4 | $A_2$ | $B_2$ | 1 | 1 | 0 | 1 |
+| 5 | $A_3$ | $B_1$ | 1 | 0 | 1 | 0 |
+| 6 | $A_3$ | $B_2$ | 1 | 0 | 1 | 1 |
+
+: Exemplo de codificação por categoria de referência para dois atributos. {#tbl-codificacao-referencia-conjunta}
+
+O modelo correspondente é
+
+$$
+V_i
+=
+\beta_0
++
+\beta_{A2}z_{i,A2}
++
+\beta_{A3}z_{i,A3}
++
+\beta_{B2}z_{i,B2}.
+$$ {#eq-modelo-referencia-conjunta}
+
+Para o perfil de referência,
+
+$$
+(A_1,B_1),
+$$
+
+tem-se
+
+$$
+V(A_1,B_1)
+=
+\beta_0.
+$$
+
+Para
+
+$$
+(A_2,B_1),
+$$
+
+a utilidade sistemática é
+
+$$
+V(A_2,B_1)
+=
+\beta_0+\beta_{A2}.
+$$
+
+Logo,
+
+$$
+V(A_2,B_1)
+-
+V(A_1,B_1)
+=
+\beta_{A2}.
+$$
+
+A interpretação do coeficiente está, portanto, vinculada à categoria escolhida como referência.
+
+### Codificação por efeitos
+
+Outra possibilidade consiste em representar os níveis de cada atributo por contrastes cuja soma seja zero.
+
+Para um atributo com três níveis, uma codificação possível é
+
+| Nível | $z_1$ | $z_2$ |
+|:---:|---:|---:|
+| $A_1$ | 1 | 0 |
+| $A_2$ | 0 | 1 |
+| $A_3$ | -1 | -1 |
+
+: Exemplo de codificação por efeitos para um atributo com três níveis. {#tbl-codificacao-efeitos-conjunta}
+
+Nesse caso, a contribuição do atributo é
+
+$$
+\beta_{A1}z_1
++
+\beta_{A2}z_2.
+$$
+
+Os níveis possuem utilidades parciais
+
+$$
+u_A(A_1)
+=
+\beta_{A1},
+$$
+
+$$
+u_A(A_2)
+=
+\beta_{A2},
+$$
+
+e
+
+$$
+u_A(A_3)
+=
+-
+\beta_{A1}
+-
+\beta_{A2}.
+$$ {#eq-recuperacao-nivel-efeitos-conjunta}
+
+Consequentemente,
+
+$$
+u_A(A_1)
++
+u_A(A_2)
++
+u_A(A_3)
+=
+0.
+$$ {#eq-restricao-soma-zero-conjunta}
+
+A restrição de soma zero determina uma origem para as utilidades parciais daquele atributo.
+
+O nível codificado pela linha
+
+$$
+(-1,-1)
+$$
+
+não possui utilidade zero. Sua utilidade é recuperada a partir da restrição em @eq-restricao-soma-zero-conjunta.
+
+Essa diferença é importante:
+
+- na codificação por referência, um nível funciona como base de comparação;
+- na codificação por efeitos, as utilidades dos níveis são expressas relativamente a uma restrição de soma zero.
+
+Os coeficientes produzidos pelas duas parametrizações não possuem, em geral, os mesmos valores numéricos.
+
+## Identificação do modelo
+
+A necessidade de codificação decorre de um problema de identificação.
+
+Suponha que um atributo possua $L_j$ níveis e que sejam incluídas simultaneamente:
+
+- uma coluna de intercepto;
+- uma coluna indicadora para cada um dos $L_j$ níveis.
+
+Para cada perfil, exatamente uma dessas indicadoras é igual a $1$. Portanto,
+
+$$
+\mathbf 1_N
+=
+\mathbf z_{j1}
++
+\cdots
++
+\mathbf z_{jL_j},
+$$ {#eq-dependencia-indicadores-conjunta}
+
+em que
+
+$$
+\mathbf z_{j\ell}
+$$
+
+denota a coluna indicadora do nível $\ell$.
+
+A coluna do intercepto é, assim, combinação linear das colunas associadas aos níveis do atributo.
+
+Consequentemente, a matriz de delineamento possui colunas linearmente dependentes.
+
+Essa relação conecta diretamente três conceitos desenvolvidos nos módulos anteriores:
+
+$$
+\operatorname{posto}(\mathbf Z)<d,
+$$
+
+a matriz
+
+$$
+\mathbf Z^\top\mathbf Z
+$$
+
+é singular e os elementos de
+
+$$
+\boldsymbol{\beta}
+$$
+
+não são todos identificados individualmente.
+
+O Módulo II já mostrou, no estudo de delineamentos com posto deficiente, que diferentes vetores de parâmetros podem produzir os mesmos valores ajustados. O mesmo princípio aparece aqui com uma interpretação específica de utilidade.
+
+::: {#def-identificacao-conjunta}
+## Identificação na Análise Conjunta
+
+Uma parametrização da Análise Conjunta é **identificada** quando as restrições impostas à representação dos níveis permitem determinar unicamente os parâmetros utilizados nessa parametrização a partir da estrutura do modelo.
+
+Quando a matriz de delineamento possui posto deficiente, diferentes vetores de coeficientes podem representar as mesmas utilidades sistemáticas dos perfis.
+:::
+
+Considere um vetor
+
+$$
+\mathbf d
+\neq
+\mathbf0
+$$
+
+pertencente ao núcleo de $\mathbf Z$:
+
+$$
+\mathbf Z\mathbf d
+=
+\mathbf0.
+$$
+
+Então,
+
+$$
+\mathbf Z
+\left(
+\boldsymbol{\beta}
++
+\mathbf d
+\right)
+=
+\mathbf Z
+\boldsymbol{\beta}.
+$$ {#eq-parametros-equivalentes-conjunta}
+
+Portanto,
+
+$$
+\boldsymbol{\beta}
+$$
+
+e
+
+$$
+\boldsymbol{\beta}
++
+\mathbf d
+$$
+
+produzem exatamente o mesmo vetor de utilidades sistemáticas.
+
+Essa é a versão univariada da equivalência de parametrizações desenvolvida no Módulo II para matrizes de parâmetros em @eq-equivalencia-matrizes-parametros.
+
+A pseudoinversa pode selecionar uma solução particular em um problema de posto deficiente, mas não transforma parâmetros não identificados em parâmetros identificados. A identificação decorre da estrutura do delineamento e das restrições impostas à parametrização.
+
+## Restrições de identificação
+
+Duas estratégias já apresentadas resolvem a redundância produzida pelos indicadores completos.
+
+### Eliminação de uma categoria
+
+Na codificação por referência, uma coluna indicadora de cada atributo é eliminada.
+
+Para o modelo aditivo com intercepto, o número de parâmetros é então
+
+$$
+d
+=
+1
++
+\sum_{j=1}^{m}
+(L_j-1).
+$$ {#eq-numero-parametros-aditivo-conjunta}
+
+O primeiro termo corresponde ao intercepto e cada atributo acrescenta $L_j-1$ parâmetros independentes.
+
+### Restrição de soma zero
+
+Na codificação por efeitos, também são utilizados $L_j-1$ parâmetros independentes para cada atributo, mas a utilidade do nível restante é obtida impondo
+
+$$
+\sum_{\ell=1}^{L_j}
+u_j(\ell)
+=
+0.
+$$ {#eq-restricao-geral-soma-zero-conjunta}
+
+Em ambas as abordagens, o objetivo é representar o mesmo número de graus de liberdade associado ao atributo:
+
+$$
+L_j-1.
+$$
+
+A parametrização determina **como** esses graus de liberdade são expressos, e não quantos efeitos independentes o atributo possui.
+
+## Equivalência entre parametrizações
+
+Considere duas matrizes de delineamento,
+
+$$
+\mathbf Z_1
+$$
+
+e
+
+$$
+\mathbf Z_2,
+$$
+
+correspondentes a duas codificações diferentes dos mesmos efeitos.
+
+Se elas geram o mesmo espaço coluna,
+
+$$
+\mathcal C(\mathbf Z_1)
+=
+\mathcal C(\mathbf Z_2),
+$$ {#eq-mesmo-espaco-parametrizacoes-conjunta}
+
+então representam o mesmo conjunto de vetores de utilidades sistemáticas possíveis.
+
+Os vetores de coeficientes
+
+$$
+\boldsymbol{\beta}_1
+$$
+
+e
+
+$$
+\boldsymbol{\beta}_2
+$$
+
+podem ser numericamente diferentes, mas um mesmo vetor ajustado pode ser escrito como
+
+$$
+\mathbf V
+=
+\mathbf Z_1
+\boldsymbol{\beta}_1
+=
+\mathbf Z_2
+\boldsymbol{\beta}_2.
+$$ {#eq-utilidades-invariantes-parametrizacao}
+
+Esse resultado é a aplicação, à Análise Conjunta, da propriedade desenvolvida no Módulo II segundo a qual o espaço do modelo e os valores ajustados dependem de
+
+$$
+\mathcal C(\mathbf Z),
+$$
+
+e não de uma base particular utilizada para representá-lo.
+
+Consequentemente, não se deve comparar diretamente coeficientes provenientes de codificações diferentes sem antes considerar o significado atribuído a cada parâmetro.
+
+O objeto substantivo de interesse está nas preferências representadas pelo modelo e nos contrastes entre níveis e perfis que permanecem definidos independentemente da parametrização.
+
+## Diferenças de utilidade e funções estimáveis
+
+Considere dois perfis com vetores de delineamento
+
+$$
+\mathbf z_i
+$$
+
+e
+
+$$
+\mathbf z_h.
+$$
+
+A diferença entre suas utilidades sistemáticas é
+
+$$
+\begin{aligned}
+V_i-V_h
+&=
+\mathbf z_i^\top
+\boldsymbol{\beta}
+-
+\mathbf z_h^\top
+\boldsymbol{\beta}
+\\
+&=
+\left(
+\mathbf z_i-\mathbf z_h
+\right)^\top
+\boldsymbol{\beta}.
+\end{aligned}
+$$ {#eq-contraste-perfis-conjunta}
+
+Essa diferença é uma função linear dos parâmetros.
+
+Mesmo quando uma parametrização redundante impede a identificação de cada coeficiente individual, uma diferença como @eq-contraste-perfis-conjunta pode permanecer unicamente determinada pelo espaço do modelo.
+
+A definição em @def-funcao-estimavel-modelo-multivariado e a caracterização em @thm-caracterizacao-estimabilidade-modelo-multivariado mostram que, em delineamentos de posto deficiente, a interpretação deve ser formulada em termos das funções dos parâmetros que permanecem determinadas pelo espaço linha de $\mathbf Z$.
+
+Na Análise Conjunta, exemplos naturais são diferenças entre utilidades de níveis, diferenças entre utilidades de perfis e outros contrastes identificados pelo delineamento. As utilidades ajustadas dos perfis observados permanecem unicamente determinadas; para um novo perfil, sua utilidade sistemática é estimável quando o vetor de codificação correspondente pertence ao espaço linha de $\mathbf Z$.
+
+Considere, por exemplo, dois níveis $a$ e $b$ do atributo $j$. O contraste
+
+$$
+u_j(a)-u_j(b)
+$$
+
+possui significado de preferência independente da escolha de uma origem arbitrária para as utilidades desse atributo, desde que o contraste seja estimável no delineamento adotado.
+
+Essa propriedade esclarece por que o valor absoluto de uma utilidade parcial não deve ser interpretado isoladamente.
+
+O que permanece substantivamente interpretável são comparações compatíveis com a parametrização e identificadas pela estrutura do delineamento.
+
+## Um exemplo de equivalência entre codificações
+
+Considere novamente o atributo $A$ com três níveis.
+
+Suponha que, sob uma codificação por efeitos, as utilidades parciais sejam
+
+$$
+u_A(A_1)=2,
+$$
+
+$$
+u_A(A_2)=-0,5
+$$
+
+e
+
+$$
+u_A(A_3)=-1,5.
+$$
+
+A restrição
+
+$$
+2-0,5-1,5=0
+$$
+
+é satisfeita.
+
+As diferenças entre os níveis são
+
+$$
+u_A(A_2)-u_A(A_1)
+=
+-2,5,
+$$
+
+e
+
+$$
+u_A(A_3)-u_A(A_1)
+=
+-3,5.
+$$
+
+Se $A_1$ for escolhido como categoria de referência, os coeficientes correspondentes serão
+
+$$
+\beta_{A2}^{(\mathrm{ref})}
+=
+-2,5
+$$
+
+e
+
+$$
+\beta_{A3}^{(\mathrm{ref})}
+=
+-3,5.
+$$
+
+Os números mudaram porque o significado dos parâmetros mudou.
+
+Entretanto, a ordenação das contribuições associadas aos níveis permanece:
+
+$$
+u_A(A_1)
+>
+u_A(A_2)
+>
+u_A(A_3).
+$$
+
+Mais precisamente, os contrastes de utilidade entre os níveis são os mesmos nas duas representações.
+
+Esse exemplo ilustra a diferença entre:
+
+- **parâmetro da codificação**, cujo valor depende da base escolhida;
+- **contraste estimável de preferência**, que pode permanecer invariável entre parametrizações equivalentes.
+
+## Posto e complexidade do modelo
+
+A identificação também depende de a matriz de delineamento conter informação suficiente para separar todos os efeitos incluídos no modelo.
+
+No modelo aditivo sem interações, o número de parâmetros independentes é dado por @eq-numero-parametros-aditivo-conjunta.
+
+Se forem incluídas interações entre dois atributos $A_j$ e $A_h$, com respectivamente $L_j$ e $L_h$ níveis, essa interação acrescenta
+
+$$
+(L_j-1)(L_h-1)
+$$ {#eq-parametros-interacao-conjunta}
+
+graus de liberdade ao modelo quando utilizada uma parametrização identificada.
+
+Assim, ampliar a estrutura de utilidade de
+
+$$
+V_i
+=
+\beta_0
++
+\sum_j
+u_j(x_{ij})
+$$
+
+para
+
+$$
+V_i
+=
+\beta_0
++
+\sum_j
+u_j(x_{ij})
++
+\sum_{j<h}
+u_{jh}(x_{ij},x_{ih})
+$$
+
+aumenta as exigências impostas ao delineamento.
+
+Não basta acrescentar colunas à matriz $\mathbf Z$. É necessário que as combinações de perfis observadas permitam separar os novos efeitos.
+
+Essa relação prepara a próxima etapa da formulação: a construção dos perfis não determina apenas quais alternativas serão avaliadas; ela determina o **espaço de efeitos que poderá ser estimado**.
+
+## Do modelo identificado ao delineamento dos perfis
+
+A matriz
+
+$$
+\mathbf Z
+$$
+
+é determinada por duas decisões distintas:
+
+1. quais efeitos serão incluídos na estrutura de utilidade;
+2. quais perfis serão efetivamente apresentados.
+
+A primeira decisão determina as colunas necessárias.
+
+A segunda determina as linhas disponíveis para identificar essas colunas.
+
+Um delineamento adequado precisa, portanto, produzir uma matriz com posto suficiente para os efeitos que se pretende estimar.
+
+No caso mais simples, todos os perfis do produto cartesiano
+
+$$
+\mathcal L_1
+\times
+\cdots
+\times
+\mathcal L_m
+$$
+
+são utilizados. Esse é o **delineamento fatorial completo**.
+
+Quando o número de combinações é grande, pode-se utilizar apenas parte dos perfis. Surge então o **delineamento fracionário**, cuja construção precisa preservar a estimabilidade dos efeitos considerados no modelo.
+
+A próxima seção examina essa relação entre número de perfis, posto, ortogonalidade e capacidade de separar utilidades parciais.
+
+## Delineamento dos perfis
+
+A matriz de delineamento depende dos perfis que são apresentados. Assim, o planejamento dos perfis e a identificação dos parâmetros são partes do mesmo problema.
+
+Se o atributo $j$ possui $L_j$ níveis, o conjunto de todos os perfis possíveis contém
+
+$$
+N_{\mathrm{perf}}
+=
+\prod_{j=1}^{m}
+L_j
+$$
+
+combinações, conforme @eq-numero-perfis-completo-conjunta.
+
+### Delineamento fatorial completo
+
+No **delineamento fatorial completo**, todas as combinações possíveis dos níveis dos atributos são utilizadas.
+
+Considere, por exemplo, três atributos com
+
+$$
+L_1=2,
+\qquad
+L_2=3
+\qquad\text{e}\qquad
+L_3=2.
+$$
+
+O número de perfis é
+
+$$
+N_{\mathrm{perf}}
+=
+2\times3\times2
+=
+12.
+$$
+
+O delineamento completo contém informação sobre todas as combinações dos níveis. Para um modelo aditivo adequadamente parametrizado, essa estrutura permite separar os efeitos principais dos atributos. Também permite representar interações desde que o modelo e a parametrização sejam compatíveis com os graus de liberdade disponíveis.
+
+Entretanto, o número de perfis cresce multiplicativamente. Com muitos atributos ou muitos níveis, apresentar todas as combinações pode produzir uma tarefa excessivamente extensa.
+
+### Delineamento fracionário
+
+No **delineamento fracionário**, utiliza-se apenas um subconjunto dos perfis possíveis.
+
+Se
+
+$$
+\mathcal P
+=
+\mathcal L_1
+\times
+\cdots
+\times
+\mathcal L_m
+$$
+
+é o conjunto completo, escolhe-se
+
+$$
+\mathcal P_F
+\subset
+\mathcal P.
+$$
+
+O objetivo é reduzir o número de alternativas apresentadas preservando informação suficiente para os efeitos incluídos no modelo.
+
+A redução do número de perfis possui uma consequência matemática direta: são removidas linhas da matriz de delineamento. Por isso, a escolha do subconjunto não pode ser analisada separadamente do posto de
+
+$$
+\mathbf Z.
+$$
+
+Um delineamento fracionário é compatível com determinado modelo somente quando os efeitos de interesse permanecem estimáveis.
+
+Por exemplo, um conjunto de perfis pode permitir estimar todos os efeitos principais e, ao mesmo tempo, não permitir separar determinadas interações. A possibilidade de estimar um efeito depende da relação entre as colunas de $\mathbf Z$ produzida pelos perfis escolhidos.
+
+### Ortogonalidade
+
+Uma situação particularmente simples ocorre quando as colunas que representam diferentes efeitos são ortogonais.
+
+Para duas colunas centralizadas,
+
+$$
+\mathbf z_h
+\qquad\text{e}\qquad
+\mathbf z_k,
+$$
+
+a ortogonalidade corresponde a
+
+$$
+\mathbf z_h^\top
+\mathbf z_k
+=
+0.
+$$ {#eq-ortogonalidade-delineamento-conjunta}
+
+Nesse caso, a informação utilizada para estimar um efeito não apresenta associação linear com a coluna utilizada para representar o outro efeito.
+
+A ortogonalidade facilita a separação das contribuições dos atributos e simplifica a estrutura de
+
+$$
+\mathbf Z^\top\mathbf Z.
+$$
+
+Ela também evidencia a ligação entre Análise Conjunta e delineamento experimental: os perfis são construídos para produzir informação sobre efeitos definidos previamente.
+
+Ortogonalidade, porém, não substitui identificação. Um delineamento precisa possuir posto suficiente para os parâmetros ou funções que se pretende estimar.
+
+### Balanceamento
+
+Outra propriedade útil é o balanceamento dos níveis.
+
+Um atributo está balanceado quando seus níveis aparecem com frequências iguais ou aproximadamente iguais no conjunto de perfis.
+
+Em um delineamento completo, o balanceamento ocorre naturalmente quando todas as combinações são utilizadas. Em delineamentos fracionários, ele depende da seleção realizada.
+
+Balanceamento e ortogonalidade são propriedades relacionadas à distribuição da informação na matriz de delineamento. A construção de delineamentos ótimos ou algoritmos específicos para selecionar perfis pertence à etapa metodológica posterior.
+
+## Estimação das utilidades
+
+Considere inicialmente uma resposta quantitativa,
+
+$$
+\mathbf y
+=
+\begin{pmatrix}
+y_1\\
+\vdots\\
+y_N
+\end{pmatrix},
+$$
+
+e o modelo
+
+$$
+\mathbf y
+=
+\mathbf Z
+\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon}.
+$$
+
+Quando
+
+$$
+\operatorname{posto}(\mathbf Z)=d,
+$$
+
+o resultado de @thm-estimador-minimos-quadrados-multivariado, aplicado ao caso de uma única resposta, fornece
+
+$$
+\widehat{\boldsymbol{\beta}}
+=
+\left(
+\mathbf Z^\top
+\mathbf Z
+\right)^{-1}
+\mathbf Z^\top
+\mathbf y.
+$$ {#eq-estimador-utilidades-conjunta}
+
+A Análise Conjunta utiliza, portanto, a teoria de mínimos quadrados já desenvolvida no Módulo II. O conteúdo específico da técnica está na construção da matriz de delineamento a partir dos perfis e na interpretação dos parâmetros como utilidades parciais ou contrastes de preferência.
+
+Os valores ajustados são
+
+$$
+\widehat{\mathbf V}
+=
+\mathbf Z
+\widehat{\boldsymbol{\beta}},
+$$ {#eq-utilidades-ajustadas-conjunta}
+
+e o valor ajustado para o perfil $i$ é
+
+$$
+\widehat V_i
+=
+\mathbf z_i^\top
+\widehat{\boldsymbol{\beta}}.
+$$ {#eq-utilidade-ajustada-perfil}
+
+Dependendo da parametrização, os elementos de
+
+$$
+\widehat{\boldsymbol{\beta}}
+$$
+
+representam diretamente utilidades parciais ou contrastes entre níveis.
+
+### Utilidade estimada de um perfil
+
+Considere um modelo aditivo com três atributos,
+
+$$
+A,
+\qquad
+B
+\qquad\text{e}\qquad
+C.
+$$
+
+Para um perfil
+
+$$
+(A=a,\;B=b,\;C=c),
+$$
+
+a utilidade sistemática estimada é
+
+$$
+\widehat V(a,b,c)
+=
+\widehat\beta_0
++
+\widehat u_A(a)
++
+\widehat u_B(b)
++
+\widehat u_C(c).
+$$ {#eq-utilidade-perfil-tres-atributos}
+
+A @fig-decomposicao-utilidade-conjunta representa essa composição em um exemplo numérico. Cada parcela corresponde à contribuição associada a um elemento da parametrização, e sua soma determina a utilidade estimada do perfil.
+
+```{r}
+#| label: fig-decomposicao-utilidade-conjunta
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Decomposição da utilidade sistemática de um perfil em uma constante e utilidades parciais associadas aos níveis dos atributos. A soma das contribuições determina a utilidade total estimada."
+#| fig-width: 9
+#| fig-height: 5
+#| fig-align: center
+
+library(ggplot2)
+
+contribuicoes <- data.frame(
+  componente = factor(
+    c(
+      "Constante",
+      "Atributo A",
+      "Atributo B",
+      "Atributo C"
+    ),
+    levels = c(
+      "Constante",
+      "Atributo A",
+      "Atributo B",
+      "Atributo C"
+    )
+  ),
+  utilidade = c(
+    4.0,
+    1.5,
+    -0.8,
+    2.0
+  )
+)
+
+utilidade_total <- sum(
+  contribuicoes$utilidade
+)
+
+ggplot(
+  contribuicoes,
+  aes(
+    x = componente,
+    y = utilidade
+  )
+) +
+  geom_col(
+    width = 0.65
+  ) +
+  geom_hline(
+    yintercept = 0,
+    linewidth = 0.5
+  ) +
+  annotate(
+    "text",
+    x = 2.5,
+    y = max(
+      contribuicoes$utilidade
+    ) + 0.7,
+    label = paste0(
+      "Utilidade total = ",
+      formatC(
+        utilidade_total,
+        format = "f",
+        digits = 1,
+        decimal.mark = ","
+      )
+    )
+  ) +
+  labs(
+    x = NULL,
+    y = "Contribuição para a utilidade"
+  ) +
+  theme_minimal(
+    base_size = 12
+  )
+```
+
+A figura evidencia a propriedade compensatória da formulação aditiva. O atributo $B$ reduz a utilidade do perfil no exemplo, enquanto os demais componentes produzem contribuições positivas. A preferência global é determinada pela soma dessas parcelas.
+
+A decomposição também mostra por que uma utilidade parcial deve ser interpretada dentro da parametrização adotada. Alterar a origem das utilidades pode modificar parcelas individuais sem alterar as diferenças entre perfis representadas pelo modelo.
+
+## Interpretação das preferências
+
+A estimação fornece utilidades associadas aos níveis. A interpretação procura converter essas estimativas em comparações entre alternativas e atributos.
+
+### Comparação entre níveis
+
+Para dois níveis $a$ e $b$ de um mesmo atributo,
+
+$$
+\widehat u_j(a)
+-
+\widehat u_j(b)
+$$
+
+quantifica a diferença estimada de contribuição entre eles.
+
+Se
+
+$$
+\widehat u_j(a)
+>
+\widehat u_j(b),
+$$
+
+o nível $a$ contribui mais para a utilidade sistemática do que $b$, mantida a estrutura especificada pelo modelo.
+
+Em um modelo aditivo, essa diferença independe dos níveis assumidos pelos demais atributos. Quando existem interações, essa interpretação precisa incluir os termos correspondentes.
+
+### Amplitude das utilidades de um atributo
+
+Na formulação aditiva sem interações, uma medida resumida da variação das contribuições dentro do atributo $j$ é
+
+$$
+R_j
+=
+\max_{\ell}
+u_j(\ell)
+-
+\min_{\ell}
+u_j(\ell).
+$$ {#eq-amplitude-utilidades-conjunta}
+
+Essa amplitude mede quanto a utilidade sistemática pode variar em razão dos níveis daquele atributo incluídos no estudo, mantendo a estrutura aditiva especificada.
+
+Se
+
+$$
+\sum_{h=1}^{m}R_h
+>
+0,
+$$
+
+a comparação entre atributos pode ser padronizada por
+
+$$
+I_j
+=
+\frac{
+R_j
+}{
+\displaystyle
+\sum_{h=1}^{m}
+R_h
+}.
+$$ {#eq-importancia-relativa-conjunta}
+
+Nesse caso,
+
+$$
+0
+\leq
+I_j
+\leq
+1
+$$
+
+e
+
+$$
+\sum_{j=1}^{m}
+I_j
+=
+1.
+$$
+
+::: {#def-importancia-relativa-conjunta}
+## Importância relativa de um atributo
+
+No modelo aditivo, suponha
+
+$$
+\sum_{h=1}^{m}R_h>0.
+$$
+
+A **importância relativa** do atributo $j$ é a proporção da amplitude total das utilidades parciais atribuída aos níveis desse atributo:
+
+$$
+I_j
+=
+\frac{
+\max_\ell u_j(\ell)-\min_\ell u_j(\ell)
+}{
+\displaystyle
+\sum_{h=1}^{m}
+\left[
+\max_\ell u_h(\ell)-\min_\ell u_h(\ell)
+\right]
+}.
+$$
+:::
+
+Se
+
+$$
+R_1
+=
+\cdots
+=
+R_m
+=
+0,
+$$
+
+não existe variação de utilidade entre os níveis considerados e a importância relativa definida por @eq-importancia-relativa-conjunta não está determinada.
+
+A importância relativa também depende dos níveis incluídos. Se um atributo é observado apenas em uma faixa estreita de valores, sua amplitude de utilidade pode ser pequena. Ampliar o intervalo entre seus níveis pode aumentar
+
+$$
+R_j
+$$
+
+sem que tenha ocorrido mudança na estrutura de preferências da população.
+
+Por isso, $I_j$ descreve a participação relativa do atributo **dentro do conjunto específico de níveis considerado no estudo**.
+
+Quando o modelo inclui interações, a contribuição de um atributo pode depender dos níveis dos demais. Nesse caso, a amplitude baseada somente em suas utilidades parciais principais não resume toda a contribuição do atributo, e a interpretação da importância exige considerar a estrutura de interações.
+
+## Preferências individuais e agregadas
+
+Até aqui, o modelo foi escrito para um único vetor de parâmetros
+
+$$
+\boldsymbol{\beta}.
+$$
+
+Essa representação pode corresponder a um participante individual ou a uma estrutura comum assumida para um conjunto de participantes.
+
+### Modelo individual
+
+Para o participante $r$, pode-se escrever
+
+$$
+\mathbf y_r
+=
+\mathbf Z_r
+\boldsymbol{\beta}_r
++
+\boldsymbol{\varepsilon}_r,
+$$ {#eq-modelo-individual-conjunta}
+
+em que
+
+$$
+\boldsymbol{\beta}_r
+$$
+
+representa suas utilidades ou contrastes de preferência.
+
+Participantes diferentes podem possuir
+
+$$
+\boldsymbol{\beta}_r
+\neq
+\boldsymbol{\beta}_{r'}.
+$$
+
+A heterogeneidade pode ocorrer tanto na intensidade quanto na direção das preferências.
+
+### Modelo agregado
+
+Uma formulação agregada assume um vetor comum,
+
+$$
+\boldsymbol{\beta},
+$$
+
+para representar a estrutura média ou compartilhada de preferência.
+
+Essa simplificação pode ser apropriada quando o objetivo é descrever um padrão agregado, mas pode ocultar diferenças entre indivíduos.
+
+Por exemplo, uma utilidade média próxima de zero para determinado nível pode resultar de:
+
+- baixa preferência em todos os participantes;
+- forte preferência positiva em parte deles e forte preferência negativa em outra parte.
+
+Essas situações possuem interpretações diferentes, embora possam produzir a mesma média agregada.
+
+Modelos com efeitos aleatórios, classes latentes ou outras estruturas para heterogeneidade constituem extensões da formulação básica e não serão desenvolvidos neste capítulo.
+
+## Diferentes formas de resposta
+
+A estrutura de perfis e utilidades pode ser utilizada com diferentes tipos de resposta.
+
+O tipo de resposta determina qual modelo estatístico conecta a preferência observada à utilidade.
+
+A @tbl-formas-resposta-conjunta resume as principais situações.
+
+| Resposta observada | Informação fornecida | Estrutura estatística compatível |
+|---|---|---|
+| avaliação quantitativa | intensidade da avaliação | modelo linear |
+| categoria ordinal | posição em uma escala ordenada | modelo ordinal |
+| ordenação de perfis | ordem relativa das alternativas | modelo para postos ou ordenações |
+| comparação pareada | preferência entre duas alternativas | modelo probabilístico de comparação |
+| escolha | alternativa selecionada em um conjunto | modelo de utilidade aleatória |
+
+: Formas de resposta na Análise Conjunta. {#tbl-formas-resposta-conjunta}
+
+A matriz de atributos descreve os mesmos tipos de perfis, mas o mecanismo que liga utilidade e observação muda.
+
+### Avaliação quantitativa
+
+Quando a resposta é uma escala quantitativa tratada como métrica, a formulação linear é
+
+$$
+Y_i
+=
+\mathbf z_i^\top
+\boldsymbol{\beta}
++
+\varepsilon_i.
+$$
+
+Aqui, as diferenças numéricas da escala observada participam diretamente da estimação.
+
+### Resposta ordinal
+
+Em uma resposta ordinal, as categorias possuem ordem, mas suas distâncias não precisam possuir interpretação métrica.
+
+Nesse caso, a informação
+
+$$
+Y_i>Y_h
+$$
+
+indica uma ordem entre respostas, mas não autoriza concluir que a diferença numérica entre categorias represente a mesma diferença de utilidade em toda a escala.
+
+A formulação probabilística precisa respeitar essa estrutura ordinal.
+
+### Ordenação
+
+Quando vários perfis são ordenados, observa-se informação do tipo
+
+$$
+\mathbf x_{i_1}
+\succ
+\mathbf x_{i_2}
+\succ
+\cdots
+\succ
+\mathbf x_{i_K}.
+$$
+
+A resposta fornece a posição relativa das alternativas, e não uma medida métrica direta da distância entre suas preferências.
+
+### Comparação pareada
+
+Na comparação entre dois perfis,
+
+$$
+i
+\qquad\text{e}\qquad
+h,
+$$
+
+observa-se qual alternativa é preferida.
+
+A resposta está associada à diferença
+
+$$
+V_i-V_h.
+$$
+
+Uma formulação probabilística acrescenta termos aleatórios às utilidades e relaciona a probabilidade de preferência a essa diferença.
+
+### Escolha
+
+Em uma tarefa de escolha, uma alternativa é selecionada entre várias disponíveis.
+
+A utilidade deixa de ser observada diretamente. O que se observa é a decisão resultante da comparação entre utilidades latentes.
+
+Essa situação conduz aos modelos de utilidade aleatória.
+
+## Utilidade aleatória
+
+Para o participante $r$ e a alternativa $i$, escreva
+
+$$
+\mathsf U_{ir}
+=
+V_{ir}
++
+\varepsilon_{ir},
+$$ {#eq-utilidade-aleatoria-conjunta}
+
+em que
+
+$$
+V_{ir}
+=
+\mathbf z_{ir}^\top
+\boldsymbol{\beta}
+$$ {#eq-utilidade-sistematica-escolha-conjunta}
+
+é a parcela sistemática e
+
+$$
+\varepsilon_{ir}
+$$
+
+é uma parcela aleatória não observada.
+
+A alternativa $i$ é escolhida quando sua utilidade supera a das demais alternativas disponíveis:
+
+$$
+\mathsf U_{ir}
+>
+\mathsf U_{hr}
+$$
+
+para todos os concorrentes $h$.
+
+Assim,
+
+$$
+P(i\text{ escolhido})
+=
+P
+\left(
+V_{ir}+\varepsilon_{ir}
+>
+V_{hr}+\varepsilon_{hr},
+\;
+\forall h\neq i
+\right).
+$$ {#eq-probabilidade-escolha-conjunta}
+
+A distribuição atribuída aos termos aleatórios determina a forma específica das probabilidades de escolha.
+
+O objetivo neste capítulo é apenas estabelecer a ponte estrutural:
+
+- os atributos e níveis formam $\mathbf z_{ir}$;
+- os parâmetros determinam a utilidade sistemática;
+- a escolha fornece informação indireta sobre as diferenças de utilidade.
+
+Modelos específicos de escolha, suas funções de probabilidade e procedimentos de estimação pertencem ao desenvolvimento metodológico posterior [@green1990conjoint].
+
+## Natureza relativa da utilidade
+
+A interpretação da utilidade depende do tipo de resposta.
+
+Em preferências puramente ordinais, uma transformação estritamente crescente preserva a ordenação das alternativas.
+
+Se
+
+$$
+U_i>U_h
+$$
+
+e
+
+$$
+g
+$$
+
+é estritamente crescente, então
+
+$$
+g(U_i)>g(U_h).
+$$
+
+Entretanto, a formulação aditiva e os modelos probabilísticos utilizam estruturas numéricas mais específicas. Nesses casos, não se pode aplicar arbitrariamente qualquer transformação monotônica aos parâmetros e esperar preservar o mesmo modelo.
+
+No modelo linear para avaliações quantitativas, localização e escala estão vinculadas à escala da resposta.
+
+Nos modelos de escolha, apenas diferenças de utilidade determinam comparações entre alternativas, e restrições de localização e escala são necessárias para identificar uma parametrização probabilística.
+
+Assim, a afirmação de que “a utilidade é relativa” precisa ser interpretada segundo a forma de resposta e o modelo utilizado.
+
+## Pressupostos e limites
+
+A Análise Conjunta reúne pressupostos sobre a representação dos perfis, a estrutura da utilidade, o delineamento e o mecanismo probabilístico associado à resposta.
+
+### Definição adequada dos atributos
+
+Os perfis precisam ser descritos por atributos e níveis capazes de representar as diferenças relevantes entre as alternativas consideradas.
+
+Se uma característica importante para a preferência não está representada, sua contribuição não pode ser separada pelas utilidades estimadas dos atributos incluídos.
+
+### Aditividade
+
+No modelo aditivo,
+
+$$
+V_i
+=
+\beta_0
++
+\sum_{j=1}^{m}
+u_j(x_{ij}),
+$$
+
+o efeito de um atributo não depende dos níveis dos demais.
+
+Essa é uma hipótese estrutural da formulação.
+
+Quando existem interações relevantes, o modelo aditivo pode representar inadequadamente a forma como as características são combinadas na preferência.
+
+### Compensação
+
+A soma das utilidades parciais admite compensação entre atributos.
+
+Essa estrutura pode ser inadequada quando determinados níveis funcionam como requisitos absolutos, limites ou restrições não compensatórias.
+
+### Identificação
+
+A parametrização precisa impor restrições suficientes para eliminar redundâncias entre intercepto e indicadores de níveis.
+
+Além disso, os perfis observados precisam produzir uma matriz de delineamento com posto suficiente para os efeitos de interesse.
+
+### Compatibilidade entre resposta e modelo
+
+A formulação probabilística deve ser compatível com a escala da resposta.
+
+Uma avaliação métrica, uma ordenação e uma escolha fornecem informações diferentes sobre a preferência e não devem ser tratadas como se fossem observações do mesmo tipo.
+
+### Independência e estrutura dos erros
+
+Na formulação linear mais simples, os erros precisam possuir estrutura compatível com o modelo linear adotado.
+
+Quando várias avaliações pertencem ao mesmo participante, pode existir dependência entre respostas da mesma pessoa. A independência entre todas as observações não deve ser assumida automaticamente quando o delineamento produz medidas repetidas por participante.
+
+Modelos que representem explicitamente essa dependência pertencem às extensões metodológicas.
+
+### Delineamento e estimabilidade
+
+Um número reduzido de perfis pode diminuir a carga da tarefa, mas também reduz a informação disponível.
+
+A seleção dos perfis precisa preservar os efeitos que serão interpretados.
+
+Adicionar interações ou outras estruturas sem ampliar adequadamente o delineamento pode produzir parâmetros não identificados ou efeitos confundidos.
+
+### Generalização
+
+As utilidades estimadas descrevem preferências relativas aos:
+
+- atributos selecionados;
+- níveis utilizados;
+- perfis apresentados;
+- participantes observados;
+- mecanismo de resposta adotado.
+
+Alterar esses elementos modifica o problema estatístico. Por isso, utilidades e importâncias relativas não devem ser tratadas como características absolutas e independentes do delineamento.
+
+## Relações com outras formulações estatísticas
+
+### Modelo linear
+
+A relação mais direta é com o modelo linear.
+
+Para avaliações quantitativas,
+
+$$
+\mathbf y
+=
+\mathbf Z
+\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon}.
+$$
+
+A matriz de delineamento representa os atributos e seus níveis, e os elementos de
+
+$$
+\boldsymbol{\beta}
+$$
+
+recebem interpretação de utilidades parciais ou contrastes.
+
+A teoria de posto, projeções, mínimos quadrados e funções estimáveis já desenvolvida no Módulo II aplica-se diretamente.
+
+A Análise Conjunta acrescenta ao modelo linear uma estrutura substantiva específica: as linhas de $\mathbf Z$ são **alternativas** e seus parâmetros descrevem **preferências associadas às características dessas alternativas**.
+
+### Delineamento experimental
+
+A matriz $\mathbf Z$ também estabelece uma ligação direta com o delineamento experimental.
+
+Os atributos desempenham papel semelhante ao de fatores, os níveis definem condições e os perfis correspondem a combinações dessas condições.
+
+O delineamento controla quais efeitos podem ser separados.
+
+A diferença está no objetivo: na Análise Conjunta, o interesse está em decompor preferências ou escolhas relacionadas a alternativas.
+
+### Modelos de escolha
+
+Quando a resposta observada é uma escolha, a formulação linear direta deixa de ser suficiente.
+
+A estrutura
+
+$$
+\mathsf U_{ir}
+=
+\mathbf z_{ir}^\top
+\boldsymbol{\beta}
++
+\varepsilon_{ir}
+$$
+
+transforma os mesmos atributos e parâmetros de utilidade em uma variável latente.
+
+A distribuição dos erros converte diferenças de utilidade sistemática em probabilidades de escolha.
+
+Assim, Análise Conjunta e modelos de escolha compartilham:
+
+- representação das alternativas por atributos;
+- parâmetros de utilidade;
+- comparação entre alternativas.
+
+O mecanismo de observação da resposta determina a formulação probabilística específica.
+
+## Síntese da Análise Conjunta
+
+A Análise Conjunta parte de alternativas descritas por atributos e níveis.
+
+Um perfil é representado por
+
+$$
+\mathbf x_i
+=
+(x_{i1},\ldots,x_{im})^\top,
+$$
+
+e sua preferência é representada por uma utilidade.
+
+Na formulação aditiva,
+
+$$
+V_i
+=
+\beta_0
++
+\sum_{j=1}^{m}
+u_j(x_{ij}).
+$$
+
+As funções
+
+$$
+u_j(\cdot)
+$$
+
+representam utilidades parciais associadas aos níveis.
+
+Depois da codificação dos atributos, a formulação torna-se
+
+$$
+\mathbf V
+=
+\mathbf Z
+\boldsymbol{\beta}.
+$$
+
+Para avaliações quantitativas,
+
+$$
+\mathbf y
+=
+\mathbf Z
+\boldsymbol{\beta}
++
+\boldsymbol{\varepsilon}.
+$$
+
+A matriz de delineamento conecta três elementos:
+
+- os perfis apresentados;
+- a parametrização das utilidades;
+- os efeitos que podem ser estimados.
+
+Uma parametrização redundante produz perda de posto e não identificação dos coeficientes individuais. Categoria de referência e codificação por efeitos fornecem representações identificadas dos mesmos graus de liberdade.
+
+Parametrizações diferentes podem produzir coeficientes distintos e, ao mesmo tempo, representar o mesmo espaço de utilidades ajustadas. Por isso, contrastes entre níveis e diferenças entre perfis constituem objetos particularmente relevantes para interpretação.
+
+O delineamento completo utiliza todas as combinações dos níveis. Delineamentos fracionários reduzem o número de perfis, mas precisam preservar a estimabilidade dos efeitos pretendidos.
+
+As amplitudes
+
+$$
+R_j
+=
+\max_\ell u_j(\ell)
+-
+\min_\ell u_j(\ell)
+$$
+
+permitem construir medidas de importância relativa dos atributos,
+
+$$
+I_j
+=
+\frac{R_j}
+{\sum_h R_h},
+$$
+
+que devem ser interpretadas relativamente aos níveis incluídos.
+
+A forma de resposta determina o modelo estatístico. Avaliações quantitativas permitem uma formulação linear direta; respostas ordinais, ordenações, comparações e escolhas requerem modelos compatíveis com a informação efetivamente observada.
+
+Nos modelos de escolha,
+
+$$
+\mathsf U_{ir}
+=
+V_{ir}
++
+\varepsilon_{ir}
+$$
+
+introduz uma utilidade latente cuja parcela sistemática continua sendo construída a partir dos atributos.
+
+A Análise Conjunta reúne, portanto, conceitos desenvolvidos anteriormente no livro — modelo linear, matriz de delineamento, posto, funções estimáveis e delineamentos fatoriais — para resolver um problema específico: **decompor preferências globais em contribuições associadas às características das alternativas**.
+
+## Síntese do Módulo 3
+
+O Módulo 3 apresentou a formulação matemática e estatística das principais técnicas multivariadas a partir dos fundamentos construídos nos módulos anteriores.
+
+As técnicas diferem quanto ao problema estatístico, ao objeto de entrada e ao critério utilizado, mas compartilham um conjunto relativamente pequeno de estruturas matemáticas.
+
+Na Análise de Componentes Principais, o problema de redução dimensional conduziu à maximização da variância, à decomposição espectral e à aproximação de posto reduzido.
+
+Na Análise Fatorial, a covariância observada foi representada por uma estrutura de fatores comuns e variâncias específicas.
+
+Na Análise de Agrupamentos, distâncias e dispersões foram utilizadas para formalizar o problema de construir grupos sem rótulos previamente conhecidos.
+
+No Escalonamento Multidimensional, dissimilaridades foram convertidas em uma representação geométrica por meio de distâncias, produtos internos e decomposição espectral.
+
+Na Análise de Correspondência, uma tabela de contingência foi transformada em perfis e resíduos padronizados para construir uma representação geométrica das associações entre categorias.
+
+Na MANOVA, o modelo linear multivariado produziu matrizes de hipótese e erro, cujas raízes características permitiram comparar vetores de médias.
+
+Na Análise Discriminante, as mesmas estruturas de dispersão foram utilizadas para construir direções de separação e, sob modelos probabilísticos, regras de classificação.
+
+Na Correlação Canônica, dois blocos de variáveis foram branqueados e relacionados por uma SVD que produziu pares de combinações com associação máxima.
+
+Na Análise Conjunta, a matriz de delineamento e o modelo de utilidade permitiram decompor preferências em contribuições associadas aos atributos e níveis.
+
+Esses capítulos mostram que compreender uma técnica multivariada exige reconhecer quatro elementos:
+
+1. **o problema estatístico** que se deseja resolver;
+2. **o objeto matemático** em que os dados são representados;
+3. **o modelo, critério ou decomposição** que define a solução;
+4. **o significado estatístico e geométrico** atribuído ao resultado.
+
+A @tbl-sintese-modulo3 reúne essas relações.
+
+| Técnica | Problema estatístico | Objeto principal | Estrutura da solução |
+|---|---|---|---|
+| ACP | reduzir dimensão preservando variabilidade | matriz de covariâncias/correlações ou dados | autovalores e SVD |
+| Análise Fatorial | representar dependência por fatores latentes | matriz de covariâncias/correlações | modelo de covariâncias |
+| Agrupamentos | formar grupos sem rótulos prévios | dados ou dissimilaridades | distâncias e critérios de dispersão |
+| MDS | representar dissimilaridades geometricamente | matriz de dissimilaridades | matriz de Gram e decomposição espectral |
+| Correspondência | representar associação entre categorias | tabela de contingência | perfis, resíduos padronizados e SVD |
+| MANOVA | comparar vetores de médias | respostas e delineamento | matrizes $\mathbf H$ e $\mathbf E$ e raízes características |
+| Discriminante | separar grupos e classificar | dados com grupos conhecidos | Fisher ou regras probabilísticas |
+| Correlação Canônica | associar dois blocos de variáveis | covariâncias em blocos | branqueamento e SVD |
+| Análise Conjunta | decompor preferências | perfis e respostas de preferência | matriz de delineamento e modelo de utilidade |
+
+: Problemas, objetos e estruturas matemáticas das técnicas apresentadas no Módulo 3. {#tbl-sintese-modulo3}
+
+A recorrência de autovalores, SVD, projeções, distâncias, covariâncias, matrizes de delineamento e modelos probabilísticos não significa que as técnicas resolvam o mesmo problema. O significado de cada estrutura é determinado pela pergunta estatística que deu origem à formulação.
+
+O papel dos fundamentos dos Módulos I e II é justamente permitir reconhecer essa recorrência. Uma vez estabelecidos os resultados gerais sobre espaços vetoriais, transformações, decomposições matriciais, covariâncias, distribuições multivariadas, estimação e modelos lineares, cada técnica pode ser compreendida como uma forma específica de combinar esses elementos.
+
+O Módulo 3 encerra, assim, a formulação das técnicas. Os procedimentos de estimação específicos, decisões operacionais, diagnósticos, validação, implementação computacional e interpretação de estudos aplicados podem ser desenvolvidos posteriormente sem perder de vista a estrutura matemática e estatística que sustenta cada método.

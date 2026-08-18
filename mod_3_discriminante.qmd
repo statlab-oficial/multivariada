@@ -64,8 +64,8 @@ A **classificação** procura definir uma regra
 $$
 \psi:
 \mathbb R^p
-\longrightarrow
-\{1,\ldots,G\}
+\to
+\{1,\ldots,G\}.
 $$
 
 que atribua uma nova observação $\mathbf x$ a uma das classes.
@@ -74,9 +74,32 @@ Neste capítulo, a avaliação preditiva de uma regra estimada não será confun
 
 ## Classificação como problema de decisão
 
-A teoria geral de decisão já foi desenvolvida no Módulo II. Em particular, `@def-regra-bayes` estabelece que uma regra de Bayes minimiza a perda posterior esperada.
+A classificação pode ser formulada como um problema de decisão. Para cada observação
 
-Para o problema de classificação, seja
+$$
+\mathbf x
+\in
+\mathbb R^p,
+$$
+
+deve-se escolher uma ação
+
+$$
+a
+\in
+\mathcal A
+=
+\{1,\ldots,G\},
+$$
+
+em que a ação $a=g$ corresponde a classificar a observação na classe $g$.
+
+A construção da regra depende das distribuições condicionais das características, das probabilidades a priori das classes e das consequências atribuídas às possíveis decisões [@berger1985].
+
+::: {#def-probabilidades-priori-discriminante}
+## Probabilidades a priori das classes
+
+As **probabilidades a priori** são
 
 $$
 \pi_g
@@ -86,7 +109,22 @@ P(\mathsf G=g),
 g=1,\ldots,G,
 $$
 
-a probabilidade a priori da classe $g$, e denote por
+com
+
+$$
+\pi_g>0
+$$
+
+e
+
+$$
+\sum_{g=1}^{G}\pi_g=1.
+$$
+
+Elas representam a distribuição das classes antes da observação das características da nova unidade.
+:::
+
+Denote por
 
 $$
 f_g(\mathbf x)
@@ -99,7 +137,7 @@ f
 \right)
 $$
 
-a densidade condicional das características nessa classe.
+a densidade condicional das características na classe $g$.
 
 Pelo teorema de Bayes,
 
@@ -120,27 +158,158 @@ P
 }.
 $$ {#eq-posterior-classe-discriminante}
 
-As probabilidades posteriores combinam duas fontes de informação. A densidade
+A probabilidade posterior combina a ocorrência esperada da classe, representada por $\pi_g$, com a compatibilidade de $\mathbf x$ com sua distribuição condicional, representada por $f_g(\mathbf x)$.
+
+A classe de maior probabilidade posterior nem sempre representa a decisão mais adequada. Essa escolha também pode depender das consequências dos diferentes tipos de erro.
+
+::: {#def-perda-classificacao-discriminante}
+## Perda de classificação
+
+Se a classe verdadeira é $g$ e a decisão tomada é $a$, a **perda de classificação**
 
 $$
-f_g(\mathbf x)
+L(a,g)
+\geq
+0
 $$
 
-mede a compatibilidade de $\mathbf x$ com a distribuição da classe $g$, enquanto
+quantifica a consequência atribuída a essa decisão.
+
+A diagonal
 
 $$
-\pi_g
+L(g,g)
 $$
 
-incorpora a frequência ou importância atribuída à classe antes da observação das características.
+corresponde às decisões corretas, enquanto os elementos
 
-Se os erros de classificação possuem a mesma perda, a regra de Bayes já desenvolvida no Módulo II reduz-se à escolha da classe de maior probabilidade posterior.
+$$
+L(a,g),
+\qquad
+a\neq g,
+$$
+
+correspondem aos diferentes tipos de erro de classificação.
+:::
+
+Condicionando na observação das características, as possíveis perdas são ponderadas pelas probabilidades posteriores das classes.
+
+::: {#def-risco-condicional-classificacao-discriminante}
+## Risco condicional de classificação
+
+O **risco condicional** de atribuir a observação $\mathbf x$ à classe $a$ é
+
+$$
+R
+\left(
+a\mid\mathbf x
+\right)
+=
+\sum_{g=1}^{G}
+L(a,g)
+P
+\left(
+\mathsf G=g
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right).
+$$ {#eq-risco-condicional-classificacao-discriminante}
+:::
+
+A decisão de Bayes escolhe a ação de menor risco condicional.
+
+::: {#def-regra-bayes-classificacao-discriminante}
+## Regra de Bayes para classificação
+
+A **regra de Bayes** atribui a observação $\mathbf x$ a uma classe pertencente ao conjunto
+
+$$
+\psi_{\mathrm B}(\mathbf x)
+\in
+\underset{
+a\in\{1,\ldots,G\}
+}{
+\operatorname{arg\,min}
+}
+\;
+R
+\left(
+a\mid\mathbf x
+\right).
+$$ {#eq-regra-bayes-risco-discriminante}
+:::
+
+A regra depende conjuntamente das distribuições condicionais, das probabilidades a priori e da função de perda.
+
+Um caso particular é a perda zero--um,
+
+$$
+L(a,g)
+=
+\begin{cases}
+0,
+&
+a=g,
+\\
+1,
+&
+a\neq g.
+\end{cases}
+$$ {#eq-perda-zero-um-discriminante}
+
+Nesse caso,
+
+$$
+\begin{aligned}
+R
+\left(
+a\mid\mathbf x
+\right)
+&=
+\sum_{g\neq a}
+P
+\left(
+\mathsf G=g
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right)
+\\
+&=
+1
+-
+P
+\left(
+\mathsf G=a
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right).
+\end{aligned}
+$$
+
+Minimizar o risco equivale, portanto, a maximizar a probabilidade posterior:
+
+$$
+\psi_{\mathrm B}(\mathbf x)
+\in
+\underset{
+g\in\{1,\ldots,G\}
+}{
+\operatorname{arg\,max}
+}
+\;
+P
+\left(
+\mathsf G=g
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right).
+$$
 
 Como o denominador de @eq-posterior-classe-discriminante é comum a todas as classes,
 
 $$
 \psi_{\mathrm B}(\mathbf x)
-=
+\in
 \underset{
 g\in\{1,\ldots,G\}
 }{
@@ -150,21 +319,17 @@ g\in\{1,\ldots,G\}
 \pi_g f_g(\mathbf x).
 $$ {#eq-regra-bayes-classificacao-discriminante}
 
-A expressão
-
-$$
-\pi_g f_g(\mathbf x)
-$$
-
-pode ser substituída por qualquer transformação estritamente crescente que preserve sua ordenação entre as classes. Em particular, quando as densidades são positivas, é conveniente trabalhar com
+Quando as densidades são positivas, a comparação pode ser realizada equivalentemente por
 
 $$
 \log\pi_g
 +
-\log f_g(\mathbf x).
+\log f_g(\mathbf x),
 $$ {#eq-escore-log-bayes-discriminante}
 
-Quando as perdas diferem entre os tipos de erro, a regra de maior posterior deixa de ser necessariamente ótima. Nesse caso, utiliza-se diretamente o risco condicional já construído no Módulo II. O efeito dos custos sobre as fronteiras de decisão decorre, portanto, da teoria de decisão e não de uma modificação da geometria de Fisher.
+pois o logaritmo preserva a ordenação dos valores positivos.
+
+Com perdas assimétricas, a regra de maior posterior deixa de ser necessariamente ótima. A decisão permanece definida pela minimização de @eq-risco-condicional-classificacao-discriminante. Assim, probabilidades a priori e custos pertencem ao problema de decisão e não modificam o critério geométrico de Fisher.
 
 ## Discriminação linear sob normalidade
 
@@ -610,6 +775,323 @@ os termos quadráticos e os log-determinantes comuns cancelam-se. A QDA reduz-se
 
 A @fig-comparacao-distribuicoes-normais, construída no Módulo II, antecipa geometricamente essa diferença: covariância comum produz populações com mesma forma e orientação, enquanto covariâncias distintas permitem que cada classe possua geometria própria.
 
+A consequência dessa diferença para a classificação é mostrada na @fig-fronteiras-lda-qda. No painel da LDA, as duas classes compartilham a mesma matriz de covariâncias e a igualdade entre as funções discriminantes produz uma reta. No painel da QDA, cada classe possui sua própria matriz de covariâncias e a fronteira resultante é curva.
+
+```{r}
+#| label: fig-fronteiras-lda-qda
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Fronteiras de decisão para duas populações normais. As elipses delimitam regiões de concentração de 75%. Com covariância comum, a LDA produz uma fronteira linear; com covariâncias distintas, a QDA pode produzir uma fronteira quadrática."
+#| fig-width: 10
+#| fig-height: 5
+#| fig-align: center
+
+library(ggplot2)
+
+delta_lda <- function(X, mu, Sigma, prior = 0.5) {
+  Sigma_inv <- solve(Sigma)
+
+  as.vector(
+    X %*% Sigma_inv %*% mu
+  ) -
+    0.5 *
+    as.numeric(
+      t(mu) %*% Sigma_inv %*% mu
+    ) +
+    log(prior)
+}
+
+delta_qda <- function(X, mu, Sigma, prior = 0.5) {
+  Sigma_inv <- solve(Sigma)
+
+  D <- sweep(
+    X,
+    2,
+    mu,
+    "-"
+  )
+
+  quadratica <- rowSums(
+    (D %*% Sigma_inv) * D
+  )
+
+  -0.5 * log(det(Sigma)) -
+    0.5 * quadratica +
+    log(prior)
+}
+
+elipse_normal <- function(
+  mu,
+  Sigma,
+  classe,
+  cenario,
+  prob = 0.75,
+  n = 250
+) {
+  decomposicao <- eigen(
+    Sigma,
+    symmetric = TRUE
+  )
+
+  angulo <- seq(
+    0,
+    2 * pi,
+    length.out = n
+  )
+
+  circulo <- cbind(
+    cos(angulo),
+    sin(angulo)
+  )
+
+  raio <- sqrt(
+    qchisq(
+      prob,
+      df = 2
+    )
+  )
+
+  transformacao <- decomposicao$vectors %*%
+    diag(
+      sqrt(
+        decomposicao$values
+      )
+    )
+
+  pontos <- raio *
+    circulo %*%
+    t(transformacao)
+
+  pontos <- sweep(
+    pontos,
+    2,
+    mu,
+    "+"
+  )
+
+  data.frame(
+    x1 = pontos[, 1],
+    x2 = pontos[, 2],
+    classe = classe,
+    cenario = cenario
+  )
+}
+
+mu_1 <- c(
+  -1.4,
+  -0.3
+)
+
+mu_2 <- c(
+  1.4,
+  0.3
+)
+
+Sigma_comum <- matrix(
+  c(
+    1.0, 0.55,
+    0.55, 0.8
+  ),
+  nrow = 2,
+  byrow = TRUE
+)
+
+Sigma_1 <- matrix(
+  c(
+    1.5, 0.7,
+    0.7, 0.6
+  ),
+  nrow = 2,
+  byrow = TRUE
+)
+
+Sigma_2 <- matrix(
+  c(
+    0.5, -0.15,
+    -0.15, 1.3
+  ),
+  nrow = 2,
+  byrow = TRUE
+)
+
+grade_base <- expand.grid(
+  x1 = seq(
+    -4,
+    4,
+    length.out = 220
+  ),
+  x2 = seq(
+    -3.5,
+    3.5,
+    length.out = 220
+  )
+)
+
+X_grade <- as.matrix(
+  grade_base[
+    c(
+      "x1",
+      "x2"
+    )
+  ]
+)
+
+grade_lda <- grade_base
+
+grade_lda$diferenca <-
+  delta_lda(
+    X_grade,
+    mu_1,
+    Sigma_comum
+  ) -
+  delta_lda(
+    X_grade,
+    mu_2,
+    Sigma_comum
+  )
+
+grade_lda$cenario <-
+  "LDA: covariância comum"
+
+grade_qda <- grade_base
+
+grade_qda$diferenca <-
+  delta_qda(
+    X_grade,
+    mu_1,
+    Sigma_1
+  ) -
+  delta_qda(
+    X_grade,
+    mu_2,
+    Sigma_2
+  )
+
+grade_qda$cenario <-
+  "QDA: covariâncias distintas"
+
+grade <- rbind(
+  grade_lda,
+  grade_qda
+)
+
+elipses <- rbind(
+  elipse_normal(
+    mu_1,
+    Sigma_comum,
+    "Classe 1",
+    "LDA: covariância comum"
+  ),
+  elipse_normal(
+    mu_2,
+    Sigma_comum,
+    "Classe 2",
+    "LDA: covariância comum"
+  ),
+  elipse_normal(
+    mu_1,
+    Sigma_1,
+    "Classe 1",
+    "QDA: covariâncias distintas"
+  ),
+  elipse_normal(
+    mu_2,
+    Sigma_2,
+    "Classe 2",
+    "QDA: covariâncias distintas"
+  )
+)
+
+centros <- rbind(
+  data.frame(
+    x1 = c(
+      mu_1[1],
+      mu_2[1]
+    ),
+    x2 = c(
+      mu_1[2],
+      mu_2[2]
+    ),
+    classe = c(
+      "Classe 1",
+      "Classe 2"
+    ),
+    cenario =
+      "LDA: covariância comum"
+  ),
+  data.frame(
+    x1 = c(
+      mu_1[1],
+      mu_2[1]
+    ),
+    x2 = c(
+      mu_1[2],
+      mu_2[2]
+    ),
+    classe = c(
+      "Classe 1",
+      "Classe 2"
+    ),
+    cenario =
+      "QDA: covariâncias distintas"
+  )
+)
+
+ggplot() +
+  geom_path(
+    data = elipses,
+    aes(
+      x = x1,
+      y = x2,
+      linetype = classe,
+      group = interaction(
+        classe,
+        cenario
+      )
+    ),
+    linewidth = 0.9
+  ) +
+  geom_point(
+    data = centros,
+    aes(
+      x = x1,
+      y = x2,
+      shape = classe
+    ),
+    size = 3
+  ) +
+  geom_contour(
+    data = grade,
+    aes(
+      x = x1,
+      y = x2,
+      z = diferenca
+    ),
+    breaks = 0,
+    linewidth = 1.1,
+    show.legend = FALSE
+  ) +
+  facet_wrap(
+    ~ cenario
+  ) +
+  coord_equal() +
+  labs(
+    x = expression(X[1]),
+    y = expression(X[2]),
+    linetype = "Classe",
+    shape = "Classe"
+  ) +
+  theme_minimal(
+    base_size = 12
+  ) +
+  theme(
+    legend.position = "bottom"
+  )
+```
+
+A linha que separa as classes no primeiro painel decorre do cancelamento dos termos quadráticos comuns às duas densidades. No segundo painel, esse cancelamento não ocorre porque $\boldsymbol{\Sigma}_1\neq\boldsymbol{\Sigma}_2$. A diferença visual entre as fronteiras é, portanto, consequência direta das hipóteses probabilísticas que distinguem LDA e QDA.
+
 ## O que as regras probabilísticas resolvem
 
 As funções em @eq-funcao-discriminante-linear e @eq-funcao-discriminante-quadratica surgem de um problema de decisão. Seu objetivo é comparar classes para uma observação $\mathbf x$ e produzir uma regra de classificação.
@@ -674,7 +1156,7 @@ n_g
 \right)^\top.
 $$
 
-O Módulo II também estabeleceu em @thm-decomposicao-dispersao-grupos a decomposição
+O Módulo II também estabeleceu em @prp-decomposicao-dispersao-grupos a decomposição
 
 $$
 \mathbf T
@@ -757,6 +1239,238 @@ $$ {#eq-criterio-fisher-discriminante}
 O numerador mede separação entre grupos; o denominador mede dispersão interna. Assim, maximizar $J_F(\mathbf a)$ não significa simplesmente procurar uma direção em que os centroides estejam afastados. A distância entre eles é avaliada relativamente à variabilidade observada na mesma direção.
 
 Essa distinção separa Fisher da ACP. Na ACP, a direção é escolhida para explicar grande variabilidade da nuvem total. Em Fisher, a informação dos grupos entra explicitamente na função objetivo.
+
+A @fig-projecoes-fisher compara duas projeções das mesmas observações. A primeira utiliza simplesmente a direção que une os centroides. A segunda incorpora a dispersão intragrupos por meio da direção de Fisher. Para tornar comparáveis as duas projeções, seus escores foram expressos relativamente ao desvio-padrão intragrupos.
+
+```{r}
+#| label: fig-projecoes-fisher
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Projeção das mesmas duas classes na direção que une os centroides e na direção de Fisher. A direção discriminante aumenta a separação entre os grupos relativamente à dispersão intragrupos."
+#| fig-width: 10
+#| fig-height: 5
+#| fig-align: center
+
+library(ggplot2)
+
+rmvnorm_base <- function(
+  n,
+  mu,
+  Sigma
+) {
+  p <- length(mu)
+
+  Z <- matrix(
+    rnorm(
+      n * p
+    ),
+    nrow = n,
+    ncol = p
+  )
+
+  X <- Z %*%
+    chol(Sigma)
+
+  sweep(
+    X,
+    2,
+    mu,
+    "+"
+  )
+}
+
+padroniza_intra <- function(
+  z,
+  grupo
+) {
+  medias_grupo <- ave(
+    z,
+    grupo
+  )
+
+  variancia_intra <-
+    sum(
+      (z - medias_grupo)^2
+    ) /
+    (
+      length(z) -
+        length(
+          unique(grupo)
+        )
+    )
+
+  (
+    z - mean(z)
+  ) /
+    sqrt(
+      variancia_intra
+    )
+}
+
+set.seed(2026)
+
+mu_1 <- c(
+  -1.5,
+  -0.5
+)
+
+mu_2 <- c(
+  1.5,
+  0.5
+)
+
+Sigma <- matrix(
+  c(
+    2.0, 1.4,
+    1.4, 1.2
+  ),
+  nrow = 2,
+  byrow = TRUE
+)
+
+n <- 180
+
+X_1 <- rmvnorm_base(
+  n,
+  mu_1,
+  Sigma
+)
+
+X_2 <- rmvnorm_base(
+  n,
+  mu_2,
+  Sigma
+)
+
+X <- rbind(
+  X_1,
+  X_2
+)
+
+grupo <- factor(
+  rep(
+    c(
+      "Classe 1",
+      "Classe 2"
+    ),
+    each = n
+  )
+)
+
+media_1 <- colMeans(
+  X_1
+)
+
+media_2 <- colMeans(
+  X_2
+)
+
+d <- media_2 - media_1
+
+D_1 <- sweep(
+  X_1,
+  2,
+  media_1,
+  "-"
+)
+
+D_2 <- sweep(
+  X_2,
+  2,
+  media_2,
+  "-"
+)
+
+T_intra <- crossprod(
+  D_1
+) +
+  crossprod(
+    D_2
+  )
+
+a_centroides <- d /
+  sqrt(
+    sum(
+      d^2
+    )
+  )
+
+a_fisher <- solve(
+  T_intra,
+  d
+)
+
+a_fisher <- a_fisher /
+  sqrt(
+    sum(
+      a_fisher^2
+    )
+  )
+
+z_centroides <- as.vector(
+  X %*%
+    a_centroides
+)
+
+z_fisher <- as.vector(
+  X %*%
+    a_fisher
+)
+
+dados_projecao <- rbind(
+  data.frame(
+    escore = padroniza_intra(
+      z_centroides,
+      grupo
+    ),
+    grupo = grupo,
+    direcao =
+      "Direção entre os centroides"
+  ),
+  data.frame(
+    escore = padroniza_intra(
+      z_fisher,
+      grupo
+    ),
+    grupo = grupo,
+    direcao =
+      "Direção de Fisher"
+  )
+)
+
+ggplot(
+  dados_projecao,
+  aes(
+    x = escore,
+    linetype = grupo
+  )
+) +
+  geom_density(
+    linewidth = 1.1,
+    adjust = 1.05
+  ) +
+  facet_wrap(
+    ~ direcao,
+    nrow = 1
+  ) +
+  labs(
+    x =
+      "Coordenada projetada / dispersão intragrupos",
+    y =
+      "Densidade",
+    linetype =
+      "Classe"
+  ) +
+  theme_minimal(
+    base_size = 12
+  ) +
+  theme(
+    legend.position = "bottom"
+  )
+```
+
+Na direção que une os centroides, parte da diferença entre as médias é acompanhada por grande dispersão dentro das classes. A direção de Fisher modifica os pesos das características para reduzir essa sobreposição relativa. A figura representa diretamente o papel do denominador de @eq-criterio-fisher-discriminante: uma separação entre centroides é mais informativa quando ocorre em uma direção de pequena dispersão intragrupos.
 
 ## Direções discriminantes
 
@@ -940,7 +1654,7 @@ existe no máximo uma direção discriminante.
 
 Para três grupos, existem no máximo duas.
 
-A redução dimensional produzida por Fisher é, portanto, limitada pela estrutura dos rótulos, e não apenas pela dimensão original $p$.
+A redução dimensional produzida por Fisher depende conjuntamente da dimensão original $p$ e da estrutura dos grupos, com limite máximo $\min(p,G-1)$.
 
 ## Coordenadas discriminantes
 
@@ -1023,6 +1737,298 @@ $$
 e, consequentemente, as próprias direções discriminantes.
 
 A interpretação dos eixos deve considerar esse objetivo. Uma variável com coeficiente elevado em determinada direção participa da combinação que separa os grupos naquela dimensão, mas a magnitude isolada dos coeficientes depende da escala e da correlação entre as características. Procedimentos detalhados para interpretar coeficientes, correlações estruturais e contribuições das variáveis pertencem à etapa metodológica posterior.
+
+A @fig-coordenadas-discriminantes mostra a transformação de um conjunto com três características e três grupos. O primeiro painel apresenta apenas duas das características originais. O segundo utiliza as duas direções discriminantes disponíveis para esses grupos e incorpora informação das três características.
+
+```{r}
+#| label: fig-coordenadas-discriminantes
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Representação de três grupos em duas características originais e nas duas coordenadas discriminantes de Fisher. As coordenadas são construídas especificamente para representar a separação entre os grupos."
+#| fig-width: 10
+#| fig-height: 5
+#| fig-align: center
+
+library(ggplot2)
+
+rmvnorm_base <- function(
+  n,
+  mu,
+  Sigma
+) {
+  p <- length(mu)
+
+  Z <- matrix(
+    rnorm(
+      n * p
+    ),
+    nrow = n,
+    ncol = p
+  )
+
+  X <- Z %*%
+    chol(Sigma)
+
+  sweep(
+    X,
+    2,
+    mu,
+    "+"
+  )
+}
+
+set.seed(2027)
+
+Sigma <- matrix(
+  c(
+    1.2, 0.7, 0.2,
+    0.7, 1.8, 0.1,
+    0.2, 0.1, 0.7
+  ),
+  nrow = 3,
+  byrow = TRUE
+)
+
+medias <- list(
+  c(
+    -1.6,
+    0.0,
+    -0.8
+  ),
+  c(
+    1.6,
+    0.0,
+    -0.8
+  ),
+  c(
+    0.0,
+    0.3,
+    1.8
+  )
+)
+
+n_grupo <- 55
+
+X_lista <- lapply(
+  medias,
+  function(mu) {
+    rmvnorm_base(
+      n_grupo,
+      mu,
+      Sigma
+    )
+  }
+)
+
+X <- do.call(
+  rbind,
+  X_lista
+)
+
+grupo <- factor(
+  rep(
+    c(
+      "Grupo 1",
+      "Grupo 2",
+      "Grupo 3"
+    ),
+    each = n_grupo
+  )
+)
+
+media_global <- colMeans(
+  X
+)
+
+T_intra <- matrix(
+  0,
+  nrow = 3,
+  ncol = 3
+)
+
+T_entre <- matrix(
+  0,
+  nrow = 3,
+  ncol = 3
+)
+
+for (
+  g in levels(grupo)
+) {
+  X_g <- X[
+    grupo == g,
+    ,
+    drop = FALSE
+  ]
+
+  media_g <- colMeans(
+    X_g
+  )
+
+  D_g <- sweep(
+    X_g,
+    2,
+    media_g,
+    "-"
+  )
+
+  T_intra <- T_intra +
+    crossprod(
+      D_g
+    )
+
+  d_g <- matrix(
+    media_g -
+      media_global,
+    ncol = 1
+  )
+
+  T_entre <- T_entre +
+    nrow(X_g) *
+    (
+      d_g %*%
+        t(d_g)
+    )
+}
+
+decomp_intra <- eigen(
+  T_intra,
+  symmetric = TRUE
+)
+
+T_intra_menos_meio <-
+  decomp_intra$vectors %*%
+  diag(
+    1 /
+      sqrt(
+        decomp_intra$values
+      )
+  ) %*%
+  t(
+    decomp_intra$vectors
+  )
+
+K_F <-
+  T_intra_menos_meio %*%
+  T_entre %*%
+  T_intra_menos_meio
+
+decomp_fisher <- eigen(
+  K_F,
+  symmetric = TRUE
+)
+
+U_2 <- decomp_fisher$vectors[
+  ,
+  1:2,
+  drop = FALSE
+]
+
+A <- T_intra_menos_meio %*%
+  U_2
+
+normas <- sqrt(
+  colSums(
+    A^2
+  )
+)
+
+A <- sweep(
+  A,
+  2,
+  normas,
+  "/"
+)
+
+X_c <- sweep(
+  X,
+  2,
+  media_global,
+  "-"
+)
+
+Z <- X_c %*%
+  A
+
+dados_original <- data.frame(
+  eixo_1 = X[, 1],
+  eixo_2 = X[, 2],
+  grupo = grupo,
+  painel =
+    "Características originais: X1 × X2"
+)
+
+dados_discriminante <- data.frame(
+  eixo_1 = Z[, 1],
+  eixo_2 = Z[, 2],
+  grupo = grupo,
+  painel =
+    "Coordenadas discriminantes: z1 × z2"
+)
+
+dados_figura <- rbind(
+  dados_original,
+  dados_discriminante
+)
+
+centroides <- aggregate(
+  cbind(
+    eixo_1,
+    eixo_2
+  ) ~
+    grupo +
+    painel,
+  data = dados_figura,
+  FUN = mean
+)
+
+ggplot(
+  dados_figura,
+  aes(
+    x = eixo_1,
+    y = eixo_2,
+    color = grupo,
+    shape = grupo
+  )
+) +
+  geom_point(
+    alpha = 0.6,
+    size = 1.8
+  ) +
+  geom_point(
+    data = centroides,
+    aes(
+      x = eixo_1,
+      y = eixo_2,
+      color = grupo
+    ),
+    inherit.aes = FALSE,
+    shape = 4,
+    size = 4,
+    stroke = 1.3
+  ) +
+  facet_wrap(
+    ~ painel,
+    scales = "free"
+  ) +
+  labs(
+    x = NULL,
+    y = NULL,
+    color = "Grupo",
+    shape = "Grupo"
+  ) +
+  theme_minimal(
+    base_size = 12
+  ) +
+  theme(
+    legend.position = "bottom"
+  )
+```
+
+O primeiro painel utiliza apenas duas das três características e, por isso, não representa toda a informação disponível para distinguir os grupos. As coordenadas discriminantes utilizam combinações das três características e são escolhidas especificamente para aumentar a separação entre os centroides relativamente à dispersão intragrupos.
+
+A figura também evidencia uma diferença em relação à ACP: os novos eixos dependem dos rótulos dos grupos. Se os rótulos forem alterados, $\mathbf T_{\mathrm{intra}}$, $\mathbf T_{\mathrm{entre}}$ e as próprias coordenadas discriminantes também poderão mudar.
 
 ## Geometria pela dispersão intragrupos
 
@@ -1487,6 +2493,53 @@ $$ {#eq-condicao-dimensao-qda}
 
 A QDA exige, portanto, mais informação por grupo do que a LDA para estimar as matrizes de covariâncias sem regularização.
 
+### Identificação das direções discriminantes
+
+As direções de Fisher apresentam as indeterminações próprias do problema de autovalores generalizados.
+
+Se $\lambda_j$ é uma raiz simples e $\mathbf a_j$ satisfaz
+
+$$
+\mathbf T_{\mathrm{entre}}
+\mathbf a_j
+=
+\lambda_j
+\mathbf T_{\mathrm{intra}}
+\mathbf a_j,
+$$
+
+então qualquer múltiplo não nulo de $\mathbf a_j$ representa a mesma direção discriminante.
+
+Com a normalização adotada em @eq-normalizacao-fisher,
+
+$$
+\mathbf a_j^\top
+\mathbf T_{\mathrm{intra}}
+\mathbf a_j
+=
+1,
+$$
+
+permanece a indeterminação de sinal:
+
+$$
+\mathbf a_j
+\qquad\text{e}\qquad
+-\mathbf a_j
+$$
+
+representam o mesmo eixo discriminante. A mudança de sinal altera apenas a orientação da coordenada
+
+$$
+z_j(\mathbf x),
+$$
+
+sem modificar a separação representada por esse eixo.
+
+Quando uma raiz possui multiplicidade maior que $1$, os autovetores individuais associados não são únicos. Diferentes bases ortogonais na métrica de $\mathbf T_{\mathrm{intra}}$ podem representar o mesmo autoespaço.
+
+Nesse caso, o objeto identificado é o **subespaço discriminante** associado à raiz repetida, e não uma orientação particular de seus eixos.
+
 ## Pressupostos e limites
 
 A Análise Discriminante reúne uma formulação geométrica e formulações probabilísticas. As condições associadas a essas construções não são as mesmas.
@@ -1552,7 +2605,7 @@ $$
 
 e os termos quadráticos permanecem na comparação.
 
-Portanto, a diferença entre LDA e QDA decorre diretamente do modelo de covariâncias adotado, e não apenas da escolha de uma forma algébrica diferente para a regra de classificação.
+Portanto, a diferença entre LDA e QDA decorre diretamente do modelo de covariâncias adotado. A forma algébrica da regra de classificação é consequência dessa estrutura.
 
 ### Probabilidades a priori e perdas
 
