@@ -1,0 +1,3289 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.24">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>16&nbsp; Formulação da Análise de Agrupamentos</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 1em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./mod_3_escalonamento.html" rel="next">
+<link href="./mod_3_fatorial.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b651517ce65839d647a86e2780455cfb.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-2641b481724464e61c86985d8c912b6f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-4c6d65c679321d81af7ec8b61b1d5a24.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-2641b481724464e61c86985d8c912b6f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Nenhum resultado",
+    "search-matching-documents-text": "documentos correspondentes",
+    "search-copy-link-title": "Copiar link para a busca",
+    "search-hide-matches-text": "Esconder correspondências adicionais",
+    "search-more-match-text": "mais correspondência neste documento",
+    "search-more-matches-text": "mais correspondências neste documento",
+    "search-clear-button-title": "Limpar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Procurar"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./mod_3_estruturas.html">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</a></li><li class="breadcrumb-item"><a href="./mod_3_agrupamento.html"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Formulação da Análise de Agrupamentos</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Procurar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
+      <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo escuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Procurar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Informações Legais e Declaração de Uso de Inteligência Artificial</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./prefacio_multivariada.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./identifica_multivariada.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Identificação da Disciplina</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo I — Fundamentos Matemáticos e Geométricos da Análise Multivariada</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_vetores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Vetores e representação dos dados multivariados</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_matrizes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Álgebra matricial aplicada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_espacos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Espaços vetoriais, bases e projeções</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_transformacoes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Transformações lineares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_autovetores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Autovalores, autovetores e decomposição espectral</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_svd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Decomposição em Valores Singulares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_calculo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Cálculo Diferencial, Integral e Matricial Aplicado à Estatística Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_exc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercícios de fixação do Módulo I</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo II — Fundamentos Probabilísticos e Inferenciais da Análise Multivariada</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_covariancias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Matrizes de covariâncias e correlações</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_normal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Distribuição Normal Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_amostrais.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Estatísticas Amostrais e Estimação</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_modelo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Modelo Linear Multivariado e Hipóteses Lineares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_inferencia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Inferência Multivariada</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_estruturas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Problemas e estruturas das técnicas multivariadas</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_cp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Formulação da Análise de Componentes Principais</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_fatorial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Formulação da Análise Fatorial</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_agrupamento.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Formulação da Análise de Agrupamentos</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_escalonamento.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Formulação do Escalonamento Multidimensional</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_correspondencia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Formulação da Análise de Correspondência</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_manova.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Formulação da MANOVA</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_discriminante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Formulação da Análise Discriminante</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_canonica.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Formulação da Correlação Canônica</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_conjunta.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Formulação da Análise Conjunta</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referências</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Índice</h2>
+   
+  <ul>
+  <li><a href="#o-problema-de-formação-de-grupos" id="toc-o-problema-de-formação-de-grupos" class="nav-link active" data-scroll-target="#o-problema-de-formação-de-grupos"><span class="header-section-number">16.1</span> O problema de formação de grupos</a></li>
+  <li><a href="#representação-dos-objetos-e-proximidade" id="toc-representação-dos-objetos-e-proximidade" class="nav-link" data-scroll-target="#representação-dos-objetos-e-proximidade"><span class="header-section-number">16.2</span> Representação dos objetos e proximidade</a>
+  <ul class="collapse">
+  <li><a href="#efeito-da-escala" id="toc-efeito-da-escala" class="nav-link" data-scroll-target="#efeito-da-escala"><span class="header-section-number">16.2.1</span> Efeito da escala</a></li>
+  </ul></li>
+  <li><a href="#partições" id="toc-partições" class="nav-link" data-scroll-target="#partições"><span class="header-section-number">16.3</span> Partições</a>
+  <ul class="collapse">
+  <li><a href="#partições-rígidas-difusas-e-probabilísticas" id="toc-partições-rígidas-difusas-e-probabilísticas" class="nav-link" data-scroll-target="#partições-rígidas-difusas-e-probabilísticas"><span class="header-section-number">16.3.1</span> Partições rígidas, difusas e probabilísticas</a></li>
+  </ul></li>
+  <li><a href="#homogeneidade-interna-e-separação" id="toc-homogeneidade-interna-e-separação" class="nav-link" data-scroll-target="#homogeneidade-interna-e-separação"><span class="header-section-number">16.4</span> Homogeneidade interna e separação</a></li>
+  <li><a href="#agrupamento-por-centroides" id="toc-agrupamento-por-centroides" class="nav-link" data-scroll-target="#agrupamento-por-centroides"><span class="header-section-number">16.5</span> Agrupamento por centroides</a>
+  <ul class="collapse">
+  <li><a href="#dispersão-dentro-e-entre-grupos" id="toc-dispersão-dentro-e-entre-grupos" class="nav-link" data-scroll-target="#dispersão-dentro-e-entre-grupos"><span class="header-section-number">16.5.1</span> Dispersão dentro e entre grupos</a></li>
+  <li><a href="#formulação-das-k-médias" id="toc-formulação-das-k-médias" class="nav-link" data-scroll-target="#formulação-das-k-médias"><span class="header-section-number">16.5.2</span> Formulação das <span class="math inline">\(K\)</span>-médias</a></li>
+  <li><a href="#o-centroide-como-minimizador" id="toc-o-centroide-como-minimizador" class="nav-link" data-scroll-target="#o-centroide-como-minimizador"><span class="header-section-number">16.5.3</span> O centroide como minimizador</a></li>
+  <li><a href="#partição-para-centroides-fixados" id="toc-partição-para-centroides-fixados" class="nav-link" data-scroll-target="#partição-para-centroides-fixados"><span class="header-section-number">16.5.4</span> Partição para centroides fixados</a></li>
+  <li><a href="#geometria-das-regiões-de-alocação" id="toc-geometria-das-regiões-de-alocação" class="nav-link" data-scroll-target="#geometria-das-regiões-de-alocação"><span class="header-section-number">16.5.5</span> Geometria das regiões de alocação</a></li>
+  <li><a href="#existência-e-não-unicidade-da-solução" id="toc-existência-e-não-unicidade-da-solução" class="nav-link" data-scroll-target="#existência-e-não-unicidade-da-solução"><span class="header-section-number">16.5.6</span> Existência e não unicidade da solução</a></li>
+  <li><a href="#natureza-do-problema-de-otimização" id="toc-natureza-do-problema-de-otimização" class="nav-link" data-scroll-target="#natureza-do-problema-de-otimização"><span class="header-section-number">16.5.7</span> Natureza do problema de otimização</a></li>
+  <li><a href="#formulação-populacional-do-critério-das-k-médias" id="toc-formulação-populacional-do-critério-das-k-médias" class="nav-link" data-scroll-target="#formulação-populacional-do-critério-das-k-médias"><span class="header-section-number">16.5.8</span> Formulação populacional do critério das <span class="math inline">\(K\)</span>-médias</a></li>
+  <li><a href="#efeito-de-transformações-sobre-as-k-médias" id="toc-efeito-de-transformações-sobre-as-k-médias" class="nav-link" data-scroll-target="#efeito-de-transformações-sobre-as-k-médias"><span class="header-section-number">16.5.9</span> Efeito de transformações sobre as <span class="math inline">\(K\)</span>-médias</a></li>
+  </ul></li>
+  <li><a href="#estrutura-dos-métodos-hierárquicos" id="toc-estrutura-dos-métodos-hierárquicos" class="nav-link" data-scroll-target="#estrutura-dos-métodos-hierárquicos"><span class="header-section-number">16.6</span> Estrutura dos métodos hierárquicos</a>
+  <ul class="collapse">
+  <li><a href="#ligações-simples-completa-e-média" id="toc-ligações-simples-completa-e-média" class="nav-link" data-scroll-target="#ligações-simples-completa-e-média"><span class="header-section-number">16.6.1</span> Ligações simples, completa e média</a></li>
+  <li><a href="#método-de-ward-e-dispersão-intragrupos" id="toc-método-de-ward-e-dispersão-intragrupos" class="nav-link" data-scroll-target="#método-de-ward-e-dispersão-intragrupos"><span class="header-section-number">16.6.2</span> Método de Ward e dispersão intragrupos</a></li>
+  <li><a href="#dendrograma-e-níveis-de-fusão" id="toc-dendrograma-e-níveis-de-fusão" class="nav-link" data-scroll-target="#dendrograma-e-níveis-de-fusão"><span class="header-section-number">16.6.3</span> Dendrograma e níveis de fusão</a></li>
+  <li><a href="#ultramétrica-induzida-pela-hierarquia" id="toc-ultramétrica-induzida-pela-hierarquia" class="nav-link" data-scroll-target="#ultramétrica-induzida-pela-hierarquia"><span class="header-section-number">16.6.4</span> Ultramétrica induzida pela hierarquia</a></li>
+  <li><a href="#uma-partição-e-uma-hierarquia-representam-objetos-diferentes" id="toc-uma-partição-e-uma-hierarquia-representam-objetos-diferentes" class="nav-link" data-scroll-target="#uma-partição-e-uma-hierarquia-representam-objetos-diferentes"><span class="header-section-number">16.6.5</span> Uma partição e uma hierarquia representam objetos diferentes</a></li>
+  </ul></li>
+  <li><a href="#diferentes-definições-matemáticas-de-grupo" id="toc-diferentes-definições-matemáticas-de-grupo" class="nav-link" data-scroll-target="#diferentes-definições-matemáticas-de-grupo"><span class="header-section-number">16.7</span> Diferentes definições matemáticas de grupo</a>
+  <ul class="collapse">
+  <li><a href="#formulação-probabilística-de-grupos" id="toc-formulação-probabilística-de-grupos" class="nav-link" data-scroll-target="#formulação-probabilística-de-grupos"><span class="header-section-number">16.7.1</span> Formulação probabilística de grupos</a></li>
+  <li><a href="#grupos-definidos-por-densidade" id="toc-grupos-definidos-por-densidade" class="nav-link" data-scroll-target="#grupos-definidos-por-densidade"><span class="header-section-number">16.7.2</span> Grupos definidos por densidade</a></li>
+  </ul></li>
+  <li><a href="#dependência-da-solução" id="toc-dependência-da-solução" class="nav-link" data-scroll-target="#dependência-da-solução"><span class="header-section-number">16.8</span> Dependência da solução</a>
+  <ul class="collapse">
+  <li><a href="#dependência-das-variáveis" id="toc-dependência-das-variáveis" class="nav-link" data-scroll-target="#dependência-das-variáveis"><span class="header-section-number">16.8.1</span> Dependência das variáveis</a></li>
+  <li><a href="#dependência-da-escala-e-da-métrica" id="toc-dependência-da-escala-e-da-métrica" class="nav-link" data-scroll-target="#dependência-da-escala-e-da-métrica"><span class="header-section-number">16.8.2</span> Dependência da escala e da métrica</a></li>
+  <li><a href="#dependência-da-forma-dos-grupos" id="toc-dependência-da-forma-dos-grupos" class="nav-link" data-scroll-target="#dependência-da-forma-dos-grupos"><span class="header-section-number">16.8.3</span> Dependência da forma dos grupos</a></li>
+  </ul></li>
+  <li><a href="#ausência-de-classes-naturais-automáticas" id="toc-ausência-de-classes-naturais-automáticas" class="nav-link" data-scroll-target="#ausência-de-classes-naturais-automáticas"><span class="header-section-number">16.9</span> Ausência de classes naturais automáticas</a></li>
+  <li><a href="#relações-com-outras-técnicas-multivariadas" id="toc-relações-com-outras-técnicas-multivariadas" class="nav-link" data-scroll-target="#relações-com-outras-técnicas-multivariadas"><span class="header-section-number">16.10</span> Relações com outras técnicas multivariadas</a>
+  <ul class="collapse">
+  <li><a href="#agrupamentos-e-acp" id="toc-agrupamentos-e-acp" class="nav-link" data-scroll-target="#agrupamentos-e-acp"><span class="header-section-number">16.10.1</span> Agrupamentos e ACP</a></li>
+  <li><a href="#agrupamentos-e-mds" id="toc-agrupamentos-e-mds" class="nav-link" data-scroll-target="#agrupamentos-e-mds"><span class="header-section-number">16.10.2</span> Agrupamentos e MDS</a></li>
+  <li><a href="#agrupamentos-e-análise-discriminante" id="toc-agrupamentos-e-análise-discriminante" class="nav-link" data-scroll-target="#agrupamentos-e-análise-discriminante"><span class="header-section-number">16.10.3</span> Agrupamentos e Análise Discriminante</a></li>
+  <li><a href="#agrupamentos-e-manova" id="toc-agrupamentos-e-manova" class="nav-link" data-scroll-target="#agrupamentos-e-manova"><span class="header-section-number">16.10.4</span> Agrupamentos e MANOVA</a></li>
+  </ul></li>
+  <li><a href="#síntese" id="toc-síntese" class="nav-link" data-scroll-target="#síntese"><span class="header-section-number">16.11</span> Síntese</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./mod_3_estruturas.html">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</a></li><li class="breadcrumb-item"><a href="./mod_3_agrupamento.html"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Formulação da Análise de Agrupamentos</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Formulação da Análise de Agrupamentos</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A Análise de Agrupamentos reúne métodos destinados a organizar objetos em grupos a partir de suas relações de proximidade. Ao contrário das técnicas estudadas nos dois capítulos anteriores, a definição da solução depende diretamente do critério adotado para representar a semelhança entre os objetos e para caracterizar um grupo <span class="citation" data-cites="johnson2007">(<a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>)</span>.</p>
+<p>Os fundamentos geométricos necessários já foram estabelecidos no Módulo 1. A matriz de dados foi definida em <a href="mod_1_vetores.html#def-matriz-dados" class="quarto-xref">Definição&nbsp;<span>1.6</span></a>, a distância euclidiana em <a href="mod_1_vetores.html#def-distancia-euclidiana" class="quarto-xref">Definição&nbsp;<span>1.13</span></a> e geometrias determinadas por produtos internos e normas induzidas foram desenvolvidas em <a href="mod_1_espacos.html#def-produto-interno-induzido" class="quarto-xref">Definição&nbsp;<span>3.16</span></a> e <a href="mod_1_espacos.html#def-norma-induzida" class="quarto-xref">Definição&nbsp;<span>3.17</span></a>. O Módulo 2 acrescentou a decomposição da dispersão total em parcelas intragrupos e entre grupos em <a href="mod_2_covariancias.html#prp-decomposicao-dispersao-grupos" class="quarto-xref">Proposição&nbsp;<span>8.11</span></a>. Neste capítulo, esses resultados passam a definir critérios específicos para construir agrupamentos.</p>
+<p>A formulação da técnica envolve os elementos organizados na <a href="#tbl-estrutura-problema-agrupamento" class="quarto-xref">Tabela&nbsp;<span>16.1</span></a>.</p>
+<div id="tbl-estrutura-problema-agrupamento" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-estrutura-problema-agrupamento-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;16.1: Elementos que definem um problema de Análise de Agrupamentos.
+</figcaption>
+<div aria-describedby="tbl-estrutura-problema-agrupamento-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Elemento</th>
+<th>Objeto</th>
+<th>Papel na análise</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Representação dos objetos</td>
+<td>matriz de dados <span class="math inline">\(\mathbf X\)</span> ou matriz de dissimilaridades <span class="math inline">\(\boldsymbol{\Delta}\)</span></td>
+<td>determina a informação disponível para comparar os objetos</td>
+</tr>
+<tr class="even">
+<td>Proximidade</td>
+<td>distância, dissimilaridade ou similaridade</td>
+<td>estabelece o significado de objetos próximos</td>
+</tr>
+<tr class="odd">
+<td>Organização</td>
+<td>partição <span class="math inline">\(\mathcal P\)</span> ou estrutura hierárquica</td>
+<td>representa os grupos construídos</td>
+</tr>
+<tr class="even">
+<td>Critério</td>
+<td>função de perda, dispersão ou ligação</td>
+<td>permite comparar diferentes organizações</td>
+</tr>
+<tr class="odd">
+<td>Solução</td>
+<td>grupos de objetos</td>
+<td>resulta da otimização ou da regra de construção adotada</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A mesma coleção de observações pode produzir agrupamentos diferentes quando um desses elementos é alterado. Por isso, a Análise de Agrupamentos não possui uma definição universal de grupo independente da representação, da proximidade e do critério utilizado.</p>
+<section id="o-problema-de-formação-de-grupos" class="level2" data-number="16.1">
+<h2 data-number="16.1" class="anchored" data-anchor-id="o-problema-de-formação-de-grupos"><span class="header-section-number">16.1</span> O problema de formação de grupos</h2>
+<p>Considere <span class="math inline">\(n\)</span> objetos representados pelas linhas da matriz de dados</p>
+<p><span class="math display">\[
+\mathbf X
+=
+\begin{bmatrix}
+\mathbf x_1^\top\\
+\vdots\\
+\mathbf x_n^\top
+\end{bmatrix}
+\in
+\mathbb R^{n\times p},
+\]</span></p>
+<p>conforme <a href="mod_1_vetores.html#def-matriz-dados" class="quarto-xref">Definição&nbsp;<span>1.6</span></a>.</p>
+<p>Os grupos não são conhecidos previamente. O objetivo é construir uma organização dos índices das observações de modo que a proximidade entre objetos pertencentes ao mesmo grupo seja elevada segundo o critério adotado, enquanto objetos atribuídos a grupos diferentes apresentem maior separação.</p>
+<p>Essa formulação distingue a Análise de Agrupamentos da Análise Discriminante, que utilizará grupos previamente conhecidos. Aqui, a própria organização dos objetos faz parte da solução.</p>
+<p>A <a href="#fig-agrupamentos-particoes-plausiveis" class="quarto-xref">Figura&nbsp;<span>16.1</span></a> mostra uma mesma configuração bidimensional organizada de duas formas. A figura ilustra que os pontos observados, isoladamente, não determinam qual partição deve ser escolhida.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-agrupamentos-particoes-plausiveis" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agrupamentos-particoes-plausiveis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_agrupamento_files/figure-html/fig-agrupamentos-particoes-plausiveis-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-agrupamentos-particoes-plausiveis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;16.1: Diferentes partições de uma mesma configuração de observações.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>As duas organizações mantêm os mesmos pontos e alteram somente a regra utilizada para reuni-los. A figura representa uma característica da técnica: a estrutura de grupos deve ser interpretada em relação ao critério que a produziu.</p>
+</section>
+<section id="representação-dos-objetos-e-proximidade" class="level2" data-number="16.2">
+<h2 data-number="16.2" class="anchored" data-anchor-id="representação-dos-objetos-e-proximidade"><span class="header-section-number">16.2</span> Representação dos objetos e proximidade</h2>
+<p>A matriz de dados não é a única forma de entrada da Análise de Agrupamentos. Quando as coordenadas dos objetos estão disponíveis, a proximidade pode ser calculada a partir das linhas de <span class="math inline">\(\mathbf X\)</span>. Quando as relações entre os objetos já são fornecidas diretamente, a análise pode partir de uma matriz de dissimilaridades.</p>
+<p>A distância euclidiana já foi definida em <a href="mod_1_vetores.html#def-distancia-euclidiana" class="quarto-xref">Definição&nbsp;<span>1.13</span></a>. Para duas observações <span class="math inline">\(\mathbf x_i\)</span> e <span class="math inline">\(\mathbf x_j\)</span>, utilizaremos diretamente</p>
+<p><span class="math display">\[
+d_{ij}
+=
+\left\|
+\mathbf x_i-\mathbf x_j
+\right\|.
+\]</span></p>
+<p>Não é necessário reconstruir suas propriedades métricas neste capítulo. O resultado será aplicado para definir a geometria de métodos como as <span class="math inline">\(K\)</span>-médias e o método de Ward.</p>
+<p>O Módulo 1 também estabeleceu em <a href="mod_1_espacos.html#def-norma-induzida" class="quarto-xref">Definição&nbsp;<span>3.17</span></a> que uma matriz positiva definida pode modificar a geometria utilizada para medir comprimentos e distâncias. Assim, diferentes escolhas de métrica podem atribuir diferentes proximidades ao mesmo conjunto de observações. A distância de Mahalanobis constitui uma aplicação estatística dessa estrutura e já foi definida em <a href="mod_2_covariancias.html#def-distancia-mahalanobis" class="quarto-xref">Definição&nbsp;<span>8.9</span></a>.</p>
+<p>A Análise de Agrupamentos também pode receber como entrada uma matriz</p>
+<p><span class="math display">\[
+\boldsymbol{\Delta}
+=
+\left(
+\delta_{ij}
+\right)
+\in
+\mathbb R^{n\times n},
+\]</span></p>
+<p>na qual <span class="math inline">\(\delta_{ij}\)</span> representa a dissimilaridade entre os objetos <span class="math inline">\(i\)</span> e <span class="math inline">\(j\)</span>.</p>
+<div id="def-dissimilaridade-agrupamento" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 16.1 (Dissimilaridade)</strong></span> Uma <strong>dissimilaridade</strong> é uma medida numérica de separação entre objetos na qual valores maiores representam menor proximidade. Uma dissimilaridade não precisa satisfazer todas as propriedades exigidas de uma distância métrica.</p>
+</div>
+<p>A definição de dissimilaridade amplia a formulação para situações em que a proximidade entre os objetos não satisfaz todas as propriedades de uma distância métrica.</p>
+<p>Nos métodos hierárquicos desenvolvidos neste capítulo, será considerada uma matriz de dissimilaridades simétrica, com</p>
+<p><span class="math display">\[
+\delta_{ij}
+\geq
+0,
+\qquad
+\delta_{ii}
+=
+0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\delta_{ij}
+=
+\delta_{ji}.
+\]</span></p>
+<p>A desigualdade triangular não será exigida.</p>
+<p>De forma correspondente, uma similaridade atribui valores maiores a objetos considerados mais semelhantes. A transformação entre similaridade e dissimilaridade depende da medida adotada e não constitui uma operação universal.</p>
+<p>A distinção entre matriz de atributos e matriz de dissimilaridades é sintetizada na <a href="#tbl-representacao-agrupamentos" class="quarto-xref">Tabela&nbsp;<span>16.2</span></a>.</p>
+<div id="tbl-representacao-agrupamentos" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-representacao-agrupamentos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;16.2: Formas de representação utilizadas na Análise de Agrupamentos.
+</figcaption>
+<div aria-describedby="tbl-representacao-agrupamentos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Representação</th>
+<th>Informação disponível</th>
+<th>Consequência para a formulação</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\mathbf X\in\mathbb R^{n\times p}\)</span></td>
+<td>valores das <span class="math inline">\(p\)</span> variáveis para cada objeto</td>
+<td>a proximidade é construída a partir das coordenadas</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\boldsymbol{\Delta}\in\mathbb R^{n\times n}\)</span></td>
+<td>dissimilaridades entre pares de objetos</td>
+<td>o agrupamento pode ser formulado diretamente sobre as relações entre objetos</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A escolha entre essas representações também delimita os métodos disponíveis. O critério das <span class="math inline">\(K\)</span>-médias, por exemplo, utiliza explicitamente centroides no espaço das variáveis e requer as coordenadas das observações. Métodos hierárquicos podem ser formulados diretamente a partir de uma matriz de dissimilaridades, desde que a regra de ligação seja compatível com a informação disponível.</p>
+<section id="efeito-da-escala" class="level3" data-number="16.2.1">
+<h3 data-number="16.2.1" class="anchored" data-anchor-id="efeito-da-escala"><span class="header-section-number">16.2.1</span> Efeito da escala</h3>
+<p>A dependência das distâncias em relação à escala já foi discutida no Módulo 1, e a padronização das variáveis foi formalizada no Módulo 2. A matriz de dados padronizados observada está dada em <a href="mod_2_covariancias.html#eq-matriz-dados-padronizados-observada" class="quarto-xref">Equação&nbsp;<span>8.70</span></a>. Neste capítulo, esses resultados têm uma consequência específica: modificar a escala modifica as proximidades utilizadas para construir os grupos.</p>
+<p>A <a href="#fig-agrupamentos-efeito-escala" class="quarto-xref">Figura&nbsp;<span>16.2</span></a> mostra essa consequência para uma configuração bidimensional. A figura não redefine a padronização; ela mostra seu efeito sobre o problema de agrupamento.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-agrupamentos-efeito-escala" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agrupamentos-efeito-escala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_agrupamento_files/figure-html/fig-agrupamentos-efeito-escala-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-agrupamentos-efeito-escala-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;16.2: Mudanças de escala alteram a geometria utilizada para comparar as observações.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A ampliação da segunda coordenada aumenta sua contribuição para as distâncias. Um método baseado nessas distâncias passa a comparar os mesmos objetos segundo outra geometria.</p>
+<p>A padronização deve ser entendida da mesma forma. Ela não constitui uma exigência geral da Análise de Agrupamentos. Sua utilização altera a contribuição relativa das variáveis e, portanto, altera o problema geométrico resolvido pelo método.</p>
+</section>
+</section>
+<section id="partições" class="level2" data-number="16.3">
+<h2 data-number="16.3" class="anchored" data-anchor-id="partições"><span class="header-section-number">16.3</span> Partições</h2>
+<p>Uma das formas mais comuns de representar um agrupamento é por meio de uma partição rígida do conjunto de objetos.</p>
+<p>Seja</p>
+<p><span class="math display">\[
+\mathcal I
+=
+\{1,\ldots,n\}
+\]</span></p>
+<p>o conjunto dos índices das observações.</p>
+<div id="def-particao-agrupamento" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 16.2 (Partição em grupos)</strong></span> Uma <strong>partição em <span class="math inline">\(K\)</span> grupos</strong> é uma coleção</p>
+<p><span class="math display">\[
+\mathcal P
+=
+\left\{
+C_1,\ldots,C_K
+\right\}
+\]</span></p>
+<p>de subconjuntos não vazios de <span class="math inline">\(\mathcal I\)</span> que satisfaz</p>
+<p><span class="math display">\[
+C_k
+\cap
+C_{\ell}
+=
+\varnothing,
+\qquad
+k\neq\ell,
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\bigcup_{k=1}^{K}
+C_k
+=
+\mathcal I.
+\]</span></p>
+</div>
+<p>As duas condições estabelecem que:</p>
+<ul>
+<li>um objeto não pertence simultaneamente a dois grupos distintos;</li>
+<li>todos os objetos são atribuídos a algum grupo.</li>
+</ul>
+<p>O número de elementos do grupo <span class="math inline">\(C_k\)</span> será denotado por</p>
+<p><span class="math display">\[
+n_k
+=
+|C_k|,
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\sum_{k=1}^{K}
+n_k
+=
+n.
+\]</span></p>
+<p>A partição é um objeto combinatório. Ela informa quais observações pertencem ao mesmo grupo, mas não determina sozinha o critério utilizado para obtê-la.</p>
+<p>Uma representação equivalente pode ser construída por indicadores de pertinência,</p>
+<p><span class="math display">\[
+g_{ik}
+=
+\begin{cases}
+1,
+&amp;
+i\in C_k,
+\\[4pt]
+0,
+&amp;
+i\notin C_k.
+\end{cases}
+\]</span></p>
+<p>Para uma partição rígida,</p>
+<p><span id="eq-restricao-pertinencia-rigida"><span class="math display">\[
+\sum_{k=1}^{K}
+g_{ik}
+=
+1,
+\qquad
+i=1,\ldots,n.
+\tag{16.1}\]</span></span></p>
+<section id="partições-rígidas-difusas-e-probabilísticas" class="level3" data-number="16.3.1">
+<h3 data-number="16.3.1" class="anchored" data-anchor-id="partições-rígidas-difusas-e-probabilísticas"><span class="header-section-number">16.3.1</span> Partições rígidas, difusas e probabilísticas</h3>
+<p>A partição rígida não é a única forma possível de representar agrupamentos.</p>
+<p>Em uma estrutura <strong>difusa</strong>, pode-se associar a cada objeto um grau de pertencimento</p>
+<p><span class="math display">\[
+u_{ik}
+\in
+[0,1],
+\]</span></p>
+<p>geralmente sujeito a</p>
+<p><span class="math display">\[
+\sum_{k=1}^{K}
+u_{ik}
+=
+1.
+\]</span></p>
+<p>Em uma estrutura <strong>probabilística</strong>, podem ser atribuídas probabilidades</p>
+<p><span class="math display">\[
+P
+\left(
+\mathsf G_i=k
+\mid
+\mathbf x_i
+\right)
+\]</span></p>
+<p>às diferentes possibilidades de pertencimento.</p>
+<p>Essas representações não são equivalentes à partição rígida. Elas correspondem a diferentes definições matemáticas da associação entre um objeto e um grupo.</p>
+<p>O desenvolvimento principal deste capítulo utilizará partições rígidas porque elas permitem formular diretamente os critérios geométricos de <span class="math inline">\(K\)</span>-médias e dos métodos hierárquicos. As formulações probabilísticas serão retomadas posteriormente para mostrar outra interpretação possível de grupo.</p>
+</section>
+</section>
+<section id="homogeneidade-interna-e-separação" class="level2" data-number="16.4">
+<h2 data-number="16.4" class="anchored" data-anchor-id="homogeneidade-interna-e-separação"><span class="header-section-number">16.4</span> Homogeneidade interna e separação</h2>
+<p>Uma partição só se torna uma solução de agrupamento depois que se estabelece um critério para comparar diferentes partições.</p>
+<p>Considere</p>
+<p><span class="math display">\[
+\mathcal P
+=
+\{C_1,\ldots,C_K\}.
+\]</span></p>
+<p>Um critério baseado em homogeneidade interna deve assumir valores melhores quando objetos pertencentes ao mesmo grupo apresentam pequena dispersão segundo a geometria escolhida.</p>
+<p>Um critério baseado em separação deve favorecer grupos suficientemente distintos entre si.</p>
+<p>Essas duas propriedades são relacionadas, mas não são equivalentes em qualquer método. A forma exata de medi-las depende da definição de grupo.</p>
+<p>Para agrupamentos representados por centroides e distância euclidiana quadrática, a homogeneidade interna pode ser expressa por somas de quadrados. Essa escolha conduz ao critério das <span class="math inline">\(K\)</span>-médias e permite utilizar diretamente a decomposição da dispersão estabelecida no Módulo 2.</p>
+<p>O próximo passo consiste, portanto, em atribuir a cada grupo um centro representativo e mostrar por que a média aritmética surge como solução do problema de mínima dispersão quadrática.</p>
+</section>
+<section id="agrupamento-por-centroides" class="level2" data-number="16.5">
+<h2 data-number="16.5" class="anchored" data-anchor-id="agrupamento-por-centroides"><span class="header-section-number">16.5</span> Agrupamento por centroides</h2>
+<p>Uma partição pode ser representada geometricamente por um ponto que resume cada grupo. Para</p>
+<p><span class="math display">\[
+\mathcal P
+=
+\left\{
+C_1,\ldots,C_K
+\right\},
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+n_k
+=
+|C_k|,
+\]</span></p>
+<p>o <strong>centroide</strong> do grupo <span class="math inline">\(C_k\)</span> será denotado por</p>
+<p><span id="eq-centroide-grupo"><span class="math display">\[
+\mathbf c_k
+=
+\frac{1}{n_k}
+\sum_{i\in C_k}
+\mathbf x_i.
+\tag{16.2}\]</span></span></p>
+<p>A notação <span class="math inline">\(\mathbf c_k\)</span> distingue o centro calculado a partir das observações de um vetor de médias populacional <span class="math inline">\(\boldsymbol{\mu}_k\)</span>, que será utilizado posteriormente em técnicas formuladas a partir de populações ou grupos previamente definidos.</p>
+<p>No agrupamento por centroides, a proximidade entre uma observação e um grupo é determinada por sua distância ao centro correspondente. Essa representação conduz naturalmente a critérios baseados na dispersão das observações em torno dos centroides.</p>
+<section id="dispersão-dentro-e-entre-grupos" class="level3" data-number="16.5.1">
+<h3 data-number="16.5.1" class="anchored" data-anchor-id="dispersão-dentro-e-entre-grupos"><span class="header-section-number">16.5.1</span> Dispersão dentro e entre grupos</h3>
+<p>A decomposição da dispersão para grupos já foi estabelecida no Módulo 2. A matriz de dispersão intragrupos foi definida em <a href="mod_2_covariancias.html#def-sscp-intragrupos" class="quarto-xref">Definição&nbsp;<span>8.14</span></a>, a matriz entre grupos em <a href="mod_2_covariancias.html#def-sscp-entre-grupos" class="quarto-xref">Definição&nbsp;<span>8.15</span></a>, e <a href="mod_2_covariancias.html#prp-decomposicao-dispersao-grupos" class="quarto-xref">Proposição&nbsp;<span>8.11</span></a> demonstrou que</p>
+<p><span class="math display">\[
+\mathbf T
+=
+\mathbf T_{\mathrm{intra}}
++
+\mathbf T_{\mathrm{entre}}.
+\]</span></p>
+<p>Naquele resultado, os grupos eram considerados conhecidos. Na Análise de Agrupamentos, a mesma decomposição adquire outra função: a partição passa a ser desconhecida e deve ser construída.</p>
+<p>Para uma partição</p>
+<p><span class="math display">\[
+\mathcal P
+=
+\left\{
+C_1,\ldots,C_K
+\right\},
+\]</span></p>
+<p>a matriz intragrupos pode ser escrita, utilizando os centroides de <a href="#eq-centroide-grupo" class="quarto-xref">Equação&nbsp;<span>16.2</span></a>, como</p>
+<p><span id="eq-sscp-intra-agrupamento"><span class="math display">\[
+\mathbf T_{\mathrm{intra}}
+\left(
+\mathcal P
+\right)
+=
+\sum_{k=1}^{K}
+\sum_{i\in C_k}
+\left(
+\mathbf x_i-\mathbf c_k
+\right)
+\left(
+\mathbf x_i-\mathbf c_k
+\right)^\top.
+\tag{16.3}\]</span></span></p>
+<p>Tomando o traço,</p>
+<p><span id="eq-traco-dispersao-intra-agrupamento"><span class="math display">\[
+\begin{aligned}
+\operatorname{tr}
+\left[
+\mathbf T_{\mathrm{intra}}
+\left(
+\mathcal P
+\right)
+\right]
+&amp;=
+\sum_{k=1}^{K}
+\sum_{i\in C_k}
+\operatorname{tr}
+\left[
+\left(
+\mathbf x_i-\mathbf c_k
+\right)
+\left(
+\mathbf x_i-\mathbf c_k
+\right)^\top
+\right]
+\\
+&amp;=
+\sum_{k=1}^{K}
+\sum_{i\in C_k}
+\left\|
+\mathbf x_i-\mathbf c_k
+\right\|^2.
+\end{aligned}
+\tag{16.4}\]</span></span></p>
+<p>A expressão em <a href="#eq-traco-dispersao-intra-agrupamento" class="quarto-xref">Equação&nbsp;<span>16.4</span></a> transforma a matriz de dispersão do Módulo 2 em um critério escalar para comparar partições.</p>
+<p>Quanto menores forem as distâncias quadráticas das observações aos centroides de seus grupos, menor será</p>
+<p><span class="math display">\[
+\operatorname{tr}
+\left(
+\mathbf T_{\mathrm{intra}}
+\right).
+\]</span></p>
+<p>Como a matriz total <span class="math inline">\(\mathbf T\)</span> não depende da partição e</p>
+<p><span class="math display">\[
+\mathbf T
+=
+\mathbf T_{\mathrm{intra}}
++
+\mathbf T_{\mathrm{entre}},
+\]</span></p>
+<p>segue também que</p>
+<p><span id="eq-traco-decomposicao-agrupamento"><span class="math display">\[
+\operatorname{tr}
+\left(
+\mathbf T
+\right)
+=
+\operatorname{tr}
+\left(
+\mathbf T_{\mathrm{intra}}
+\right)
++
+\operatorname{tr}
+\left(
+\mathbf T_{\mathrm{entre}}
+\right).
+\tag{16.5}\]</span></span></p>
+<p>Para <span class="math inline">\(K\)</span> fixado, reduzir a dispersão intragrupos aumenta a parcela da dispersão atribuída às diferenças entre os centroides. Essa relação fornece a formulação utilizada pelas <span class="math inline">\(K\)</span>-médias.</p>
+</section>
+<section id="formulação-das-k-médias" class="level3" data-number="16.5.2">
+<h3 data-number="16.5.2" class="anchored" data-anchor-id="formulação-das-k-médias"><span class="header-section-number">16.5.2</span> Formulação das <span class="math inline">\(K\)</span>-médias</h3>
+<p>O método das <span class="math inline">\(K\)</span>-médias define os grupos pela minimização da soma das distâncias euclidianas quadráticas das observações aos centroides correspondentes <span class="citation" data-cites="macqueen1967 johnson2007">(<a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>; <a href="references.html#ref-macqueen1967" role="doc-biblioref">MacQueen, 1967</a>)</span>.</p>
+<div id="def-criterio-kmedias" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 16.3 (Critério das <span class="math inline">\(K\)</span>-médias)</strong></span> Para um número fixado de grupos <span class="math inline">\(K\)</span>, considere os indicadores de pertinência <span class="math inline">\(g_{ik}\)</span> e os centros</p>
+<p><span class="math display">\[
+\mathbf c_1,\ldots,\mathbf c_K
+\in
+\mathbb R^p.
+\]</span></p>
+<p>O critério conjunto das <span class="math inline">\(K\)</span>-médias é</p>
+<p><span id="eq-criterio-conjunto-kmedias"><span class="math display">\[
+Q_K
+\left(
+\{g_{ik}\},
+\mathbf c_1,\ldots,\mathbf c_K
+\right)
+=
+\sum_{i=1}^{n}
+\sum_{k=1}^{K}
+g_{ik}
+\left\|
+\mathbf x_i-\mathbf c_k
+\right\|^2,
+\tag{16.6}\]</span></span></p>
+<p>sujeito a</p>
+<p><span class="math display">\[
+g_{ik}
+\in
+\{0,1\}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\sum_{k=1}^{K}
+g_{ik}
+=
+1,
+\qquad
+i=1,\ldots,n,
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\sum_{i=1}^{n}
+g_{ik}
+\geq
+1,
+\qquad
+k=1,\ldots,K.
+\]</span></p>
+<p>A primeira condição atribui cada observação a exatamente um grupo. A segunda garante que os <span class="math inline">\(K\)</span> grupos sejam não vazios.</p>
+<p>Para uma partição</p>
+<p><span class="math display">\[
+\mathcal P
+=
+\{C_1,\ldots,C_K\},
+\]</span></p>
+<p>o critério após a minimização em relação aos centros é</p>
+<p><span id="eq-criterio-kmedias"><span class="math display">\[
+J_K
+\left(
+\mathcal P
+\right)
+=
+\sum_{k=1}^{K}
+\sum_{i\in C_k}
+\left\|
+\mathbf x_i-\mathbf c_k
+\right\|^2,
+\tag{16.7}\]</span></span></p>
+<p>em que</p>
+<p><span class="math display">\[
+\mathbf c_k
+=
+\frac{1}{n_k}
+\sum_{i\in C_k}
+\mathbf x_i.
+\]</span></p>
+<p>A propriedade de que esses centroides minimizam o critério para uma partição fixada será estabelecida em <a href="#prp-centroide-minimiza-soma-quadrados" class="quarto-xref">Proposição&nbsp;<span>16.1</span></a>.</p>
+<p>A solução global pode ser representada por</p>
+<p><span id="eq-solucao-global-kmedias"><span class="math display">\[
+\mathcal P^{*}
+\in
+\operatorname*{arg\,min}_{\mathcal P}
+J_K
+\left(
+\mathcal P
+\right).
+\tag{16.8}\]</span></span></p>
+</div>
+<p>Pela relação em <a href="#eq-traco-dispersao-intra-agrupamento" class="quarto-xref">Equação&nbsp;<span>16.4</span></a>,</p>
+<p><span id="eq-kmedias-traco-intra"><span class="math display">\[
+J_K
+\left(
+\mathcal P
+\right)
+=
+\operatorname{tr}
+\left[
+\mathbf T_{\mathrm{intra}}
+\left(
+\mathcal P
+\right)
+\right].
+\tag{16.9}\]</span></span></p>
+<p>Assim, as <span class="math inline">\(K\)</span>-médias utilizam diretamente a estrutura de dispersão introduzida no Módulo 2. A diferença está no papel dos grupos: naquele módulo, a partição era dada; aqui, ela é parte do problema de otimização.</p>
+<p>A partir de <a href="#eq-traco-decomposicao-agrupamento" class="quarto-xref">Equação&nbsp;<span>16.5</span></a>,</p>
+<p><span class="math display">\[
+J_K
+\left(
+\mathcal P
+\right)
+=
+\operatorname{tr}
+\left(
+\mathbf T
+\right)
+-
+\operatorname{tr}
+\left[
+\mathbf T_{\mathrm{entre}}
+\left(
+\mathcal P
+\right)
+\right].
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\operatorname{tr}
+\left(
+\mathbf T
+\right)
+\]</span></p>
+<p>é constante para a mesma matriz de dados, minimizar o critério das <span class="math inline">\(K\)</span>-médias equivale a maximizar</p>
+<p><span id="eq-kmedias-maximizacao-entre"><span class="math display">\[
+\operatorname{tr}
+\left[
+\mathbf T_{\mathrm{entre}}
+\left(
+\mathcal P
+\right)
+\right].
+\tag{16.10}\]</span></span></p>
+<p>As duas formulações descrevem o mesmo problema para <span class="math inline">\(K\)</span> fixado: procurar grupos compactos em torno de seus centroides produz, simultaneamente, maior separação quadrática entre esses centroides.</p>
+</section>
+<section id="o-centroide-como-minimizador" class="level3" data-number="16.5.3">
+<h3 data-number="16.5.3" class="anchored" data-anchor-id="o-centroide-como-minimizador"><span class="header-section-number">16.5.3</span> O centroide como minimizador</h3>
+<p>A presença da média de cada grupo em <a href="#eq-criterio-kmedias" class="quarto-xref">Equação&nbsp;<span>16.7</span></a> decorre do critério quadrático. Ela é a solução exata do problema de representar um conjunto de observações por um único ponto.</p>
+<div id="prp-centroide-minimiza-soma-quadrados" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposição 16.1 (Centroide e soma de quadrados)</strong></span> Considere um grupo não vazio <span class="math inline">\(C\)</span> com <span class="math inline">\(n_C\)</span> observações e centroide</p>
+<p><span class="math display">\[
+\mathbf c_C
+=
+\frac{1}{n_C}
+\sum_{i\in C}
+\mathbf x_i.
+\]</span></p>
+<p>Para qualquer</p>
+<p><span class="math display">\[
+\mathbf c
+\in
+\mathbb R^p,
+\]</span></p>
+<p>tem-se</p>
+<p><span id="eq-decomposicao-centroide"><span class="math display">\[
+\sum_{i\in C}
+\left\|
+\mathbf x_i-\mathbf c
+\right\|^2
+=
+\sum_{i\in C}
+\left\|
+\mathbf x_i-\mathbf c_C
+\right\|^2
++
+n_C
+\left\|
+\mathbf c-\mathbf c_C
+\right\|^2.
+\tag{16.11}\]</span></span></p>
+<p>Consequentemente, o centroide é o único minimizador:</p>
+<p><span class="math display">\[
+\operatorname*{arg\,min}_{\mathbf c\in\mathbb R^p}
+\sum_{i\in C}
+\left\|
+\mathbf x_i-\mathbf c
+\right\|^2
+=
+\left\{
+\mathbf c_C
+\right\}.
+\]</span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Comprovação</em>. </span>Para cada observação,</p>
+<p><span class="math display">\[
+\mathbf x_i-\mathbf c
+=
+\left(
+\mathbf x_i-\mathbf c_C
+\right)
++
+\left(
+\mathbf c_C-\mathbf c
+\right).
+\]</span></p>
+<p>Logo,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\left\|
+\mathbf x_i-\mathbf c
+\right\|^2
+&amp;=
+\left\|
+\mathbf x_i-\mathbf c_C
+\right\|^2
++
+\left\|
+\mathbf c_C-\mathbf c
+\right\|^2
+\\
+&amp;\quad+
+2
+\left(
+\mathbf x_i-\mathbf c_C
+\right)^\top
+\left(
+\mathbf c_C-\mathbf c
+\right).
+\end{aligned}
+\]</span></p>
+<p>Somando sobre <span class="math inline">\(i\in C\)</span>,</p>
+<p><span class="math display">\[
+\sum_{i\in C}
+\left(
+\mathbf x_i-\mathbf c_C
+\right)
+=
+\mathbf 0,
+\]</span></p>
+<p>de modo que os termos cruzados desaparecem. Obtém-se, então, <a href="#eq-decomposicao-centroide" class="quarto-xref">Equação&nbsp;<span>16.11</span></a>.</p>
+<p>A primeira parcela dessa expressão não depende de <span class="math inline">\(\mathbf c\)</span>, enquanto</p>
+<p><span class="math display">\[
+n_C
+\left\|
+\mathbf c-\mathbf c_C
+\right\|^2
+\geq
+0.
+\]</span></p>
+<p>O valor mínimo ocorre em</p>
+<p><span class="math display">\[
+\mathbf c
+=
+\mathbf c_C.
+\]</span></p>
+</div>
+<p>O resultado mostra que o uso da média não constitui uma escolha independente do critério. Ele decorre da utilização da distância euclidiana quadrática.</p>
+<p>Alterar a medida de perda pode alterar o representante ótimo do grupo. Por isso, o centroide deve ser interpretado em conjunto com a função objetivo que o produz.</p>
+</section>
+<section id="partição-para-centroides-fixados" class="level3" data-number="16.5.4">
+<h3 data-number="16.5.4" class="anchored" data-anchor-id="partição-para-centroides-fixados"><span class="header-section-number">16.5.4</span> Partição para centroides fixados</h3>
+<p>O critério também possui uma estrutura simples quando os centroides</p>
+<p><span class="math display">\[
+\mathbf c_1,\ldots,\mathbf c_K
+\]</span></p>
+<p>são considerados fixos.</p>
+<p>Para uma observação <span class="math inline">\(\mathbf x_i\)</span>, sua contribuição ao critério será</p>
+<p><span class="math display">\[
+\left\|
+\mathbf x_i-\mathbf c_k
+\right\|^2
+\]</span></p>
+<p>se ela for atribuída ao grupo <span class="math inline">\(C_k\)</span>.</p>
+<p>A menor contribuição possível é obtida escolhendo um grupo pertencente a</p>
+<p><span id="eq-alocacao-centroide-proximo"><span class="math display">\[
+\operatorname*{arg\,min}_{1\leq k\leq K}
+\left\|
+\mathbf x_i-\mathbf c_k
+\right\|^2.
+\tag{16.12}\]</span></span></p>
+<p>Assim, para centroides fixados, cada observação é associada a um centroide mais próximo.</p>
+<p>Os dois resultados anteriores descrevem duas propriedades do critério, sintetizadas na <a href="#tbl-subproblemas-kmedias" class="quarto-xref">Tabela&nbsp;<span>16.3</span></a>.</p>
+<div id="tbl-subproblemas-kmedias" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-subproblemas-kmedias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;16.3: Estrutura do critério das <span class="math inline">\(K\)</span>-médias quando se fixa uma das partes do problema.
+</figcaption>
+<div aria-describedby="tbl-subproblemas-kmedias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Elemento fixado</th>
+<th>Quantidade determinada pelo critério</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Partição <span class="math inline">\(\mathcal P\)</span></td>
+<td>cada centro ótimo é o centroide das observações do grupo</td>
+</tr>
+<tr class="even">
+<td>Centroides <span class="math inline">\(\mathbf c_1,\ldots,\mathbf c_K\)</span></td>
+<td>cada observação é atribuída a um centroide de menor distância</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Essa estrutura explica a formulação dos procedimentos iterativos utilizados para calcular soluções das <span class="math inline">\(K\)</span>-médias. Os algoritmos, as estratégias de inicialização e os critérios de parada pertencem à implementação da técnica e não serão desenvolvidos neste capítulo.</p>
+</section>
+<section id="geometria-das-regiões-de-alocação" class="level3" data-number="16.5.5">
+<h3 data-number="16.5.5" class="anchored" data-anchor-id="geometria-das-regiões-de-alocação"><span class="header-section-number">16.5.5</span> Geometria das regiões de alocação</h3>
+<p>Para centroides fixados, a regra em <a href="#eq-alocacao-centroide-proximo" class="quarto-xref">Equação&nbsp;<span>16.12</span></a> divide o espaço em regiões formadas pelos pontos mais próximos de cada centroide.</p>
+<p>Para dois centroides <span class="math inline">\(\mathbf c_k\)</span> e <span class="math inline">\(\mathbf c_\ell\)</span>, a fronteira entre suas regiões satisfaz</p>
+<p><span class="math display">\[
+\left\|
+\mathbf x-\mathbf c_k
+\right\|^2
+=
+\left\|
+\mathbf x-\mathbf c_\ell
+\right\|^2.
+\]</span></p>
+<p>Expandindo as duas normas,</p>
+<p><span class="math display">\[
+\mathbf x^\top\mathbf x
+-
+2\mathbf c_k^\top\mathbf x
++
+\mathbf c_k^\top\mathbf c_k
+=
+\mathbf x^\top\mathbf x
+-
+2\mathbf c_\ell^\top\mathbf x
++
+\mathbf c_\ell^\top\mathbf c_\ell.
+\]</span></p>
+<p>Os termos</p>
+<p><span class="math display">\[
+\mathbf x^\top\mathbf x
+\]</span></p>
+<p>se cancelam, resultando em</p>
+<p><span id="eq-fronteira-voronoi-kmedias"><span class="math display">\[
+2
+\left(
+\mathbf c_\ell-\mathbf c_k
+\right)^\top
+\mathbf x
+=
+\mathbf c_\ell^\top\mathbf c_\ell
+-
+\mathbf c_k^\top\mathbf c_k.
+\tag{16.13}\]</span></span></p>
+<p>A fronteira é, portanto, um hiperplano.</p>
+<p>As regiões definidas simultaneamente por todos os centroides formam uma partição de Voronoi do espaço. Essa geometria explica por que as <span class="math inline">\(K\)</span>-médias favorecem grupos representáveis por regiões convexas associadas a centros.</p>
+<p>A <a href="#fig-kmedias-voronoi" class="quarto-xref">Figura&nbsp;<span>16.3</span></a> representa uma solução com três centroides. As regiões de fundo indicam qual centroide é o mais próximo em cada posição do plano, enquanto os símbolos maiores identificam os centroides da solução.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-kmedias-voronoi" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-kmedias-voronoi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_agrupamento_files/figure-html/fig-kmedias-voronoi-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="720">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-kmedias-voronoi-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;16.3: Centroides e regiões de alocação definidas pela distância euclidiana.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A figura mostra duas propriedades da formulação. Cada grupo é representado por um centroide, e a alocação é determinada pela geometria euclidiana relativa a esses centros. A forma dos grupos obtidos pelo critério está vinculada a essa representação.</p>
+<div id="exm-comparacao-particoes-kmedias" class="theorem example">
+<p><span class="theorem-title"><strong>Exemplo 16.1 (Comparação de duas partições)</strong></span> Considere quatro observações unidimensionais,</p>
+<p><span class="math display">\[
+x_1=1,
+\qquad
+x_2=2,
+\qquad
+x_3=8,
+\qquad
+x_4=9,
+\]</span></p>
+<p>e duas partições candidatas com</p>
+<p><span class="math display">\[
+K=2.
+\]</span></p>
+<p>Na primeira,</p>
+<p><span class="math display">\[
+\mathcal P_1
+=
+\left\{
+\{1,2\},
+\{3,4\}
+\right\}.
+\]</span></p>
+<p>Os centroides são</p>
+<p><span class="math display">\[
+c_1
+=
+1{,}5
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+c_2
+=
+8{,}5.
+\]</span></p>
+<p>Logo,</p>
+<p><span class="math display">\[
+\begin{aligned}
+J_2
+\left(
+\mathcal P_1
+\right)
+&amp;=
+(1-1{,}5)^2
++
+(2-1{,}5)^2
+\\
+&amp;\quad+
+(8-8{,}5)^2
++
+(9-8{,}5)^2
+\\
+&amp;=
+1.
+\end{aligned}
+\]</span></p>
+<p>Considere agora</p>
+<p><span class="math display">\[
+\mathcal P_2
+=
+\left\{
+\{1,3\},
+\{2,4\}
+\right\}.
+\]</span></p>
+<p>Os centroides são</p>
+<p><span class="math display">\[
+c_1
+=
+4{,}5
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+c_2
+=
+5{,}5.
+\]</span></p>
+<p>Nesse caso,</p>
+<p><span class="math display">\[
+\begin{aligned}
+J_2
+\left(
+\mathcal P_2
+\right)
+&amp;=
+(1-4{,}5)^2
++
+(8-4{,}5)^2
+\\
+&amp;\quad+
+(2-5{,}5)^2
++
+(9-5{,}5)^2
+\\
+&amp;=
+49.
+\end{aligned}
+\]</span></p>
+<p>O critério atribui valor menor à primeira partição porque as observações estão muito mais concentradas em torno dos respectivos centroides.</p>
+<p>O exemplo também mostra que o método não procura apenas separar pontos distantes. A solução é definida pela soma global das dispersões quadráticas dentro dos grupos.</p>
+</div>
+</section>
+<section id="existência-e-não-unicidade-da-solução" class="level3" data-number="16.5.6">
+<h3 data-number="16.5.6" class="anchored" data-anchor-id="existência-e-não-unicidade-da-solução"><span class="header-section-number">16.5.6</span> Existência e não unicidade da solução</h3>
+<p>Para uma matriz de dados finita e um valor fixado de</p>
+<p><span class="math display">\[
+1\leq K\leq n,
+\]</span></p>
+<p>existe pelo menos uma partição que minimiza <a href="#eq-criterio-kmedias" class="quarto-xref">Equação&nbsp;<span>16.7</span></a>.</p>
+<p>O número de partições possíveis das <span class="math inline">\(n\)</span> observações em <span class="math inline">\(K\)</span> grupos não vazios é finito. Como</p>
+<p><span class="math display">\[
+J_K
+\left(
+\mathcal P
+\right)
+\geq
+0
+\]</span></p>
+<p>para toda partição admissível, o menor valor do critério é atingido por pelo menos uma delas.</p>
+<p>A existência de um mínimo global não implica unicidade.</p>
+<p>Podem existir duas partições distintas</p>
+<p><span class="math display">\[
+\mathcal P_1
+\neq
+\mathcal P_2
+\]</span></p>
+<p>tais que</p>
+<p><span class="math display">\[
+J_K
+\left(
+\mathcal P_1
+\right)
+=
+J_K
+\left(
+\mathcal P_2
+\right)
+=
+\min_{\mathcal P}
+J_K
+\left(
+\mathcal P
+\right).
+\]</span></p>
+<p>Também há uma indeterminação de rótulos. As coleções</p>
+<p><span class="math display">\[
+\left\{
+C_1,C_2,\ldots,C_K
+\right\}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\left\{
+C_{\pi(1)},
+C_{\pi(2)},
+\ldots,
+C_{\pi(K)}
+\right\},
+\]</span></p>
+<p>para qualquer permutação <span class="math inline">\(\pi\)</span>, representam a mesma partição substantiva.</p>
+<p>Essa indeterminação é diferente daquela encontrada na Análise Fatorial. Na Análise Fatorial, diferentes orientações podem representar a mesma estrutura de covariâncias. Nas <span class="math inline">\(K\)</span>-médias, os rótulos dos grupos são arbitrários e podem ainda existir diferentes partições geométricas com o mesmo valor mínimo.</p>
+</section>
+<section id="natureza-do-problema-de-otimização" class="level3" data-number="16.5.7">
+<h3 data-number="16.5.7" class="anchored" data-anchor-id="natureza-do-problema-de-otimização"><span class="header-section-number">16.5.7</span> Natureza do problema de otimização</h3>
+<p>O problema completo das <span class="math inline">\(K\)</span>-médias combina duas escolhas:</p>
+<ul>
+<li>a atribuição de cada observação a um grupo;</li>
+<li>a posição dos centroides.</li>
+</ul>
+<p>Para uma partição fixada, <a href="#prp-centroide-minimiza-soma-quadrados" class="quarto-xref">Proposição&nbsp;<span>16.1</span></a> fornece diretamente os centroides ótimos. Para centroides fixados, <a href="#eq-alocacao-centroide-proximo" class="quarto-xref">Equação&nbsp;<span>16.12</span></a> fornece diretamente a melhor atribuição de cada observação.</p>
+<p>O problema conjunto permanece combinatório. A função objetivo pode apresentar diferentes soluções localmente estáveis, e procedimentos iterativos podem atingir soluções distintas conforme seu ponto de partida.</p>
+<p>Essa propriedade pertence ao problema matemático das <span class="math inline">\(K\)</span>-médias. Estratégias computacionais para inicialização, repetição e comparação de soluções serão tratadas na etapa de implementação.</p>
+<p>O valor de <span class="math inline">\(K\)</span> também faz parte da especificação do problema em <a href="#eq-solucao-global-kmedias" class="quarto-xref">Equação&nbsp;<span>16.8</span></a>. Modificar <span class="math inline">\(K\)</span> altera o conjunto de partições admissíveis e a própria função de otimização considerada. Os critérios utilizados para escolher o número de grupos pertencem à condução aplicada da análise e não serão desenvolvidos neste capítulo.</p>
+</section>
+<section id="formulação-populacional-do-critério-das-k-médias" class="level3" data-number="16.5.8">
+<h3 data-number="16.5.8" class="anchored" data-anchor-id="formulação-populacional-do-critério-das-k-médias"><span class="header-section-number">16.5.8</span> Formulação populacional do critério das <span class="math inline">\(K\)</span>-médias</h3>
+<p>A formulação das <span class="math inline">\(K\)</span>-médias também pode ser expressa no nível populacional.</p>
+<p>Considere o vetor aleatório</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+\in
+\mathbb R^p
+\]</span></p>
+<p>e <span class="math inline">\(K\)</span> centros</p>
+<p><span class="math display">\[
+\mathbf c_1,\ldots,\mathbf c_K.
+\]</span></p>
+<p>O risco quadrático de quantização é</p>
+<p><span id="eq-risco-populacional-kmedias"><span class="math display">\[
+R_K
+\left(
+\mathbf c_1,\ldots,\mathbf c_K
+\right)
+=
+E
+\left[
+\min_{1\leq k\leq K}
+\left\|
+\boldsymbol{\mathsf X}
+-
+\mathbf c_k
+\right\|^2
+\right],
+\tag{16.14}\]</span></span></p>
+<p>desde que o segundo momento necessário exista.</p>
+<p>Uma solução populacional procura centros pertencentes a</p>
+<p><span class="math display">\[
+\operatorname*{arg\,min}_{
+\mathbf c_1,\ldots,\mathbf c_K
+}
+R_K
+\left(
+\mathbf c_1,\ldots,\mathbf c_K
+\right).
+\]</span></p>
+<p>Para uma amostra aleatória multivariada, conforme <a href="mod_2_amostrais.html#def-amostra-aleatoria-multivariada" class="quarto-xref">Definição&nbsp;<span>10.1</span></a>, a esperança populacional é substituída por sua média empírica:</p>
+<p><span id="eq-risco-empirico-kmedias"><span class="math display">\[
+\widehat R_K
+\left(
+\mathbf c_1,\ldots,\mathbf c_K
+\right)
+=
+\frac{1}{n}
+\sum_{i=1}^{n}
+\min_{1\leq k\leq K}
+\left\|
+\mathbf x_i-\mathbf c_k
+\right\|^2.
+\tag{16.15}\]</span></span></p>
+<p>Para centros fixados, a atribuição ao centro mais próximo fornece</p>
+<p><span class="math display">\[
+n
+\widehat R_K
+\left(
+\mathbf c_1,\ldots,\mathbf c_K
+\right)
+=
+\sum_{i=1}^{n}
+\min_{1\leq k\leq K}
+\left\|
+\mathbf x_i-\mathbf c_k
+\right\|^2.
+\]</span></p>
+<p>Minimizando também em relação aos centros e utilizando <a href="#prp-centroide-minimiza-soma-quadrados" class="quarto-xref">Proposição&nbsp;<span>16.1</span></a>, obtém-se</p>
+<p><span id="eq-equivalencia-risco-empirico-kmedias"><span class="math display">\[
+\min_{
+\mathbf c_1,\ldots,\mathbf c_K
+}
+n
+\widehat R_K
+\left(
+\mathbf c_1,\ldots,\mathbf c_K
+\right)
+=
+\min_{\mathcal P}
+J_K
+\left(
+\mathcal P
+\right).
+\tag{16.16}\]</span></span></p>
+<p>A formulação populacional esclarece o significado estatístico do critério: a solução amostral procura uma configuração de centros que minimize empiricamente a distância quadrática ao centro mais próximo.</p>
+<p>Essa interpretação também delimita o alcance de resultados de consistência. Resultados de consistência para <span class="math inline">\(K\)</span>-médias referem-se à convergência dos minimizadores empíricos para a solução do problema de quantização populacional, sob condições adicionais sobre a distribuição e a solução <span class="citation" data-cites="pollard1981">(<a href="references.html#ref-pollard1981" role="doc-biblioref">Pollard, 1981</a>)</span>. Essa convergência não demonstra, por si só, a existência de classes naturais independentes do critério.</p>
+</section>
+<section id="efeito-de-transformações-sobre-as-k-médias" class="level3" data-number="16.5.9">
+<h3 data-number="16.5.9" class="anchored" data-anchor-id="efeito-de-transformações-sobre-as-k-médias"><span class="header-section-number">16.5.9</span> Efeito de transformações sobre as <span class="math inline">\(K\)</span>-médias</h3>
+<p>A formulação por distância euclidiana permite recuperar diretamente resultados geométricos do Módulo 1.</p>
+<p>Uma translação comum</p>
+<p><span class="math display">\[
+\mathbf x_i^{*}
+=
+\mathbf x_i+\mathbf b
+\]</span></p>
+<p>também desloca cada centroide:</p>
+<p><span class="math display">\[
+\mathbf c_k^{*}
+=
+\mathbf c_k+\mathbf b.
+\]</span></p>
+<p>Consequentemente,</p>
+<p><span class="math display">\[
+\left\|
+\mathbf x_i^{*}
+-
+\mathbf c_k^{*}
+\right\|^2
+=
+\left\|
+\mathbf x_i-\mathbf c_k
+\right\|^2.
+\]</span></p>
+<p>O critério das <span class="math inline">\(K\)</span>-médias é, portanto, invariante a uma translação comum das observações.</p>
+<p>O mesmo ocorre sob uma transformação ortogonal</p>
+<p><span class="math display">\[
+\mathbf x_i^{*}
+=
+\mathbf Q\mathbf x_i.
+\]</span></p>
+<p>A preservação de produtos internos, normas, ângulos e distâncias por transformações ortogonais foi estabelecida em <a href="mod_1_transformacoes.html#prp-preservacao-geometria-transformacao-ortogonal" class="quarto-xref">Proposição&nbsp;<span>4.10</span></a>. Aplicada às observações e aos centroides, essa propriedade mantém as distâncias utilizadas pelo critério das <span class="math inline">\(K\)</span>-médias. Os centroides transformados são</p>
+<p><span class="math display">\[
+\mathbf c_k^{*}
+=
+\mathbf Q\mathbf c_k,
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\left\|
+\mathbf Q
+\left(
+\mathbf x_i-\mathbf c_k
+\right)
+\right\|^2
+=
+\left\|
+\mathbf x_i-\mathbf c_k
+\right\|^2.
+\]</span></p>
+<p>Assim, rotações e reflexões ortogonais preservam o valor do critério e a estrutura geométrica da solução, salvo a transformação das próprias coordenadas.</p>
+<p>Mudanças individuais de escala não apresentam essa propriedade. Como já ilustrado em <a href="#fig-agrupamentos-efeito-escala" class="quarto-xref">Figura&nbsp;<span>16.2</span></a>, elas modificam as distâncias relativas e podem alterar a partição ótima.</p>
+<p>A <a href="#tbl-transformacoes-kmedias" class="quarto-xref">Tabela&nbsp;<span>16.4</span></a> resume essas consequências.</p>
+<div id="tbl-transformacoes-kmedias" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-transformacoes-kmedias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;16.4: Efeito de transformações geométricas sobre o critério das <span class="math inline">\(K\)</span>-médias.
+</figcaption>
+<div aria-describedby="tbl-transformacoes-kmedias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Transformação das observações</th>
+<th>Efeito sobre as distâncias euclidianas</th>
+<th>Efeito sobre o problema das <span class="math inline">\(K\)</span>-médias</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>translação comum</td>
+<td>preservadas</td>
+<td>preserva o critério e a partição correspondente</td>
+</tr>
+<tr class="even">
+<td>rotação ortogonal</td>
+<td>preservadas</td>
+<td>preserva o critério e transforma rigidamente a solução</td>
+</tr>
+<tr class="odd">
+<td>reflexão ortogonal</td>
+<td>preservadas</td>
+<td>preserva o critério e transforma rigidamente a solução</td>
+</tr>
+<tr class="even">
+<td>escala comum por <span class="math inline">\(a\neq0\)</span></td>
+<td>multiplicadas por <span class="math inline">\(|a|\)</span></td>
+<td>multiplica <span class="math inline">\(J_K\)</span> por <span class="math inline">\(a^2\)</span>, sem alterar a ordenação das partições</td>
+</tr>
+<tr class="odd">
+<td>escalas diferentes por variável</td>
+<td>alteradas de forma desigual</td>
+<td>pode alterar a partição ótima</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Essa análise mostra que as propriedades geométricas das transformações estudadas no Módulo 1 têm consequência direta na técnica: somente transformações que preservam ou modificam uniformemente a geometria euclidiana mantêm a mesma organização relativa das partições.</p>
+<p>A formulação por centroides representa uma definição específica de grupo: regiões compactas organizadas em torno de centros. Os métodos hierárquicos utilizam outra estrutura. Em vez de procurar diretamente uma única partição que minimize uma função global, eles constroem uma sequência de agrupamentos aninhados a partir de uma regra de proximidade entre conjuntos.</p>
+</section>
+</section>
+<section id="estrutura-dos-métodos-hierárquicos" class="level2" data-number="16.6">
+<h2 data-number="16.6" class="anchored" data-anchor-id="estrutura-dos-métodos-hierárquicos"><span class="header-section-number">16.6</span> Estrutura dos métodos hierárquicos</h2>
+<p>As <span class="math inline">\(K\)</span>-médias procuram diretamente uma partição para um número <span class="math inline">\(K\)</span> previamente fixado de grupos. Os métodos hierárquicos utilizam outra representação: constroem uma sequência de partições relacionadas por inclusão.</p>
+<p>Em um procedimento aglomerativo, parte-se da partição formada por <span class="math inline">\(n\)</span> grupos unitários,</p>
+<p><span class="math display">\[
+\mathcal P_n
+=
+\left\{
+\{1\},\ldots,\{n\}
+\right\},
+\]</span></p>
+<p>e, a cada etapa, dois grupos são fundidos. Após uma fusão, obtém-se uma nova partição com um grupo a menos, até chegar a</p>
+<p><span class="math display">\[
+\mathcal P_1
+=
+\left\{
+\{1,\ldots,n\}
+\right\}.
+\]</span></p>
+<p>As partições sucessivas são aninhadas: um grupo formado em determinada etapa permanece contido em algum grupo das etapas posteriores.</p>
+<div id="def-hierarquia-agrupamentos" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 16.4 (Hierarquia de agrupamentos)</strong></span> Uma <strong>hierarquia aglomerativa</strong> é uma sequência de partições</p>
+<p><span class="math display">\[
+\mathcal P_n,
+\mathcal P_{n-1},
+\ldots,
+\mathcal P_1,
+\]</span></p>
+<p>na qual <span class="math inline">\(\mathcal P_{r-1}\)</span> é obtida de <span class="math inline">\(\mathcal P_r\)</span> pela fusão de exatamente dois grupos.</p>
+</div>
+<p>A construção da hierarquia exige uma regra para comparar grupos. O Módulo 1 forneceu a distância entre observações em <a href="mod_1_vetores.html#def-distancia-euclidiana" class="quarto-xref">Definição&nbsp;<span>1.13</span></a> e outras geometrias por meio de normas induzidas. No agrupamento hierárquico, essa informação deve ser estendida de pares de observações para pares de conjuntos.</p>
+<p>Considere dois grupos não vazios</p>
+<p><span class="math display">\[
+A
+\subseteq
+\{1,\ldots,n\}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+B
+\subseteq
+\{1,\ldots,n\}.
+\]</span></p>
+<p>Uma <strong>regra de ligação</strong> define uma dissimilaridade</p>
+<p><span class="math display">\[
+D(A,B)
+\]</span></p>
+<p>entre esses grupos. Diferentes regras utilizam de maneiras distintas as dissimilaridades entre seus elementos e, por isso, podem produzir hierarquias diferentes a partir da mesma matriz <span class="math inline">\(\boldsymbol{\Delta}\)</span>.</p>
+<section id="ligações-simples-completa-e-média" class="level3" data-number="16.6.1">
+<h3 data-number="16.6.1" class="anchored" data-anchor-id="ligações-simples-completa-e-média"><span class="header-section-number">16.6.1</span> Ligações simples, completa e média</h3>
+<p>Três regras podem ser construídas diretamente a partir das dissimilaridades entre pares de objetos.</p>
+<p>Na <strong>ligação simples</strong>,</p>
+<p><span id="eq-ligacao-simples"><span class="math display">\[
+D_{\mathrm{simples}}
+\left(
+A,B
+\right)
+=
+\min_{\substack{i\in A\\j\in B}}
+\delta_{ij}.
+\tag{16.17}\]</span></span></p>
+<p>A proximidade entre os grupos é determinada pelo par mais próximo. A fusão pode, portanto, ocorrer quando existe uma conexão curta entre dois conjuntos, mesmo que outros elementos estejam relativamente afastados.</p>
+<p>Na <strong>ligação completa</strong>,</p>
+<p><span id="eq-ligacao-completa"><span class="math display">\[
+D_{\mathrm{completa}}
+\left(
+A,B
+\right)
+=
+\max_{\substack{i\in A\\j\in B}}
+\delta_{ij}.
+\tag{16.18}\]</span></span></p>
+<p>A comparação é determinada pelo par mais distante. Essa definição favorece fusões nas quais todos os elementos dos dois grupos permanecem relativamente próximos.</p>
+<p>Na <strong>ligação média</strong>,</p>
+<p><span id="eq-ligacao-media"><span class="math display">\[
+D_{\mathrm{media}}
+\left(
+A,B
+\right)
+=
+\frac{1}{
+|A||B|
+}
+\sum_{i\in A}
+\sum_{j\in B}
+\delta_{ij}.
+\tag{16.19}\]</span></span></p>
+<p>A dissimilaridade entre os grupos corresponde à média das dissimilaridades entre todos os pares formados por um elemento de <span class="math inline">\(A\)</span> e um elemento de <span class="math inline">\(B\)</span>.</p>
+<p>As três regras utilizam a mesma matriz de dissimilaridades, mas representam noções distintas de proximidade entre conjuntos.</p>
+<p>A <a href="#tbl-ligacoes-hierarquicas" class="quarto-xref">Tabela&nbsp;<span>16.5</span></a> compara as três definições de proximidade entre grupos.</p>
+<div id="tbl-ligacoes-hierarquicas" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-ligacoes-hierarquicas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;16.5: Critérios de ligação construídos a partir das dissimilaridades entre objetos.
+</figcaption>
+<div aria-describedby="tbl-ligacoes-hierarquicas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Regra de ligação</th>
+<th>Dissimilaridade entre <span class="math inline">\(A\)</span> e <span class="math inline">\(B\)</span></th>
+<th>Estrutura privilegiada</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>simples</td>
+<td>menor dissimilaridade entre pares</td>
+<td>conexão entre elementos próximos</td>
+</tr>
+<tr class="even">
+<td>completa</td>
+<td>maior dissimilaridade entre pares</td>
+<td>controle da maior separação interna após a fusão</td>
+</tr>
+<tr class="odd">
+<td>média</td>
+<td>média das dissimilaridades entre pares</td>
+<td>proximidade média entre os conjuntos</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A diferença entre os critérios pode ser observada mesmo com poucos objetos. Considere dois grupos</p>
+<p><span class="math display">\[
+A
+=
+\{1,2\}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+B
+=
+\{3,4\},
+\]</span></p>
+<p>com dissimilaridades entre seus elementos dadas por</p>
+<p><span class="math display">\[
+\delta_{13}=2,
+\qquad
+\delta_{14}=8,
+\qquad
+\delta_{23}=3,
+\qquad
+\delta_{24}=7.
+\]</span></p>
+<p>Então,</p>
+<p><span class="math display">\[
+D_{\mathrm{simples}}(A,B)
+=
+2,
+\]</span></p>
+<p><span class="math display">\[
+D_{\mathrm{completa}}(A,B)
+=
+8
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+D_{\mathrm{media}}(A,B)
+=
+\frac{
+2+8+3+7
+}{4}
+=
+5.
+\]</span></p>
+<p>Não há contradição entre os três resultados. Cada valor responde a uma definição diferente da distância entre grupos.</p>
+<p>A escolha da ligação faz, portanto, parte da definição matemática do agrupamento hierárquico.</p>
+</section>
+<section id="método-de-ward-e-dispersão-intragrupos" class="level3" data-number="16.6.2">
+<h3 data-number="16.6.2" class="anchored" data-anchor-id="método-de-ward-e-dispersão-intragrupos"><span class="header-section-number">16.6.2</span> Método de Ward e dispersão intragrupos</h3>
+<p>O método de Ward utiliza uma construção diferente das três ligações anteriores. Na formulação desenvolvida aqui, os objetos possuem coordenadas em um espaço euclidiano e a decisão de fusão é baseada no aumento da dispersão quadrática intragrupos <span class="citation" data-cites="ward1963">(<a href="references.html#ref-ward1963" role="doc-biblioref">Ward, 1963</a>)</span>.</p>
+<p>Essa interpretação depende da estrutura euclidiana que permite definir centroides e somas de quadrados. Uma matriz arbitrária de dissimilaridades não possui, por si só, a mesma interpretação em termos de SSCP.</p>
+<p>Essa formulação permite reutilizar diretamente a matriz <span class="math inline">\(\mathbf T_{\mathrm{intra}}\)</span> definida em <a href="mod_2_covariancias.html#def-sscp-intragrupos" class="quarto-xref">Definição&nbsp;<span>8.14</span></a> e a decomposição de <a href="mod_2_covariancias.html#prp-decomposicao-dispersao-grupos" class="quarto-xref">Proposição&nbsp;<span>8.11</span></a>.</p>
+<p>Considere dois grupos <span class="math inline">\(A\)</span> e <span class="math inline">\(B\)</span>, com tamanhos</p>
+<p><span class="math display">\[
+n_A
+=
+|A|,
+\qquad
+n_B
+=
+|B|,
+\]</span></p>
+<p>e centroides</p>
+<p><span class="math display">\[
+\mathbf c_A
+=
+\frac{1}{n_A}
+\sum_{i\in A}
+\mathbf x_i
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf c_B
+=
+\frac{1}{n_B}
+\sum_{i\in B}
+\mathbf x_i.
+\]</span></p>
+<p>Após a fusão,</p>
+<p><span class="math display">\[
+C
+=
+A\cup B,
+\]</span></p>
+<p>o novo centroide é</p>
+<p><span id="eq-centroide-fusao-ward"><span class="math display">\[
+\mathbf c_C
+=
+\frac{
+n_A\mathbf c_A
++
+n_B\mathbf c_B
+}{
+n_A+n_B
+}.
+\tag{16.20}\]</span></span></p>
+<p>Antes da fusão, a contribuição desses dois grupos para a dispersão intragrupos é</p>
+<p><span class="math display">\[
+J(A)+J(B)
+=
+\sum_{i\in A}
+\left\|
+\mathbf x_i-\mathbf c_A
+\right\|^2
++
+\sum_{i\in B}
+\left\|
+\mathbf x_i-\mathbf c_B
+\right\|^2.
+\]</span></p>
+<p>Depois da fusão, a contribuição passa a ser</p>
+<p><span class="math display">\[
+J(A\cup B)
+=
+\sum_{i\in A\cup B}
+\left\|
+\mathbf x_i-\mathbf c_C
+\right\|^2.
+\]</span></p>
+<p>O aumento produzido pela fusão é</p>
+<p><span id="eq-incremento-ward-definicao"><span class="math display">\[
+\Delta_{\mathrm{Ward}}
+\left(
+A,B
+\right)
+=
+J(A\cup B)
+-
+J(A)
+-
+J(B).
+\tag{16.21}\]</span></span></p>
+<p>O resultado obtido em <a href="#prp-centroide-minimiza-soma-quadrados" class="quarto-xref">Proposição&nbsp;<span>16.1</span></a> pode ser aplicado separadamente aos grupos <span class="math inline">\(A\)</span> e <span class="math inline">\(B\)</span>. Para as observações de <span class="math inline">\(A\)</span>,</p>
+<p><span class="math display">\[
+\sum_{i\in A}
+\left\|
+\mathbf x_i-\mathbf c_C
+\right\|^2
+=
+\sum_{i\in A}
+\left\|
+\mathbf x_i-\mathbf c_A
+\right\|^2
++
+n_A
+\left\|
+\mathbf c_A-\mathbf c_C
+\right\|^2.
+\]</span></p>
+<p>Analogamente,</p>
+<p><span class="math display">\[
+\sum_{i\in B}
+\left\|
+\mathbf x_i-\mathbf c_C
+\right\|^2
+=
+\sum_{i\in B}
+\left\|
+\mathbf x_i-\mathbf c_B
+\right\|^2
++
+n_B
+\left\|
+\mathbf c_B-\mathbf c_C
+\right\|^2.
+\]</span></p>
+<p>Substituindo essas expressões em <a href="#eq-incremento-ward-definicao" class="quarto-xref">Equação&nbsp;<span>16.21</span></a>,</p>
+<p><span class="math display">\[
+\Delta_{\mathrm{Ward}}
+\left(
+A,B
+\right)
+=
+n_A
+\left\|
+\mathbf c_A-\mathbf c_C
+\right\|^2
++
+n_B
+\left\|
+\mathbf c_B-\mathbf c_C
+\right\|^2.
+\]</span></p>
+<p>De <a href="#eq-centroide-fusao-ward" class="quarto-xref">Equação&nbsp;<span>16.20</span></a>,</p>
+<p><span class="math display">\[
+\mathbf c_A-\mathbf c_C
+=
+\frac{
+n_B
+}{
+n_A+n_B
+}
+\left(
+\mathbf c_A-\mathbf c_B
+\right)
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf c_B-\mathbf c_C
+=
+-\frac{
+n_A
+}{
+n_A+n_B
+}
+\left(
+\mathbf c_A-\mathbf c_B
+\right).
+\]</span></p>
+<p>Logo,</p>
+<p><span id="eq-incremento-ward"><span class="math display">\[
+\Delta_{\mathrm{Ward}}
+\left(
+A,B
+\right)
+=
+\frac{
+n_A n_B
+}{
+n_A+n_B
+}
+\left\|
+\mathbf c_A-\mathbf c_B
+\right\|^2.
+\tag{16.22}\]</span></span></p>
+<div id="prp-incremento-ward" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposição 16.2 (Incremento de dispersão no método de Ward)</strong></span> A fusão de dois grupos <span class="math inline">\(A\)</span> e <span class="math inline">\(B\)</span> aumenta a soma de quadrados intragrupos em</p>
+<p><span class="math display">\[
+\Delta_{\mathrm{Ward}}
+\left(
+A,B
+\right)
+=
+\frac{
+n_A n_B
+}{
+n_A+n_B
+}
+\left\|
+\mathbf c_A-\mathbf c_B
+\right\|^2.
+\]</span></p>
+</div>
+<p>O método de Ward seleciona, em cada etapa, uma fusão com menor aumento em</p>
+<p><span class="math display">\[
+\operatorname{tr}
+\left(
+\mathbf T_{\mathrm{intra}}
+\right).
+\]</span></p>
+<p>A expressão em <a href="#eq-incremento-ward" class="quarto-xref">Equação&nbsp;<span>16.22</span></a> apresenta duas componentes. A distância entre os centroides mede a separação geométrica dos grupos, enquanto</p>
+<p><span class="math display">\[
+\frac{
+n_A n_B
+}{
+n_A+n_B
+}
+\]</span></p>
+<p>incorpora seus tamanhos.</p>
+<p>Ward e <span class="math inline">\(K\)</span>-médias compartilham, portanto, a mesma estrutura de dispersão quadrática. A diferença está na forma como a solução é construída. As <span class="math inline">\(K\)</span>-médias procuram uma partição para um <span class="math inline">\(K\)</span> fixado; Ward constrói sucessivamente uma hierarquia de fusões e controla o aumento local da dispersão intragrupos.</p>
+<p>A <a href="#fig-agrupamentos-ligacoes" class="quarto-xref">Figura&nbsp;<span>16.4</span></a> representa a diferença conceitual entre ligação simples, ligação completa e Ward para dois grupos.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-agrupamentos-ligacoes" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agrupamentos-ligacoes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_agrupamento_files/figure-html/fig-agrupamentos-ligacoes-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="912">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-agrupamentos-ligacoes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;16.4: Diferentes critérios utilizam diferentes características para medir a proximidade entre dois grupos.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Na ligação simples, apenas o par mais próximo determina a comparação. Na ligação completa, utiliza-se o par mais afastado. Em Ward, a distância entre centroides participa de uma expressão ponderada pelos tamanhos dos grupos e representa o aumento produzido na dispersão intragrupos.</p>
+<p>A ligação média não aparece na figura porque utiliza simultaneamente todos os pares entre os dois grupos e não pode ser representada por um único segmento.</p>
+</section>
+<section id="dendrograma-e-níveis-de-fusão" class="level3" data-number="16.6.3">
+<h3 data-number="16.6.3" class="anchored" data-anchor-id="dendrograma-e-níveis-de-fusão"><span class="header-section-number">16.6.3</span> Dendrograma e níveis de fusão</h3>
+<p>A sequência produzida por um método hierárquico pode ser representada por um dendrograma.</p>
+<p>Cada folha corresponde a um objeto. As uniões representam fusões entre grupos, e a altura associada a uma fusão registra o valor do critério no momento em que ela ocorre.</p>
+<div id="def-dendrograma" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 16.5 (Dendrograma)</strong></span> Um <strong>dendrograma</strong> é uma representação gráfica de uma hierarquia de agrupamentos na qual as folhas representam os objetos e as alturas das junções registram os níveis em que grupos são fundidos.</p>
+</div>
+<p>O dendrograma representa toda a sequência de partições produzida pelo método. Uma partição específica com <span class="math inline">\(K\)</span> grupos pode ser identificada por uma etapa da sequência hierárquica. Quando as alturas de fusão distinguem essa etapa, a mesma partição pode ser representada por um corte horizontal no dendrograma.</p>
+<p>Essa operação não deve ser confundida com a escolha do número de grupos. O dendrograma contém as partições aninhadas produzidas pelo critério; a decisão sobre qual delas utilizar pertence à etapa de análise e validação.</p>
+<p>A <a href="#fig-agrupamentos-dendrograma" class="quarto-xref">Figura&nbsp;<span>16.5</span></a> apresenta uma hierarquia simples construída a partir de seis objetos.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-agrupamentos-dendrograma" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-agrupamentos-dendrograma-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_agrupamento_files/figure-html/fig-agrupamentos-dendrograma-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="720">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-agrupamentos-dendrograma-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;16.5: Representação hierárquica das fusões entre seis objetos. A altura registra o nível da fusão.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>O eixo vertical do dendrograma deve ser interpretado segundo o critério utilizado. Na ligação simples, por exemplo, a altura corresponde à menor dissimilaridade que conecta os grupos. Em Ward, ela está associada ao aumento da dispersão intragrupos segundo a implementação e a escala adotadas.</p>
+<p>Por isso, alturas obtidas por critérios diferentes não representam necessariamente a mesma quantidade estatística.</p>
+</section>
+<section id="ultramétrica-induzida-pela-hierarquia" class="level3" data-number="16.6.4">
+<h3 data-number="16.6.4" class="anchored" data-anchor-id="ultramétrica-induzida-pela-hierarquia"><span class="header-section-number">16.6.4</span> Ultramétrica induzida pela hierarquia</h3>
+<p>A hierarquia também define uma nova dissimilaridade entre objetos.</p>
+<p>Para dois objetos <span class="math inline">\(i\)</span> e <span class="math inline">\(j\)</span>, considere a altura em que eles aparecem pela primeira vez no mesmo grupo do dendrograma. Denote essa altura por</p>
+<p><span class="math display">\[
+d_{\mathrm{cop}}
+\left(
+i,j
+\right).
+\]</span></p>
+<p>Essa quantidade é denominada <strong>dissimilaridade cofenética</strong>.</p>
+<div id="def-dissimilaridade-cofenetica" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 16.6 (Dissimilaridade cofenética)</strong></span> A <strong>dissimilaridade cofenética</strong> entre dois objetos é o nível da hierarquia no qual eles passam, pela primeira vez, a pertencer ao mesmo grupo.</p>
+</div>
+<p>A estrutura hierárquica impõe uma propriedade mais forte que a desigualdade triangular usual.</p>
+<div id="def-ultrametrica" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 16.7 (Ultramétrica)</strong></span> Uma distância <span class="math inline">\(d_U\)</span> é uma <strong>ultramétrica</strong> quando, para quaisquer três objetos <span class="math inline">\(i\)</span>, <span class="math inline">\(j\)</span> e <span class="math inline">\(k\)</span>,</p>
+<p><span id="eq-desigualdade-ultrametrica"><span class="math display">\[
+d_U
+\left(
+i,k
+\right)
+\leq
+\max
+\left\{
+d_U
+\left(
+i,j
+\right),
+d_U
+\left(
+j,k
+\right)
+\right\}.
+\tag{16.23}\]</span></span></p>
+</div>
+<p>Quando os níveis de fusão da hierarquia são não decrescentes, a dissimilaridade cofenética definida por essas alturas é ultramétrica.</p>
+<p>Para compreender essa propriedade, considere três objetos. Se <span class="math inline">\(i\)</span> e <span class="math inline">\(j\)</span> já pertencem ao mesmo grupo em determinado nível e <span class="math inline">\(j\)</span> e <span class="math inline">\(k\)</span> também pertencem ao mesmo grupo nesse nível, então a estrutura aninhada da hierarquia implica que <span class="math inline">\(i\)</span> e <span class="math inline">\(k\)</span> também pertencem ao mesmo grupo nesse nível ou em um nível inferior. Consequentemente,</p>
+<p><span class="math display">\[
+d_{\mathrm{cop}}
+\left(
+i,k
+\right)
+\leq
+\max
+\left\{
+d_{\mathrm{cop}}
+\left(
+i,j
+\right),
+d_{\mathrm{cop}}
+\left(
+j,k
+\right)
+\right\}.
+\]</span></p>
+<p>Sob essa condição de monotonicidade dos níveis de fusão, o dendrograma pode ser interpretado como uma representação de uma geometria ultramétrica construída a partir das dissimilaridades originais.</p>
+<p>Essa geometria não precisa reproduzir exatamente a matriz <span class="math inline">\(\boldsymbol{\Delta}\)</span>. O método hierárquico transforma a estrutura inicial de proximidades em uma estrutura aninhada de grupos e, consequentemente, em uma nova relação de proximidade.</p>
+</section>
+<section id="uma-partição-e-uma-hierarquia-representam-objetos-diferentes" class="level3" data-number="16.6.5">
+<h3 data-number="16.6.5" class="anchored" data-anchor-id="uma-partição-e-uma-hierarquia-representam-objetos-diferentes"><span class="header-section-number">16.6.5</span> Uma partição e uma hierarquia representam objetos diferentes</h3>
+<p>As <span class="math inline">\(K\)</span>-médias produzem diretamente uma partição</p>
+<p><span class="math display">\[
+\mathcal P
+=
+\left\{
+C_1,\ldots,C_K
+\right\}.
+\]</span></p>
+<p>Um método hierárquico produz uma coleção ordenada de partições aninhadas. Essa diferença modifica o tipo de informação fornecida pela técnica e é sintetizada na <a href="#tbl-particao-hierarquia" class="quarto-xref">Tabela&nbsp;<span>16.6</span></a>.</p>
+<div id="tbl-particao-hierarquia" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-particao-hierarquia-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;16.6: Estruturas produzidas por diferentes formulações de agrupamento.
+</figcaption>
+<div aria-describedby="tbl-particao-hierarquia-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Estrutura</th>
+<th>Resultado principal</th>
+<th>Critério</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(K\)</span>-médias</td>
+<td>uma partição para <span class="math inline">\(K\)</span> fixado</td>
+<td>minimização da dispersão quadrática intragrupos</td>
+</tr>
+<tr class="even">
+<td>ligação simples</td>
+<td>uma hierarquia</td>
+<td>menor dissimilaridade entre grupos</td>
+</tr>
+<tr class="odd">
+<td>ligação completa</td>
+<td>uma hierarquia</td>
+<td>maior dissimilaridade entre grupos</td>
+</tr>
+<tr class="even">
+<td>ligação média</td>
+<td>uma hierarquia</td>
+<td>média das dissimilaridades entre grupos</td>
+</tr>
+<tr class="odd">
+<td>Ward</td>
+<td>uma hierarquia</td>
+<td>menor aumento da dispersão intragrupos</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A existência de diferentes critérios mostra que “grupo” não corresponde a um único objeto matemático. Nas <span class="math inline">\(K\)</span>-médias, um grupo é representado por proximidade a um centroide. Na ligação simples, a formação de grupos depende da conectividade produzida por pares próximos. Na ligação completa, exige-se controle da maior separação entre os elementos que serão reunidos. Em Ward, a fusão é avaliada por seu efeito sobre a dispersão quadrática interna.</p>
+<p>Essa diferença será ampliada na próxima seção ao considerar formulações nas quais grupos são definidos como componentes de uma distribuição probabilística ou como regiões de elevada densidade.</p>
+</section>
+</section>
+<section id="diferentes-definições-matemáticas-de-grupo" class="level2" data-number="16.7">
+<h2 data-number="16.7" class="anchored" data-anchor-id="diferentes-definições-matemáticas-de-grupo"><span class="header-section-number">16.7</span> Diferentes definições matemáticas de grupo</h2>
+<p>As formulações anteriores mostram que a expressão <strong>grupo</strong> não identifica um único objeto matemático. Nas <span class="math inline">\(K\)</span>-médias, um grupo é organizado em torno de um centroide. Nos métodos hierárquicos, sua formação depende de uma regra de ligação e da sequência de fusões.</p>
+<p>Outras formulações podem definir grupos a partir de modelos probabilísticos ou de regiões de concentração das observações. Essas abordagens não constituem versões equivalentes de um mesmo critério. Elas atribuem significados diferentes à estrutura procurada.</p>
+<p>A <a href="#tbl-definicoes-grupo" class="quarto-xref">Tabela&nbsp;<span>16.7</span></a> sintetiza algumas dessas definições.</p>
+<div id="tbl-definicoes-grupo" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-definicoes-grupo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;16.7: Diferentes definições matemáticas de grupo.
+</figcaption>
+<div aria-describedby="tbl-definicoes-grupo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Formulação</th>
+<th>Representação de um grupo</th>
+<th>Estrutura utilizada</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>centroides</td>
+<td>conjunto de observações próximas de um centro</td>
+<td>distância e dispersão quadrática</td>
+</tr>
+<tr class="even">
+<td>ligação simples</td>
+<td>conjunto conectado por elementos próximos</td>
+<td>menor dissimilaridade entre grupos</td>
+</tr>
+<tr class="odd">
+<td>ligação completa</td>
+<td>conjunto cuja maior separação é controlada</td>
+<td>maior dissimilaridade entre grupos</td>
+</tr>
+<tr class="even">
+<td>Ward</td>
+<td>conjunto cuja fusão produz pequeno aumento da dispersão</td>
+<td>SSCP intragrupos</td>
+</tr>
+<tr class="odd">
+<td>modelo de mistura</td>
+<td>componente de uma distribuição probabilística</td>
+<td>densidades e probabilidades de pertencimento</td>
+</tr>
+<tr class="even">
+<td>densidade</td>
+<td>região conectada de elevada concentração de observações</td>
+<td>densidade e conectividade</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A tabela explica por que métodos diferentes podem produzir soluções distintas sem que uma delas seja necessariamente incorreta. Cada método resolve um problema diferente.</p>
+<section id="formulação-probabilística-de-grupos" class="level3" data-number="16.7.1">
+<h3 data-number="16.7.1" class="anchored" data-anchor-id="formulação-probabilística-de-grupos"><span class="header-section-number">16.7.1</span> Formulação probabilística de grupos</h3>
+<p>Os critérios estudados até aqui foram formulados principalmente por distâncias, dispersões e relações entre conjuntos. Uma definição diferente pode ser obtida por meio de um modelo probabilístico.</p>
+<p>Considere uma variável categórica latente</p>
+<p><span class="math display">\[
+\mathsf G
+\in
+\{1,\ldots,K\},
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+P
+\left(
+\mathsf G=k
+\right)
+=
+\pi_k,
+\qquad
+\pi_k&gt;0,
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\sum_{k=1}^{K}
+\pi_k
+=
+1.
+\]</span></p>
+<p>Condicionalmente ao grupo,</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+\mid
+\mathsf G=k
+\]</span></p>
+<p>possui uma distribuição com densidade</p>
+<p><span class="math display">\[
+f_k
+\left(
+\mathbf x;
+\boldsymbol{\theta}_k
+\right).
+\]</span></p>
+<p>A densidade marginal de <span class="math inline">\(\boldsymbol{\mathsf X}\)</span> é</p>
+<p><span id="eq-modelo-mistura-agrupamento"><span class="math display">\[
+f
+\left(
+\mathbf x
+\right)
+=
+\sum_{k=1}^{K}
+\pi_k
+f_k
+\left(
+\mathbf x;
+\boldsymbol{\theta}_k
+\right).
+\tag{16.24}\]</span></span></p>
+<div id="def-modelo-mistura-agrupamento" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 16.8 (Modelo de mistura para agrupamento)</strong></span> Um <strong>modelo de mistura</strong> representa a distribuição das observações como uma combinação de <span class="math inline">\(K\)</span> componentes,</p>
+<p><span class="math display">\[
+f
+\left(
+\mathbf x
+\right)
+=
+\sum_{k=1}^{K}
+\pi_k
+f_k
+\left(
+\mathbf x;
+\boldsymbol{\theta}_k
+\right),
+\]</span></p>
+<p>em que <span class="math inline">\(\pi_k\)</span> é a probabilidade de pertencimento à componente <span class="math inline">\(k\)</span> e <span class="math inline">\(f_k\)</span> descreve a distribuição das observações condicionada a essa componente.</p>
+</div>
+<p>Nessa formulação, o grupo é representado por uma variável aleatória categórica não observada. A posição de uma observação em relação aos grupos pode ser descrita pelas probabilidades condicionais</p>
+<p><span class="math display">\[
+P
+\left(
+\mathsf G=k
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right).
+\]</span></p>
+<p>Essa estrutura utiliza os fundamentos probabilísticos do Módulo 2, mas resolve um problema diferente daquele da Análise Fatorial. No modelo de fatores comuns de <a href="mod_3_fatorial.html#def-modelo-fatores-comuns" class="quarto-xref">Definição&nbsp;<span>15.1</span></a>, as variáveis latentes são contínuas e explicam a estrutura de covariâncias entre variáveis observadas. No modelo de mistura, a variável latente é categórica e representa a componente à qual uma observação está associada.</p>
+<p>Os algoritmos utilizados para estimar os parâmetros de uma mistura e calcular probabilidades de pertencimento pertencem à implementação da técnica e não serão desenvolvidos neste capítulo.</p>
+<p>A formulação probabilística também não estabelece que toda estrutura encontrada corresponda a uma classe substantiva existente fora do modelo. Os grupos são componentes da distribuição especificada, e sua interpretação depende da adequação dessa representação ao problema analisado.</p>
+</section>
+<section id="grupos-definidos-por-densidade" class="level3" data-number="16.7.2">
+<h3 data-number="16.7.2" class="anchored" data-anchor-id="grupos-definidos-por-densidade"><span class="header-section-number">16.7.2</span> Grupos definidos por densidade</h3>
+<p>Uma terceira noção pode ser formulada diretamente a partir da concentração da distribuição no espaço das observações.</p>
+<p>Se <span class="math inline">\(\boldsymbol{\mathsf X}\)</span> possui densidade</p>
+<p><span class="math display">\[
+f(\mathbf x),
+\]</span></p>
+<p>considere, para um nível</p>
+<p><span class="math display">\[
+\lambda&gt;0,
+\]</span></p>
+<p>o conjunto</p>
+<p><span id="eq-conjunto-nivel-densidade"><span class="math display">\[
+L_{\lambda}
+=
+\left\{
+\mathbf x\in\mathbb R^p:
+f(\mathbf x)\geq\lambda
+\right\}.
+\tag{16.25}\]</span></span></p>
+<p>As componentes conectadas de <span class="math inline">\(L_{\lambda}\)</span> podem representar regiões distintas de elevada densidade.</p>
+<p>Essa definição permite considerar grupos com formas que não precisam ser adequadamente representadas por centroides ou regiões de Voronoi. O critério passa a ser a existência de regiões densas separadas por regiões de menor concentração.</p>
+<p>A noção de grupo baseada em densidade também explica por que métodos construídos para esse objetivo podem produzir soluções muito diferentes das <span class="math inline">\(K\)</span>-médias. Os dois procedimentos não discordam sobre uma mesma função objetivo; eles adotam definições diferentes de estrutura.</p>
+<p>Métodos computacionais baseados em densidade serão tratados posteriormente. Neste capítulo, a formulação serve para mostrar que proximidade a um centroide, conectividade e concentração probabilística são conceitos distintos.</p>
+</section>
+</section>
+<section id="dependência-da-solução" class="level2" data-number="16.8">
+<h2 data-number="16.8" class="anchored" data-anchor-id="dependência-da-solução"><span class="header-section-number">16.8</span> Dependência da solução</h2>
+<p>Uma solução de agrupamento é condicionada pelas escolhas que definem o problema. Algumas dessas escolhas atuam antes da construção dos grupos; outras pertencem ao próprio critério.</p>
+<p>A <a href="#tbl-dependencia-solucao-agrupamento" class="quarto-xref">Tabela&nbsp;<span>16.8</span></a> organiza essas dependências.</p>
+<div id="tbl-dependencia-solucao-agrupamento" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-dependencia-solucao-agrupamento-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;16.8: Elementos dos quais depende uma solução de agrupamento.
+</figcaption>
+<div aria-describedby="tbl-dependencia-solucao-agrupamento-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Elemento modificado</th>
+<th>Estrutura alterada</th>
+<th>Consequência possível</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>conjunto de variáveis</td>
+<td>representação dos objetos</td>
+<td>proximidades e grupos podem mudar</td>
+</tr>
+<tr class="even">
+<td>escala das variáveis</td>
+<td>geometria do espaço</td>
+<td>variáveis recebem pesos relativos diferentes</td>
+</tr>
+<tr class="odd">
+<td>métrica ou dissimilaridade</td>
+<td>relação de proximidade</td>
+<td>pares considerados próximos podem mudar</td>
+</tr>
+<tr class="even">
+<td>número <span class="math inline">\(K\)</span></td>
+<td>conjunto de partições admissíveis</td>
+<td>muda o problema das <span class="math inline">\(K\)</span>-médias</td>
+</tr>
+<tr class="odd">
+<td>regra de ligação</td>
+<td>proximidade entre grupos</td>
+<td>muda a hierarquia</td>
+</tr>
+<tr class="even">
+<td>função objetivo</td>
+<td>definição de agrupamento</td>
+<td>muda a estrutura procurada</td>
+</tr>
+<tr class="odd">
+<td>modelo probabilístico</td>
+<td>significado da variável latente de grupo</td>
+<td>mudam probabilidades e componentes</td>
+</tr>
+<tr class="even">
+<td>critério de densidade</td>
+<td>definição de região concentrada</td>
+<td>mudam forma e conectividade dos grupos</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Essa dependência não deve ser tratada como uma deficiência da técnica. Ela decorre do fato de que agrupamento é uma classe de problemas definida por diferentes conceitos de proximidade e organização.</p>
+<section id="dependência-das-variáveis" class="level3" data-number="16.8.1">
+<h3 data-number="16.8.1" class="anchored" data-anchor-id="dependência-das-variáveis"><span class="header-section-number">16.8.1</span> Dependência das variáveis</h3>
+<p>Cada observação é representada pelo vetor</p>
+<p><span class="math display">\[
+\mathbf x_i
+\in
+\mathbb R^p.
+\]</span></p>
+<p>Adicionar ou retirar uma variável modifica essa representação e pode alterar as distâncias entre os objetos.</p>
+<p>O agrupamento obtido pertence, portanto, ao espaço de variáveis escolhido para representar as unidades.</p>
+<p>Essa característica aproxima a técnica das discussões anteriores sobre ACP e Análise Fatorial. Nos três casos, a estrutura encontrada depende do conjunto de variáveis incluído, embora o objeto procurado seja diferente.</p>
+</section>
+<section id="dependência-da-escala-e-da-métrica" class="level3" data-number="16.8.2">
+<h3 data-number="16.8.2" class="anchored" data-anchor-id="dependência-da-escala-e-da-métrica"><span class="header-section-number">16.8.2</span> Dependência da escala e da métrica</h3>
+<p>O efeito da escala foi ilustrado em <a href="#fig-agrupamentos-efeito-escala" class="quarto-xref">Figura&nbsp;<span>16.2</span></a>. A escolha de uma métrica possui efeito mais geral: ela determina a geometria na qual proximidade e separação serão avaliadas.</p>
+<p>Os resultados do Módulo 1 sobre normas e geometrias induzidas permitem interpretar essa escolha de forma direta. Alterar a métrica significa alterar comprimentos e distâncias e, portanto, alterar o problema de agrupamento.</p>
+</section>
+<section id="dependência-da-forma-dos-grupos" class="level3" data-number="16.8.3">
+<h3 data-number="16.8.3" class="anchored" data-anchor-id="dependência-da-forma-dos-grupos"><span class="header-section-number">16.8.3</span> Dependência da forma dos grupos</h3>
+<p>O critério das <span class="math inline">\(K\)</span>-médias representa cada grupo por um centroide e utiliza regiões de Voronoi. Essa estrutura favorece grupos adequadamente descritos por proximidade a centros.</p>
+<p>A ligação simples utiliza conectividade entre pares próximos e pode representar estruturas alongadas que não são bem resumidas por um único centroide.</p>
+<p>A ligação completa controla separações máximas e tende a privilegiar outra forma de compacidade.</p>
+<p>Métodos baseados em densidade definem grupos por regiões concentradas e conectadas.</p>
+<p>Não existe, portanto, uma única geometria de grupo compartilhada por todos os métodos.</p>
+</section>
+</section>
+<section id="ausência-de-classes-naturais-automáticas" class="level2" data-number="16.9">
+<h2 data-number="16.9" class="anchored" data-anchor-id="ausência-de-classes-naturais-automáticas"><span class="header-section-number">16.9</span> Ausência de classes naturais automáticas</h2>
+<p>A Análise de Agrupamentos é uma técnica não supervisionada: os rótulos dos grupos não são observados previamente.</p>
+<p>Esse fato impõe uma diferença importante em relação à Análise Discriminante. Uma partição encontrada nos dados não demonstra automaticamente a existência de populações distintas que tenham gerado as observações.</p>
+<p>No caso das <span class="math inline">\(K\)</span>-médias, a solução é aquela que minimiza</p>
+<p><span class="math display">\[
+J_K.
+\]</span></p>
+<p>No método de Ward, a hierarquia é definida pelo aumento da dispersão intragrupos.</p>
+<p>Nas ligações simples, completa e média, a hierarquia decorre das respectivas definições de proximidade entre conjuntos.</p>
+<p>Em uma mistura probabilística, os grupos são componentes de um modelo especificado.</p>
+<p>Cada conclusão deve ser interpretada relativamente à estrutura que produziu a solução.</p>
+<div class="callout callout-style-simple callout-caution no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Cuidado</span>Grupos encontrados e grupos substantivos
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Uma solução de agrupamento estabelece uma organização dos objetos segundo uma representação e um critério definidos. A correspondência entre essa organização matemática e categorias substantivas do problema exige informação externa aos critérios de agrupamento.</p>
+</div>
+</div>
+<p>Esse limite distingue a capacidade de encontrar uma estrutura matemática da interpretação substantiva dessa estrutura.</p>
+</section>
+<section id="relações-com-outras-técnicas-multivariadas" class="level2" data-number="16.10">
+<h2 data-number="16.10" class="anchored" data-anchor-id="relações-com-outras-técnicas-multivariadas"><span class="header-section-number">16.10</span> Relações com outras técnicas multivariadas</h2>
+<p>A Análise de Agrupamentos reutiliza objetos já presentes nos capítulos anteriores, mas atribui a eles uma nova função.</p>
+<p>A <a href="#tbl-relacoes-agrupamentos-tecnicas" class="quarto-xref">Tabela&nbsp;<span>16.9</span></a> compara essas relações.</p>
+<div id="tbl-relacoes-agrupamentos-tecnicas" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-relacoes-agrupamentos-tecnicas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;16.9: Relações entre a Análise de Agrupamentos e outras técnicas multivariadas.
+</figcaption>
+<div aria-describedby="tbl-relacoes-agrupamentos-tecnicas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Técnica</th>
+<th>Objeto relacionado</th>
+<th>Função na técnica</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>ACP</td>
+<td>matriz de dados e geometria das observações</td>
+<td>construir uma representação de menor dimensão</td>
+</tr>
+<tr class="even">
+<td>Análise Fatorial</td>
+<td>variáveis observadas e estrutura de covariâncias</td>
+<td>modelar dependências por fatores latentes contínuos</td>
+</tr>
+<tr class="odd">
+<td>Agrupamentos</td>
+<td>matriz de dados ou dissimilaridades</td>
+<td>construir grupos</td>
+</tr>
+<tr class="even">
+<td>MDS</td>
+<td>matriz de dissimilaridades</td>
+<td>reconstruir uma configuração geométrica</td>
+</tr>
+<tr class="odd">
+<td>MANOVA</td>
+<td>dispersão intragrupos e entre grupos</td>
+<td>testar hipóteses sobre diferenças entre grupos conhecidos</td>
+</tr>
+<tr class="even">
+<td>Análise Discriminante</td>
+<td>médias, dispersões e distâncias entre grupos</td>
+<td>construir direções de separação e regras de classificação</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<section id="agrupamentos-e-acp" class="level3" data-number="16.10.1">
+<h3 data-number="16.10.1" class="anchored" data-anchor-id="agrupamentos-e-acp"><span class="header-section-number">16.10.1</span> Agrupamentos e ACP</h3>
+<p>A ACP pode produzir novas coordenadas para as observações. Quando são mantidas todas as componentes correspondentes a uma transformação ortogonal da representação utilizada como entrada, as distâncias euclidianas são preservadas por <a href="mod_1_transformacoes.html#prp-preservacao-geometria-transformacao-ortogonal" class="quarto-xref">Proposição&nbsp;<span>4.10</span></a>.</p>
+<p>Quando apenas <span class="math inline">\(k&lt;p\)</span> componentes são mantidas, as observações são projetadas sobre o subespaço principal definido em <a href="mod_3_cp.html#def-subespaco-principal-acp" class="quarto-xref">Definição&nbsp;<span>14.1</span></a>, como representado em <a href="mod_3_cp.html#fig-acp-projecao-reconstrucao" class="quarto-xref">Figura&nbsp;<span>14.3</span></a>. Nesse caso, as distâncias passam a ser calculadas na configuração projetada e podem diferir das distâncias anteriores à redução.</p>
+<p>A interpretação também depende da representação utilizada pela ACP. Se a análise foi realizada sobre variáveis padronizadas, a preservação pela transformação ortogonal refere-se à geometria do espaço padronizado, e não à geometria das variáveis em suas escalas originais.</p>
+<p>Assim, utilizar ACP antes de um agrupamento modifica o problema sempre que ocorre redução efetiva de dimensão ou mudança prévia da representação dos dados.</p>
+</section>
+<section id="agrupamentos-e-mds" class="level3" data-number="16.10.2">
+<h3 data-number="16.10.2" class="anchored" data-anchor-id="agrupamentos-e-mds"><span class="header-section-number">16.10.2</span> Agrupamentos e MDS</h3>
+<p>Agrupamentos e Escalonamento Multidimensional podem partir da mesma matriz</p>
+<p><span class="math display">\[
+\boldsymbol{\Delta}.
+\]</span></p>
+<p>A diferença está no objeto procurado.</p>
+<p>Na Análise de Agrupamentos, <span class="math inline">\(\boldsymbol{\Delta}\)</span> é utilizada para construir partições ou hierarquias.</p>
+<p>No MDS, ela será utilizada para obter coordenadas</p>
+<p><span class="math display">\[
+\mathbf y_1,\ldots,\mathbf y_n
+\]</span></p>
+<p>cujas distâncias representem as dissimilaridades originais.</p>
+<p>Essa relação prepara diretamente o próximo capítulo.</p>
+</section>
+<section id="agrupamentos-e-análise-discriminante" class="level3" data-number="16.10.3">
+<h3 data-number="16.10.3" class="anchored" data-anchor-id="agrupamentos-e-análise-discriminante"><span class="header-section-number">16.10.3</span> Agrupamentos e Análise Discriminante</h3>
+<p>Na Análise de Agrupamentos, os grupos fazem parte da solução.</p>
+<p>Na Análise Discriminante, os grupos serão observados previamente e serão utilizados para construir funções de separação ou regras de classificação.</p>
+<p>Na Análise de Agrupamentos, os grupos fazem parte da solução. Na Análise Discriminante, eles pertencem à informação disponível antes da construção da regra. A primeira técnica procura uma organização dos objetos; a segunda utiliza grupos conhecidos para estudar separação e classificar novas observações.</p>
+</section>
+<section id="agrupamentos-e-manova" class="level3" data-number="16.10.4">
+<h3 data-number="16.10.4" class="anchored" data-anchor-id="agrupamentos-e-manova"><span class="header-section-number">16.10.4</span> Agrupamentos e MANOVA</h3>
+<p>A conexão com MANOVA aparece na decomposição</p>
+<p><span class="math display">\[
+\mathbf T
+=
+\mathbf T_{\mathrm{intra}}
++
+\mathbf T_{\mathrm{entre}},
+\]</span></p>
+<p>já estabelecida em <a href="mod_2_covariancias.html#prp-decomposicao-dispersao-grupos" class="quarto-xref">Proposição&nbsp;<span>8.11</span></a>.</p>
+<p>Nas <span class="math inline">\(K\)</span>-médias, a partição é desconhecida e procura-se reduzir</p>
+<p><span class="math display">\[
+\operatorname{tr}
+\left(
+\mathbf T_{\mathrm{intra}}
+\right).
+\]</span></p>
+<p>Na MANOVA, os grupos serão dados pelo delineamento e as matrizes de dispersão serão utilizadas para formular um problema inferencial sobre diferenças entre vetores de médias.</p>
+<p>O mesmo objeto matricial assume funções distintas. Nas <span class="math inline">\(K\)</span>-médias, a dispersão intragrupos define um critério de otimização para construir a partição. Na MANOVA, as matrizes de dispersão participam de um problema inferencial para grupos conhecidos. Na Análise Discriminante, elas serão utilizadas para construir direções de separação entre grupos também conhecidos.</p>
+<p>Essa comparação reforça uma característica recorrente do Módulo 3: a operação matemática não determina, sozinha, a técnica. O significado estatístico depende do problema ao qual o objeto é aplicado.</p>
+</section>
+</section>
+<section id="síntese" class="level2" data-number="16.11">
+<h2 data-number="16.11" class="anchored" data-anchor-id="síntese"><span class="header-section-number">16.11</span> Síntese</h2>
+<p>A Análise de Agrupamentos procura organizar objetos sem utilizar classes previamente conhecidas. Sua formulação começa pela representação das observações e pela definição da proximidade que será utilizada.</p>
+<p>Quando os objetos são representados pelas linhas de</p>
+<p><span class="math display">\[
+\mathbf X
+\in
+\mathbb R^{n\times p},
+\]</span></p>
+<p>distâncias podem ser construídas diretamente no espaço das variáveis. Quando apenas relações entre objetos estão disponíveis, a análise pode partir de uma matriz de dissimilaridades</p>
+<p><span class="math display">\[
+\boldsymbol{\Delta}.
+\]</span></p>
+<p>Uma partição rígida em <span class="math inline">\(K\)</span> grupos é representada por</p>
+<p><span class="math display">\[
+\mathcal P
+=
+\left\{
+C_1,\ldots,C_K
+\right\}.
+\]</span></p>
+<p>No critério das <span class="math inline">\(K\)</span>-médias,</p>
+<p><span class="math display">\[
+J_K
+\left(
+\mathcal P
+\right)
+=
+\sum_{k=1}^{K}
+\sum_{i\in C_k}
+\left\|
+\mathbf x_i-\mathbf c_k
+\right\|^2
+=
+\operatorname{tr}
+\left(
+\mathbf T_{\mathrm{intra}}
+\right).
+\]</span></p>
+<p>O centroide aparece porque a média de um conjunto é o ponto que minimiza a soma das distâncias euclidianas quadráticas às observações. Para centroides fixados, cada objeto é atribuído a um centroide mais próximo, produzindo regiões de Voronoi.</p>
+<p>A decomposição</p>
+<p><span class="math display">\[
+\mathbf T
+=
+\mathbf T_{\mathrm{intra}}
++
+\mathbf T_{\mathrm{entre}}
+\]</span></p>
+<p>mostra que, para <span class="math inline">\(K\)</span> fixado, minimizar a dispersão intragrupos equivale a maximizar a parcela entre grupos segundo o traço.</p>
+<p>Nos métodos hierárquicos, o resultado principal deixa de ser uma única partição e passa a ser uma sequência aninhada de partições. Ligações simples, completas e médias utilizam diferentes definições de proximidade entre conjuntos.</p>
+<p>O método de Ward reutiliza a dispersão quadrática e mede o incremento</p>
+<p><span class="math display">\[
+\Delta_{\mathrm{Ward}}
+\left(
+A,B
+\right)
+=
+\frac{
+n_A n_B
+}{
+n_A+n_B
+}
+\left\|
+\mathbf c_A-\mathbf c_B
+\right\|^2
+\]</span></p>
+<p>produzido pela fusão de dois grupos.</p>
+<p>A hierarquia pode ser representada por um dendrograma e induz uma estrutura ultramétrica por meio das alturas das fusões.</p>
+<p>Outras formulações modificam o significado de grupo. Em modelos de mistura, grupos são componentes de uma distribuição probabilística e o pertencimento é representado por uma variável categórica latente. Em formulações baseadas em densidade, grupos podem ser associados a regiões conectadas de elevada concentração.</p>
+<p>A solução depende da representação dos objetos, das variáveis, da escala, da proximidade e do critério de agrupamento. Por isso, uma partição ou hierarquia deve ser interpretada relativamente ao problema matemático que a produziu.</p>
+<p>O próximo capítulo mantém a matriz de dissimilaridades como objeto de entrada, mas altera o objetivo da análise. O Escalonamento Multidimensional utilizará as proximidades entre objetos para reconstruir uma configuração geométrica cujas distâncias representem a estrutura contida em <span class="math inline">\(\boldsymbol{\Delta}\)</span>.</p>
+
+
+<div id="refs" class="references csl-bib-body" data-entry-spacing="1" role="list" style="display: none">
+<div id="ref-johnson2007" class="csl-entry" role="listitem">
+JOHNSON, Richard A.; WICHERN, Dean W. <strong><a href="https://books.google.com/books?id=gFWcQgAACAAJ">Applied Multivariate Statistical Analysis</a></strong>. 6. ed. Upper Saddle River, NJ: Pearson Prentice Hall, 2007.
+</div>
+<div id="ref-macqueen1967" class="csl-entry" role="listitem">
+MACQUEEN, James. Some Methods for Classification and Analysis of Multivariate Observations. <em>In</em>: Berkeley: University of California Press, 1967. Disponível em: &lt;<a href="https://projecteuclid.org/euclid.bsmsp/1200512992">https://projecteuclid.org/euclid.bsmsp/1200512992</a>&gt;. Acesso em: 3 ago. 2026
+</div>
+<div id="ref-pollard1981" class="csl-entry" role="listitem">
+POLLARD, David. <a href="https://doi.org/10.1214/aos/1176345339">Strong Consistency of <span class="math inline">\(k\)</span>-Means Clustering</a>. <strong>The Annals of Statistics</strong>, v. 9, n. 1, p. 135–140, 1981.
+</div>
+<div id="ref-ward1963" class="csl-entry" role="listitem">
+WARD, Jr., Joe H. <a href="https://doi.org/10.1080/01621459.1963.10500845">Hierarchical Grouping to Optimize an Objective Function</a>. <strong>Journal of the American Statistical Association</strong>, v. 58, n. 301, p. 236–244, 1963.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiada");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiada");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./mod_3_fatorial.html" class="pagination-link" aria-label="Formulação da Análise Fatorial">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Formulação da Análise Fatorial</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./mod_3_escalonamento.html" class="pagination-link" aria-label="Formulação do Escalonamento Multidimensional">
+        <span class="nav-page-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Formulação do Escalonamento Multidimensional</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
