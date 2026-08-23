@@ -208,7 +208,7 @@ $$
 \boldsymbol{\Sigma}
 $$
 
-para todo $i$. Para unidades distintas,
+para todo $i$ e, temos, para unidades distintas,
 
 $$
 \operatorname{Cov}
@@ -530,7 +530,7 @@ $$
 \boldsymbol{\mathsf T},
 $$
 
-ambos construídos a partir da matriz SQPC $\boldsymbol{\mathsf T}$.
+ambos construídos a partir da matriz SQPC $\boldsymbol{\mathsf T}$ definida em @def-matriz-sscp-total.
 
 A estimação pontual utiliza uma estimativa única para representar o parâmetro. A estimação por regiões utiliza conjuntos construídos para quantificar a incerteza associada ao processo amostral. Neste capítulo será desenvolvida a estimação pontual. As regiões de confiança serão tratadas no Capítulo 12.
 
@@ -570,7 +570,7 @@ A avaliação de $\widehat{\boldsymbol{\theta}}$ depende de sua distribuição a
 ::: {#def-vies-estimador}
 ## Viés de um estimador
 
-Se $E(\widehat{\boldsymbol{\theta}})$ existe, o viés de $\widehat{\boldsymbol{\theta}}$ na estimação de $\boldsymbol{\theta}$ é
+Se $E(\widehat{\boldsymbol{\theta}})$ existe, o viés (_Bias_ em inglês) de $\widehat{\boldsymbol{\theta}}$ na estimação de $\boldsymbol{\theta}$ é
 
 $$
 \operatorname{Bias}
@@ -709,7 +709,7 @@ $$
 \right).
 $$
 
-Esse resumo depende da escala e da parametrização e não substitui a matriz de covariâncias quando a dependência entre os componentes do estimador é relevante.
+Essa medida-resumo depende da escala e da parametrização e não substitui a matriz de covariâncias quando a dependência entre os componentes do estimador é relevante.
 
 Para um estimador matricial, uma representação da variabilidade é
 
@@ -724,6 +724,8 @@ $$
 $$
 
 O operador $\operatorname{vec}$, definido em @def-operador-vec, transforma a matriz estimada em um vetor e permite representar conjuntamente a variabilidade de todos os seus elementos.
+
+Viés e variabilidade descrevem aspectos diferentes do desempenho de um estimador. Um procedimento pode apresentar pequeno viés e grande variabilidade, ou maior viés e menor variabilidade. Para comparar conjuntamente essas duas fontes de erro, é necessário especificar como os desvios entre estimador e parâmetro serão avaliados.
 
 ### Erro quadrático médio e funções de perda
 
@@ -1000,6 +1002,8 @@ $$ {#eq-consistencia-definicao-probabilidade}
 
 Na formulação clássica deste capítulo, a dimensão do parâmetro é mantida fixa enquanto $n$ aumenta. Quando a dimensão também varia com $n$, é necessário declarar o regime dimensional e a métrica utilizada para avaliar o erro. Essa distinção será retomada na seção de aprofundamento sobre alta dimensão.
 
+Não viesamento e consistência descrevem propriedades diferentes. O não viesamento compara a esperança do estimador com o parâmetro para um tamanho amostral dado, enquanto a consistência descreve o que acontece com o erro de estimação quando $n$ aumenta. Uma propriedade não deve ser interpretada como sinônimo da outra.
+
 ### Eficiência
 
 Para estimadores vetoriais não viesados, uma comparação natural considera suas matrizes de covariâncias. Considere dois estimadores
@@ -1062,9 +1066,11 @@ $$
 \right).
 $$
 
-A ordem de Loewner é parcial. Duas matrizes de covariâncias podem não ser comparáveis; nesse caso, um estimador pode apresentar menor variabilidade em determinadas direções e maior variabilidade em outras.
+No caso vetorial, não existe necessariamente um estimador que seja mais preciso em todos os aspectos. Cada vetor $\mathbf a\in\mathbb R^r$ define uma combinação linear $\mathbf a^\top\widehat{\boldsymbol{\theta}}$ e, portanto, uma direção na qual a variabilidade dos estimadores pode ser comparada. Um estimador pode apresentar menor variabilidade em determinadas direções e maior variabilidade em outras.
 
-Uma comparação escalar pode utilizar, por exemplo,
+A ordem de Löwner declara $\widehat{\boldsymbol{\theta}}_1$ pelo menos tão eficiente quanto $\widehat{\boldsymbol{\theta}}_2$ somente quando a desigualdade anterior vale para **todas** as direções $\mathbf a$. Por isso, trata-se de uma ordem parcial: podem existir duas matrizes de covariâncias para as quais nenhum dos estimadores apresenta menor variabilidade em todas as direções.
+
+Quando duas matrizes de covariâncias não são comparáveis pela ordem de Löwner, pode-se adotar um critério escalar que resuma algum aspecto de sua variabilidade. Um exemplo é
 
 $$
 \operatorname{tr}
@@ -1076,7 +1082,7 @@ $$
 \right],
 $$
 
-mas outra função de perda pode produzir uma ordenação diferente.
+que soma as variâncias dos componentes do estimador. Essa escolha estabelece um critério particular de comparação; outra função de perda pode produzir uma ordenação diferente.
 
 Para estimadores viesados, a comparação baseada somente nas matrizes de covariâncias é insuficiente. É necessário considerar um risco que incorpore viés e variabilidade.
 
@@ -1084,12 +1090,12 @@ A eficiência assintótica compara as matrizes que aparecem nas distribuições-
 
 ### Suficiência
 
-Uma estatística suficiente preserva, segundo o modelo adotado, a informação da amostra sobre o parâmetro no sentido de que a distribuição condicional da amostra, dada essa estatística, não depende do parâmetro [@casella2002inference].
+Uma estatística suficiente resume a amostra preservando, segundo o modelo adotado, a informação relevante para o parâmetro de interesse. A ideia é que, depois de conhecida essa estatística, os detalhes restantes da amostra não fornecem informação adicional sobre o parâmetro [@casella2002inference].
 
 ::: {#def-estatistica-suficiente}
 ## Estatística suficiente
 
-Uma estatística
+Considere uma amostra aleatória $\boldsymbol{\mathcal X}$ cuja distribuição depende de um parâmetro populacional $\boldsymbol{\theta}$, e uma estatística definida pela regra
 
 $$
 \boldsymbol{\mathsf G}
@@ -1097,13 +1103,17 @@ $$
 G
 \left(
 \boldsymbol{\mathcal X}
-\right)
+\right).
 $$
 
-é suficiente para $\boldsymbol{\theta}$ quando a distribuição condicional da amostra, dada $\boldsymbol{\mathsf G}$, não depende de $\boldsymbol{\theta}$.
+A estatística $\boldsymbol{\mathsf G}$ é **suficiente para $\boldsymbol{\theta}$** quando a distribuição condicional da amostra $\boldsymbol{\mathcal X}$, dado o valor de $\boldsymbol{\mathsf G}$, não depende de $\boldsymbol{\theta}$.
+
+Assim, $G$ é a regra que reduz a amostra à estatística $\boldsymbol{\mathsf G}$, enquanto $\boldsymbol{\theta}$ é o parâmetro populacional sobre o qual se deseja preservar informação.
 :::
 
-Para famílias dominadas por uma medida comum, o Teorema da Fatoração de Neyman--Fisher fornece um critério equivalente.
+A suficiência pode ser entendida como uma redução dos dados sem perda de informação sobre $\boldsymbol{\theta}$ no contexto do modelo considerado. Isso não significa que seja possível reconstruir a amostra original a partir de $\boldsymbol{\mathsf G}$, mas que a parte da amostra não representada por $\boldsymbol{\mathsf G}$ deixa de depender do parâmetro.
+
+A definição de suficiência é formulada em termos de uma distribuição condicional, que nem sempre é a forma mais conveniente para verificar a propriedade diretamente. Para famílias dominadas por uma medida comum, o Teorema da Fatoração de Neyman--Fisher fornece um critério equivalente baseado na forma da densidade ou da função de probabilidade conjunta.
 
 ::: {#thm-fatoracao-neyman-fisher}
 ## Teorema da Fatoração de Neyman--Fisher
@@ -1128,7 +1138,7 @@ G
 \right)
 $$
 
-é suficiente para $\boldsymbol{\theta}$ se, e somente se, existem funções não negativas $g_{\boldsymbol{\theta}}$ e $h$ tais que
+é suficiente para $\boldsymbol{\theta}$ se, e somente se, existem funções não negativas $q_{\boldsymbol{\theta}}$ e $r$ tais que
 
 $$
 f_{\boldsymbol{\theta}}
@@ -1136,21 +1146,44 @@ f_{\boldsymbol{\theta}}
 \mathbf x
 \right)
 =
-g_{\boldsymbol{\theta}}
+q_{\boldsymbol{\theta}}
 \left[
 G
 \left(
 \mathbf x
 \right)
 \right]
-h
+r
 \left(
 \mathbf x
 \right),
 $$ {#eq-fatoracao-neyman-fisher}
 
-em que $h$ não depende de $\boldsymbol{\theta}$.
+em que $q_{\boldsymbol{\theta}}$ contém a dependência em relação ao parâmetro por meio da estatística $G(\mathbf x)$, enquanto $r(\mathbf x)$ não depende de $\boldsymbol{\theta}$.
 :::
+
+A fatoração separa a densidade conjunta em duas partes. A primeira,
+
+$$
+q_{\boldsymbol{\theta}}
+\left[
+G
+\left(
+\mathbf x
+\right)
+\right],
+$$
+
+contém toda a dependência em relação a $\boldsymbol{\theta}$ e utiliza os dados somente por meio de $G(\mathbf x)$. A segunda,
+
+$$
+r
+\left(
+\mathbf x
+\right),
+$$
+
+pode depender da amostra completa, mas não depende do parâmetro. Por isso, para estudar $\boldsymbol{\theta}$, a informação contida nos dados entra na verossimilhança por meio da estatística suficiente.
 
 No modelo normal multivariado definido em @def-normal-multivariada, o vetor de médias amostrais e a matriz SQPC formam conjuntamente uma estatística suficiente para $\boldsymbol{\mu}$ e $\boldsymbol{\Sigma}$ [@anderson2003].
 
@@ -1207,7 +1240,21 @@ $$
 \right)^\top.
 $$ {#eq-sscp-suficiencia-normal}
 
-Então,
+Nesse caso, a regra
+
+$$
+G
+\left(
+\boldsymbol{\mathcal X}
+\right)
+=
+\left(
+\bar{\boldsymbol{\mathsf X}},
+\boldsymbol{\mathsf T}
+\right)
+$$
+
+reduz a amostra completa ao vetor de médias amostrais e à matriz SQPC. A estatística
 
 $$
 \left(
@@ -1216,7 +1263,7 @@ $$
 \right)
 $$
 
-é suficiente para
+é suficiente para o parâmetro
 
 $$
 \left(
@@ -1310,7 +1357,7 @@ $$
 O resultado segue de @thm-fatoracao-neyman-fisher.
 :::
 
-A suficiência não implica, por si só, ausência de viés, consistência ou eficiência. Ela afirma que, sob o modelo considerado, a redução da amostra à estatística suficiente não perde informação sobre o parâmetro.
+A suficiência não implica, por si só, ausência de viés, consistência ou eficiência. Ela descreve a quantidade de informação sobre o parâmetro preservada pela estatística, e não a qualidade de um estimador construído a partir dela. Sob o modelo considerado, reduzir a amostra a uma estatística suficiente não elimina informação sobre $\boldsymbol{\theta}$.
 
 ### Equivariância
 
@@ -1319,7 +1366,29 @@ Uma transformação dos dados pode induzir uma transformação correspondente no
 ::: {#def-equivariancia-estimador}
 ## Equivariância de um estimador
 
-Considere uma transformação $h$ aplicada à amostra e uma transformação $g$ aplicada ao parâmetro. Um estimador definido pela regra $G$ é equivariante quando
+Considere um parâmetro populacional $\boldsymbol{\theta}$ e um estimador definido pela regra
+
+$$
+\widehat{\boldsymbol{\theta}}
+=
+G
+\left(
+\boldsymbol{\mathcal X}
+\right).
+$$
+
+Se $h$ transforma a amostra e essa transformação induz uma transformação correspondente $g$ no parâmetro populacional,
+
+$$
+\boldsymbol{\theta}
+\longmapsto
+g
+\left(
+\boldsymbol{\theta}
+\right),
+$$
+
+o estimador é **equivariante** quando aplicar $G$ aos dados transformados produz o mesmo resultado que transformar, por $g$, o estimador obtido com os dados originais:
 
 $$
 G
@@ -1338,11 +1407,18 @@ G
 \right)
 \right].
 $$ {#eq-equivariancia-estimador}
+
+Assim, $G$ representa a regra de estimação, $h$ a transformação aplicada aos dados e $g$ a transformação correspondente no parâmetro.
+
+As funções $h$ e $g$ não precisam ser iguais, pois atuam sobre objetos diferentes. A função $h$ especifica como os dados são transformados, enquanto $g$ descreve como o parâmetro de interesse se transforma em consequência dessa transformação. Para uma mesma transformação $h$ dos dados, a forma de $g$ pode mudar conforme o parâmetro considerado.
 :::
 
-Considere, por exemplo,
+Considere, por exemplo, a transformação afim dos dados
 
 $$
+h:
+\boldsymbol{\mathsf X}_i
+\longmapsto
 \boldsymbol{\mathsf Y}_i
 =
 \mathbf C
@@ -1367,10 +1443,89 @@ $$
 \mathbb R^q.
 $$
 
-O vetor de médias transformado é
+Nesse caso, $h$ é a transformação aplicada a cada vetor observado da amostra.
+
+Para o vetor de médias, o parâmetro populacional é
+
+$$
+\boldsymbol{\theta}
+=
+\boldsymbol{\mu},
+$$
+
+e a transformação correspondente no espaço paramétrico é
+
+$$
+g_{\mu}
+\left(
+\boldsymbol{\mu}
+\right)
+=
+\mathbf C
+\boldsymbol{\mu}
++
+\mathbf d.
+$$
+
+Portanto,
 
 $$
 \boldsymbol{\mu}_Y
+=
+g_{\mu}
+\left(
+\boldsymbol{\mu}
+\right)
+=
+\mathbf C
+\boldsymbol{\mu}
++
+\mathbf d.
+$$
+
+Para a matriz de covariâncias, o parâmetro populacional é
+
+$$
+\boldsymbol{\theta}
+=
+\boldsymbol{\Sigma},
+$$
+
+e, por @prp-transformacao-afim-covariancia, a transformação correspondente é
+
+$$
+g_{\Sigma}
+\left(
+\boldsymbol{\Sigma}
+\right)
+=
+\mathbf C
+\boldsymbol{\Sigma}
+\mathbf C^\top.
+$$
+
+Portanto,
+
+$$
+\boldsymbol{\Sigma}_Y
+=
+g_{\Sigma}
+\left(
+\boldsymbol{\Sigma}
+\right)
+=
+\mathbf C
+\boldsymbol{\Sigma}
+\mathbf C^\top.
+$$
+
+Esse exemplo mostra que uma mesma transformação $h$ aplicada aos dados pode induzir transformações diferentes no espaço paramétrico. Para a média,
+
+$$
+g_{\mu}
+\left(
+\boldsymbol{\mu}
+\right)
 =
 \mathbf C
 \boldsymbol{\mu}
@@ -1378,40 +1533,115 @@ $$
 \mathbf d,
 $$
 
-e, por @prp-transformacao-afim-covariancia, a matriz de covariâncias transformada é
+enquanto, para a covariância,
 
 $$
-\boldsymbol{\Sigma}_Y
+g_{\Sigma}
+\left(
+\boldsymbol{\Sigma}
+\right)
 =
 \mathbf C
 \boldsymbol{\Sigma}
 \mathbf C^\top.
 $$
 
-Os estimadores usuais que serão construídos adiante satisfazem
+Assim, a forma de $g$ depende do parâmetro considerado, mesmo quando a transformação $h$ dos dados permanece a mesma.
+
+Para estimar $\boldsymbol{\mu}$, a regra de estimação é
 
 $$
+G_{\mu}
+\left(
+\boldsymbol{\mathcal X}
+\right)
+=
+\bar{\boldsymbol{\mathsf X}}.
+$$
+
+Aplicando a mesma regra aos dados transformados,
+
+$$
+G_{\mu}
+\left[
+h
+\left(
+\boldsymbol{\mathcal X}
+\right)
+\right]
+=
 \bar{\boldsymbol{\mathsf Y}}
 =
 \mathbf C
 \bar{\boldsymbol{\mathsf X}}
 +
 \mathbf d
+=
+g_{\mu}
+\left[
+G_{\mu}
+\left(
+\boldsymbol{\mathcal X}
+\right)
+\right].
 $$
 
-e
+Portanto, o vetor de médias amostrais é equivariante em relação a essa transformação afim.
+
+Para estimar $\boldsymbol{\Sigma}$, a regra de estimação é
 
 $$
+G_{\Sigma}
+\left(
+\boldsymbol{\mathcal X}
+\right)
+=
+\boldsymbol{\mathsf S}_X.
+$$
+
+Para os dados transformados,
+
+$$
+G_{\Sigma}
+\left[
+h
+\left(
+\boldsymbol{\mathcal X}
+\right)
+\right]
+=
 \boldsymbol{\mathsf S}_Y
 =
 \mathbf C
 \boldsymbol{\mathsf S}_X
-\mathbf C^\top.
+\mathbf C^\top
+=
+g_{\Sigma}
+\left[
+G_{\Sigma}
+\left(
+\boldsymbol{\mathcal X}
+\right)
+\right].
 $$
 
-A equivariância é uma propriedade do procedimento em relação às transformações consideradas. Ela deve ser distinguida da propriedade de invariância da máxima verossimilhança, que trata da estimação de funções de parâmetros a partir de um estimador de máxima verossimilhança já obtido.
+Assim, a matriz de covariâncias amostral também é equivariante em relação à transformação considerada.
 
-As propriedades desta seção não estabelecem uma ordenação universal entre estimadores. Um procedimento pode apresentar vantagens segundo um critério e desvantagens segundo outro. A escolha depende do parâmetro de interesse, da função de perda, do modelo probabilístico, do tamanho amostral, da dimensão e do objetivo da análise.
+A equivariância descreve como um estimador responde a uma transformação dos **dados**: transformar os dados e depois estimar deve produzir o mesmo resultado que estimar primeiro e aplicar a transformação correspondente ao parâmetro.
+
+Essa propriedade deve ser distinguida da invariância da máxima verossimilhança. Nesse segundo caso, parte-se de um estimador de máxima verossimilhança já obtido para $\boldsymbol{\theta}$ e utiliza-se uma função desse estimador para estimar uma função do parâmetro.
+
+As propriedades desta seção respondem a perguntas diferentes sobre um procedimento de estimação:
+
+- **viés** compara o valor médio do estimador com o parâmetro;
+- **variabilidade** descreve quanto o estimador muda entre amostras;
+- **erro quadrático médio** combina viés e variabilidade segundo uma função de perda;
+- **consistência** descreve o comportamento do estimador quando o tamanho amostral aumenta;
+- **eficiência** compara a variabilidade de procedimentos concorrentes;
+- **suficiência** examina quanta informação sobre o parâmetro é preservada por uma estatística;
+- **equivariância** examina a coerência do estimador diante de transformações dos dados.
+
+Essas propriedades não estabelecem uma ordenação universal entre estimadores. Um procedimento pode apresentar vantagens segundo um critério e desvantagens segundo outro. A escolha depende do parâmetro de interesse, da função de perda, do modelo probabilístico, do tamanho amostral, da dimensão e do objetivo da análise.
 
 Os métodos dos momentos e da máxima verossimilhança fornecem dois princípios gerais para construir os estimadores estudados a seguir.
 
