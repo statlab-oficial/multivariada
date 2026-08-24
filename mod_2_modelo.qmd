@@ -2184,16 +2184,20 @@ ggplot2::ggplot(
       yend = Observado
     ),
     linewidth = 0.5,
-    linetype = "dashed"
+    linetype = "dashed",
+    colour = "#d62728",
+    alpha = 0.65
   ) +
   ggplot2::geom_line(
     ggplot2::aes(
       y = Ajustado
     ),
-    linewidth = 0.8
+    linewidth = 0.9,
+    colour = "#1f77b4"
   ) +
   ggplot2::geom_point(
-    size = 2
+    size = 2.2,
+    colour = "#1f77b4"
   ) +
   ggplot2::facet_wrap(
     ~Resposta,
@@ -2205,7 +2209,7 @@ ggplot2::ggplot(
     y = "Resposta"
   ) +
   ggplot2::theme_minimal(
-    base_size = 12
+    base_size = 13
   ) +
   ggplot2::theme(
     panel.grid.minor = ggplot2::element_blank()
@@ -3996,7 +4000,174 @@ n-1
 (n-G).
 $$ {#eq-graus-liberdade-modelo-grupos}
 
-Essa correspondência estabelece a ponte com a análise de variância multivariada: a matriz residual representa a variação dentro dos grupos, enquanto a parcela associada ao modelo representa a variação entre seus vetores de médias. Os critérios inferenciais que utilizam conjuntamente essas matrizes serão desenvolvidos posteriormente.
+A @fig-decomposicao-grupos-modelo representa geometricamente as duas parcelas dessa decomposição. Os segmentos que ligam cada observação à média de seu grupo representam desvios intragrupos, enquanto os segmentos tracejados que ligam as médias dos grupos à média geral representam os deslocamentos responsáveis pela dispersão entre grupos.
+
+```{r}
+#| label: fig-decomposicao-grupos-modelo
+#| fig-cap: "Dispersão intragrupos e deslocamento das médias dos grupos em relação à média geral."
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 7
+#| fig-height: 5.5
+#| fig-align: center
+
+dados_grupos <- data.frame(
+  Grupo = factor(
+    rep(
+      c(
+        "Grupo 1",
+        "Grupo 2",
+        "Grupo 3"
+      ),
+      each = 4
+    ),
+    levels = c(
+      "Grupo 1",
+      "Grupo 2",
+      "Grupo 3"
+    )
+  ),
+  Y1 = c(
+    2.0, 2.8, 3.2, 4.0,
+    4.8, 5.5, 6.2, 6.5,
+    7.5, 8.2, 8.8, 9.5
+  ),
+  Y2 = c(
+    5.8, 5.0, 6.4, 5.4,
+    7.2, 8.0, 7.4, 8.6,
+    4.6, 5.2, 4.1, 5.6
+  )
+)
+
+medias_grupos <- stats::aggregate(
+  cbind(
+    Y1,
+    Y2
+  ) ~ Grupo,
+  data = dados_grupos,
+  FUN = mean
+)
+
+names(
+  medias_grupos
+)[2:3] <- c(
+  "Media_Y1",
+  "Media_Y2"
+)
+
+indice_media <- match(
+  dados_grupos$Grupo,
+  medias_grupos$Grupo
+)
+
+dados_grupos$Media_Y1 <-
+  medias_grupos$Media_Y1[
+    indice_media
+  ]
+
+dados_grupos$Media_Y2 <-
+  medias_grupos$Media_Y2[
+    indice_media
+  ]
+
+media_geral <- data.frame(
+  Y1 = mean(
+    dados_grupos$Y1
+  ),
+  Y2 = mean(
+    dados_grupos$Y2
+  )
+)
+
+ggplot2::ggplot() +
+  ggplot2::geom_segment(
+    data = dados_grupos,
+    ggplot2::aes(
+      x = Y1,
+      y = Y2,
+      xend = Media_Y1,
+      yend = Media_Y2,
+      colour = Grupo
+    ),
+    linewidth = 0.5,
+    alpha = 0.4
+  ) +
+  ggplot2::geom_segment(
+    data = medias_grupos,
+    ggplot2::aes(
+      x = Media_Y1,
+      y = Media_Y2,
+      xend = media_geral$Y1,
+      yend = media_geral$Y2,
+      colour = Grupo
+    ),
+    linewidth = 0.8,
+    linetype = "dashed"
+  ) +
+  ggplot2::geom_point(
+    data = dados_grupos,
+    ggplot2::aes(
+      x = Y1,
+      y = Y2,
+      colour = Grupo,
+      shape = Grupo
+    ),
+    size = 2.5
+  ) +
+  ggplot2::geom_point(
+    data = medias_grupos,
+    ggplot2::aes(
+      x = Media_Y1,
+      y = Media_Y2,
+      colour = Grupo
+    ),
+    shape = 4,
+    size = 4,
+    stroke = 1.3
+  ) +
+  ggplot2::geom_point(
+    data = media_geral,
+    ggplot2::aes(
+      x = Y1,
+      y = Y2
+    ),
+    inherit.aes = FALSE,
+    shape = 8,
+    size = 3.2,
+    colour = "gray20"
+  ) +
+  ggplot2::scale_colour_manual(
+    values = c(
+      "Grupo 1" = "#1f77b4",
+      "Grupo 2" = "#2ca02c",
+      "Grupo 3" = "#d62728"
+    )
+  ) +
+  ggplot2::scale_shape_manual(
+    values = c(
+      "Grupo 1" = 16,
+      "Grupo 2" = 17,
+      "Grupo 3" = 15
+    )
+  ) +
+  ggplot2::coord_equal() +
+  ggplot2::labs(
+    x = expression(Y[1]),
+    y = expression(Y[2]),
+    colour = NULL,
+    shape = NULL
+  ) +
+  ggplot2::theme_minimal(
+    base_size = 13
+  ) +
+  ggplot2::theme(
+    panel.grid.minor = ggplot2::element_blank(),
+    legend.position = "bottom"
+  )
+```
+
+As cruzes representam as médias dos grupos e o asterisco representa a média geral. Os segmentos internos aos grupos visualizam os termos associados a $\mathbf T_{\mathrm{intra}}$, enquanto os deslocamentos das médias dos grupos em relação à média geral visualizam a estrutura associada a $\mathbf T_{\mathrm{entre}}$.
 
 A decomposição depende do espaço de médias representado por $\mathbf Z$, e não de uma parametrização específica desse espaço. Essa distinção motiva a discussão de posto, parametrização e estimabilidade da próxima seção.
 
@@ -4465,7 +4636,7 @@ O modelo linear multivariado permite formular hipóteses sobre termos do modelo,
 Considere
 
 $$
-\mathbf C
+\mathbf C_1
 \in
 \mathbb R^{g\times q}.
 $$
@@ -4473,7 +4644,7 @@ $$
 A matriz
 
 $$
-\mathbf C\mathbf B
+\mathbf C_1\mathbf B
 \in
 \mathbb R^{g\times p}
 $$
@@ -4483,15 +4654,15 @@ combina os termos representados nas linhas de $\mathbf B$.
 Se
 
 $$
-\mathbf c^\top
+\mathbf c_1^\top
 \in
 \mathbb R^{1\times q}
 $$
 
-é uma linha de $\mathbf C$, então
+é uma linha de $\mathbf C_1$, então
 
 $$
-\mathbf c^\top\mathbf B
+\mathbf c_1^\top\mathbf B
 \in
 \mathbb R^{1\times p}
 $$
@@ -4501,7 +4672,7 @@ contém a mesma combinação dos termos para todas as $p$ respostas.
 Por exemplo, se a linha $h$ de $\mathbf B$ corresponde a um único termo do modelo,
 
 $$
-\mathbf c^\top
+\mathbf c_1^\top
 =
 \mathbf e_h^\top
 $$
@@ -4523,10 +4694,10 @@ $$
 uma combinação
 
 $$
-\mathbf c^\top\mathbf B
+\mathbf c_1^\top\mathbf B
 =
 \sum_{h=1}^{G}
-c_h
+c_{1h}
 \boldsymbol{\mu}_h^\top
 $$
 
@@ -4534,7 +4705,7 @@ $$
 
 $$
 \sum_{h=1}^{G}
-c_h
+c_{1h}
 =
 0.
 $$
@@ -4542,7 +4713,7 @@ $$
 Por exemplo,
 
 $$
-\mathbf c^\top
+\mathbf c_1^\top
 =
 \begin{bmatrix}
 1 & -1 & 0 & \cdots & 0
@@ -4552,21 +4723,21 @@ $$
 produz
 
 $$
-\mathbf c^\top\mathbf B
+\mathbf c_1^\top\mathbf B
 =
 \left(
 \boldsymbol{\mu}_1-\boldsymbol{\mu}_2
 \right)^\top.
 $$
 
-Assim, uma única linha de $\mathbf C$ pode representar uma comparação entre grupos, enquanto várias linhas permitem representar simultaneamente diferentes contrastes.
+Assim, uma única linha de $\mathbf C_1$ pode representar uma comparação entre grupos, enquanto várias linhas permitem representar simultaneamente diferentes contrastes.
 
 ### Combinações das respostas
 
 A multiplicação à direita de $\mathbf B$ atua sobre as respostas. Considere
 
 $$
-\mathbf M
+\mathbf C_2
 \in
 \mathbb R^{p\times s}.
 $$
@@ -4574,27 +4745,27 @@ $$
 Então,
 
 $$
-\mathbf B\mathbf M
+\mathbf B\mathbf C_2
 \in
 \mathbb R^{q\times s}
 $$
 
-contém os efeitos do modelo sobre as $s$ combinações de respostas definidas por $\mathbf M$.
+contém os efeitos do modelo sobre as $s$ combinações de respostas definidas por $\mathbf C_2$.
 
-Para uma única combinação
+Para uma única combinação, considere
 
 $$
-\mathbf m
+\mathbf c_2
 \in
-\mathbb R^p,
+\mathbb R^p
 $$
 
-defina
+e defina
 
 $$
 \mathsf W_i
 =
-\mathbf m^\top
+\mathbf c_2^\top
 \boldsymbol{\mathsf Y}_i.
 $$
 
@@ -4610,7 +4781,7 @@ E
 =
 \mathbf z_i^\top
 \mathbf B
-\mathbf m,
+\mathbf c_2,
 $$ {#eq-media-combinacao-respostas-modelo}
 
 e sua variância residual é
@@ -4623,43 +4794,43 @@ $$
 \mathbf Z
 \right)
 =
-\mathbf m^\top
+\mathbf c_2^\top
 \boldsymbol{\Sigma}
-\mathbf m.
+\mathbf c_2.
 $$ {#eq-variancia-combinacao-respostas-modelo}
 
 Para várias combinações simultâneas,
 
 $$
-\boldsymbol{\mathcal Y}_M
+\boldsymbol{\mathcal Y}_{C_2}
 =
-\boldsymbol{\mathcal Y}\mathbf M,
+\boldsymbol{\mathcal Y}\mathbf C_2,
 $$
 
 e
 
 $$
-\boldsymbol{\mathcal Y}_M
+\boldsymbol{\mathcal Y}_{C_2}
 =
 \mathbf Z
 \left(
-\mathbf B\mathbf M
+\mathbf B\mathbf C_2
 \right)
 +
-\boldsymbol{\mathcal E}\mathbf M.
+\boldsymbol{\mathcal E}\mathbf C_2.
 $$ {#eq-modelo-respostas-combinadas}
 
 A matriz de covariâncias residuais correspondente é
 
 $$
-\boldsymbol{\Sigma}_M
+\boldsymbol{\Sigma}_{C_2}
 =
-\mathbf M^\top
+\mathbf C_2^\top
 \boldsymbol{\Sigma}
-\mathbf M.
+\mathbf C_2.
 $$ {#eq-covariancia-respostas-combinadas}
 
-Portanto, $\mathbf C$ atua sobre os termos do modelo e $\mathbf M$ atua sobre as respostas.
+Portanto, $\mathbf C_1$ atua sobre os termos do modelo e $\mathbf C_2$ atua sobre as respostas.
 
 ### Hipótese linear geral
 
@@ -4668,7 +4839,7 @@ Combinando as duas operações anteriores, define-se
 $$
 \boldsymbol{\Theta}
 =
-\mathbf C\mathbf B\mathbf M
+\mathbf C_1\mathbf B\mathbf C_2
 \in
 \mathbb R^{g\times s},
 $$ {#eq-funcao-parametrica-bilateral}
@@ -4676,18 +4847,18 @@ $$ {#eq-funcao-parametrica-bilateral}
 com
 
 $$
-\mathbf C
+\mathbf C_1
 \in
 \mathbb R^{g\times q}
 \qquad
 \text{e}
 \qquad
-\mathbf M
+\mathbf C_2
 \in
 \mathbb R^{p\times s}.
 $$
 
-As linhas de $\boldsymbol{\Theta}$ correspondem às combinações dos termos definidas por $\mathbf C$, enquanto suas colunas correspondem às combinações das respostas definidas por $\mathbf M$.
+As linhas de $\boldsymbol{\Theta}$ correspondem às combinações dos termos definidas por $\mathbf C_1$, enquanto suas colunas correspondem às combinações das respostas definidas por $\mathbf C_2$.
 
 ::: {#def-hipotese-linear-geral-multivariada}
 ## Hipótese linear geral multivariada
@@ -4696,7 +4867,7 @@ A hipótese linear geral é
 
 $$
 H_0:
-\mathbf C\mathbf B\mathbf M
+\mathbf C_1\mathbf B\mathbf C_2
 =
 \boldsymbol{\Theta}_0,
 $$ {#eq-hipotese-linear-geral-multivariada}
@@ -4725,7 +4896,7 @@ obtém-se
 
 $$
 H_0:
-\mathbf C\mathbf B\mathbf M
+\mathbf C_1\mathbf B\mathbf C_2
 =
 \mathbf0.
 $$ {#eq-hipotese-linear-homogenea}
@@ -4733,7 +4904,7 @@ $$ {#eq-hipotese-linear-homogenea}
 Se
 
 $$
-\mathbf M
+\mathbf C_2
 =
 \mathbf I_p,
 $$
@@ -4742,7 +4913,7 @@ a hipótese envolve os termos do modelo em todas as respostas:
 
 $$
 H_0:
-\mathbf C\mathbf B
+\mathbf C_1\mathbf B
 =
 \boldsymbol{\Theta}_0.
 $$
@@ -4757,9 +4928,9 @@ obtém-se a hipótese escalar
 
 $$
 H_0:
-\mathbf c^\top
+\mathbf c_1^\top
 \mathbf B
-\mathbf m
+\mathbf c_2
 =
 \theta_0.
 $$ {#eq-hipotese-linear-escalar-bilateral}
@@ -4769,15 +4940,15 @@ $$ {#eq-hipotese-linear-escalar-bilateral}
 A hipótese deve envolver uma combinação dos parâmetros determinada pelo modelo. Pela caracterização da seção anterior,
 
 $$
-\mathbf C\mathbf B
+\mathbf C_1\mathbf B
 $$
 
 é estimável quando
 
 $$
-\mathbf C
+\mathbf C_1
 =
-\mathbf C
+\mathbf C_1
 \mathbf Z^+
 \mathbf Z.
 $$ {#eq-condicao-estimabilidade-hipotese-bilateral}
@@ -4787,10 +4958,10 @@ Nessa situação,
 $$
 \widehat{\boldsymbol{\Theta}}
 =
-\mathbf C
+\mathbf C_1
 \mathbf Z^+
 \boldsymbol{\mathcal Y}
-\mathbf M
+\mathbf C_2
 $$ {#eq-estimador-funcao-bilateral-pseudoinversa}
 
 é um estimador de
@@ -4798,7 +4969,7 @@ $$ {#eq-estimador-funcao-bilateral-pseudoinversa}
 $$
 \boldsymbol{\Theta}
 =
-\mathbf C\mathbf B\mathbf M,
+\mathbf C_1\mathbf B\mathbf C_2,
 $$
 
 e, após a observação,
@@ -4806,10 +4977,10 @@ e, após a observação,
 $$
 \widehat{\boldsymbol{\Theta}}_{\mathrm{obs}}
 =
-\mathbf C
+\mathbf C_1
 \mathbf Z^+
 \mathbf Y
-\mathbf M.
+\mathbf C_2.
 $$ {#eq-estimativa-funcao-bilateral}
 
 Sua esperança condicional satisfaz
@@ -4822,80 +4993,72 @@ E
 \mathbf Z
 \right)
 =
-\mathbf C\mathbf B\mathbf M.
+\mathbf C_1\mathbf B\mathbf C_2.
 $$ {#eq-esperanca-estimador-funcao-bilateral}
 
 Para construir a SQPC associada à hipótese, defina
 
 $$
-\mathbf G_C
+\mathbf G_{C_1}
 =
-\mathbf C
+\mathbf C_1
 \mathbf Z^+
 \left(
 \mathbf Z^+
 \right)^\top
-\mathbf C^\top.
+\mathbf C_1^\top.
 $$ {#eq-matriz-covariancia-contrastes}
 
 Quando $\mathbf Z$ possui posto coluna completo,
 
 $$
-\mathbf G_C
+\mathbf G_{C_1}
 =
-\mathbf C
+\mathbf C_1
 \left(
 \mathbf Z^\top
 \mathbf Z
 \right)^{-1}
-\mathbf C^\top.
+\mathbf C_1^\top.
 $$ {#eq-matriz-covariancia-contrastes-posto-completo}
 
-No caso escalar, com
-
-$$
-\mathbf C
-=
-\mathbf c^\top
-$$
-
-e uma única combinação de respostas $\mathbf m$, a variância do estimador é
+No caso escalar, com uma combinação dos termos $\mathbf c_1$ e uma combinação das respostas $\mathbf c_2$,
 
 $$
 \operatorname{Var}
 \left(
-\mathbf c^\top
+\mathbf c_1^\top
 \widehat{\mathbf B}
-\mathbf m
+\mathbf c_2
 \mid
 \mathbf Z
 \right)
 =
 \left[
-\mathbf c^\top
+\mathbf c_1^\top
 \left(
 \mathbf Z^\top
 \mathbf Z
 \right)^{-1}
-\mathbf c
+\mathbf c_1
 \right]
 \left(
-\mathbf m^\top
+\mathbf c_2^\top
 \boldsymbol{\Sigma}
-\mathbf m
+\mathbf c_2
 \right),
 $$ {#eq-variancia-combinacao-bilateral-parametros}
 
 quando $\mathbf Z$ possui posto coluna completo.
 
-A primeira parcela depende do delineamento e do contraste entre os termos do modelo; a segunda depende da variabilidade residual da combinação de respostas.
+A primeira parcela depende do delineamento e da combinação dos termos do modelo; a segunda depende da variabilidade residual da combinação das respostas.
 
-Para as construções seguintes, $\mathbf C$ será considerada sem linhas redundantes. Assim,
+Para as construções seguintes, $\mathbf C_1$ será considerada sem linhas redundantes. Assim,
 
 $$
 \operatorname{posto}
 \left(
-\mathbf C
+\mathbf C_1
 \right)
 =
 g,
@@ -4921,7 +5084,7 @@ $$
 \boldsymbol{\Theta}_0.
 $$ {#eq-desvio-observado-hipotese-linear}
 
-Quando $\mathbf C$ não contém contrastes redundantes, $\mathbf G_C$ é positiva definida e permite ponderar esse afastamento segundo a variabilidade decorrente do delineamento.
+Quando $\mathbf C_1$ não contém combinações redundantes, $\mathbf G_{C_1}$ é positiva definida e permite ponderar esse afastamento segundo a variabilidade decorrente do delineamento.
 
 ::: {#def-sscp-hipotese-linear}
 ## SQPC da hipótese linear
@@ -4932,7 +5095,7 @@ $$
 \mathbf H
 =
 \widehat{\boldsymbol{\Delta}}^\top
-\mathbf G_C^{-1}
+\mathbf G_{C_1}^{-1}
 \widehat{\boldsymbol{\Delta}}.
 $$ {#eq-sscp-hipotese-linear}
 
@@ -4987,11 +5150,11 @@ $$
 Para as mesmas combinações de respostas, a SQPC residual é
 
 $$
-\mathbf E_M
+\mathbf E_{C_2}
 =
-\mathbf M^\top
+\mathbf C_2^\top
 \mathbf E
-\mathbf M.
+\mathbf C_2.
 $$ {#eq-sscp-residual-respostas-hipotese}
 
 Portanto, a hipótese produz o par
@@ -4999,16 +5162,16 @@ Portanto, a hipótese produz o par
 $$
 \left(
 \mathbf H,
-\mathbf E_M
+\mathbf E_{C_2}
 \right).
 $$
 
-A matriz $\mathbf H$ representa a variação associada ao afastamento da hipótese, enquanto $\mathbf E_M$ representa a variação residual das mesmas combinações de respostas.
+A matriz $\mathbf H$ representa a variação associada ao afastamento da hipótese, enquanto $\mathbf E_{C_2}$ representa a variação residual das mesmas combinações de respostas.
 
 Quando
 
 $$
-\mathbf M
+\mathbf C_2
 =
 \mathbf I_p,
 $$
@@ -5176,27 +5339,27 @@ $$
 n-r_F.
 $$ {#eq-graus-liberdade-residual-modelo-completo}
 
-Para combinações de respostas definidas por $\mathbf M$,
+Para combinações de respostas definidas por $\mathbf C_2$,
 
 $$
-\mathbf H_M
+\mathbf H_{C_2}
 =
-\mathbf M^\top
+\mathbf C_2^\top
 \mathbf H
-\mathbf M
+\mathbf C_2
 $$
 
 e
 
 $$
-\mathbf E_{F,M}
+\mathbf E_{F,C_2}
 =
-\mathbf M^\top
+\mathbf C_2^\top
 \mathbf E_F
-\mathbf M.
+\mathbf C_2.
 $$ {#eq-sscp-modelos-encaixados-respostas-transformadas}
 
-A formulação por $\mathbf C\mathbf B\mathbf M$ identifica a função paramétrica examinada; a formulação por modelos encaixados mostra quanto a inclusão dos termos correspondentes reduz a variação residual.
+A formulação por $\mathbf C_1\mathbf B\mathbf C_2$ identifica a função paramétrica examinada; a formulação por modelos encaixados mostra quanto a inclusão dos termos correspondentes reduz a variação residual.
 
 ### Casos particulares
 
@@ -5354,29 +5517,13 @@ H_0:
 \beta_{hk}.
 $$
 
-Esses casos mostram a função das duas matrizes:
-
-$$
-\boxed{
-\mathbf C
-\text{ combina termos do modelo}
-}
-$$
-
-e
-
-$$
-\boxed{
-\mathbf M
-\text{ combina respostas}.
-}
-$$
+Esses casos mostram a função das duas matrizes. A matriz $\mathbf C_1$ combina termos do modelo, enquanto $\mathbf C_2$ combina respostas.
 
 A estrutura que seguirá para o Capítulo 12 é
 
 $$
 H_0:
-\mathbf C\mathbf B\mathbf M
+\mathbf C_1\mathbf B\mathbf C_2
 =
 \boldsymbol{\Theta}_0,
 $$
@@ -5541,7 +5688,134 @@ $$
 
 Para um aumento de uma unidade em $x$, a média ajustada de $Y_1$ aumenta em aproximadamente $1,600$, enquanto a média ajustada de $Y_2$ diminui em aproximadamente $1,029$.
 
-**Valores ajustados e resíduos**
+A @fig-exemplo-regressao-multivariada-ajuste mostra simultaneamente as duas respostas, seus ajustes e os respectivos resíduos.
+
+```{r}
+#| label: fig-exemplo-regressao-multivariada-ajuste
+#| fig-cap: "Respostas observadas, ajustes lineares e resíduos do exemplo integrado."
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 7.5
+#| fig-height: 5
+#| fig-align: center
+
+x_exemplo <- 1:6
+
+Y_exemplo <- matrix(
+  c(
+    3, 8,
+    5, 7,
+    4, 7,
+    8, 5,
+    9, 4,
+    11, 3
+  ),
+  nrow = 6,
+  byrow = TRUE
+)
+
+Z_exemplo <- cbind(
+  1,
+  x_exemplo
+)
+
+B_exemplo <- solve(
+  crossprod(
+    Z_exemplo
+  ),
+  crossprod(
+    Z_exemplo,
+    Y_exemplo
+  )
+)
+
+Y_ajustado_exemplo <-
+  Z_exemplo %*%
+  B_exemplo
+
+dados_exemplo <- rbind(
+  data.frame(
+    x = x_exemplo,
+    Observado = Y_exemplo[, 1],
+    Ajustado = Y_ajustado_exemplo[, 1],
+    Resposta = "Y1"
+  ),
+  data.frame(
+    x = x_exemplo,
+    Observado = Y_exemplo[, 2],
+    Ajustado = Y_ajustado_exemplo[, 2],
+    Resposta = "Y2"
+  )
+)
+
+dados_exemplo$Resposta <- factor(
+  dados_exemplo$Resposta,
+  levels = c(
+    "Y1",
+    "Y2"
+  )
+)
+
+ggplot2::ggplot(
+  dados_exemplo,
+  ggplot2::aes(
+    x = x,
+    y = Observado,
+    colour = Resposta,
+    shape = Resposta
+  )
+) +
+  ggplot2::geom_segment(
+    ggplot2::aes(
+      xend = x,
+      y = Ajustado,
+      yend = Observado,
+      colour = Resposta
+    ),
+    linewidth = 0.5,
+    linetype = "dashed",
+    alpha = 0.5
+  ) +
+  ggplot2::geom_line(
+    ggplot2::aes(
+      y = Ajustado,
+      group = Resposta
+    ),
+    linewidth = 0.9
+  ) +
+  ggplot2::geom_point(
+    size = 2.7
+  ) +
+  ggplot2::scale_colour_manual(
+    values = c(
+      "Y1" = "#1f77b4",
+      "Y2" = "#2ca02c"
+    )
+  ) +
+  ggplot2::scale_shape_manual(
+    values = c(
+      "Y1" = 16,
+      "Y2" = 17
+    )
+  ) +
+  ggplot2::labs(
+    x = expression(x),
+    y = "Resposta",
+    colour = NULL,
+    shape = NULL
+  ) +
+  ggplot2::theme_minimal(
+    base_size = 13
+  ) +
+  ggplot2::theme(
+    panel.grid.minor = ggplot2::element_blank(),
+    legend.position = "bottom"
+  )
+```
+
+A figura evidencia as inclinações em sentidos opostos das duas respostas. Os segmentos tracejados ligam cada observação ao valor ajustado correspondente e representam graficamente os resíduos que serão reunidos na matriz $\widehat{\mathbf U}$.
+
 
 A matriz de valores ajustados é
 
@@ -5775,7 +6049,7 @@ Considere a hipótese de que $x$ não apresenta efeito linear sobre nenhuma das 
 Para selecionar a segunda linha de $\mathbf B$, defina
 
 $$
-\mathbf C
+\mathbf C_1
 =
 \begin{bmatrix}
 0 & 1
@@ -5785,7 +6059,7 @@ $$
 Como as duas respostas são mantidas,
 
 $$
-\mathbf M
+\mathbf C_2
 =
 \mathbf I_2.
 $$
@@ -5816,7 +6090,7 @@ O afastamento observado em relação à hipótese nula é
 $$
 \widehat{\boldsymbol{\Delta}}
 =
-\mathbf C
+\mathbf C_1
 \widehat{\mathbf B}_{\mathrm{obs}}
 =
 \begin{bmatrix}
@@ -5834,14 +6108,14 @@ A matriz associada à variabilidade desse contraste é escalar:
 
 $$
 \begin{aligned}
-\mathbf G_C
+\mathbf G_{C_1}
 &=
-\mathbf C
+\mathbf C_1
 \left(
 \mathbf Z^\top
 \mathbf Z
 \right)^{-1}
-\mathbf C^\top
+\mathbf C_1^\top
 \\
 &=
 \frac{2}{35}
@@ -5858,7 +6132,7 @@ $$
 \mathbf H
 &=
 \widehat{\boldsymbol{\Delta}}^\top
-\mathbf G_C^{-1}
+\mathbf G_{C_1}^{-1}
 \widehat{\boldsymbol{\Delta}}
 \\
 &=
@@ -5923,7 +6197,7 @@ A mesma estrutura permite avaliar o efeito da covariável sobre uma combinação
 Considere
 
 $$
-\mathbf m
+\mathbf c_2
 =
 \begin{bmatrix}
 1\\
@@ -6279,34 +6553,34 @@ A hipótese linear multivariada geral é
 
 $$
 H_0:
-\mathbf C
+\mathbf C_1
 \mathbf B
-\mathbf M
+\mathbf C_2
 =
 \boldsymbol{\Theta}_0.
 $$
 
-A matriz $\mathbf C$ combina termos do modelo e $\mathbf M$ combina respostas. A hipótese produz duas matrizes construídas sobre as mesmas combinações de respostas:
+A matriz $\mathbf C_1$ combina termos do modelo e $\mathbf C_2$ combina respostas. A hipótese produz duas matrizes construídas sobre as mesmas combinações de respostas:
 
 $$
 \mathbf H
 =
 \widehat{\boldsymbol{\Delta}}^\top
-\mathbf G_C^{-1}
+\mathbf G_{C_1}^{-1}
 \widehat{\boldsymbol{\Delta}}
 $$
 
 e
 
 $$
-\mathbf E_M
+\mathbf E_{C_2}
 =
-\mathbf M^\top
+\mathbf C_2^\top
 \mathbf E
-\mathbf M.
+\mathbf C_2.
 $$
 
-A primeira representa a variação associada ao afastamento da hipótese; a segunda representa a variação residual correspondente. Quando $\mathbf M=\mathbf I_p$, obtém-se o par
+A primeira representa a variação associada ao afastamento da hipótese; a segunda representa a variação residual correspondente. Quando $\mathbf C_2=\mathbf I_p$, obtém-se o par
 
 $$
 \left(
@@ -6329,7 +6603,7 @@ A Tabela @tbl-sintese-modelo-linear-multivariado reúne os principais objetos ut
 | SQPC do modelo | $\mathbf T_{\mathrm{mod}}$ | representa a variação associada ao modelo além do intercepto |
 | modelo de grupos | $\mathbf E=\mathbf T_{\mathrm{intra}}$, $\mathbf T_{\mathrm{mod}}=\mathbf T_{\mathrm{entre}}$ | relaciona o modelo linear à decomposição intra e entre grupos |
 | função estimável | $\mathbf C\mathbf B$ | representa comparações determinadas pelo modelo |
-| hipótese geral | $\mathbf C\mathbf B\mathbf M=\boldsymbol{\Theta}_0$ | combina termos do modelo e respostas |
+| hipótese geral | $\mathbf C_1\mathbf B\mathbf C_2=\boldsymbol{\Theta}_0$ | combina termos do modelo e respostas |
 | SQPC da hipótese | $\mathbf H$ | representa a variação associada ao afastamento da hipótese |
 
 : Principais objetos do modelo linear multivariado. {#tbl-sintese-modelo-linear-multivariado}
@@ -6343,6 +6617,6 @@ Ao concluir este capítulo, o estudante deve ser capaz de:
 - relacionar, no modelo de grupos, as matrizes $\mathbf H$ e $\mathbf E$ às dispersões entre e dentro dos grupos;
 - distinguir unicidade dos coeficientes de estimabilidade de combinações dos parâmetros;
 - interpretar a função de $\mathbf C$ e de $\mathbf M$ em uma hipótese linear;
-- formular hipóteses na forma $\mathbf C\mathbf B\mathbf M=\boldsymbol{\Theta}_0$ e construir as SQPCs correspondentes.
+- formular hipóteses na forma $\mathbf C_1\mathbf B\mathbf C_2=\boldsymbol{\Theta}_0$ e construir as SQPCs correspondentes.
 
 Este capítulo construiu os estimadores, as projeções e as matrizes SQPC que representam a variação associada ao modelo, ao resíduo e às hipóteses lineares. O Capítulo 12 desenvolverá as distribuições amostrais desses objetos e mostrará como utilizá-los na construção de testes e regiões de confiança no contexto multivariado.
