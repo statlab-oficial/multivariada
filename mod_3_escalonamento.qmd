@@ -1,8 +1,8 @@
 # Formulação do Escalonamento Multidimensional
 
-O Escalonamento Multidimensional, ou MDS, procura representar relações de dissimilaridade entre objetos por meio de uma configuração geométrica. O objeto de entrada pode ser a mesma matriz de dissimilaridades utilizada na Análise de Agrupamentos, mas o objetivo da técnica é diferente. Em Agrupamentos, as proximidades são utilizadas para construir partições ou hierarquias. No MDS, elas são utilizadas para construir coordenadas cujas distâncias representem a estrutura observada.
+O Escalonamento Multidimensional, ou MDS, procura representar relações de dissimilaridade entre objetos por meio de uma configuração geométrica. O objeto de entrada pode ser a mesma matriz de dissimilaridades utilizada na Análise de Agrupamentos, mas o objetivo da técnica é diferente. Em Agrupamentos, as proximidades são utilizadas para construir partições ou hierarquias. No MDS, elas são utilizadas para construir coordenadas cujas distâncias procurem representar a estrutura de dissimilaridades fornecida.
 
-A formulação clássica parte de uma propriedade geométrica desenvolvida no Módulo 1: distâncias euclidianas podem ser relacionadas a produtos internos. A matriz de Gram definida em @def-matriz-gram organiza esses produtos internos, enquanto a decomposição espectral fornece as coordenadas de uma configuração correspondente. O MDS clássico combina esses resultados para resolver o problema inverso: recuperar uma representação geométrica quando as coordenadas dos objetos não são conhecidas [@torgerson1952; @gower1966].
+A formulação clássica parte de uma propriedade geométrica desenvolvida no Módulo 1: distâncias euclidianas podem ser relacionadas a produtos internos. A matriz de Gram definida em @def-matriz-gram organiza esses produtos internos, enquanto a decomposição espectral permite obter coordenadas compatíveis com essa geometria. O MDS clássico combina esses resultados para resolver um problema inverso: recuperar uma representação geométrica quando as coordenadas dos objetos não são conhecidas, mas suas dissimilaridades estão disponíveis [@torgerson1952; @gower1966].
 
 Os elementos principais da formulação são apresentados na @tbl-estrutura-mds.
 
@@ -60,7 +60,7 @@ $$
 \delta_{ji}.
 $$
 
-A desigualdade triangular não será assumida nesta etapa. Ela se torna relevante quando se deseja interpretar $\boldsymbol{\Delta}$ como uma matriz de distâncias métricas.
+Não se exige, neste ponto, que objetos distintos apresentem dissimilaridade estritamente positiva nem que $\boldsymbol{\Delta}$ satisfaça a desigualdade triangular. Essas propriedades passam a ser relevantes quando se deseja interpretar a dissimilaridade como uma distância métrica.
 
 O objetivo é encontrar pontos
 
@@ -101,9 +101,9 @@ d_{ij}
 \right\|,
 $$ {#eq-distancia-configuracao-mds}
 
-utilizando a distância já definida em @def-distancia-euclidiana.
+utilizando a distância definida em @def-distancia-euclidiana.
 
-Uma reprodução exata ocorre quando
+Uma representação euclidiana exata ocorre quando
 
 $$
 d_{ij}
@@ -114,9 +114,9 @@ d_{ij}
 \delta_{ij}
 $$
 
-para todos os pares.
+para todos os pares de objetos.
 
-Em muitos problemas, essa igualdade não pode ser obtida na dimensão escolhida. A representação passa então a ser aproximada, e o significado dessa aproximação dependerá da formulação adotada.
+Em muitos problemas, essa igualdade não pode ser obtida na dimensão escolhida. Em outros, pode não existir uma configuração euclidiana exata em dimensão alguma. A representação passa então a ser aproximada, e o significado dessa aproximação dependerá da formulação adotada.
 
 A distinção entre entrada e saída é sintetizada na @tbl-entrada-saida-mds.
 
@@ -130,11 +130,11 @@ A distinção entre entrada e saída é sintetizada na @tbl-entrada-saida-mds.
 
 O problema do MDS é relacional. Não é necessário conhecer originalmente as variáveis que deram origem às diferenças entre os objetos. Uma matriz de dissimilaridades pode ser calculada a partir de uma matriz de dados, obtida por comparações entre objetos ou fornecida diretamente pelo problema analisado.
 
-Essa característica distingue o MDS da ACP. A ACP parte de coordenadas das observações e constrói uma nova representação. O MDS pode partir somente das relações entre pares e reconstruir coordenadas a partir delas.
+Essa característica distingue o MDS da ACP. A ACP parte de coordenadas das observações e constrói outra representação dessas mesmas observações. O MDS pode partir somente das relações entre pares de objetos e procurar coordenadas compatíveis com essas relações.
 
 ## Configuração e indeterminações geométricas
 
-Uma matriz de distâncias não determina a posição absoluta de uma configuração no espaço. Algumas transformações modificam as coordenadas sem modificar as distâncias entre os pontos.
+Uma matriz de distâncias não determina a posição absoluta nem a orientação absoluta de uma configuração no espaço. Algumas transformações modificam as coordenadas sem modificar as distâncias entre os pontos.
 
 ### Translação
 
@@ -395,7 +395,9 @@ ggplot(
   )
 ```
 
-A localização e a orientação dos eixos não são determinadas pelas distâncias. O objeto interpretado no MDS é a configuração relativa dos pontos.
+A localização e a orientação dos eixos não são determinadas pelas distâncias. O objeto geométrico identificado pela informação de distâncias é, portanto, uma classe de configurações equivalentes por translação e transformação ortogonal.
+
+A centralização, introduzida a seguir, escolhe um representante dessa classe quanto à translação. Ela não elimina a indeterminação por rotações ou reflexões.
 
 No MDS clássico, uma mudança global de escala não constitui a mesma indeterminação. Se
 
@@ -414,7 +416,7 @@ d_{ij}^{*}
 |c|d_{ij}.
 $$
 
-Quando os valores de $\boldsymbol{\Delta}$ possuem escala fixada, essa transformação modifica o problema. A questão da escala assume outra forma em formulações não métricas, nas quais a informação principal pode estar na ordenação das dissimilaridades.
+Quando os valores de $\boldsymbol{\Delta}$ possuem escala fixada, essa transformação modifica as distâncias que se pretende reproduzir e, portanto, modifica o problema. A questão da escala assumirá outra forma nas formulações não métricas, nas quais a informação principal pode estar na ordenação das dissimilaridades.
 
 ### Centralização da configuração
 
@@ -441,7 +443,7 @@ $$
 \mathbf1_n^\top.
 $$
 
-No MDS, a mesma matriz será utilizada para fixar o centroide da configuração na origem.
+No MDS, a mesma matriz será utilizada para escolher, entre as configurações equivalentes por translação, aquela cujo centroide está na origem.
 
 ::: {#def-configuracao-centralizada-mds}
 ## Configuração centralizada no MDS
@@ -475,7 +477,7 @@ $$
 
 Pela propriedade de @prp-centralizacao-preserva-distancias, a centralização não modifica as distâncias entre suas linhas.
 
-A condição em @eq-centralizacao-configuracao-mds não cria uma nova geometria. Ela escolhe, entre todas as translações equivalentes, aquela cujo centroide coincide com a origem.
+A condição em @eq-centralizacao-configuracao-mds não cria uma nova geometria. Ela fixa apenas a indeterminação de translação, escolhendo a configuração cujo centroide coincide com a origem.
 
 ## Da distância ao produto interno
 
@@ -545,9 +547,9 @@ $$ {#eq-distancia-gram-mds}
 
 A matriz de Gram determina, portanto, todas as distâncias euclidianas da configuração.
 
-O MDS clássico resolve o problema inverso: recebe as distâncias e procura recuperar os produtos internos.
+O MDS clássico utiliza essa relação no sentido inverso: parte das distâncias ou dissimilaridades fornecidas e reconstrói uma matriz que poderá ser interpretada como matriz de Gram quando forem satisfeitas as condições geométricas apropriadas.
 
-### Matriz das distâncias quadráticas
+### Matriz das dissimilaridades quadráticas
 
 Defina
 
@@ -559,7 +561,7 @@ $$
 \right).
 $$ {#eq-dissimilaridades-quadraticas-mds}
 
-Considere ainda o vetor formado pela diagonal da matriz de Gram,
+Quando $\boldsymbol{\Delta}$ corresponde às distâncias de uma configuração euclidiana centralizada, considere o vetor formado pela diagonal de sua matriz de Gram,
 
 $$
 \mathbf g
@@ -571,7 +573,7 @@ g_{nn}
 \end{pmatrix}.
 $$
 
-A identidade em @eq-distancia-gram-mds pode ser escrita matricialmente como
+A identidade em @eq-distancia-gram-mds pode então ser escrita matricialmente como
 
 $$
 \boldsymbol{\Delta}^{(2)}
@@ -585,7 +587,7 @@ $$
 2\mathbf G.
 $$ {#eq-distancias-gram-forma-matricial}
 
-Essa expressão contém os produtos internos desconhecidos e termos associados às normas individuais dos pontos. A centralização permite eliminar esses termos.
+Essa expressão contém os produtos internos e os termos associados às normas individuais dos pontos. A centralização permite eliminar os dois primeiros termos.
 
 Como
 
@@ -725,11 +727,9 @@ $$
 
 A operação em @eq-dupla-centralizacao-mds é denominada **dupla centralização**. Ela converte a informação expressa em distâncias quadráticas em uma matriz de produtos internos.
 
-Esse resultado completa a relação que havia sido antecipada no Módulo 1. A matriz de Gram já possuía as propriedades estabelecidas em @prp-propriedades-matriz-gram; no MDS, ela passa a ser reconstruída diretamente das dissimilaridades.
+O resultado possui uma hipótese importante: em @prp-dupla-centralizacao-mds, $\boldsymbol{\Delta}^{(2)}$ é a matriz de **distâncias euclidianas quadráticas de uma configuração**. Nessas condições, a matriz obtida é exatamente sua matriz de Gram centralizada.
 
-Quando $\boldsymbol{\Delta}$ contém distâncias euclidianas exatas, a matriz obtida em @eq-dupla-centralizacao-mds coincide com a matriz de Gram de uma configuração centralizada.
-
-Para uma matriz de dissimilaridades geral, define-se
+Para uma matriz de dissimilaridades geral, a mesma operação algébrica pode ser aplicada e define-se
 
 $$
 \mathbf G_{\Delta}
@@ -740,7 +740,50 @@ $$
 \mathbf H_n.
 $$ {#eq-gram-reconstruida-mds}
 
-A estrutura espectral de $\mathbf G_{\Delta}$ determinará se as dissimilaridades admitem uma representação euclidiana exata e, quando isso ocorre, fornecerá diretamente as coordenadas da configuração. Esse será o ponto de partida da formulação do MDS clássico.
+Nesse caso, chamar $\mathbf G_{\Delta}$ de **matriz de Gram reconstruída** antecipa uma questão que ainda precisa ser verificada: ela será efetivamente a matriz de Gram de uma configuração euclidiana se possuir a estrutura necessária para isso.
+
+Em particular, como
+
+$$
+\mathbf H_n
+\mathbf1_n
+=
+\mathbf0,
+$$
+
+tem-se sempre
+
+$$
+\mathbf G_{\Delta}\mathbf1_n
+=
+\mathbf0,
+$$
+
+e
+
+$$
+\mathbf1_n^\top\mathbf G_{\Delta}
+=
+\mathbf0^\top.
+$$
+
+Portanto, a dupla centralização produz uma matriz simétrica e centralizada sempre que $\boldsymbol{\Delta}$ é simétrica.
+
+A propriedade decisiva que falta verificar é a semidefinição positiva.
+
+Quando
+
+$$
+\mathbf G_{\Delta}
+\succeq
+\mathbf0,
+$$
+
+a matriz pode ser representada como uma matriz de Gram euclidiana, e sua decomposição espectral fornecerá coordenadas para uma configuração correspondente.
+
+Quando $\mathbf G_{\Delta}$ possui autovalores negativos, essa interpretação euclidiana exata não é possível na formulação clássica.
+
+A estrutura espectral de $\mathbf G_{\Delta}$ será, portanto, o ponto de partida para a formulação do MDS clássico.
 
 ## Formulação do MDS clássico
 
@@ -889,7 +932,7 @@ $$
 \end{aligned}
 $$ {#eq-verificacao-gram-mds}
 
-Assim, a construção espectral fornece uma matriz de coordenadas cuja matriz de Gram coincide com aquela reconstruída das distâncias.
+Assim, a construção espectral fornece uma matriz de coordenadas cuja matriz de Gram coincide com aquela reconstruída a partir das dissimilaridades.
 
 ::: {#def-coordenadas-principais-mds}
 ## Coordenadas principais
@@ -941,13 +984,13 @@ $$
 
 A solução espectral já produz, portanto, uma configuração centralizada.
 
-A posição de cada objeto na dimensão $j$ é determinada pelo elemento correspondente de
+A posição de cada objeto na dimensão $j$ é determinada pelos elementos de
 
 $$
 \sqrt{\lambda_j}\mathbf q_j.
 $$
 
-O autovalor controla a magnitude global das coordenadas ao longo daquele eixo, pois
+O autovalor controla a magnitude quadrática global das coordenadas naquele eixo, pois
 
 $$
 \left\|
@@ -958,6 +1001,8 @@ $$
 $$ {#eq-magnitude-eixo-mds}
 
 Nesse contexto, $\lambda_j$ quantifica a contribuição quadrática daquele eixo para a geometria centralizada da configuração. Essa interpretação não exige atribuir aos autovalores o significado de variâncias de variáveis aleatórias.
+
+Quando um autovalor positivo é simples, o autovetor correspondente é determinado até mudança de sinal. Quando um autovalor possui multiplicidade maior que um, diferentes bases ortonormais podem ser escolhidas no mesmo autoespaço. Essas escolhas produzem representações relacionadas por transformações ortogonais e, portanto, preservam as distâncias da configuração.
 
 ### Reprodução euclidiana exata
 
@@ -1077,7 +1122,9 @@ $$
 \right)
 $$
 
-o vetor formado pelos elementos diagonais de $\mathbf G_{\Delta}$. Como $\boldsymbol{\Delta}^{(2)}$ é simétrica e possui diagonal nula, a dupla centralização admite a relação inversa
+o vetor formado pelos elementos diagonais de $\mathbf G_{\Delta}$.
+
+Como $\boldsymbol{\Delta}^{(2)}$ é simétrica e possui diagonal nula, a transformação por dupla centralização admite a relação inversa
 
 $$
 \boldsymbol{\Delta}^{(2)}
@@ -1120,7 +1167,7 @@ $$
 Logo, a configuração construída reproduz exatamente as dissimilaridades.
 :::
 
-A simetria de $\boldsymbol{\Delta}$ é insuficiente para garantir uma representação euclidiana. A compatibilidade com essa geometria é determinada pela semidefinição positiva da matriz de Gram reconstruída.
+A simetria e a diagonal nula de $\boldsymbol{\Delta}$ não são suficientes para garantir uma representação euclidiana. A compatibilidade com essa geometria é determinada pela semidefinição positiva da matriz de Gram reconstruída.
 
 A @tbl-autovalores-gram-mds resume a interpretação espectral.
 
@@ -1148,7 +1195,7 @@ a dimensão mínima de uma representação euclidiana exata é
 $$
 r
 =
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \mathbf G_{\Delta}
 \right).
@@ -1165,13 +1212,13 @@ $$
 satisfaz
 
 $$
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \mathbf X_{\mathrm{MDS}}
 \mathbf X_{\mathrm{MDS}}^\top
 \right)
 =
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \mathbf X_{\mathrm{MDS}}
 \right)
@@ -1193,7 +1240,7 @@ qualquer representação exata deve, portanto, ter
 $$
 k
 \geq
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \mathbf G_{\Delta}
 \right).
@@ -1204,7 +1251,7 @@ Por outro lado, @eq-coordenadas-mds-classico constrói uma representação exata
 $$
 r
 =
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \mathbf G_{\Delta}
 \right)
@@ -1212,7 +1259,7 @@ $$
 
 dimensões.
 
-Como a configuração está centralizada,
+Como
 
 $$
 \mathbf G_{\Delta}\mathbf1_n
@@ -1220,10 +1267,10 @@ $$
 \mathbf0,
 $$
 
-e, portanto,
+tem-se
 
 $$
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \mathbf G_{\Delta}
 \right)
@@ -1444,7 +1491,7 @@ $$
 0.
 $$
 
-A aproximação baseada nas primeiras $k$ dimensões é
+A aproximação construída pelas primeiras $k$ componentes espectrais é
 
 $$
 \mathbf G_k
@@ -1491,7 +1538,7 @@ $$
 \mathbf D_k^{1/2}.
 $$ {#eq-configuracao-reduzida-mds}
 
-Como $\mathbf G_{\Delta}$ é semidefinida positiva, seus valores singulares coincidem com seus autovalores positivos. O resultado de Eckart–Young–Mirsky estabelecido em @thm-eckart-young-mirsky implica que $\mathbf G_k$ é uma melhor aproximação de posto no máximo $k$ de $\mathbf G_{\Delta}$, tanto na norma espectral quanto na norma de Frobenius.
+Como $\mathbf G_{\Delta}$ é semidefinida positiva, seus valores singulares coincidem com seus autovalores não negativos. O resultado de Eckart–Young–Mirsky estabelecido em @thm-eckart-young-mirsky implica que $\mathbf G_k$ é uma melhor aproximação de posto no máximo $k$ de $\mathbf G_{\Delta}$, tanto na norma espectral quanto na norma de Frobenius.
 
 Em particular,
 
@@ -1526,6 +1573,34 @@ $$
 
 O resultado tem um significado específico no MDS clássico: a redução dimensional aproxima a **matriz de produtos internos reconstruída**.
 
+### Multiplicidade espectral e não unicidade
+
+A redução dimensional exige distinguir a não unicidade dos eixos daquela que pode ocorrer na própria escolha do subespaço retido.
+
+Se
+
+$$
+\lambda_k
+>
+\lambda_{k+1},
+$$
+
+o subespaço gerado pelas $k$ primeiras direções espectrais é determinado de forma única. Mesmo nesse caso, uma base ortonormal dentro de um autoespaço associado a autovalores repetidos pode ser modificada sem alterar o subespaço correspondente, e a configuração permanece não identificada quanto a transformações ortogonais.
+
+Se, entretanto,
+
+$$
+\lambda_k
+=
+\lambda_{k+1},
+$$
+
+o corte ocorre no interior de um autoespaço associado a um autovalor de multiplicidade maior que um. Nesse caso, diferentes subespaços de dimensão $k$ podem ser selecionados dentro desse autoespaço e produzir aproximações com o mesmo erro ótimo em norma de Frobenius.
+
+Portanto, na fronteira de uma multiplicidade espectral, não é apenas a orientação dos eixos que deixa de ser única: o próprio subespaço $k$-dimensional utilizado na representação reduzida pode não ser determinado unicamente.
+
+Essa situação é análoga à discutida na ACP para autovalores repetidos e decorre da mesma estrutura espectral.
+
 As distâncias na configuração reduzida são
 
 $$
@@ -1552,7 +1627,7 @@ $$
 k<r.
 $$
 
-A aproximação espectral ótima da matriz de Gram não deve ser confundida com a minimização direta de qualquer função de discrepância definida sobre as distâncias originais. O critério otimizado em @eq-gram-reduzida-mds é matricial; outras formulações de MDS podem adotar funções objetivo diretamente baseadas nas distâncias. Essa distinção separa o MDS clássico espectral das formulações métricas baseadas em *stress*. :contentReference[oaicite:1]{index=1}
+A aproximação espectral ótima da matriz de Gram não deve ser confundida com a minimização direta de uma função de discrepância definida sobre as distâncias originais. O critério otimizado em @eq-gram-reduzida-mds é matricial; outras formulações de MDS adotam funções objetivo diretamente baseadas nas distâncias. Essa distinção separa o MDS clássico espectral das formulações baseadas em *stress*.
 
 A soma dos autovalores positivos é
 
@@ -1584,6 +1659,8 @@ $$
 \right\|^2.
 $$
 
+Essa quantidade corresponde à soma quadrática total da configuração em relação ao centroide.
+
 A razão
 
 $$
@@ -1596,13 +1673,13 @@ $$
 }
 $$ {#eq-proporcao-geometria-mds}
 
-pode, no caso euclidiano, descrever a parcela da soma quadrática da configuração centralizada representada pelas primeiras $k$ coordenadas principais.
+descreve, no caso euclidiano, a parcela dessa soma quadrática representada pelas primeiras $k$ coordenadas principais.
 
-Essa quantidade é uma medida da representação espectral da geometria. Sua interpretação não deve ser automaticamente transferida para a noção de variância explicada da ACP, porque o objeto inicial do MDS é uma matriz de dissimilaridades.
+Essa é uma medida da representação espectral da geometria. Embora sua forma seja semelhante à proporção de variância explicada utilizada na ACP, sua interpretação deve permanecer vinculada ao objeto inicial do MDS: uma matriz de dissimilaridades.
 
 ### Euclideanidade e autovalores negativos
 
-A condição de @thm-condicao-euclidiana-mds separa dois problemas que podem produzir perda de fidelidade na representação.
+A condição de @thm-condicao-euclidiana-mds separa dois problemas diferentes que podem produzir perda de fidelidade na representação.
 
 No primeiro,
 
@@ -1612,11 +1689,11 @@ $$
 \mathbf0,
 $$
 
-mas sua dimensão exata é maior que a dimensão escolhida para a representação. A perda decorre da **redução de dimensão**.
+mas sua dimensão exata é maior do que a dimensão escolhida para a representação. A discrepância decorre da **redução de dimensão**.
 
 No segundo, $\mathbf G_{\Delta}$ possui pelo menos um autovalor negativo. Nesse caso, as dissimilaridades já não admitem uma representação euclidiana exata antes de qualquer redução dimensional.
 
-Considere
+Considere uma decomposição na qual existem autovalores positivos
 
 $$
 \lambda_1
@@ -1625,20 +1702,18 @@ $$
 \geq
 \lambda_r
 >
-0
+0,
 $$
 
-e autovalores negativos
+eventuais autovalores nulos e autovalores negativos.
+
+A presença de qualquer
 
 $$
-\lambda_{s+1},
-\ldots,
-\lambda_n
-<
-0.
+\lambda_j<0
 $$
 
-A presença desses valores impede escrever
+impede escrever
 
 $$
 \mathbf G_{\Delta}
@@ -1647,7 +1722,7 @@ $$
 \mathbf X^\top
 $$
 
-para uma matriz real de coordenadas euclidianas, porque qualquer matriz da forma
+para uma matriz real de coordenadas euclidianas, porque toda matriz da forma
 
 $$
 \mathbf X
@@ -1663,12 +1738,12 @@ A @tbl-reducao-nao-euclideanidade-mds distingue as duas situações.
 | Situação | Estrutura espectral | Origem da discrepância |
 |---|---|---|
 | representação euclidiana exata | $\mathbf G_{\Delta}\succeq\mathbf0$ e todas as dimensões positivas são mantidas | não há discrepância |
-| redução dimensional | $\mathbf G_{\Delta}\succeq\mathbf0$, mas apenas $k<r$ dimensões são mantidas | truncamento da configuração euclidiana |
+| redução dimensional | $\mathbf G_{\Delta}\succeq\mathbf0$, mas apenas $k<r$ dimensões são mantidas | truncamento de uma configuração euclidiana |
 | dissimilaridades não euclidianas | $\mathbf G_{\Delta}$ possui autovalores negativos | incompatibilidade anterior à redução dimensional |
 
 : Diferença entre redução dimensional e não euclideanidade das dissimilaridades. {#tbl-reducao-nao-euclideanidade-mds}
 
-Uma forma de construir uma configuração euclidiana aproximada é utilizar somente a parte positiva da decomposição espectral,
+Uma configuração euclidiana aproximada pode ser construída utilizando somente a parte positiva da decomposição espectral,
 
 $$
 \mathbf G_+
@@ -1698,7 +1773,7 @@ $$
 
 quando existem autovalores negativos. Consequentemente, as distâncias produzidas por $\mathbf X_+$ não reproduzem exatamente as dissimilaridades originais.
 
-Descartar os autovalores negativos não transforma a matriz original em uma representação exata; produz outra geometria euclidiana aproximada.
+Descartar os autovalores negativos não transforma a matriz original em uma representação euclidiana exata. A operação substitui a estrutura original por uma geometria euclidiana aproximada.
 
 Considere, por exemplo,
 
@@ -1738,15 +1813,17 @@ $$
 
 para os três pares.
 
-A interpretação dos autovalores deve, portanto, considerar o sinal antes da escolha da dimensão. Autovalores positivos fornecem as direções disponíveis para uma representação euclidiana; autovalores nulos não acrescentam dimensão; autovalores negativos indicam que a matriz de dissimilaridades não pertence exatamente à classe de matrizes de distâncias euclidianas considerada pelo MDS clássico.
+A violação da desigualdade triangular já é suficiente, neste exemplo, para mostrar que essas três dissimilaridades não podem ser distâncias euclidianas. A análise espectral fornece a mesma incompatibilidade na forma exigida pela formulação geral do MDS clássico.
+
+A interpretação dos autovalores deve, portanto, considerar seus sinais antes da escolha da dimensão. Autovalores positivos fornecem as dimensões disponíveis para uma representação euclidiana; autovalores nulos não acrescentam dimensão; autovalores negativos indicam que a matriz de dissimilaridades não pertence exatamente à classe de matrizes de distâncias euclidianas considerada pelo MDS clássico.
 
 Procedimentos destinados a modificar dissimilaridades não euclidianas podem ser utilizados em aplicações específicas. Essas correções alteram a matriz de entrada e pertencem à etapa metodológica da análise. Neste capítulo, o ponto necessário é reconhecer a não euclideanidade e distingui-la da simples redução da dimensão.
 
-O MDS clássico pode, assim, ser entendido como uma transformação espectral da matriz de dissimilaridades em coordenadas geométricas. A próxima conexão mostra que, quando essas dissimilaridades são as próprias distâncias euclidianas entre observações de uma matriz de dados, a construção coincide com uma representação já encontrada por outro caminho na Análise de Componentes Principais.
+O MDS clássico pode, assim, ser entendido como uma reconstrução espectral de uma geometria a partir de dissimilaridades. Quando essas dissimilaridades são as próprias distâncias euclidianas entre observações de uma matriz de dados, essa construção se relaciona diretamente com uma representação já obtida por outro caminho na Análise de Componentes Principais.
 
 ## MDS clássico e Análise de Componentes Principais
 
-O MDS clássico e a ACP podem produzir representações espectrais muito próximas, mas partem de objetos diferentes. A ACP utiliza uma matriz de dados, de covariâncias ou de correlações. O MDS clássico utiliza uma matriz de distâncias ou dissimilaridades. A relação entre as duas técnicas aparece quando as distâncias fornecidas ao MDS são calculadas a partir das próprias observações em uma geometria euclidiana. :contentReference[oaicite:0]{index=0}
+O MDS clássico e a ACP podem produzir representações espectrais muito próximas, mas partem de objetos diferentes. A ACP utiliza uma matriz de dados, de covariâncias ou de correlações. O MDS clássico utiliza uma matriz de distâncias ou dissimilaridades. A relação entre as duas técnicas aparece quando as distâncias fornecidas ao MDS são calculadas a partir das próprias observações em uma geometria euclidiana.
 
 Considere uma matriz de dados centralizada
 
@@ -1771,7 +1848,7 @@ em que
 $$
 r
 =
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \mathbf X_c
 \right).
@@ -1823,7 +1900,7 @@ $$
 d_1^2,\ldots,d_r^2,
 $$
 
-e os autovetores correspondentes são as colunas de
+e os autovetores correspondentes podem ser escolhidos como as colunas de
 
 $$
 \mathbf U_r.
@@ -1850,15 +1927,15 @@ $$
 \mathbf D_r.
 $$ {#eq-escores-acp-relacao-mds}
 
-Logo,
+Logo, sob escolhas compatíveis das bases espectrais,
 
 $$
 \mathbf X_{\mathrm{MDS}}
 =
-\mathbf T_r,
+\mathbf T_r.
 $$ {#eq-equivalencia-mds-acp}
 
-até as indeterminações de sinal e, quando existem valores singulares repetidos, até transformações ortogonais nos subespaços correspondentes.
+Quando existem valores singulares repetidos, diferentes bases ortonormais podem ser escolhidas nos subespaços correspondentes. As configurações resultantes permanecem equivalentes por transformações ortogonais nesses subespaços e preservam as mesmas distâncias.
 
 ::: {#prp-equivalencia-mds-acp}
 ## Relação entre MDS clássico e escores da ACP
@@ -1928,8 +2005,8 @@ Para formular o ajuste, é útil distinguir três quantidades.
 No MDS baseado em ajuste de distâncias:
 
 - $\delta_{ij}$ é a **dissimilaridade de entrada** entre os objetos $i$ e $j$;
-- $\widehat{\delta}_{ij}$ é a **disparidade**, isto é, o valor-alvo obtido a partir da dissimilaridade segundo a transformação admitida pela formulação;
-- $d_{ij}$ é a **distância configuracional** produzida pelas coordenadas estimadas.
+- $\widehat{\delta}_{ij}$ é a **disparidade**, isto é, o valor-alvo associado à dissimilaridade segundo a transformação admitida pela formulação;
+- $d_{ij}$ é a **distância configuracional** produzida pelas coordenadas da configuração.
 :::
 
 A distinção é importante porque, em geral,
@@ -1955,7 +2032,7 @@ f
 \right),
 $$ {#eq-disparidades-mds}
 
-em que as restrições impostas a $f$ definem a informação das dissimilaridades que será preservada.
+em que as restrições impostas a $f$ determinam quais características das dissimilaridades serão preservadas.
 
 ### MDS métrico
 
@@ -2020,7 +2097,7 @@ $$
 \delta_{rs},
 $$
 
-a representação procura manter a ordenação correspondente por meio de disparidades que satisfaçam
+as disparidades devem respeitar a mesma ordenação:
 
 $$
 \widehat{\delta}_{ij}
@@ -2028,17 +2105,96 @@ $$
 \widehat{\delta}_{rs}.
 $$ {#eq-ordem-disparidades-mds}
 
-Em seguida, procura-se uma configuração cujas distâncias sejam próximas dessas disparidades.
-
-Assim, a transformação
+Essa condição pode ser expressa restringindo a transformação
 
 $$
 f
 $$
 
-em @eq-disparidades-mds é restringida a ser monótona não decrescente.
+em @eq-disparidades-mds a ser monótona não decrescente.
 
 A monotonicidade permite modificar as diferenças numéricas entre as dissimilaridades sem inverter sua ordem.
+
+O problema não consiste, em geral, em fixar primeiro uma transformação monótona e depois estimar apenas a configuração. A formulação envolve conjuntamente:
+
+- uma configuração $\mathbf X_{\mathrm{MDS},k}$;
+- disparidades $\widehat{\delta}_{ij}$ compatíveis com a ordenação das dissimilaridades.
+
+Pode-se representar a estrutura do problema considerando o conjunto de disparidades admissíveis
+
+$$
+\mathcal M
+\left(
+\boldsymbol{\Delta}
+\right)
+=
+\left\{
+\left(
+\widehat{\delta}_{ij}
+\right)_{i<j}:
+\begin{array}{l}
+\text{existe }
+f:[0,\infty)\rightarrow[0,\infty)
+\text{ monótona não decrescente,}\\[2pt]
+\widehat{\delta}_{ij}
+=
+f
+\left(
+\delta_{ij}
+\right),
+\quad
+i<j
+\end{array}
+\right\}.
+$$
+
+Essa definição garante simultaneamente a não negatividade das disparidades e a preservação da ordenação das dissimilaridades. Na formulação adotada aqui, se
+
+$$
+\delta_{ij}
+=
+\delta_{rs},
+$$
+
+então
+
+$$
+\widehat{\delta}_{ij}
+=
+\widehat{\delta}_{rs},
+$$
+
+pois ambas as disparidades são obtidas pela mesma função $f$. Outras convenções para o tratamento de empates podem ser adotadas em formulações específicas e pertencem à etapa metodológica da técnica.
+
+Uma formulação baseada na discrepância quadrática procura então reduzir
+
+$$
+\sum_{i<j}
+w_{ij}
+\left[
+d_{ij}
+\left(
+\mathbf X_{\mathrm{MDS},k}
+\right)
+-
+\widehat{\delta}_{ij}
+\right]^2
+$$
+
+em relação à configuração e às disparidades admissíveis,
+
+$$
+\left(
+\widehat{\delta}_{ij}
+\right)_{i<j}
+\in
+\mathcal M
+\left(
+\boldsymbol{\Delta}
+\right).
+$$
+
+Assim, configuração e disparidades participam conjuntamente do ajuste. Os procedimentos utilizados para realizar essa otimização e para obter as disparidades monotônicas pertencem à implementação da técnica e não serão desenvolvidos neste capítulo.
 
 Por exemplo, considere
 
@@ -2076,8 +2232,9 @@ A @tbl-mds-metrico-naometrico compara as duas formulações.
 |---|---|---|
 | informação principal | magnitude das dissimilaridades | ordenação das dissimilaridades |
 | transformação $f$ | especificada ou metricamente restringida | monótona não decrescente |
-| alvo do ajuste | reproduzir relações quantitativas | reproduzir relações ordinais |
+| alvo do ajuste | relações quantitativas entre dissimilaridades | relações ordinais entre dissimilaridades |
 | configuração | distâncias próximas das disparidades | distâncias próximas de disparidades monotônicas |
+| objetos ajustados | principalmente a configuração, dadas as disparidades especificadas pelo modelo | configuração e disparidades admissíveis sob a restrição ordinal |
 | indeterminação de escala | depende da parametrização adotada | pode ocorrer quando apenas a ordem é relevante |
 
 : Diferença entre formulações métricas e não métricas do MDS. {#tbl-mds-metrico-naometrico}
@@ -2092,7 +2249,17 @@ e suas relações continuam sendo medidas por distâncias configuracionais. O qu
 
 ### Função de *stress*
 
-Para pesos $w_{ij}\geq0$ e uma configuração não degenerada tal que
+Uma função de *stress* mede a discrepância entre as distâncias produzidas pela configuração e as disparidades utilizadas como alvos do ajuste.
+
+Para pesos
+
+$$
+w_{ij}
+\geq
+0
+$$
+
+e uma configuração não degenerada tal que
 
 $$
 \sum_{i<j}
@@ -2101,7 +2268,7 @@ w_{ij}d_{ij}^2
 0,
 $$
 
-uma forma normalizada de representar a discrepância entre distâncias e disparidades é [@kruskal1964a]
+uma forma normalizada específica de *stress* é [@kruskal1964a]
 
 $$
 \operatorname{Stress}
@@ -2135,11 +2302,15 @@ $$
 
 mede a discrepância de cada par, $w_{ij}$ determina sua contribuição para o critério e o denominador normaliza a discrepância pela escala global das distâncias configuracionais.
 
-Valores menores de *stress* indicam maior proximidade, segundo esse critério, entre as distâncias da configuração e as disparidades.
+Valores menores de *stress* indicam maior proximidade, segundo essa definição, entre as distâncias da configuração e as disparidades.
 
-O valor de *stress* não possui interpretação independente da formulação utilizada. Diferentes definições, normalizações, transformações das dissimilaridades e conjuntos de pesos podem produzir valores que não são diretamente comparáveis.
+No MDS métrico, as disparidades são determinadas pela relação quantitativa especificada para as dissimilaridades. No MDS não métrico, elas também participam do ajuste, sujeitas às restrições de monotonicidade.
 
-Por isso, o papel da função neste capítulo é estabelecer a diferença entre uma representação espectral baseada na matriz de Gram e uma representação obtida pela minimização direta de discrepâncias entre proximidades.
+A expressão em @eq-stress-mds não constitui uma definição universal de *stress*. Diferentes formulações podem utilizar outras normalizações, outros pesos ou outras formas de relacionar dissimilaridades, disparidades e distâncias.
+
+Consequentemente, valores de *stress* obtidos sob definições diferentes não são necessariamente comparáveis.
+
+O papel da função neste capítulo é estabelecer a diferença entre uma representação espectral baseada na matriz de Gram e uma representação obtida pela minimização direta de discrepâncias entre proximidades.
 
 Os critérios práticos utilizados para avaliar a magnitude do *stress*, escolher a dimensão ou comparar soluções pertencem à etapa aplicada da análise.
 
@@ -2308,53 +2479,85 @@ $$
 com
 
 $$
-\mathbf O^\top\mathbf O
+\mathbf O^\top
+\mathbf O
 =
 \mathbf I_k,
 $$
 
 então as distâncias entre os pontos permanecem inalteradas.
 
-Consequentemente, o valor de @eq-stress-mds também permanece inalterado.
+Consequentemente, o valor de @eq-stress-mds também permanece inalterado, desde que as mesmas disparidades sejam utilizadas.
 
 A escala exige tratamento separado.
 
 No MDS métrico, quando as disparidades possuem escala quantitativa fixada, multiplicar todas as coordenadas por uma constante altera as distâncias e, em geral, altera o ajuste.
 
-No MDS não métrico, a escala pode não ser identificada quando a transformação monotônica e a normalização do critério permitem compensar uma mudança global das distâncias.
+No MDS não métrico, quando a formulação permite reescalar conjuntamente as distâncias e as disparidades sem alterar as restrições de ordem e a normalização do critério, a escala global da configuração não é identificada pelo *stress*.
+
+Assim, as indeterminações da configuração dependem da informação que a formulação preserva: as transformações rígidas decorrem da utilização de distâncias, enquanto a possível indeterminação de escala no MDS não métrico decorre do caráter ordinal das proximidades e da forma adotada para o critério.
 
 A identificação da configuração deve, portanto, ser interpretada em relação à formulação específica.
 
 ## Dependência da representação
 
-O MDS representa a geometria definida pela matriz de entrada. A configuração não deve ser interpretada independentemente das dissimilaridades que lhe deram origem.
+O MDS representa a geometria definida pela matriz de entrada e pelo critério utilizado para construir a configuração. A solução não deve, portanto, ser interpretada independentemente das dissimilaridades que lhe deram origem.
 
-A @tbl-dependencia-representacao-mds organiza os principais elementos dos quais a solução depende.
+A @tbl-dependencia-representacao-mds organiza os principais elementos dos quais a representação depende.
 
 | Elemento | Efeito sobre o problema |
 |---|---|
-| definição de $\delta_{ij}$ | determina quais objetos são considerados próximos |
+| definição de $\delta_{ij}$ | determina quais relações entre objetos são consideradas próximas ou distantes |
 | transformação das dissimilaridades | determina a informação quantitativa ou ordinal preservada |
 | dimensão $k$ | limita a complexidade geométrica da configuração |
-| pesos $w_{ij}$ | modificam a contribuição relativa dos pares |
+| pesos $w_{ij}$ | modificam a contribuição relativa dos pares no critério |
 | critério de ajuste | define o significado de melhor representação |
 | restrições geométricas | determinam a classe de configurações admissíveis |
 
 : Elementos que definem a representação produzida pelo MDS. {#tbl-dependencia-representacao-mds}
 
-A dimensão da representação é parte da formulação quando
+A escolha da dimensão faz parte da formulação sempre que se procura representar a estrutura em um espaço de dimensão inferior à necessária para sua reprodução exata.
+
+No MDS clássico, quando
+
+$$
+\mathbf G_{\Delta}
+\succeq
+\mathbf0
+$$
+
+e
 
 $$
 k
 <
-r.
+\operatorname{posto}
+\left(
+\mathbf G_{\Delta}
+\right),
 $$
 
-No MDS clássico, essa escolha determina o posto da aproximação da matriz de Gram.
+essa escolha determina o posto da aproximação espectral da matriz de Gram.
 
-Nas formulações por *stress*, ela determina o espaço no qual as coordenadas serão procuradas.
+Nas formulações baseadas em *stress*, a dimensão determina o espaço
 
-Os procedimentos utilizados para escolher operacionalmente essa dimensão serão tratados posteriormente.
+$$
+\mathbb R^k
+$$
+
+no qual as coordenadas serão procuradas.
+
+Em ambas as situações, modificar $k$ modifica o problema de representação. Os procedimentos utilizados para escolher operacionalmente a dimensão serão tratados posteriormente.
+
+A dependência em relação à matriz de entrada também deve ser enfatizada. Dois conjuntos de dissimilaridades construídos para os mesmos objetos podem produzir configurações diferentes se representarem conceitos diferentes de proximidade.
+
+A configuração deve, portanto, ser interpretada como uma representação de
+
+$$
+\boldsymbol{\Delta},
+$$
+
+e não como uma geometria absoluta dos objetos.
 
 ## Ausência de um modelo probabilístico universal
 
@@ -2366,28 +2569,54 @@ $$
 
 seja uma estatística proveniente de uma amostra aleatória multivariada.
 
-As dissimilaridades podem resultar de diferentes processos, incluindo medidas físicas, distâncias calculadas a partir de variáveis, comparações entre objetos ou avaliações de semelhança.
+As dissimilaridades podem resultar de diferentes processos, entre eles:
 
-Consequentemente, não existe uma distribuição amostral única associada às coordenadas do MDS.
+- medidas físicas entre objetos;
+- distâncias calculadas a partir de uma matriz de dados;
+- avaliações ou julgamentos de semelhança;
+- proximidades obtidas por outros procedimentos;
+- quantidades estimadas a partir de dados aleatórios.
 
-Quando as dissimilaridades são estimadas ou observadas com erro, resultados inferenciais dependem do modelo probabilístico adotado para seu mecanismo de geração. A formulação básica do capítulo permanece, portanto, geométrica e descritiva. :contentReference[oaicite:1]{index=1}
+Essas situações não possuem um único mecanismo probabilístico em comum.
 
-Essa característica diferencia o MDS de técnicas como a Análise Fatorial de máxima verossimilhança ou a MANOVA, nas quais um modelo probabilístico específico participa diretamente da formulação inferencial.
+Quando
 
-O próximo passo é relacionar essa estrutura ao capítulo anterior e ao seguinte. Agrupamentos e MDS podem receber a mesma matriz de dissimilaridades, mas constroem objetos distintos. A Análise de Correspondência também produzirá coordenadas, porém a geometria será determinada por perfis e pela distância qui-quadrado, e não por uma matriz geral de dissimilaridades euclidianas.
+$$
+\boldsymbol{\Delta}
+$$
+
+é tratada como uma matriz fixa de proximidades, a formulação desenvolvida neste capítulo é essencialmente geométrica e descritiva.
+
+Se as dissimilaridades forem calculadas a partir de uma amostra aleatória, estimadas com erro ou obtidas por avaliações sujeitas a variabilidade, a configuração construída passa a depender de quantidades aleatórias. Entretanto, sua distribuição amostral não é determinada apenas pelas equações do MDS.
+
+Resultados inferenciais exigem, nesse caso, especificar o mecanismo probabilístico que produziu ou estimou as dissimilaridades.
+
+Não existe, portanto, uma hipótese de normalidade multivariada universal para o MDS.
+
+A normalidade poderá surgir em formulações específicas se fizer parte de um modelo probabilístico utilizado para gerar ou estimar as proximidades, mas não é condição para definir:
+
+- a dupla centralização;
+- a matriz de Gram reconstruída;
+- a solução espectral do MDS clássico;
+- as coordenadas principais;
+- ou uma função de *stress*.
+
+Essa característica diferencia o MDS de técnicas nas quais um modelo probabilístico específico participa diretamente da formulação inferencial, como a Análise Fatorial sob máxima verossimilhança normal ou a MANOVA clássica sob suas hipóteses probabilísticas.
+
+A distinção também impede transferir automaticamente para o MDS testes, distribuições de referência ou intervalos de confiança pertencentes a outros modelos multivariados.
 
 ## Relações com outras técnicas multivariadas
 
-O Escalonamento Multidimensional compartilha objetos matemáticos com outras técnicas do Módulo 3, mas atribui a eles funções diferentes. A distinção entre as técnicas depende do problema resolvido e do significado da representação obtida.
+O Escalonamento Multidimensional compartilha objetos matemáticos com outras técnicas do Módulo 3, mas atribui a eles funções diferentes. A distinção entre as técnicas depende do problema resolvido, do objeto de entrada e do significado da representação construída.
 
 A @tbl-relacoes-mds-tecnicas sintetiza as relações mais próximas.
 
 | Técnica | Objeto de entrada relacionado | Estrutura construída |
 |---|---|---|
-| ACP | matriz de dados, covariâncias ou correlações | componentes e escores que representam variabilidade |
+| ACP | matriz de dados, covariâncias ou correlações | componentes e escores associados à variabilidade |
 | Agrupamentos | matriz de dados ou dissimilaridades | partições ou hierarquias |
 | MDS | matriz de dissimilaridades | configuração geométrica de objetos |
-| Análise de Correspondência | tabela de contingência | configuração geométrica de perfis segundo a métrica qui-quadrado |
+| Análise de Correspondência | tabela de contingência | configuração geométrica de perfis na métrica qui-quadrado |
 
 : Relações entre o MDS e outras técnicas multivariadas. {#tbl-relacoes-mds-tecnicas}
 
@@ -2398,10 +2627,12 @@ O capítulo anterior mostrou que uma matriz
 $$
 \boldsymbol{\Delta}
 =
-(\delta_{ij})
+\left(
+\delta_{ij}
+\right)
 $$
 
-pode ser utilizada para construir grupos. No MDS, a mesma matriz pode ser utilizada para construir coordenadas.
+pode ser utilizada para construir grupos. No MDS, a mesma matriz pode servir para construir coordenadas.
 
 A diferença está no objeto procurado.
 
@@ -2410,7 +2641,9 @@ Na Análise de Agrupamentos, uma solução pode assumir a forma de uma partiçã
 $$
 \mathcal P
 =
-\{C_1,\ldots,C_K\}
+\left\{
+C_1,\ldots,C_K
+\right\}
 $$
 
 ou de uma hierarquia de partições.
@@ -2423,15 +2656,31 @@ $$
 \mathbb R^{n\times k}
 $$
 
-cujas distâncias representem as relações registradas em $\boldsymbol{\Delta}$.
+cujas distâncias procurem representar as relações registradas em
 
-Os dois resultados também não devem ser confundidos na interpretação. Objetos próximos em uma configuração de MDS apresentam pequena distância segundo a geometria representada, mas essa proximidade não estabelece automaticamente a existência de um grupo. A definição de grupo depende de um critério adicional, como os desenvolvidos no capítulo de Análise de Agrupamentos.
+$$
+\boldsymbol{\Delta}.
+$$
 
-De forma correspondente, uma partição obtida por agrupamento não fornece necessariamente uma representação geométrica de todas as relações entre os objetos. Ela resume as proximidades segundo o critério utilizado para formar os grupos.
+Objetos próximos em uma configuração de MDS apresentam pequena distância segundo a geometria representada, mas essa proximidade não estabelece automaticamente a existência de um grupo.
+
+A definição de grupo exige um critério adicional, como os desenvolvidos no capítulo de Análise de Agrupamentos.
+
+De forma correspondente, uma partição obtida por agrupamento não fornece necessariamente uma representação geométrica de todas as relações entre os objetos. Ela resume essas relações segundo o critério utilizado para construir os grupos.
+
+Assim, MDS e Agrupamentos podem utilizar a mesma informação de entrada e responder a perguntas diferentes.
 
 ### MDS e ACP
 
-A relação matemática entre MDS clássico e ACP foi estabelecida em @prp-equivalencia-mds-acp. Quando as dissimilaridades são as distâncias euclidianas entre as observações de uma mesma matriz de dados centralizada, a dupla centralização recupera
+A relação matemática entre MDS clássico e ACP foi estabelecida em @prp-equivalencia-mds-acp.
+
+Quando as dissimilaridades são as distâncias euclidianas entre as observações de uma mesma matriz de dados centralizada,
+
+$$
+\mathbf X_c,
+$$
+
+a dupla centralização recupera
 
 $$
 \mathbf G_{\Delta}
@@ -2440,58 +2689,126 @@ $$
 \mathbf X_c^\top,
 $$
 
-e as coordenadas principais do MDS coincidem, até as indeterminações ortogonais admissíveis, com os escores obtidos pela SVD da matriz de dados.
+e as coordenadas principais do MDS coincidem, até as indeterminações ortogonais admissíveis, com os escores obtidos pela SVD dessa representação.
 
-Essa equivalência não elimina a diferença entre as técnicas. A ACP começa com coordenadas das observações e estuda a variabilidade dessas coordenadas. O MDS pode começar apenas com relações entre objetos e procura uma configuração que represente essas relações.
+Essa equivalência não elimina a diferença entre os problemas.
 
-Quando as dissimilaridades do MDS não são as distâncias euclidianas associadas à mesma representação utilizada na ACP, a equivalência deixa de existir.
+A ACP começa com coordenadas das observações e procura direções que organizem sua variabilidade.
+
+O MDS pode começar somente com relações entre pares de objetos e procura construir coordenadas que representem essas relações.
+
+Além disso, na ACP as direções possuem relação explícita com as variáveis originais por meio dos vetores de coeficientes e das quantidades derivadas dessas variáveis. Em um MDS construído apenas a partir de uma matriz de dissimilaridades, essa informação pode não estar disponível.
+
+Quando as dissimilaridades utilizadas no MDS não são as distâncias euclidianas da mesma representação utilizada na ACP, a equivalência estabelecida em @prp-equivalencia-mds-acp deixa de existir.
 
 ### MDS e Análise de Correspondência
 
-A Análise de Correspondência também produzirá coordenadas para representar objetos em poucas dimensões. A origem da geometria, entretanto, será diferente.
+A Análise de Correspondência também produzirá coordenadas para representar relações em baixa dimensão, mas a origem da geometria será diferente.
 
-No MDS, a geometria é determinada pela matriz de dissimilaridades fornecida à técnica.
+No MDS, parte-se de uma matriz geral de dissimilaridades entre um conjunto de objetos.
 
-Na Análise de Correspondência, a geometria será construída a partir dos perfis de uma tabela de contingência e de uma distância ponderada pelas massas das categorias. A representação estará associada ao afastamento em relação à independência entre linhas e colunas.
+Na Análise de Correspondência, o ponto de partida será uma tabela de contingência. Suas linhas e colunas serão transformadas em perfis, e a geometria será ponderada pelas massas associadas às categorias.
 
-As duas técnicas compartilham o uso de decomposições matriciais para construir representações de baixa dimensão, mas não representam o mesmo tipo de informação.
+A distância relevante deixará de ser uma distância euclidiana ordinária aplicada diretamente às frequências e passará a envolver a métrica qui-quadrado dos perfis.
+
+Também haverá uma diferença na estrutura da representação. No MDS, a configuração representa um conjunto de objetos definidos pela matriz de dissimilaridades. Na Análise de Correspondência, linhas e colunas da tabela participarão de uma representação dual obtida a partir de uma decomposição matricial ponderada.
+
+As duas técnicas compartilham, portanto, a construção de coordenadas geométricas e o uso de decomposições espectrais ou singulares, mas representam objetos e métricas diferentes.
+
+Essa relação prepara diretamente o capítulo seguinte.
 
 ## Limites da interpretação geométrica
 
-Uma configuração de MDS transforma relações entre objetos em posições geométricas. Sua interpretação deve permanecer condicionada à definição das dissimilaridades e ao critério utilizado para produzir a representação.
+Uma configuração de MDS transforma relações entre objetos em posições geométricas. Sua interpretação deve permanecer condicionada à definição das dissimilaridades, à dimensão escolhida e ao critério utilizado para produzir a representação.
 
 ### Proximidade depende da dissimilaridade
 
-Se dois objetos aparecem próximos na configuração, essa proximidade significa que sua relação é pequena segundo a dissimilaridade utilizada na análise.
+Se dois objetos aparecem próximos na configuração, essa proximidade significa que sua relação é pequena segundo a dissimilaridade utilizada na análise e segundo o grau de fidelidade alcançado pela representação.
 
-Alterar
+Alterar a definição de
 
 $$
 \delta_{ij}
 $$
 
-por meio de outra definição de proximidade pode modificar a configuração mesmo quando os objetos analisados permanecem os mesmos.
+pode modificar a configuração mesmo quando os objetos analisados permanecem os mesmos.
 
-Assim como na Análise de Agrupamentos, a geometria não é uma propriedade absoluta dos objetos. Ela depende da representação escolhida para compará-los.
+Assim como na Análise de Agrupamentos, a geometria não é uma propriedade absoluta dos objetos. Ela depende da representação adotada para compará-los.
+
+Esse ponto é especialmente importante quando a dissimilaridade possui significado substantivo próprio. A interpretação de uma distância pequena na configuração deve remeter àquilo que valores pequenos de
+
+$$
+\delta_{ij}
+$$
+
+representam no problema analisado.
 
 ### Os eixos não possuem interpretação substantiva automática
 
-No MDS, rotações e reflexões preservam as distâncias. Consequentemente, a orientação absoluta dos eixos não é identificada pela matriz de dissimilaridades.
+A informação de distâncias não identifica uma orientação absoluta para a configuração.
 
-Conforme @eq-invariancia-ortogonal-mds, multiplicar a configuração à direita por uma matriz ortogonal preserva todas as distâncias. A orientação dos eixos pode, portanto, ser modificada sem alterar a geometria relacional representada.
+Conforme @eq-invariancia-ortogonal-mds, se
 
-Por isso, o significado principal da configuração está nas posições relativas, distâncias, direções de contraste entre conjuntos de pontos e estruturas geométricas estáveis sob transformações ortogonais. A interpretação direta de uma coordenada isolada requer informação adicional sobre os objetos ou sobre variáveis externas.
+$$
+\mathbf O^\top
+\mathbf O
+=
+\mathbf I_k,
+$$
 
-Essa característica distingue o MDS da ACP. Na ACP, os eixos são combinações lineares explicitamente relacionadas às variáveis originais por seus coeficientes e correlações. No MDS construído apenas a partir de uma matriz de dissimilaridades, essa relação com variáveis originais pode não estar disponível.
+então
+
+$$
+\mathbf X_{\mathrm{MDS},k}
+$$
+
+e
+
+$$
+\mathbf X_{\mathrm{MDS},k}
+\mathbf O
+$$
+
+possuem as mesmas distâncias entre todos os pares de objetos.
+
+Rotações e reflexões podem, portanto, modificar as coordenadas individuais sem modificar a geometria representada.
+
+No MDS clássico, a solução espectral fornece uma orientação canônica associada aos autovetores escolhidos, mas a matriz de distâncias, por si só, não atribui significado substantivo necessário a essa orientação.
+
+Por isso, uma afirmação como
+
+> “a primeira dimensão representa necessariamente determinada característica”
+
+não decorre apenas da solução matemática do MDS.
+
+A interpretação substantiva de um eixo exige informação adicional sobre os objetos, variáveis externas ou conhecimento do problema que permita relacionar a direção geométrica a alguma característica observável.
+
+O conteúdo diretamente identificado pela matriz de dissimilaridades está principalmente nas relações geométricas invariantes, como:
+
+- distâncias entre objetos;
+- proximidades relativas;
+- configurações locais;
+- separações entre conjuntos de pontos;
+- estruturas preservadas por transformações ortogonais.
+
+Essa característica distingue o MDS da ACP. Na ACP, os eixos são combinações lineares explicitamente construídas a partir das variáveis originais. No MDS definido apenas por dissimilaridades, essa ligação pode não existir.
 
 ### Representação em baixa dimensão é uma aproximação
 
 Quando
 
 $$
+\mathbf G_{\Delta}
+\succeq
+\mathbf0
+$$
+
+e
+
+$$
 k
 <
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \mathbf G_{\Delta}
 \right),
@@ -2499,11 +2816,19 @@ $$
 
 uma representação em $k$ dimensões não preserva integralmente a geometria euclidiana reconstruída.
 
-No MDS clássico, a representação em dimensão reduzida substitui $\mathbf G_{\Delta}$ pela aproximação de posto reduzido $\mathbf G_k$ definida em @eq-gram-reduzida-mds.
+No MDS clássico, a configuração reduzida corresponde à aproximação da matriz de Gram por
+
+$$
+\mathbf G_k
+$$
+
+definida em @eq-gram-reduzida-mds.
 
 Nas formulações baseadas em *stress*, a perda é avaliada pela discrepância entre distâncias configuracionais e disparidades.
 
-Uma representação bidimensional deve, portanto, ser interpretada como uma projeção ou aproximação da estrutura considerada. A facilidade de visualizar duas dimensões não constitui evidência de que a estrutura original seja intrinsecamente bidimensional.
+Portanto, uma representação bidimensional ou tridimensional deve ser interpretada como uma representação reduzida da estrutura considerada, salvo quando a dimensão retida for suficiente para uma reprodução exata.
+
+A facilidade de visualizar uma configuração em duas dimensões não constitui evidência de que a estrutura original seja intrinsecamente bidimensional.
 
 ### Redução dimensional e não euclideanidade são problemas distintos
 
@@ -2523,11 +2848,26 @@ $$
 \mathbf0
 $$
 
-e apenas algumas coordenadas principais são mantidas, existe uma geometria euclidiana exata em dimensão maior e a representação reduzida aproxima essa geometria.
+e apenas
 
-Quando existem autovalores negativos, as dissimilaridades originais não admitem representação euclidiana exata na formulação clássica, independentemente da dimensão escolhida.
+$$
+k
+<
+\operatorname{posto}
+\left(
+\mathbf G_{\Delta}
+\right)
+$$
 
-Essa distinção deve preceder qualquer interpretação da qualidade de uma configuração reduzida.
+coordenadas principais são mantidas, existe uma representação euclidiana exata em dimensão maior e a perda decorre do truncamento.
+
+Quando $\mathbf G_{\Delta}$ possui autovalores negativos, as dissimilaridades originais não admitem representação euclidiana exata na formulação clássica, independentemente de quantas dimensões euclidianas positivas sejam mantidas.
+
+No primeiro caso, aproxima-se uma geometria euclidiana existente.
+
+No segundo, procura-se uma representação euclidiana aproximada para uma estrutura que não é exatamente euclidiana.
+
+Essa distinção deve preceder a interpretação da qualidade de uma configuração reduzida.
 
 ### Estrutura geométrica não implica estrutura de grupos
 
@@ -2535,18 +2875,22 @@ Regiões visualmente próximas ou separadas em uma configuração podem auxiliar
 
 O MDS procura representar proximidades. A identificação de grupos exige uma definição adicional de agrupamento ou informação substantiva externa à configuração.
 
-Da mesma forma, posições extremas na representação indicam relações geométricas específicas segundo a matriz de entrada, mas não devem ser automaticamente interpretadas como observações atípicas em um modelo probabilístico.
+Da mesma forma, uma posição extrema no mapa indica que um objeto ocupa uma posição geometricamente diferenciada segundo a matriz de entrada. Isso não implica automaticamente que ele seja um *outlier* em algum modelo probabilístico.
+
+A interpretação deve permanecer vinculada ao objeto matemático efetivamente analisado.
 
 ## Síntese
 
-O Escalonamento Multidimensional parte de relações entre objetos e procura representá-las por meio de coordenadas em um espaço de menor dimensão.
+O Escalonamento Multidimensional parte de relações entre objetos e procura representá-las por meio de coordenadas em um espaço euclidiano.
 
 A entrada básica é uma matriz de dissimilaridades
 
 $$
 \boldsymbol{\Delta}
 =
-(\delta_{ij}),
+\left(
+\delta_{ij}
+\right),
 $$
 
 enquanto a saída é uma configuração
@@ -2557,7 +2901,9 @@ $$
 \mathbb R^{n\times k}.
 $$
 
-No MDS clássico, o problema é convertido de distâncias para produtos internos. Para uma configuração centralizada, sua matriz de Gram é
+No MDS clássico, o problema é convertido de distâncias para produtos internos.
+
+Para uma configuração centralizada, sua matriz de Gram é
 
 $$
 \mathbf G
@@ -2566,7 +2912,7 @@ $$
 \mathbf X_{\mathrm{MDS}}^\top,
 $$
 
-e as distâncias satisfazem
+e suas distâncias satisfazem
 
 $$
 d_{ij}^2
@@ -2589,7 +2935,7 @@ $$
 \mathbf H_n.
 $$
 
-Essa expressão constitui a ligação entre a matriz de dissimilaridades e a geometria euclidiana da configuração.
+Essa expressão constitui a ligação fundamental entre a matriz de dissimilaridades e a geometria euclidiana utilizada pelo MDS clássico.
 
 Quando
 
@@ -2599,7 +2945,9 @@ $$
 \mathbf0,
 $$
 
-as dissimilaridades admitem representação euclidiana exata. Se
+as dissimilaridades admitem representação euclidiana exata.
+
+Se
 
 $$
 \mathbf G_{\Delta}
@@ -2609,7 +2957,7 @@ $$
 \mathbf Q_+^\top,
 $$
 
-as coordenadas principais são
+uma configuração centralizada correspondente é
 
 $$
 \mathbf X_{\mathrm{MDS}}
@@ -2621,24 +2969,24 @@ $$
 A dimensão mínima de uma representação exata é
 
 $$
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \mathbf G_{\Delta}
 \right).
 $$
 
-Quando uma representação com
+Quando se utiliza
 
 $$
 k
 <
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \mathbf G_{\Delta}
 \right)
 $$
 
-dimensões é utilizada, o MDS clássico aproxima a matriz de Gram pela retenção das principais componentes espectrais:
+dimensões, o MDS clássico substitui a matriz de Gram por uma aproximação espectral de posto reduzido,
 
 $$
 \mathbf G_k
@@ -2648,7 +2996,29 @@ $$
 \mathbf Q_k^\top.
 $$
 
-O resultado de Eckart–Young–Mirsky permite interpretar essa construção como aproximação de posto reduzido da matriz de Gram. Esse critério não deve ser confundido com a minimização direta de discrepâncias nas distâncias.
+O resultado de Eckart–Young–Mirsky permite interpretar essa construção como uma melhor aproximação de posto no máximo $k$ segundo as normas consideradas.
+
+Se
+
+$$
+\lambda_k
+>
+\lambda_{k+1},
+$$
+
+o subespaço espectral retido está separado do restante.
+
+Se o corte ocorre em uma multiplicidade,
+
+$$
+\lambda_k
+=
+\lambda_{k+1},
+$$
+
+a escolha do subespaço ótimo pode não ser única.
+
+Essa não unicidade deve ser distinguida da indeterminação geral da configuração por transformações ortogonais.
 
 Autovalores negativos de
 
@@ -2656,39 +3026,87 @@ $$
 \mathbf G_{\Delta}
 $$
 
-indicam outra situação: as dissimilaridades não possuem representação euclidiana exata na formulação clássica. A não euclideanidade é uma propriedade da matriz de entrada e deve ser distinguida da perda produzida pela redução dimensional.
+representam outra situação. Eles indicam que as dissimilaridades não possuem representação euclidiana exata na formulação clássica.
 
-Quando as distâncias do MDS clássico são calculadas entre as linhas de uma matriz de dados centralizada, a dupla centralização recupera
+A não euclideanidade é, portanto, uma propriedade da matriz de entrada e deve ser distinguida da perda produzida pela redução dimensional.
+
+Quando as distâncias do MDS clássico são calculadas entre as linhas de uma matriz de dados centralizada,
+
+$$
+\mathbf X_c,
+$$
+
+a dupla centralização recupera
 
 $$
 \mathbf X_c
 \mathbf X_c^\top,
 $$
 
-e as coordenadas principais coincidem, até transformações ortogonais admissíveis, com os escores da ACP na mesma representação.
+e as coordenadas principais coincidem, até transformações ortogonais admissíveis, com os escores da ACP obtidos na mesma geometria.
 
-As formulações baseadas diretamente no ajuste das distâncias distinguem dissimilaridades,
+As formulações baseadas diretamente no ajuste das distâncias distinguem três objetos:
 
 $$
 \delta_{ij},
 $$
 
-disparidades,
+a dissimilaridade fornecida;
 
 $$
 \widehat{\delta}_{ij},
 $$
 
-e distâncias configuracionais,
+a disparidade utilizada como alvo;
+
+e
 
 $$
-d_{ij}.
+d_{ij},
 $$
 
-No MDS métrico, a magnitude das dissimilaridades participa do ajuste. No MDS não métrico, a informação principal está em sua ordenação e as disparidades são restringidas por uma transformação monotônica.
+a distância produzida pela configuração.
 
-Uma medida de *stress* compara distâncias e disparidades segundo uma função de discrepância. Seu significado depende da normalização, dos pesos e da transformação admitida para as proximidades.
+No MDS métrico, as magnitudes das dissimilaridades participam do ajuste segundo a transformação admitida.
 
-A configuração resultante permanece indeterminada quanto à translação, rotação e reflexão quando o critério depende somente das distâncias. Por isso, sua interpretação se concentra na geometria relativa dos objetos e não na orientação absoluta dos eixos.
+No MDS não métrico, a informação central está em sua ordenação. Configuração e disparidades são ajustadas sob restrições de monotonicidade.
 
-O capítulo seguinte mantém a construção de representações geométricas de baixa dimensão, mas modifica o objeto de entrada e a métrica. Na Análise de Correspondência, uma tabela de contingência será transformada em perfis e desvios em relação à independência. A distância qui-quadrado e a SVD fornecerão a estrutura geométrica utilizada para representar simultaneamente linhas e colunas.
+Uma forma normalizada de *stress* pode ser escrita como
+
+$$
+\operatorname{Stress}
+=
+\sqrt{
+\frac{
+\displaystyle
+\sum_{i<j}
+w_{ij}
+\left(
+d_{ij}
+-
+\widehat{\delta}_{ij}
+\right)^2
+}{
+\displaystyle
+\sum_{i<j}
+w_{ij}
+d_{ij}^2
+}
+}.
+$$
+
+O valor obtido mede a discrepância segundo essa formulação específica. Sua interpretação depende da normalização, dos pesos, das disparidades e das restrições adotadas.
+
+A formulação básica do MDS é predominantemente geométrica e não exige normalidade multivariada.
+
+Se as dissimilaridades forem aleatórias ou estimadas, qualquer desenvolvimento inferencial depende do modelo probabilístico utilizado para explicar seu mecanismo de geração. Não existe uma distribuição amostral universal das coordenadas do MDS decorrente apenas da formulação geométrica.
+
+A configuração também não é identificada por sua posição ou orientação absoluta. Translações, rotações e reflexões preservam as distâncias quando o critério depende apenas delas. Em determinadas formulações não métricas, a escala global também pode não ser identificada.
+
+Por isso, a interpretação deve concentrar-se nas relações geométricas efetivamente determinadas pelas proximidades, e não atribuir significado substantivo automático aos eixos ou às coordenadas isoladas.
+
+O capítulo utiliza, assim, resultados do Módulo 1 sobre distâncias, produtos internos, matrizes de Gram, centralização, autovalores, decomposição espectral, SVD e aproximações de posto reduzido. Os fundamentos probabilísticos do Módulo 2 tornam-se relevantes somente quando se especifica um mecanismo aleatório para a obtenção das dissimilaridades.
+
+O capítulo seguinte mantém o objetivo de construir representações geométricas de baixa dimensão, mas modifica o objeto de entrada e a métrica utilizada.
+
+Na Análise de Correspondência, uma tabela de contingência será transformada em perfis e desvios em relação à independência. As massas das categorias definirão ponderações, a distância qui-quadrado fornecerá a geometria relevante e uma SVD ponderada permitirá construir simultaneamente coordenadas para linhas e colunas.

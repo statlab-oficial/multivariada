@@ -1,6 +1,6 @@
 # Formulação da Correlação Canônica
 
-A Correlação Canônica estuda a associação linear entre **dois blocos de variáveis quantitativas** observados sobre as mesmas unidades. Em vez de examinar separadamente todas as correlações entre variáveis dos dois conjuntos, a técnica procura combinações lineares de cada bloco cuja correlação seja a maior possível.
+A Correlação Canônica estuda a **associação linear entre dois blocos de variáveis quantitativas** observados sobre as mesmas unidades. Em vez de examinar separadamente todas as correlações entre variáveis dos dois conjuntos, a técnica procura uma combinação linear de cada bloco de modo que a correlação entre as duas combinações seja a maior possível.
 
 Considere dois vetores aleatórios,
 
@@ -13,7 +13,9 @@ $$
 \mathsf X_p
 \end{pmatrix}
 \in
-\mathbb R^p
+\mathbb R^p,
+\qquad
+p\geq1,
 $$
 
 e
@@ -27,10 +29,14 @@ $$
 \mathsf Y_q
 \end{pmatrix}
 \in
-\mathbb R^q.
+\mathbb R^q,
+\qquad
+q\geq1,
 $$
 
-Os dois blocos desempenham papéis simétricos. A Correlação Canônica não exige que um deles seja previamente definido como conjunto de respostas e o outro como conjunto de preditores. Seu objetivo é identificar a estrutura de associação linear compartilhada pelos dois conjuntos [@anderson2003; @johnson2007; @mardia2024].
+definidos sobre a mesma população e com segundos momentos finitos.
+
+Os dois blocos desempenham papéis matematicamente simétricos. A Correlação Canônica não exige, em sua formulação básica, que um bloco seja previamente denominado conjunto de respostas e o outro conjunto de preditores. Seu objetivo é identificar a estrutura de associação linear compartilhada entre os dois conjuntos [@anderson2003; @johnson2007; @mardia2024].
 
 A técnica constrói pares de variáveis da forma
 
@@ -58,17 +64,55 @@ $$
 \right),
 $$
 
-escolhendo os vetores de coeficientes para que
+em que
 
 $$
-\operatorname{Corr}
-\left(
-\mathsf U_j,
-\mathsf V_j
-\right)
+\mathbf a_j\in\mathbb R^p
+\qquad\text{e}\qquad
+\mathbf b_j\in\mathbb R^q.
 $$
 
-seja grande. O primeiro par produz a maior correlação possível; os pares seguintes representam associações adicionais que não repetem as dimensões já obtidas.
+O primeiro par é escolhido para produzir a maior correlação possível. Os pares seguintes descrevem dimensões adicionais de associação linear, sujeitas a condições que impedem a repetição das dimensões anteriormente obtidas.
+
+Defina
+
+$$
+m
+=
+\min(p,q).
+$$
+
+Existem, no máximo, $m$ correlações canônicas, que serão ordenadas como
+
+$$
+1
+\geq
+\rho_1
+\geq
+\rho_2
+\geq
+\cdots
+\geq
+\rho_m
+\geq
+0.
+$$
+
+Algumas delas podem ser nulas. O número de correlações estritamente positivas será determinado posteriormente pelo posto da estrutura de associação entre os dois blocos.
+
+O objetivo deste capítulo é mostrar por que a maximização da correlação entre duas combinações lineares conduz ao **branqueamento das estruturas internas dos blocos** e, em seguida, à **decomposição em valores singulares da covariância cruzada branqueada**. A formulação por autovalores generalizados será apresentada como representação equivalente da mesma solução.
+
+A análise será construída distinguindo:
+
+- a estrutura populacional de covariâncias;
+- a função objetivo da técnica;
+- a solução geométrica e espectral;
+- as variáveis, correlações, cargas e cargas cruzadas canônicas;
+- a formulação amostral correspondente;
+- as condições de existência, posto e identificação;
+- o papel adicional da normalidade na inferência clássica.
+
+Algoritmos computacionais, escolha prática do número de dimensões, diagnósticos extensos, regularização para alta dimensão e aplicações completas serão tratados posteriormente.
 
 A estrutura geral é resumida na @tbl-estrutura-cca.
 
@@ -76,18 +120,20 @@ A estrutura geral é resumida na @tbl-estrutura-cca.
 |---|---|---|
 | primeiro bloco | $\boldsymbol{\mathsf X}\in\mathbb R^p$ | conjunto de variáveis do primeiro domínio |
 | segundo bloco | $\boldsymbol{\mathsf Y}\in\mathbb R^q$ | conjunto de variáveis do segundo domínio |
-| associação entre blocos | $\boldsymbol{\Sigma}_{XY}$ | reúne as covariâncias cruzadas |
+| associação entre blocos | $\boldsymbol{\Sigma}_{XY}\in\mathbb R^{p\times q}$ | reúne as covariâncias cruzadas |
+| estrutura interna do primeiro bloco | $\boldsymbol{\Sigma}_{XX}\in\mathbb R^{p\times p}$ | representa variâncias e covariâncias de $\boldsymbol{\mathsf X}$ |
+| estrutura interna do segundo bloco | $\boldsymbol{\Sigma}_{YY}\in\mathbb R^{q\times q}$ | representa variâncias e covariâncias de $\boldsymbol{\mathsf Y}$ |
 | combinação do primeiro bloco | $\mathsf U=\mathbf a^\top(\boldsymbol{\mathsf X}-\boldsymbol{\mu}_X)$ | resume linearmente o primeiro bloco |
 | combinação do segundo bloco | $\mathsf V=\mathbf b^\top(\boldsymbol{\mathsf Y}-\boldsymbol{\mu}_Y)$ | resume linearmente o segundo bloco |
 | função objetivo | $\operatorname{Corr}(\mathsf U,\mathsf V)$ | mede a associação entre as duas combinações |
 | solução matricial | SVD de uma covariância cruzada branqueada | determina correlações e direções canônicas |
-| resultado | $\rho_1,\ldots,\rho_s$ | correlações canônicas ordenadas |
+| resultado | $\rho_1,\ldots,\rho_m$ | correlações canônicas ordenadas |
 
 : Elementos da formulação da Correlação Canônica. {#tbl-estrutura-cca}
 
 ## O problema de associação entre dois blocos
 
-Considere, por exemplo, um primeiro conjunto de características representado por
+Considere um primeiro conjunto de características representado por
 
 $$
 \boldsymbol{\mathsf X}
@@ -114,35 +160,49 @@ h=1,\ldots,p,
 k=1,\ldots,q,
 $$
 
-descreve associações entre pares de variáveis. Entretanto, a relação entre os dois blocos pode estar distribuída simultaneamente por várias variáveis.
+descreve associações entre pares específicos de variáveis.
+
+Entretanto, a associação entre os dois blocos pode estar distribuída simultaneamente por várias componentes.
 
 Uma combinação
 
 $$
 \mathsf U
 =
-a_1\mathsf X_1
+a_1
+\left(
+\mathsf X_1-\mu_{X_1}
+\right)
 +
 \cdots
 +
-a_p\mathsf X_p
+a_p
+\left(
+\mathsf X_p-\mu_{X_p}
+\right)
 $$
 
-pode concentrar um padrão do primeiro bloco que se associa fortemente a outra combinação,
+pode concentrar um padrão do primeiro bloco que esteja fortemente associado a outra combinação,
 
 $$
 \mathsf V
 =
-b_1\mathsf Y_1
+b_1
+\left(
+\mathsf Y_1-\mu_{Y_1}
+\right)
 +
 \cdots
 +
-b_q\mathsf Y_q,
+b_q
+\left(
+\mathsf Y_q-\mu_{Y_q}
+\right),
 $$
 
 mesmo quando nenhuma correlação bivariada isolada resume adequadamente essa relação.
 
-A questão estatística passa, portanto, a ser encontrar
+A questão estatística é, portanto, encontrar
 
 $$
 \mathbf a
@@ -160,11 +220,19 @@ $$
 
 que façam as duas combinações lineares apresentar a maior correlação possível.
 
-Essa formulação diferencia a Correlação Canônica de outras técnicas baseadas em projeções. Na ACP, procura-se uma direção que maximize a variabilidade de um único bloco. Em Fisher, procura-se uma direção que maximize a separação entre grupos relativamente à dispersão intragrupos. Na Correlação Canônica, duas direções são escolhidas simultaneamente, uma em cada bloco, para maximizar a associação entre as combinações resultantes.
+A diferença em relação a outras técnicas baseadas em projeções está na função objetivo.
+
+Na ACP, uma direção é escolhida para maximizar a variabilidade de um único conjunto.
+
+Na formulação de Fisher, uma direção é escolhida para maximizar a separação entre grupos relativamente à dispersão intragrupos.
+
+Na Correlação Canônica, **duas direções são escolhidas simultaneamente**, uma em cada bloco, com o objetivo de maximizar a associação entre as duas combinações produzidas.
+
+Por isso, a solução não será determinada apenas pela variabilidade existente dentro de cada conjunto nem apenas pelas covariâncias cruzadas. Ela dependerá da relação entre essas duas estruturas.
 
 ## Estrutura de covariâncias em blocos
 
-Sejam
+Como os vetores possuem segundos momentos finitos, existem
 
 $$
 E
@@ -173,6 +241,8 @@ E
 \right)
 =
 \boldsymbol{\mu}_X
+\in
+\mathbb R^p
 $$
 
 e
@@ -183,7 +253,9 @@ E
 \boldsymbol{\mathsf Y}
 \right)
 =
-\boldsymbol{\mu}_Y.
+\boldsymbol{\mu}_Y
+\in
+\mathbb R^q.
 $$
 
 A matriz de covariâncias do vetor conjunto
@@ -193,6 +265,8 @@ $$
 \boldsymbol{\mathsf X}\\
 \boldsymbol{\mathsf Y}
 \end{pmatrix}
+\in
+\mathbb R^{p+q}
 $$
 
 pode ser particionada como
@@ -208,7 +282,9 @@ $$
 \boldsymbol{\Sigma}_{YX}
 &
 \boldsymbol{\Sigma}_{YY}
-\end{pmatrix}.
+\end{pmatrix}
+\in
+\mathbb R^{(p+q)\times(p+q)}.
 $$ {#eq-covariancia-particionada-cca}
 
 Os blocos diagonais,
@@ -220,6 +296,8 @@ $$
 \left(
 \boldsymbol{\mathsf X}
 \right)
+\in
+\mathbb R^{p\times p}
 $$
 
 e
@@ -230,10 +308,12 @@ $$
 \operatorname{Cov}
 \left(
 \boldsymbol{\mathsf Y}
-\right),
+\right)
+\in
+\mathbb R^{q\times q},
 $$
 
-descrevem as estruturas de variância e covariância internas de cada conjunto.
+descrevem as estruturas internas de variabilidade e covariância dos dois conjuntos.
 
 O bloco
 
@@ -245,30 +325,90 @@ $$
 \boldsymbol{\mathsf X},
 \boldsymbol{\mathsf Y}
 \right)
+\in
+\mathbb R^{p\times q}
 $$
 
-é a matriz de covariâncias cruzadas já definida em @def-covariancia-cruzada. Sua transposta satisfaz
+é a matriz de covariâncias cruzadas definida em @def-covariancia-cruzada.
+
+Sua transposta é
 
 $$
 \boldsymbol{\Sigma}_{YX}
 =
-\boldsymbol{\Sigma}_{XY}^\top.
+\boldsymbol{\Sigma}_{XY}^\top
+\in
+\mathbb R^{q\times p}.
 $$
 
-A matriz $\boldsymbol{\Sigma}_{XY}$ contém a informação que conecta os dois blocos, mas sua interpretação depende das estruturas internas representadas por $\boldsymbol{\Sigma}_{XX}$ e $\boldsymbol{\Sigma}_{YY}$. A Correlação Canônica irá separar essas duas funções: primeiro removerá a geometria interna de cada conjunto e depois analisará a associação que permanece entre eles.
-
-### Ausência de associação linear entre os blocos
-
-O resultado estabelecido em @prp-covariancia-combinacoes-blocos fornece, para quaisquer vetores
+A matriz
 
 $$
-\mathbf a\in\mathbb R^p
+\boldsymbol{\Sigma}_{XY}
+$$
+
+contém a informação de associação linear que conecta os blocos.
+
+Entretanto, suas entradas não podem ser avaliadas isoladamente da variabilidade interna representada por
+
+$$
+\boldsymbol{\Sigma}_{XX}
+\qquad\text{e}\qquad
+\boldsymbol{\Sigma}_{YY}.
+$$
+
+Uma covariância cruzada de determinada magnitude possui significado diferente quando as variâncias das combinações envolvidas também são grandes ou pequenas.
+
+A Correlação Canônica irá separar essas funções. As estruturas internas dos dois blocos serão utilizadas para definir as métricas de normalização, enquanto
+
+$$
+\boldsymbol{\Sigma}_{XY}
+$$
+
+determinará a ligação entre eles.
+
+Na formulação clássica desenvolvida neste capítulo, será assumido
+
+$$
+\boldsymbol{\Sigma}_{XX}
+\succ
+\mathbf0
 $$
 
 e
 
 $$
-\mathbf b\in\mathbb R^q,
+\boldsymbol{\Sigma}_{YY}
+\succ
+\mathbf0.
+$$
+
+Essas condições garantem variância positiva para toda combinação linear não nula de cada bloco e, posteriormente, a existência de
+
+$$
+\boldsymbol{\Sigma}_{XX}^{-1/2}
+\qquad\text{e}\qquad
+\boldsymbol{\Sigma}_{YY}^{-1/2}.
+$$
+
+Não se exige normalidade conjunta para essa construção.
+
+### Ausência de associação linear entre os blocos
+
+O resultado estabelecido em @prp-covariancia-combinacoes-blocos fornece, para quaisquer
+
+$$
+\mathbf a
+\in
+\mathbb R^p
+$$
+
+e
+
+$$
+\mathbf b
+\in
+\mathbb R^q,
 $$
 
 a identidade
@@ -278,11 +418,15 @@ $$
 \left[
 \mathbf a^\top
 \left(
-\boldsymbol{\mathsf X}-\boldsymbol{\mu}_X
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_X
 \right),
 \mathbf b^\top
 \left(
-\boldsymbol{\mathsf Y}-\boldsymbol{\mu}_Y
+\boldsymbol{\mathsf Y}
+-
+\boldsymbol{\mu}_Y
 \right)
 \right]
 =
@@ -303,19 +447,57 @@ então
 
 $$
 \operatorname{Cov}
+\left[
+\mathbf a^\top
 \left(
-\mathbf a^\top\boldsymbol{\mathsf X},
-\mathbf b^\top\boldsymbol{\mathsf Y}
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_X
+\right),
+\mathbf b^\top
+\left(
+\boldsymbol{\mathsf Y}
+-
+\boldsymbol{\mu}_Y
 \right)
+\right]
 =
 0
 $$
 
 para **todas** as combinações lineares dos dois blocos.
 
-Nesse caso, nenhuma escolha de $\mathbf a$ e $\mathbf b$ produz associação linear diferente de zero.
+Nesse caso, nenhuma escolha de
 
-A recíproca também vale: se todas as combinações lineares possuem covariância cruzada nula, então
+$$
+\mathbf a
+\qquad\text{e}\qquad
+\mathbf b
+$$
+
+produz covariância linear diferente de zero entre as combinações.
+
+A recíproca também vale.
+
+Se
+
+$$
+\mathbf a^\top
+\boldsymbol{\Sigma}_{XY}
+\mathbf b
+=
+0
+$$
+
+para todos
+
+$$
+\mathbf a\in\mathbb R^p
+\qquad\text{e}\qquad
+\mathbf b\in\mathbb R^q,
+$$
+
+então
 
 $$
 \boldsymbol{\Sigma}_{XY}
@@ -323,9 +505,49 @@ $$
 \mathbf0.
 $$
 
-Portanto, a matriz de covariâncias cruzadas é o objeto populacional que concentra toda a associação linear entre os dois conjuntos.
+Por exemplo, tomando os vetores das bases canônicas,
 
-Se o vetor conjunto é normal multivariado, o resultado já estabelecido em @prp-independencia-blocos-normais implica ainda
+$$
+\mathbf a=\mathbf e_h,
+\qquad
+\mathbf b=\mathbf e_k,
+$$
+
+obtém-se
+
+$$
+\operatorname{Cov}
+(\mathsf X_h,\mathsf Y_k)
+=
+0
+$$
+
+para todo
+
+$$
+h=1,\ldots,p
+\qquad\text{e}\qquad
+k=1,\ldots,q.
+$$
+
+Portanto,
+
+$$
+\boldsymbol{\Sigma}_{XY}
+$$
+
+é o objeto populacional que reúne toda a associação **linear** entre os dois conjuntos.
+
+Se o vetor conjunto
+
+$$
+\begin{pmatrix}
+\boldsymbol{\mathsf X}\\
+\boldsymbol{\mathsf Y}
+\end{pmatrix}
+$$
+
+possui distribuição normal multivariada, o resultado de @prp-independencia-blocos-normais implica
 
 $$
 \boldsymbol{\Sigma}_{XY}
@@ -337,7 +559,19 @@ $$
 \boldsymbol{\mathsf Y}.
 $$ {#eq-independencia-blocos-normais-cca}
 
-Essa equivalência depende da normalidade conjunta. Fora desse modelo, covariância cruzada nula representa ausência de associação linear, mas não independência em geral.
+Essa equivalência depende da normalidade conjunta.
+
+Fora desse modelo,
+
+$$
+\boldsymbol{\Sigma}_{XY}
+=
+\mathbf0
+$$
+
+significa ausência de associação linear entre os blocos, mas não implica independência em geral.
+
+Essa distinção será mantida ao longo do capítulo: a **Correlação Canônica populacional pode ser definida sem normalidade**, enquanto a normalidade conjunta acrescenta propriedades probabilísticas e sustenta parte da teoria inferencial clássica.
 
 ## Variáveis canônicas e função objetivo
 
@@ -364,10 +598,18 @@ $$
 \boldsymbol{\mathsf Y}
 -
 \boldsymbol{\mu}_Y
-\right).
+\right),
 $$ {#eq-variaveis-lineares-cca}
 
-Pela estrutura de covariâncias,
+com
+
+$$
+\mathbf a\in\mathbb R^p,
+\qquad
+\mathbf b\in\mathbb R^q.
+$$
+
+Pelas propriedades das combinações lineares desenvolvidas no Módulo 2,
 
 $$
 \operatorname{Var}
@@ -387,7 +629,7 @@ $$
 \mathbf b
 $$ {#eq-variancia-v-cca}
 
-e, utilizando @eq-covariancia-combinacoes-cca,
+e
 
 $$
 \operatorname{Cov}
@@ -398,7 +640,35 @@ $$
 \mathbf b.
 $$ {#eq-covariancia-uv-cca}
 
-Logo,
+Sob
+
+$$
+\boldsymbol{\Sigma}_{XX}
+\succ
+\mathbf0
+\qquad\text{e}\qquad
+\boldsymbol{\Sigma}_{YY}
+\succ
+\mathbf0,
+$$
+
+se
+
+$$
+\mathbf a\neq\mathbf0
+\qquad\text{e}\qquad
+\mathbf b\neq\mathbf0,
+$$
+
+então
+
+$$
+\operatorname{Var}(\mathsf U)>0
+\qquad\text{e}\qquad
+\operatorname{Var}(\mathsf V)>0.
+$$
+
+A correlação está, portanto, definida e é
 
 $$
 \operatorname{Corr}
@@ -422,9 +692,49 @@ $$
 }.
 $$ {#eq-correlacao-combinacoes-cca}
 
-A expressão em @eq-correlacao-combinacoes-cca é invariante à multiplicação de $\mathbf a$ ou $\mathbf b$ por constantes não nulas, exceto por uma eventual mudança de sinal. Portanto, os comprimentos dos vetores de coeficientes precisam ser fixados para identificar uma representação conveniente das direções.
+Essa expressão contém três estruturas diferentes:
 
-A normalização natural é
+- o numerador mede a covariância entre as combinações dos dois blocos;
+- a primeira forma quadrática do denominador mede a variância da combinação de $\boldsymbol{\mathsf X}$;
+- a segunda mede a variância da combinação de $\boldsymbol{\mathsf Y}$.
+
+A função objetivo é invariante a mudanças de escala dos coeficientes. Se
+
+$$
+c\neq0
+\qquad\text{e}\qquad
+d\neq0,
+$$
+
+então
+
+$$
+\operatorname{Corr}
+\left[
+(c\mathbf a)^\top
+\boldsymbol{\mathsf X},
+(d\mathbf b)^\top
+\boldsymbol{\mathsf Y}
+\right]
+=
+\operatorname{sgn}(cd)
+\operatorname{Corr}
+\left(
+\mathsf U,\mathsf V
+\right).
+$$
+
+Portanto, os comprimentos de
+
+$$
+\mathbf a
+\qquad\text{e}\qquad
+\mathbf b
+$$
+
+não são determinados pelo problema.
+
+Uma normalização natural é fixar as variâncias das duas combinações:
 
 $$
 \mathbf a^\top
@@ -454,10 +764,13 @@ $$
 1
 $$
 
-e a correlação reduz-se a
+e
 
 $$
 \operatorname{Corr}
+(\mathsf U,\mathsf V)
+=
+\operatorname{Cov}
 (\mathsf U,\mathsf V)
 =
 \mathbf a^\top
@@ -465,13 +778,83 @@ $$
 \mathbf b.
 $$ {#eq-correlacao-normalizada-cca}
 
+A procura pela maior correlação transforma-se, assim, em um problema de maximização de uma **forma bilinear** sujeito a duas restrições quadráticas.
+
+Essa estrutura é diferente do quociente de Rayleigh generalizado utilizado na MANOVA e na Análise Discriminante.
+
+Naquelas técnicas, um único vetor aparece em duas formas quadráticas.
+
+Na Correlação Canônica, existem dois vetores,
+
+$$
+\mathbf a
+\qquad\text{e}\qquad
+\mathbf b,
+$$
+
+pertencentes a espaços de dimensões que podem ser diferentes, e o termo que conecta os dois blocos é
+
+$$
+\mathbf a^\top
+\boldsymbol{\Sigma}_{XY}
+\mathbf b.
+$$
+
+Essa diferença é a razão matemática pela qual a SVD de uma matriz retangular aparecerá naturalmente na solução.
+
 ::: {#def-primeiro-par-canonico}
 ## Primeiro par canônico
 
-Suponha
+Sejam
+
+$$
+\boldsymbol{\mathsf X}\in\mathbb R^p
+\qquad\text{e}\qquad
+\boldsymbol{\mathsf Y}\in\mathbb R^q
+$$
+
+vetores aleatórios com segundos momentos finitos, médias
+
+$$
+\boldsymbol{\mu}_X
+=
+E
+\left(
+\boldsymbol{\mathsf X}
+\right)
+$$
+
+e
+
+$$
+\boldsymbol{\mu}_Y
+=
+E
+\left(
+\boldsymbol{\mathsf Y}
+\right),
+$$
+
+e matrizes
 
 $$
 \boldsymbol{\Sigma}_{XX}
+=
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}
+\right)
+\succ
+\mathbf0,
+$$
+
+$$
+\boldsymbol{\Sigma}_{YY}
+=
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf Y}
+\right)
 \succ
 \mathbf0
 $$
@@ -479,12 +862,18 @@ $$
 e
 
 $$
-\boldsymbol{\Sigma}_{YY}
-\succ
-\mathbf0.
+\boldsymbol{\Sigma}_{XY}
+=
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X},
+\boldsymbol{\mathsf Y}
+\right)
+\in
+\mathbb R^{p\times q}.
 $$
 
-O **primeiro par canônico** é formado pelas variáveis
+O **primeiro par canônico** é formado por
 
 $$
 \mathsf U_1
@@ -510,10 +899,21 @@ $$
 \right),
 $$
 
-em que $\mathbf a_1$ e $\mathbf b_1$ resolvem
+em que
 
 $$
-\max_{\mathbf a,\mathbf b}
+\mathbf a_1\in\mathbb R^p
+\qquad\text{e}\qquad
+\mathbf b_1\in\mathbb R^q
+$$
+
+resolvem
+
+$$
+\max_{
+\mathbf a\in\mathbb R^p,\,
+\mathbf b\in\mathbb R^q
+}
 \;
 \mathbf a^\top
 \boldsymbol{\Sigma}_{XY}
@@ -546,29 +946,122 @@ $$
 \rho_1
 =
 \operatorname{Corr}
-(\mathsf U_1,\mathsf V_1)
+\left(
+\mathsf U_1,
+\mathsf V_1
+\right)
 $$
 
 é a **primeira correlação canônica**.
 :::
 
-Como o sinal de um dos vetores pode ser invertido sem alterar as restrições, o primeiro par pode ser orientado de forma que
+As restrições definem conjuntos compactos porque
 
 $$
-\rho_1
-\geq
-0.
+\boldsymbol{\Sigma}_{XX}
+\succ
+\mathbf0
+\qquad\text{e}\qquad
+\boldsymbol{\Sigma}_{YY}
+\succ
+\mathbf0.
 $$
 
-O problema possui, portanto, uma estrutura diferente dos quocientes de Rayleigh utilizados na MANOVA e na Análise Discriminante. Aqui existem **dois vetores de coeficientes**, um para cada bloco, e o numerador é uma forma bilinear:
+Como a função
 
 $$
+(\mathbf a,\mathbf b)
+\longmapsto
 \mathbf a^\top
 \boldsymbol{\Sigma}_{XY}
-\mathbf b.
+\mathbf b
 $$
 
-Essa diferença explica por que a decomposição em valores singulares será a formulação mais natural da solução.
+é contínua, o máximo existe.
+
+Além disso, por ser uma correlação,
+
+$$
+-1
+\leq
+\rho_1
+\leq
+1.
+$$
+
+Se uma solução produzir valor negativo, substituir
+
+$$
+\mathbf a_1
+$$
+
+por
+
+$$
+-\mathbf a_1
+$$
+
+ou
+
+$$
+\mathbf b_1
+$$
+
+por
+
+$$
+-\mathbf b_1
+$$
+
+preserva as restrições e troca o sinal da correlação.
+
+Por convenção, escolhe-se a orientação de modo que
+
+$$
+0
+\leq
+\rho_1
+\leq
+1.
+$$
+
+Se
+
+$$
+\boldsymbol{\Sigma}_{XY}
+=
+\mathbf0,
+$$
+
+então
+
+$$
+\rho_1=0.
+$$
+
+Reciprocamente, sob a positividade definida dos blocos internos, se
+
+$$
+\rho_1=0,
+$$
+
+então nenhuma combinação linear dos dois blocos possui correlação diferente de zero e, portanto,
+
+$$
+\boldsymbol{\Sigma}_{XY}
+=
+\mathbf0.
+$$
+
+A próxima etapa consiste em transformar as duas restrições quadráticas em restrições euclidianas. Esse é o papel do **branqueamento** por
+
+$$
+\boldsymbol{\Sigma}_{XX}^{-1/2}
+\qquad\text{e}\qquad
+\boldsymbol{\Sigma}_{YY}^{-1/2},
+$$
+
+que permitirá converter o problema bilinear em uma maximização resolvida diretamente pela decomposição em valores singulares.
 
 ## Da normalização ao branqueamento
 
@@ -592,19 +1085,25 @@ $$
 1
 $$
 
-mostram que as direções dos dois blocos são medidas segundo métricas diferentes.
+mostram que os coeficientes dos dois blocos são normalizados segundo geometrias diferentes.
 
-No primeiro bloco, o comprimento relevante é determinado por
-
-$$
-\boldsymbol{\Sigma}_{XX},
-$$
-
-enquanto no segundo é determinado por
+No primeiro bloco, a forma quadrática
 
 $$
-\boldsymbol{\Sigma}_{YY}.
+\mathbf a^\top
+\boldsymbol{\Sigma}_{XX}
+\mathbf a
 $$
+
+mede a variância da combinação de $\boldsymbol{\mathsf X}$, enquanto, no segundo,
+
+$$
+\mathbf b^\top
+\boldsymbol{\Sigma}_{YY}
+\mathbf b
+$$
+
+mede a variância da combinação de $\boldsymbol{\mathsf Y}$.
 
 A solução torna-se mais transparente quando essas duas geometrias são transformadas em geometria euclidiana.
 
@@ -624,7 +1123,7 @@ $$
 \mathbf0,
 $$
 
-a raiz quadrada principal definida em @def-raiz-quadrada-principal é não singular para cada uma dessas matrizes. Portanto,
+as raízes quadradas principais dessas matrizes são positivas definidas e não singulares, conforme @def-raiz-quadrada-principal. Portanto,
 
 $$
 \boldsymbol{\Sigma}_{XX}^{-1/2}
@@ -656,7 +1155,7 @@ $$
 \mathbf b.
 $$ {#eq-transformacao-v-cca}
 
-Então,
+Como as transformações são invertíveis,
 
 $$
 \mathbf a
@@ -674,10 +1173,11 @@ $$
 \mathbf v.
 $$
 
-As restrições tornam-se
+As restrições de variância tornam-se
 
 $$
-\mathbf u^\top\mathbf u
+\mathbf u^\top
+\mathbf u
 =
 1
 $$
@@ -685,7 +1185,8 @@ $$
 e
 
 $$
-\mathbf v^\top\mathbf v
+\mathbf v^\top
+\mathbf v
 =
 1.
 $$ {#eq-normalizacao-euclidiana-cca}
@@ -705,47 +1206,7 @@ $$
 \mathbf v.
 $$ {#eq-correlacao-branqueada-cca}
 
-A matriz
-
-$$
-\boldsymbol{\Sigma}_{XX}^{-1/2}
-\boldsymbol{\Sigma}_{XY}
-\boldsymbol{\Sigma}_{YY}^{-1/2}
-$$
-
-será o objeto utilizado na solução. Ela representa a associação cruzada depois que a estrutura de covariâncias interna de cada bloco foi incorporada à transformação.
-
-No próximo passo, o problema canônico torna-se uma maximização bilinear entre vetores de norma unitária. A SVD fornece diretamente suas direções ótimas e mostra que as correlações canônicas são os valores singulares dessa matriz de associação branqueada.
-
-## Solução pela decomposição em valores singulares
-
-A transformação obtida em @eq-correlacao-branqueada-cca reduz o problema canônico a
-
-$$
-\max_{\mathbf u,\mathbf v}
-\;
-\mathbf u^\top
-\mathbf K_{\mathrm{CCA}}
-\mathbf v
-$$ {#eq-maximizacao-branqueada-cca}
-
-sujeito a
-
-$$
-\mathbf u^\top\mathbf u
-=
-1
-$$
-
-e
-
-$$
-\mathbf v^\top\mathbf v
-=
-1,
-$$
-
-em que
+Defina
 
 $$
 \mathbf K_{\mathrm{CCA}}
@@ -757,7 +1218,9 @@ $$
 \mathbb R^{p\times q}.
 $$ {#eq-matriz-cca-branqueada}
 
-A matriz $\mathbf K_{\mathrm{CCA}}$ é a covariância cruzada entre as versões branqueadas dos dois blocos. De fato, definindo
+A matriz $\mathbf K_{\mathrm{CCA}}$ reúne a associação cruzada depois que as estruturas internas de covariância dos dois blocos foram padronizadas.
+
+Essa interpretação pode ser vista diretamente sobre os vetores aleatórios. Defina
 
 $$
 \boldsymbol{\mathsf X}^{*}
@@ -780,19 +1243,28 @@ $$
 \boldsymbol{\mathsf Y}
 -
 \boldsymbol{\mu}_Y
-\right),
+\right).
 $$ {#eq-bloco-y-branqueado-cca}
 
-obtém-se
+Como as raízes quadradas principais são simétricas,
 
 $$
+\begin{aligned}
 \operatorname{Cov}
 \left(
 \boldsymbol{\mathsf X}^{*}
 \right)
-=
+&=
+\boldsymbol{\Sigma}_{XX}^{-1/2}
+\boldsymbol{\Sigma}_{XX}
+\boldsymbol{\Sigma}_{XX}^{-1/2}
+\\
+&=
 \mathbf I_p,
+\end{aligned}
 $$
+
+e, analogamente,
 
 $$
 \operatorname{Cov}
@@ -800,10 +1272,10 @@ $$
 \boldsymbol{\mathsf Y}^{*}
 \right)
 =
-\mathbf I_q
+\mathbf I_q.
 $$
 
-e
+Além disso,
 
 $$
 \operatorname{Cov}
@@ -815,25 +1287,45 @@ $$
 \mathbf K_{\mathrm{CCA}}.
 $$ {#eq-covariancia-cruzada-branqueada-cca}
 
-Assim, as estruturas internas de variâncias e covariâncias foram removidas de cada conjunto. O problema passa a depender somente da associação linear que permanece entre os dois blocos branqueados.
-
-Seja
+Portanto, o branqueamento transforma cada bloco em um vetor com matriz de covariâncias identidade e preserva, em
 
 $$
-r
+\mathbf K_{\mathrm{CCA}},
+$$
+
+a estrutura de associação linear existente entre eles.
+
+É importante interpretar corretamente a expressão “remove a estrutura interna”. O branqueamento não elimina informação dos blocos. Ele incorpora suas variâncias e covariâncias à transformação de coordenadas, de modo que o problema restante possa ser analisado segundo a geometria euclidiana.
+
+A maximização canônica passa então a ser
+
+$$
+\max_{
+\|\mathbf u\|=\|\mathbf v\|=1
+}
+\;
+\mathbf u^\top
+\mathbf K_{\mathrm{CCA}}
+\mathbf v.
+$$ {#eq-maximizacao-branqueada-cca}
+
+Temos agora uma forma bilinear entre vetores pertencentes a dois espaços euclidianos que podem possuir dimensões diferentes.
+
+Essa é precisamente a estrutura para a qual a Decomposição em Valores Singulares fornece a solução natural.
+
+## Solução pela Decomposição em Valores Singulares
+
+Defina
+
+$$
+m
 =
 \min(p,q).
 $$
 
-Pela SVD completa definida em @def-svd-completa, a matriz
+A partir da SVD completa definida em @def-svd-completa, podem ser retidos os $m$ pares de vetores singulares associados às posições da diagonal retangular da decomposição.
 
-$$
-\mathbf K_{\mathrm{CCA}}
-\in
-\mathbb R^{p\times q}
-$$
-
-possui $r$ valores singulares, contando também aqueles que podem ser nulos. Retendo os vetores singulares associados às $r$ posições da diagonal retangular, escreva
+Escreva
 
 $$
 \mathbf K_{\mathrm{CCA}}
@@ -853,10 +1345,10 @@ $$
 &
 \cdots
 &
-\mathbf l_r
+\mathbf l_m
 \end{pmatrix}
 \in
-\mathbb R^{p\times r},
+\mathbb R^{p\times m},
 $$
 
 $$
@@ -867,10 +1359,10 @@ $$
 &
 \cdots
 &
-\mathbf r_r
+\mathbf r_m
 \end{pmatrix}
 \in
-\mathbb R^{q\times r},
+\mathbb R^{q\times m},
 $$
 
 e
@@ -880,13 +1372,13 @@ $$
 =
 \operatorname{diag}
 \left(
-\rho_1,\ldots,\rho_r
+\rho_1,\ldots,\rho_m
 \right)
 \in
-\mathbb R^{r\times r},
+\mathbb R^{m\times m}.
 $$
 
-com
+Os valores singulares são ordenados de modo que
 
 $$
 \rho_1
@@ -895,28 +1387,36 @@ $$
 \geq
 \cdots
 \geq
-\rho_r
+\rho_m
 \geq
 0.
 $$ {#eq-ordenacao-correlacoes-canonicas}
 
-Os vetores singulares satisfazem
+As colunas de $\mathbf L$ e $\mathbf R$ são ortonormais:
 
 $$
-\mathbf L^\top\mathbf L
+\mathbf L^\top
+\mathbf L
 =
-\mathbf I_r
+\mathbf I_m
 $$
 
 e
 
 $$
-\mathbf R^\top\mathbf R
+\mathbf R^\top
+\mathbf R
 =
-\mathbf I_r.
+\mathbf I_m.
 $$
 
-Além disso,
+Para cada
+
+$$
+j=1,\ldots,m,
+$$
+
+as relações singulares são
 
 $$
 \mathbf K_{\mathrm{CCA}}
@@ -936,7 +1436,7 @@ $$
 \mathbf r_j.
 $$ {#eq-relacao-singular-esquerda-cca}
 
-A caracterização variacional da SVD mostra que
+Pela caracterização variacional da SVD,
 
 $$
 \max_{
@@ -946,22 +1446,26 @@ $$
 \mathbf K_{\mathrm{CCA}}
 \mathbf v
 =
-\rho_1,
+\rho_1.
 $$
 
-e o máximo é atingido por
+Uma solução é
 
 $$
 \mathbf u_1
 =
-\mathbf l_1,
-\qquad
+\mathbf l_1
+$$
+
+e
+
+$$
 \mathbf v_1
 =
 \mathbf r_1.
 $$
 
-Consequentemente, o primeiro par de coeficientes canônicos é
+Retornando às coordenadas originais,
 
 $$
 \mathbf a_1
@@ -979,7 +1483,27 @@ $$
 \mathbf r_1.
 $$ {#eq-coeficiente-y-primeiro-cca}
 
-A correlação entre as variáveis correspondentes é
+Esses coeficientes satisfazem
+
+$$
+\mathbf a_1^\top
+\boldsymbol{\Sigma}_{XX}
+\mathbf a_1
+=
+1
+$$
+
+e
+
+$$
+\mathbf b_1^\top
+\boldsymbol{\Sigma}_{YY}
+\mathbf b_1
+=
+1.
+$$
+
+A correlação entre as correspondentes variáveis canônicas é
 
 $$
 \operatorname{Corr}
@@ -1000,24 +1524,54 @@ $$
 1.
 $$
 
-A mesma construção aplicada aos demais pares de vetores singulares produz as correlações canônicas sucessivas.
+A mesma construção aplicada aos demais pares de vetores singulares produz as dimensões canônicas sucessivas.
 
 ::: {#def-correlacoes-canonicas}
 ## Correlações canônicas
 
-As **correlações canônicas** entre os blocos $\boldsymbol{\mathsf X}$ e $\boldsymbol{\mathsf Y}$ são os valores singulares
+Sejam
 
 $$
-\rho_1
-\geq
-\cdots
-\geq
-\rho_r
-\geq
-0
+\boldsymbol{\mathsf X}
+\in
+\mathbb R^p
+\qquad\text{e}\qquad
+\boldsymbol{\mathsf Y}
+\in
+\mathbb R^q
 $$
 
-da matriz de covariância cruzada branqueada
+vetores aleatórios com segundos momentos finitos e matrizes de covariâncias
+
+$$
+\boldsymbol{\Sigma}_{XX}
+\succ
+\mathbf0
+$$
+
+e
+
+$$
+\boldsymbol{\Sigma}_{YY}
+\succ
+\mathbf0.
+$$
+
+Seja
+
+$$
+\boldsymbol{\Sigma}_{XY}
+=
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X},
+\boldsymbol{\mathsf Y}
+\right)
+\in
+\mathbb R^{p\times q}
+$$
+
+e defina
 
 $$
 \mathbf K_{\mathrm{CCA}}
@@ -1027,17 +1581,69 @@ $$
 \boldsymbol{\Sigma}_{YY}^{-1/2}.
 $$
 
-A correlação $\rho_j$ corresponde ao par de combinações lineares determinado pelos vetores singulares $\mathbf l_j$ e $\mathbf r_j$.
+Para
+
+$$
+m=\min(p,q),
+$$
+
+as **correlações canônicas** são os valores singulares
+
+$$
+\rho_1
+\geq
+\cdots
+\geq
+\rho_m
+\geq
+0
+$$
+
+de
+
+$$
+\mathbf K_{\mathrm{CCA}}.
+$$
+
+Para cada $j$, uma escolha correspondente de coeficientes canônicos é
+
+$$
+\mathbf a_j
+=
+\boldsymbol{\Sigma}_{XX}^{-1/2}
+\mathbf l_j
+$$
+
+e
+
+$$
+\mathbf b_j
+=
+\boldsymbol{\Sigma}_{YY}^{-1/2}
+\mathbf r_j,
+$$
+
+em que
+
+$$
+\mathbf l_j
+\qquad\text{e}\qquad
+\mathbf r_j
+$$
+
+são vetores singulares associados a $\rho_j$.
 :::
 
-A definição mostra que as correlações canônicas não são correlações escolhidas entre pares das variáveis originais. Elas medem a associação entre combinações dos dois blocos depois que as estruturas internas de covariância foram incorporadas à geometria de cada conjunto.
+A definição mostra que as correlações canônicas não são selecionadas dentre as correlações bivariadas originais.
+
+Elas resultam da otimização sobre **todas as combinações lineares admissíveis dos dois blocos**, depois de incorporadas as estruturas internas de covariância de cada conjunto.
 
 ## Pares canônicos sucessivos
 
 Para
 
 $$
-j=1,\ldots,r,
+j=1,\ldots,m,
 $$
 
 defina
@@ -1084,9 +1690,134 @@ $$
 \right).
 $$ {#eq-pares-canonicos-sucessivos}
 
+A expressão “pares sucessivos” possui um significado de otimização, e não apenas de ordenação posterior dos valores singulares.
+
+Depois de obtidos os pares
+
+$$
+(\mathsf U_1,\mathsf V_1),
+\ldots,
+(\mathsf U_{j-1},\mathsf V_{j-1}),
+$$
+
+o $j$-ésimo par maximiza
+
+$$
+\operatorname{Corr}
+(\mathsf U,\mathsf V)
+$$
+
+entre combinações unitariamente padronizadas que sejam não correlacionadas, dentro de cada bloco, com as variáveis canônicas anteriormente obtidas.
+
+Equivalentemente, para
+
+$$
+j\geq2,
+$$
+
+procura-se maximizar
+
+$$
+\mathbf a^\top
+\boldsymbol{\Sigma}_{XY}
+\mathbf b
+$$ {#eq-maximizacao-par-sucessivo-cca}
+
+sujeito a
+
+$$
+\mathbf a^\top
+\boldsymbol{\Sigma}_{XX}
+\mathbf a
+=
+1,
+$$
+
+$$
+\mathbf b^\top
+\boldsymbol{\Sigma}_{YY}
+\mathbf b
+=
+1,
+$$
+
+e, para
+
+$$
+k=1,\ldots,j-1,
+$$
+
+$$
+\mathbf a^\top
+\boldsymbol{\Sigma}_{XX}
+\mathbf a_k
+=
+0
+$$
+
+e
+
+$$
+\mathbf b^\top
+\boldsymbol{\Sigma}_{YY}
+\mathbf b_k
+=
+0.
+$$ {#eq-restricoes-pares-sucessivos-cca}
+
+Depois do branqueamento, essas restrições tornam-se simplesmente
+
+$$
+\mathbf u^\top
+\mathbf l_k
+=
+0
+$$
+
+e
+
+$$
+\mathbf v^\top
+\mathbf r_k
+=
+0,
+\qquad
+k<j.
+$$
+
+A caracterização variacional dos valores singulares mostra então que o valor máximo do $j$-ésimo problema é
+
+$$
+\rho_j.
+$$
+
+Portanto,
+
+$$
+\rho_1
+\geq
+\rho_2
+\geq
+\cdots
+\geq
+\rho_m
+\geq
+0
+$$
+
+representa uma sequência de associações lineares máximas sujeitas à exclusão das dimensões canônicas já utilizadas.
+
 A ortogonalidade dos vetores singulares produz diretamente a estrutura de covariâncias das variáveis canônicas.
 
-Para dois índices $j$ e $\ell$,
+Para
+
+$$
+j,\ell
+\in
+\{1,\ldots,m\},
+$$
+
+tem-se
 
 $$
 \begin{aligned}
@@ -1103,7 +1834,7 @@ $$
 \end{aligned}
 $$
 
-Portanto,
+Logo,
 
 $$
 \operatorname{Cov}
@@ -1113,7 +1844,7 @@ $$
 1,
 &
 j=\ell,
-\\
+\\[4pt]
 0,
 &
 j\neq\ell.
@@ -1130,14 +1861,14 @@ $$
 1,
 &
 j=\ell,
-\\
+\\[4pt]
 0,
 &
 j\neq\ell.
 \end{cases}
 $$ {#eq-covariancia-v-pares-cca}
 
-Entre variáveis pertencentes aos dois blocos,
+Para variáveis pertencentes a blocos diferentes,
 
 $$
 \begin{aligned}
@@ -1151,11 +1882,11 @@ $$
 &=
 \rho_\ell
 \mathbf l_j^\top
-\mathbf l_\ell,
+\mathbf l_\ell.
 \end{aligned}
 $$
 
-e, portanto,
+Consequentemente,
 
 $$
 \operatorname{Cov}
@@ -1165,12 +1896,14 @@ $$
 \rho_j,
 &
 j=\ell,
-\\
+\\[4pt]
 0,
 &
 j\neq\ell.
 \end{cases}
 $$ {#eq-covariancia-cruzada-pares-cca}
+
+Como todas as variáveis canônicas possuem variância unitária, essas covariâncias são também correlações.
 
 Se
 
@@ -1180,7 +1913,7 @@ $$
 \begin{pmatrix}
 \mathsf U_1\\
 \vdots\\
-\mathsf U_r
+\mathsf U_m
 \end{pmatrix}
 $$
 
@@ -1192,11 +1925,11 @@ $$
 \begin{pmatrix}
 \mathsf V_1\\
 \vdots\\
-\mathsf V_r
+\mathsf V_m
 \end{pmatrix},
 $$
 
-essas propriedades podem ser reunidas como
+as relações anteriores podem ser reunidas como
 
 $$
 \operatorname{Cov}
@@ -1204,7 +1937,7 @@ $$
 \boldsymbol{\mathsf U}
 \right)
 =
-\mathbf I_r,
+\mathbf I_m,
 $$ {#eq-covariancia-vetor-u-cca}
 
 $$
@@ -1213,7 +1946,7 @@ $$
 \boldsymbol{\mathsf V}
 \right)
 =
-\mathbf I_r
+\mathbf I_m
 $$ {#eq-covariancia-vetor-v-cca}
 
 e
@@ -1228,9 +1961,31 @@ $$
 \mathbf D_{\rho}.
 $$ {#eq-covariancia-vetores-canonicos}
 
-A transformação canônica produz, portanto, pares ordenados de variáveis unitariamente padronizadas. Dentro de cada bloco, as variáveis canônicas são não correlacionadas; entre os dois blocos, cada $\mathsf U_j$ possui correlação não nula apenas com a variável $\mathsf V_j$ correspondente.
+A transformação canônica produz, portanto, pares ordenados de variáveis com variância unitária.
 
-Esse resultado fornece a interpretação dos pares sucessivos. O primeiro par representa a associação linear máxima entre os blocos. O segundo representa a maior associação adicional possível depois de excluídas as direções utilizadas pelo primeiro par, e assim sucessivamente.
+Dentro de cada bloco, variáveis canônicas pertencentes a dimensões distintas são não correlacionadas.
+
+Entre os blocos, cada
+
+$$
+\mathsf U_j
+$$
+
+possui correlação
+
+$$
+\rho_j
+$$
+
+com
+
+$$
+\mathsf V_j
+$$
+
+e correlação zero com as demais variáveis canônicas do segundo conjunto.
+
+Isso esclarece o significado de sucessão na CCA: cada novo par descreve uma dimensão adicional de associação linear que não repete as dimensões canônicas anteriores.
 
 ### Número de correlações canônicas positivas
 
@@ -1249,12 +2004,12 @@ $$
 são não singulares,
 
 $$
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \mathbf K_{\mathrm{CCA}}
 \right)
 =
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \boldsymbol{\Sigma}_{XY}
 \right).
@@ -1263,55 +2018,69 @@ $$ {#eq-posto-k-cca}
 Defina
 
 $$
-s
+r_C
 =
-\operatorname{rank}
+\operatorname{posto}
 \left(
 \boldsymbol{\Sigma}_{XY}
 \right).
 $$
 
-Então,
+Como
 
 $$
-s
+\boldsymbol{\Sigma}_{XY}
+\in
+\mathbb R^{p\times q},
+$$
+
+tem-se
+
+$$
+r_C
 \leq
 \min(p,q)
 =
-r.
+m.
 $$ {#eq-numero-correlacoes-canonicas-positivas}
 
-Exatamente $s$ valores singulares são positivos:
+Pela relação entre posto e valores singulares, exatamente
+
+$$
+r_C
+$$
+
+correlações canônicas são positivas:
 
 $$
 \rho_1
 \geq
 \cdots
 \geq
-\rho_s
+\rho_{r_C}
 >
-0,
+0.
 $$
 
-enquanto
+Se
 
 $$
-\rho_{s+1}
+r_C<m,
+$$
+
+então
+
+$$
+\rho_{r_C+1}
 =
 \cdots
 =
-\rho_r
+\rho_m
 =
-0
+0.
 $$
 
-quando
-
-$$
-s<r.
-$$
-
-Assim, o número de dimensões de associação linear entre os dois blocos é determinado pelo posto da covariância cruzada.
+Portanto, o número de dimensões com associação linear canônica positiva é determinado pelo posto da matriz de covariâncias cruzadas.
 
 Se
 
@@ -1324,18 +2093,85 @@ $$
 então
 
 $$
-s=0
+r_C=0
 $$
 
-e todas as correlações canônicas são nulas.
+e
 
-No extremo oposto, uma correlação canônica igual a $1$ indica a existência de combinações lineares unitariamente padronizadas dos dois blocos com associação linear perfeita.
+$$
+\rho_1
+=
+\cdots
+=
+\rho_m
+=
+0.
+$$
+
+Nesse caso, não existe associação linear entre nenhuma combinação dos dois blocos.
+
+No outro extremo, se
+
+$$
+\rho_j=1,
+$$
+
+existem combinações lineares unitariamente padronizadas
+
+$$
+\mathsf U_j
+$$
+
+e
+
+$$
+\mathsf V_j
+$$
+
+com correlação perfeita.
+
+Como ambas possuem variância $1$, após escolha consistente do sinal,
+
+$$
+\operatorname{Var}
+\left(
+\mathsf U_j-\mathsf V_j
+\right)
+=
+0.
+$$
+
+Assim,
+
+$$
+\mathsf U_j
+=
+\mathsf V_j
+$$
+
+quase certamente, a menos de uma constante que é nula porque as variáveis canônicas foram construídas a partir de vetores centrados.
+
+Uma correlação canônica igual a $1$ representa, portanto, uma relação linear exata entre combinações não triviais dos dois blocos.
 
 ## Formulação equivalente por autovalores
 
-A SVD fornece a formulação mais direta porque o problema envolve simultaneamente dois vetores de coeficientes. Entretanto, a solução também pode ser expressa por problemas de autovalores.
+A SVD é a formulação mais direta da Correlação Canônica porque o problema original envolve simultaneamente dois vetores de coeficientes,
 
-Das relações singulares,
+$$
+\mathbf a
+\qquad\text{e}\qquad
+\mathbf b,
+$$
+
+e uma matriz retangular,
+
+$$
+\boldsymbol{\Sigma}_{XY}.
+$$
+
+Entretanto, a mesma solução pode ser expressa por problemas de autovalores.
+
+Das relações singulares
 
 $$
 \mathbf K_{\mathrm{CCA}}
@@ -1377,6 +2213,34 @@ $$
 \mathbf r_j.
 $$ {#eq-autovalor-branqueado-y-cca}
 
+As matrizes
+
+$$
+\mathbf K_{\mathrm{CCA}}
+\mathbf K_{\mathrm{CCA}}^\top
+\in
+\mathbb R^{p\times p}
+$$
+
+e
+
+$$
+\mathbf K_{\mathrm{CCA}}^\top
+\mathbf K_{\mathrm{CCA}}
+\in
+\mathbb R^{q\times q}
+$$
+
+são simétricas e semidefinidas positivas.
+
+Seus autovalores positivos coincidem e são exatamente
+
+$$
+\rho_1^2,
+\ldots,
+\rho_{r_C}^2.
+$$
+
 Substituindo @eq-matriz-cca-branqueada no primeiro problema,
 
 $$
@@ -1400,7 +2264,13 @@ $$
 \mathbf a_j,
 $$
 
-obtém-se
+multiplicar à esquerda por
+
+$$
+\boldsymbol{\Sigma}_{XX}^{1/2}
+$$
+
+produz
 
 $$
 \boldsymbol{\Sigma}_{XY}
@@ -1426,15 +2296,69 @@ $$
 \mathbf b_j.
 $$ {#eq-autovalor-generalizado-y-cca}
 
-As quantidades
+Esses são problemas de autovalores generalizados do mesmo tipo definido em @def-autovalor-generalizado.
+
+No primeiro bloco, o par matricial é
 
 $$
-\rho_j^2
+\left(
+\boldsymbol{\Sigma}_{XY}
+\boldsymbol{\Sigma}_{YY}^{-1}
+\boldsymbol{\Sigma}_{YX},
+\;
+\boldsymbol{\Sigma}_{XX}
+\right),
 $$
 
-são, portanto, autovalores generalizados dos pares matriciais correspondentes.
+com dimensões
 
-As equações @eq-autovalor-generalizado-x-cca e @eq-autovalor-generalizado-y-cca não representam dois conjuntos independentes de soluções. Os coeficientes de cada par estão conectados por
+$$
+p\times p.
+$$
+
+No segundo bloco, o par é
+
+$$
+\left(
+\boldsymbol{\Sigma}_{YX}
+\boldsymbol{\Sigma}_{XX}^{-1}
+\boldsymbol{\Sigma}_{XY},
+\;
+\boldsymbol{\Sigma}_{YY}
+\right),
+$$
+
+com dimensões
+
+$$
+q\times q.
+$$
+
+Os dois problemas possuem os mesmos autovalores **positivos**,
+
+$$
+\rho_1^2,
+\ldots,
+\rho_{r_C}^2.
+$$
+
+Quando
+
+$$
+p\neq q,
+$$
+
+a matriz quadrada de maior dimensão pode possuir autovalores nulos adicionais que não correspondem a novos pares canônicos.
+
+As equações @eq-autovalor-generalizado-x-cca e @eq-autovalor-generalizado-y-cca não representam duas soluções independentes.
+
+Para cada
+
+$$
+j=1,\ldots,m,
+$$
+
+as relações singulares implicam
 
 $$
 \boldsymbol{\Sigma}_{XY}
@@ -1456,40 +2380,130 @@ $$
 \mathbf b_j.
 $$ {#eq-relacao-coeficientes-y-cca}
 
-Para
+Quando
 
 $$
 \rho_j>0,
 $$
 
-uma direção de um bloco determina a correspondente direção do outro.
+a primeira relação fornece
 
-A formulação por autovalores conecta a Correlação Canônica aos problemas espectrais já utilizados em MANOVA e Análise Discriminante. A diferença permanece na origem do problema: em CCA, os autovalores surgem depois de eliminar um dos dois vetores de uma maximização bilinear, e seus valores são os **quadrados** das correlações canônicas.
+$$
+\mathbf a_j
+=
+\frac1{\rho_j}
+\boldsymbol{\Sigma}_{XX}^{-1}
+\boldsymbol{\Sigma}_{XY}
+\mathbf b_j,
+$$
 
+enquanto a segunda fornece
+
+$$
+\mathbf b_j
+=
+\frac1{\rho_j}
+\boldsymbol{\Sigma}_{YY}^{-1}
+\boldsymbol{\Sigma}_{YX}
+\mathbf a_j.
+$$
+
+Assim, em cada dimensão com correlação positiva, a direção de um bloco determina a direção correspondente do outro, respeitadas as normalizações e a convenção de sinal.
+
+A formulação por autovalores conecta a Correlação Canônica aos problemas espectrais utilizados anteriormente em MANOVA e Análise Discriminante.
+
+Há, entretanto, uma diferença estrutural importante.
+
+Na MANOVA e na formulação de Fisher, o problema é introduzido diretamente como uma comparação entre duas formas quadráticas de um mesmo vetor.
+
+Na Correlação Canônica, o ponto de partida é uma **maximização bilinear entre dois vetores pertencentes a blocos distintos**. O branqueamento transforma as restrições em normas euclidianas, a SVD resolve simultaneamente os dois lados do problema e somente depois a eliminação de um dos vetores produz os problemas de autovalores.
+
+Por isso, os autovalores dessa formulação são
+
+$$
+\rho_j^2,
+$$
+
+isto é, os quadrados das correlações canônicas, enquanto os valores singulares de
+
+$$
+\mathbf K_{\mathrm{CCA}}
+$$
+
+são diretamente
+
+$$
+\rho_j.
+$$
 ## Geometria da Correlação Canônica
 
-A interpretação geométrica pode ser formulada sem identificar diretamente $\mathbb R^p$ e $\mathbb R^q$, que podem possuir dimensões diferentes.
-
-Considere o espaço das variáveis aleatórias centradas com variância finita e produto interno
+A interpretação geométrica da Correlação Canônica deve acomodar dois blocos que podem possuir dimensões diferentes,
 
 $$
-\langle
+p
+\neq
+q.
+$$
+
+Por isso, não é adequado identificar diretamente os espaços de coeficientes
+
+$$
+\mathbb R^p
+\qquad\text{e}\qquad
+\mathbb R^q.
+$$
+
+A geometria relevante pode ser construída no espaço das variáveis aleatórias centradas e quadrado-integráveis.
+
+Considere
+
+$$
+L_0^2
+=
+\left\{
+\mathsf A:
+E(\mathsf A)=0,
+\;
+E(\mathsf A^2)<\infty
+\right\},
+$$
+
+identificando variáveis aleatórias iguais quase certamente.
+
+Nesse espaço, defina o produto interno
+
+$$
+\left\langle
 \mathsf A,\mathsf B
-\rangle
+\right\rangle
+=
+E
+\left(
+\mathsf A\mathsf B
+\right)
 =
 \operatorname{Cov}
-(\mathsf A,\mathsf B).
+\left(
+\mathsf A,\mathsf B
+\right).
 $$ {#eq-produto-interno-covariancia-cca}
 
-Para variáveis centradas,
+Como as variáveis são centradas,
 
 $$
-\|\mathsf A\|^2
+\|
+\mathsf A
+\|^2
 =
-\operatorname{Var}(\mathsf A).
+\left\langle
+\mathsf A,\mathsf A
+\right\rangle
+=
+\operatorname{Var}
+(\mathsf A).
 $$
 
-Defina o subespaço gerado pelas combinações lineares do primeiro bloco,
+Defina o subespaço gerado pelas combinações lineares centradas do primeiro bloco,
 
 $$
 \mathcal H_X
@@ -1499,7 +2513,9 @@ $$
 \mathsf X_1-E(\mathsf X_1),
 \ldots,
 \mathsf X_p-E(\mathsf X_p)
-\right\},
+\right\}
+\subset
+L_0^2,
 $$
 
 e, analogamente,
@@ -1512,17 +2528,101 @@ $$
 \mathsf Y_1-E(\mathsf Y_1),
 \ldots,
 \mathsf Y_q-E(\mathsf Y_q)
-\right\}.
+\right\}
+\subset
+L_0^2.
 $$
 
-Uma variável canônica $\mathsf U$ pertence a $\mathcal H_X$, enquanto $\mathsf V$ pertence a $\mathcal H_Y$.
+Sob
+
+$$
+\boldsymbol{\Sigma}_{XX}
+\succ
+\mathbf0,
+$$
+
+nenhuma combinação linear não trivial das componentes centradas de
+
+$$
+\boldsymbol{\mathsf X}
+$$
+
+possui variância zero. Portanto,
+
+$$
+\dim
+\left(
+\mathcal H_X
+\right)
+=
+p.
+$$
+
+Analogamente,
+
+$$
+\boldsymbol{\Sigma}_{YY}
+\succ
+\mathbf0
+$$
+
+implica
+
+$$
+\dim
+\left(
+\mathcal H_Y
+\right)
+=
+q.
+$$
+
+Uma variável canônica
+
+$$
+\mathsf U
+=
+\mathbf a^\top
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_X
+\right)
+$$
+
+pertence a
+
+$$
+\mathcal H_X,
+$$
+
+enquanto
+
+$$
+\mathsf V
+=
+\mathbf b^\top
+\left(
+\boldsymbol{\mathsf Y}
+-
+\boldsymbol{\mu}_Y
+\right)
+$$
+
+pertence a
+
+$$
+\mathcal H_Y.
+$$
 
 Sob as normalizações
 
 $$
-\operatorname{Var}(\mathsf U)
+\operatorname{Var}
+(\mathsf U)
 =
-\operatorname{Var}(\mathsf V)
+\operatorname{Var}
+(\mathsf V)
 =
 1,
 $$
@@ -1530,15 +2630,29 @@ $$
 tem-se
 
 $$
+\|
+\mathsf U
+\|
+=
+\|
+\mathsf V
+\|
+=
+1
+$$
+
+e
+
+$$
 \operatorname{Corr}
 (\mathsf U,\mathsf V)
 =
-\langle
+\left\langle
 \mathsf U,\mathsf V
-\rangle.
+\right\rangle.
 $$
 
-O primeiro problema canônico pode então ser escrito como
+Assim, o primeiro problema canônico pode ser escrito como
 
 $$
 \rho_1
@@ -1550,20 +2664,31 @@ $$
 \mathsf V\in\mathcal H_Y,\;
 \|\mathsf V\|=1
 }}
-\langle
+\left\langle
 \mathsf U,\mathsf V
-\rangle.
+\right\rangle.
 $$ {#eq-geometria-primeiro-par-cca}
 
-Essa é precisamente a construção do menor ângulo entre dois subespaços.
+Essa é precisamente a caracterização do cosseno do menor ângulo principal entre os subespaços
+
+$$
+\mathcal H_X
+\qquad\text{e}\qquad
+\mathcal H_Y.
+$$
 
 Se
 
 $$
 \theta_1
+\in
+\left[
+0,
+\frac{\pi}{2}
+\right]
 $$
 
-é o primeiro ângulo principal entre $\mathcal H_X$ e $\mathcal H_Y$, então
+é o primeiro ângulo principal, então
 
 $$
 \rho_1
@@ -1572,18 +2697,124 @@ $$
 \theta_1.
 $$ {#eq-primeiro-angulo-canonico}
 
-Os pares sucessivos produzem os demais ângulos principais:
+### O papel do branqueamento na geometria
+
+A relação com a SVD torna-se particularmente clara quando os blocos são branqueados.
+
+Considere
 
 $$
-\rho_j
+\boldsymbol{\mathsf X}^{*}
 =
-\cos
-\theta_j,
-\qquad
-j=1,\ldots,r,
-$$ {#eq-angulos-canonicos}
+\boldsymbol{\Sigma}_{XX}^{-1/2}
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_X
+\right)
+$$
 
-com
+e
+
+$$
+\boldsymbol{\mathsf Y}^{*}
+=
+\boldsymbol{\Sigma}_{YY}^{-1/2}
+\left(
+\boldsymbol{\mathsf Y}
+-
+\boldsymbol{\mu}_Y
+\right).
+$$
+
+Como
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}^{*}
+\right)
+=
+\mathbf I_p,
+$$
+
+as componentes de
+
+$$
+\boldsymbol{\mathsf X}^{*}
+$$
+
+formam um sistema ortonormal em
+
+$$
+\mathcal H_X
+$$
+
+segundo o produto interno de @eq-produto-interno-covariancia-cca.
+
+De modo análogo, as componentes de
+
+$$
+\boldsymbol{\mathsf Y}^{*}
+$$
+
+formam um sistema ortonormal em
+
+$$
+\mathcal H_Y.
+$$
+
+A matriz
+
+$$
+\mathbf K_{\mathrm{CCA}}
+=
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}^{*},
+\boldsymbol{\mathsf Y}^{*}
+\right)
+$$
+
+é, portanto, a matriz de produtos internos entre duas bases ortonormais desses subespaços.
+
+Sua entrada
+
+$$
+\left[
+\mathbf K_{\mathrm{CCA}}
+\right]_{hk}
+$$
+
+é o produto interno entre a componente branqueada $h$ do primeiro bloco e a componente branqueada $k$ do segundo.
+
+A SVD de
+
+$$
+\mathbf K_{\mathrm{CCA}}
+$$
+
+determina os ângulos principais entre
+
+$$
+\mathcal H_X
+$$
+
+e
+
+$$
+\mathcal H_Y.
+$$
+
+Se
+
+$$
+m
+=
+\min(p,q),
+$$
+
+existem $m$ ângulos principais,
 
 $$
 0
@@ -1594,12 +2825,32 @@ $$
 \leq
 \cdots
 \leq
-\theta_r
+\theta_m
 \leq
-\frac{\pi}{2}.
+\frac{\pi}{2},
 $$
 
-Como o cosseno decresce nesse intervalo,
+e
+
+$$
+\rho_j
+=
+\cos
+\theta_j,
+\qquad
+j=1,\ldots,m.
+$$ {#eq-angulos-canonicos}
+
+Como o cosseno é decrescente em
+
+$$
+\left[
+0,
+\frac{\pi}{2}
+\right],
+$$
+
+a ordenação dos ângulos produz
 
 $$
 \rho_1
@@ -1608,14 +2859,68 @@ $$
 \geq
 \cdots
 \geq
-\rho_r.
+\rho_m
+\geq
+0.
+$$
+
+Se
+
+$$
+r_C
+=
+\operatorname{posto}
+\left(
+\boldsymbol{\Sigma}_{XY}
+\right),
+$$
+
+então
+
+$$
+\rho_j>0,
+\qquad
+j=1,\ldots,r_C,
+$$
+
+e
+
+$$
+\rho_j=0,
+\qquad
+j=r_C+1,\ldots,m,
+$$
+
+quando
+
+$$
+r_C<m.
+$$
+
+Consequentemente,
+
+$$
+\theta_j
+<
+\frac{\pi}{2},
+\qquad
+j\leq r_C,
+$$
+
+enquanto as dimensões com correlação canônica nula satisfazem
+
+$$
+\theta_j
+=
+\frac{\pi}{2}.
 $$
 
 A interpretação é direta:
 
-- $\rho_j$ próximo de $1$ corresponde a um pequeno ângulo entre direções dos dois subespaços;
+- $\rho_j$ próximo de $1$ corresponde a um pequeno ângulo principal;
 - $\rho_j$ próximo de $0$ corresponde a direções próximas da ortogonalidade;
-- $\rho_j=0$ indica ausência de associação linear naquela dimensão canônica.
+- $\rho_j=0$ corresponde à ortogonalidade naquela dimensão canônica;
+- $\rho_j=1$ corresponde a ângulo principal igual a zero.
 
 Quando
 
@@ -1623,35 +2928,33 @@ $$
 \rho_j=1,
 $$
 
-o ângulo correspondente é zero e existe uma combinação linear de um bloco perfeitamente alinhada com uma combinação linear do outro bloco.
+existe uma variável unitária pertencente simultaneamente aos dois subespaços.
 
-Essa geometria explica o papel do branqueamento. As matrizes
+Equivalentemente, existem combinações lineares centradas e não triviais dos dois blocos que, após escolha consistente do sinal, coincidem quase certamente.
 
-$$
-\boldsymbol{\Sigma}_{XX}^{-1/2}
-$$
+A geometria fornece, assim, outra interpretação da CCA: a técnica procura sucessivamente as direções de maior alinhamento entre os subespaços lineares gerados pelos dois conjuntos de variáveis.
 
-e
-
-$$
-\boldsymbol{\Sigma}_{YY}^{-1/2}
-$$
-
-removem as métricas internas distintas dos dois conjuntos. A SVD de $\mathbf K_{\mathrm{CCA}}$ identifica então as direções de maior alinhamento entre os espaços resultantes.
-
-A Correlação Canônica pode, portanto, ser vista como uma análise dos ângulos entre os subespaços lineares gerados pelos dois blocos depois que suas estruturas internas de covariância são incorporadas à geometria.
+Essa interpretação é equivalente à formulação por SVD. O branqueamento constrói bases ortonormais em cada subespaço e a SVD da matriz de produtos internos entre essas bases fornece os cossenos dos ângulos principais.
 
 ## Interpretação das variáveis canônicas
 
-As correlações canônicas
+As correlações
 
 $$
-\rho_1,\ldots,\rho_s
+\rho_1,\ldots,\rho_m
 $$
 
-quantificam a intensidade das associações lineares sucessivas entre os dois blocos. Para compreender quais variáveis originais participam dessas associações, é necessário distinguir os **coeficientes canônicos** das correlações entre as variáveis originais e as variáveis canônicas.
+quantificam a intensidade das associações lineares canônicas entre os dois blocos.
 
-Para o par $j$,
+Entretanto, uma correlação canônica elevada não informa, isoladamente, quais variáveis originais estão mais relacionadas à correspondente dimensão canônica.
+
+Para interpretar os pares, é necessário distinguir:
+
+- os **coeficientes canônicos**, que constroem as combinações lineares;
+- as **cargas canônicas**, que relacionam cada variável à variável canônica de seu próprio bloco;
+- as **cargas cruzadas**, que relacionam cada variável à variável canônica do outro bloco.
+
+Considere o par $j$,
 
 $$
 \mathsf U_j
@@ -1674,8 +2977,22 @@ $$
 \boldsymbol{\mathsf Y}
 -
 \boldsymbol{\mu}_Y
-\right).
+\right),
 $$
+
+normalizado de modo que
+
+$$
+\operatorname{Var}
+(\mathsf U_j)
+=
+\operatorname{Var}
+(\mathsf V_j)
+=
+1.
+$$
+
+### Coeficientes canônicos
 
 Os elementos de
 
@@ -1689,18 +3006,110 @@ $$
 \mathbf b_j
 $$
 
-são os **coeficientes canônicos**. Eles determinam como as variáveis de cada bloco são combinadas para formar $\mathsf U_j$ e $\mathsf V_j$.
+são os **coeficientes canônicos**.
 
-Sua magnitude, entretanto, depende da escala das variáveis e da estrutura de dependência existente dentro de cada bloco. Variáveis fortemente correlacionadas podem distribuir entre si a informação necessária para formar uma mesma variável canônica. Por isso, a interpretação de um par canônico não deve se apoiar exclusivamente na magnitude dos coeficientes.
+Eles determinam diretamente como as variáveis de cada bloco são combinadas para produzir
+
+$$
+\mathsf U_j
+\qquad\text{e}\qquad
+\mathsf V_j.
+$$
+
+Esses coeficientes dependem da escala das variáveis e, principalmente, da estrutura de covariâncias existente dentro de cada bloco.
+
+Quando variáveis de um mesmo conjunto são fortemente associadas, diferentes coeficientes podem compensar-se na construção de uma mesma combinação.
+
+Por isso, a magnitude isolada de um coeficiente não deve ser interpretada como medida direta da associação da correspondente variável com a dimensão canônica.
 
 ### Cargas canônicas
-
-Uma forma complementar de interpretação é examinar a correlação entre cada variável original e a variável canônica construída a partir de seu próprio bloco.
 
 ::: {#def-cargas-canonicas}
 ## Cargas canônicas
 
-A **carga canônica** da variável $\mathsf X_h$ sobre a variável canônica $\mathsf U_j$ é
+Sejam
+
+$$
+\boldsymbol{\mathsf X}\in\mathbb R^p
+\qquad\text{e}\qquad
+\boldsymbol{\mathsf Y}\in\mathbb R^q
+$$
+
+vetores aleatórios com segundos momentos finitos, médias
+
+$$
+\boldsymbol{\mu}_X
+=
+E
+\left(
+\boldsymbol{\mathsf X}
+\right),
+\qquad
+\boldsymbol{\mu}_Y
+=
+E
+\left(
+\boldsymbol{\mathsf Y}
+\right),
+$$
+
+e matrizes de covariâncias
+
+$$
+\boldsymbol{\Sigma}_{XX}
+\succ
+\mathbf0
+\qquad\text{e}\qquad
+\boldsymbol{\Sigma}_{YY}
+\succ
+\mathbf0.
+$$
+
+Considere
+
+$$
+\mathbf a_j\in\mathbb R^p,
+\qquad
+\mathbf b_j\in\mathbb R^q,
+$$
+
+e as variáveis canônicas
+
+$$
+\mathsf U_j
+=
+\mathbf a_j^\top
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_X
+\right),
+$$
+
+$$
+\mathsf V_j
+=
+\mathbf b_j^\top
+\left(
+\boldsymbol{\mathsf Y}
+-
+\boldsymbol{\mu}_Y
+\right),
+$$
+
+normalizadas de modo que
+
+$$
+\operatorname{Var}
+(\mathsf U_j)
+=
+\operatorname{Var}
+(\mathsf V_j)
+=
+1.
+$$
+
+A **carga canônica** da variável $\mathsf X_h$ sobre $\mathsf U_j$ é
 
 $$
 \ell_{hj}^{(X)}
@@ -1714,7 +3123,7 @@ $$
 h=1,\ldots,p.
 $$ {#eq-carga-canonica-x}
 
-Analogamente, a carga da variável $\mathsf Y_k$ sobre $\mathsf V_j$ é
+A carga canônica da variável $\mathsf Y_k$ sobre $\mathsf V_j$ é
 
 $$
 \ell_{kj}^{(Y)}
@@ -1732,14 +3141,26 @@ $$ {#eq-carga-canonica-y}
 Como
 
 $$
-\operatorname{Var}(\mathsf U_j)
-=
-\operatorname{Var}(\mathsf V_j)
+\operatorname{Var}
+(\mathsf U_j)
 =
 1,
 $$
 
-as cargas do primeiro bloco podem ser escritas como
+tem-se
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X},
+\mathsf U_j
+\right)
+=
+\boldsymbol{\Sigma}_{XX}
+\mathbf a_j.
+$$
+
+Consequentemente,
 
 $$
 \ell_{hj}^{(X)}
@@ -1755,10 +3176,10 @@ $$
 \boldsymbol{\Sigma}_{XX}
 \right]_{hh}
 }
-},
+}.
 $$ {#eq-carga-canonica-x-matriz}
 
-e, para o segundo bloco,
+De modo análogo,
 
 $$
 \ell_{kj}^{(Y)}
@@ -1777,9 +3198,29 @@ $$
 }.
 $$ {#eq-carga-canonica-y-matriz}
 
-As cargas descrevem a associação das variáveis originais com a dimensão canônica construída no próprio bloco. Uma carga de grande magnitude indica que a variável está fortemente associada à correspondente variável canônica.
+As cargas são correlações e, portanto,
 
-Coeficientes e cargas respondem, portanto, a perguntas diferentes:
+$$
+-1
+\leq
+\ell_{hj}^{(X)}
+\leq
+1
+$$
+
+e
+
+$$
+-1
+\leq
+\ell_{kj}^{(Y)}
+\leq
+1.
+$$
+
+Uma carga de grande magnitude indica forte associação linear entre a variável original e a variável canônica de seu próprio bloco.
+
+Coeficientes e cargas respondem a perguntas diferentes.
 
 | Quantidade | Pergunta respondida |
 |---|---|
@@ -1788,14 +3229,91 @@ Coeficientes e cargas respondem, portanto, a perguntas diferentes:
 
 : Diferença entre coeficientes e cargas canônicas. {#tbl-coeficientes-cargas-cca}
 
+A distinção é importante porque um coeficiente numericamente pequeno não implica necessariamente carga pequena, e vice-versa.
+
 ### Cargas cruzadas
 
-Também é possível relacionar uma variável original diretamente à variável canônica construída no **outro bloco**.
+Também é possível relacionar uma variável original à variável canônica construída no outro bloco.
 
 ::: {#def-cargas-cruzadas-canonicas}
 ## Cargas cruzadas
 
-As **cargas cruzadas** do par $j$ são
+Sejam
+
+$$
+\boldsymbol{\mathsf X}\in\mathbb R^p
+\qquad\text{e}\qquad
+\boldsymbol{\mathsf Y}\in\mathbb R^q
+$$
+
+vetores aleatórios com segundos momentos finitos e médias
+
+$$
+\boldsymbol{\mu}_X
+=
+E
+\left(
+\boldsymbol{\mathsf X}
+\right),
+\qquad
+\boldsymbol{\mu}_Y
+=
+E
+\left(
+\boldsymbol{\mathsf Y}
+\right).
+$$
+
+Considere o par canônico
+
+$$
+\mathsf U_j
+=
+\mathbf a_j^\top
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_X
+\right),
+\qquad
+\mathsf V_j
+=
+\mathbf b_j^\top
+\left(
+\boldsymbol{\mathsf Y}
+-
+\boldsymbol{\mu}_Y
+\right),
+$$
+
+com
+
+$$
+\operatorname{Var}
+(\mathsf U_j)
+=
+\operatorname{Var}
+(\mathsf V_j)
+=
+1
+$$
+
+e
+
+$$
+\operatorname{Corr}
+(\mathsf U_j,\mathsf V_j)
+=
+\rho_j.
+$$
+
+Para
+
+$$
+h=1,\ldots,p,
+$$
+
+a **carga cruzada** da variável $\mathsf X_h$ sobre a variável canônica do segundo bloco é
 
 $$
 \ell_{hj}^{(X,V)}
@@ -1804,10 +3322,16 @@ $$
 \left(
 \mathsf X_h,
 \mathsf V_j
-\right)
+\right).
 $$
 
-e
+Para
+
+$$
+k=1,\ldots,q,
+$$
+
+a **carga cruzada** da variável $\mathsf Y_k$ sobre a variável canônica do primeiro bloco é
 
 $$
 \ell_{kj}^{(Y,U)}
@@ -1820,7 +3344,7 @@ $$
 $$
 :::
 
-As relações entre os coeficientes canônicos obtidas em @eq-relacao-coeficientes-x-cca e @eq-relacao-coeficientes-y-cca implicam
+A relação
 
 $$
 \boldsymbol{\Sigma}_{XY}
@@ -1828,10 +3352,42 @@ $$
 =
 \rho_j
 \boldsymbol{\Sigma}_{XX}
-\mathbf a_j.
+\mathbf a_j
 $$
 
-Consequentemente,
+implica
+
+$$
+\begin{aligned}
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X},
+\mathsf V_j
+\right)
+&=
+\boldsymbol{\Sigma}_{XY}
+\mathbf b_j
+\\
+&=
+\rho_j
+\boldsymbol{\Sigma}_{XX}
+\mathbf a_j.
+\end{aligned}
+$$
+
+Como
+
+$$
+\operatorname{Var}
+(\mathsf U_j)
+=
+\operatorname{Var}
+(\mathsf V_j)
+=
+1,
+$$
+
+segue que
 
 $$
 \ell_{hj}^{(X,V)}
@@ -1840,7 +3396,7 @@ $$
 \ell_{hj}^{(X)}.
 $$ {#eq-relacao-carga-cruzada-x}
 
-De modo análogo,
+Analogamente,
 
 $$
 \ell_{kj}^{(Y,U)}
@@ -1849,16 +3405,24 @@ $$
 \ell_{kj}^{(Y)}.
 $$ {#eq-relacao-carga-cruzada-y}
 
-As cargas cruzadas combinam, portanto, duas informações:
+As cargas cruzadas incorporam, portanto, dois componentes:
 
-- a associação da variável original com sua própria dimensão canônica;
-- a intensidade da associação entre as duas variáveis canônicas, representada por $\rho_j$.
+- a associação da variável original com a dimensão canônica de seu próprio bloco;
+- a intensidade da associação entre as duas variáveis canônicas, medida por $\rho_j$.
 
-Uma variável pode possuir carga elevada em seu próprio bloco e, ainda assim, carga cruzada moderada quando a correlação canônica do par não é elevada.
+Por isso, uma variável pode possuir carga canônica elevada e carga cruzada moderada quando
+
+$$
+\rho_j
+$$
+
+não é elevado.
 
 ### Associação bivariada e associação canônica
 
-A @fig-associacao-canonica ilustra por que a Correlação Canônica não se reduz ao exame das correlações cruzadas individuais. No exemplo, cada variável dos dois blocos compartilha parte de duas fontes de variação. Nenhum par isolado concentra toda a associação disponível, enquanto as combinações canônicas reúnem essas informações.
+A @fig-associacao-canonica ilustra por que a Correlação Canônica não se reduz ao exame das correlações cruzadas individuais.
+
+No exemplo, cada variável dos dois blocos compartilha parte de duas fontes de variação. Nenhum par isolado concentra toda a associação disponível, enquanto as combinações canônicas podem reunir simultaneamente a informação distribuída entre várias variáveis.
 
 ```{r}
 #| label: fig-associacao-canonica
@@ -1959,11 +3523,13 @@ b1 <- raiz_inversa(
   decomp_cca$v[, 1]
 
 U1 <- as.vector(
-  Xc %*% a1
+  Xc %*%
+    a1
 )
 
 V1 <- as.vector(
-  Yc %*% b1
+  Yc %*%
+    b1
 )
 
 Rxy <- cor(
@@ -1990,30 +3556,30 @@ dados_individual <- data.frame(
   eixo_y =
     Y[, indice[2]],
   painel = paste0(
-  "Maior correlação individual: |r| = ",
-  formatC(
-    abs(
-      r_individual
-    ),
-    format = "f",
-    digits = 2,
-    decimal.mark = ","
+    "Maior correlação individual: |r| = ",
+    formatC(
+      abs(
+        r_individual
+      ),
+      format = "f",
+      digits = 2,
+      decimal.mark = ","
+    )
   )
-)
 )
 
 dados_canonico <- data.frame(
   eixo_x = U1,
   eixo_y = V1,
   painel = paste0(
-  "Primeiro par canônico: rho1 = ",
-  formatC(
-    decomp_cca$d[1],
-    format = "f",
-    digits = 2,
-    decimal.mark = ","
+    "Primeiro par canônico: rho1 = ",
+    formatC(
+      decomp_cca$d[1],
+      format = "f",
+      digits = 2,
+      decimal.mark = ","
+    )
   )
-)
 )
 
 dados_figura <- rbind(
@@ -2050,27 +3616,41 @@ ggplot(
   )
 ```
 
-O painel da esquerda utiliza o par de variáveis originais com maior correlação cruzada em módulo. O painel da direita utiliza as duas combinações que maximizam a correlação entre os blocos. O aumento da associação decorre da possibilidade de reunir simultaneamente informação distribuída por várias variáveis.
+O painel da esquerda utiliza o par de variáveis originais com maior correlação cruzada em módulo.
 
-A Correlação Canônica não cria uma associação ausente nos dados. Ela identifica as combinações lineares em que a associação representada por $\boldsymbol{\Sigma}_{XY}$ se manifesta com maior intensidade relativamente às estruturas internas dos dois blocos.
+O painel da direita utiliza as combinações que maximizam a correlação entre os blocos.
+
+O aumento da associação decorre da possibilidade de combinar informação distribuída entre várias variáveis.
+
+A Correlação Canônica não cria uma associação ausente nos dados. Ela procura as combinações lineares em que a associação representada por
+
+$$
+\boldsymbol{\Sigma}_{XY}
+$$
+
+se manifesta com maior intensidade relativamente às estruturas internas dos dois blocos.
 
 ## Variância extraída e redundância
 
-Uma correlação canônica elevada descreve forte associação entre
+A correlação canônica
+
+$$
+\rho_j
+$$
+
+mede a intensidade da associação entre
 
 $$
 \mathsf U_j
-$$
-
-e
-
-$$
+\qquad\text{e}\qquad
 \mathsf V_j.
 $$
 
-Isso não significa automaticamente que essas duas variáveis canônicas representem grande parte das variáveis originais de seus respectivos blocos.
+Entretanto, ela não informa quanto cada variável canônica representa as variáveis originais de seu próprio bloco.
 
-As cargas canônicas fornecem uma medida resumida dessa representação.
+Para descrever esse segundo aspecto, podem ser utilizadas as cargas canônicas.
+
+### Variância extraída
 
 Para o primeiro bloco, defina
 
@@ -2084,7 +3664,7 @@ VE_{X,j}
 \right)^2.
 $$ {#eq-variancia-extraida-x-cca}
 
-Para o segundo,
+Para o segundo bloco,
 
 $$
 VE_{Y,j}
@@ -2096,11 +3676,35 @@ VE_{Y,j}
 \right)^2.
 $$ {#eq-variancia-extraida-y-cca}
 
-Essas quantidades representam a média das proporções de variância das variáveis padronizadas de cada bloco associadas à correspondente variável canônica.
+Como cada carga é uma correlação, seu quadrado representa a proporção da variância da correspondente variável padronizada associada linearmente à variável canônica considerada.
 
-Uma medida complementar pergunta quanto dessa representação também está associada ao outro bloco.
+Assim,
 
-Como as cargas cruzadas satisfazem
+$$
+VE_{X,j}
+$$
+
+e
+
+$$
+VE_{Y,j}
+$$
+
+são médias dessas proporções dentro de cada bloco.
+
+Essas quantidades não são determinadas apenas por
+
+$$
+\rho_j.
+$$
+
+Duas variáveis canônicas podem possuir correlação elevada entre si e, ainda assim, apresentar cargas pequenas em muitas das variáveis originais.
+
+### Índice de redundância
+
+As cargas cruzadas permitem combinar a representação interna de um bloco com a associação canônica entre os blocos.
+
+Como
 
 $$
 \ell_{hj}^{(X,V)}
@@ -2109,22 +3713,36 @@ $$
 \ell_{hj}^{(X)},
 $$
 
-a média de seus quadrados é
+tem-se
 
 $$
 \begin{aligned}
-Red_{X\mid Y,j}
-&=
-\frac{1}{p}
+\frac1p
 \sum_{h=1}^{p}
 \left(
 \ell_{hj}^{(X,V)}
+\right)^2
+&=
+\frac1p
+\sum_{h=1}^{p}
+\rho_j^2
+\left(
+\ell_{hj}^{(X)}
 \right)^2
 \\
 &=
 VE_{X,j}
 \rho_j^2.
 \end{aligned}
+$$
+
+Define-se, portanto,
+
+$$
+Red_{X\mid Y,j}
+=
+VE_{X,j}
+\rho_j^2.
 $$ {#eq-redundancia-x-cca}
 
 Analogamente,
@@ -2136,20 +3754,24 @@ VE_{Y,j}
 \rho_j^2.
 $$ {#eq-redundancia-y-cca}
 
-Essas medidas são chamadas **índices de redundância**.
+Os índices de redundância distinguem duas informações:
 
-Elas distinguem dois aspectos:
+- $VE_{X,j}$ ou $VE_{Y,j}$ resume quanto a dimensão canônica representa, em média, as variáveis padronizadas do próprio bloco;
+- $\rho_j^2$ incorpora quanto essa dimensão está linearmente associada à dimensão correspondente do outro bloco.
 
-- $\rho_j^2$ mede a intensidade da associação entre as duas variáveis canônicas;
-- $VE_{X,j}$ e $VE_{Y,j}$ medem quanto as respectivas variáveis canônicas representam, em média, as variáveis padronizadas dos próprios blocos.
+A redundância não deve ser interpretada como efeito causal nem como coeficiente geral de determinação entre os dois vetores aleatórios.
 
-Por isso, uma correlação canônica elevada pode coexistir com redundância pequena. Isso ocorre quando duas combinações lineares estão fortemente correlacionadas, mas cada uma delas representa uma parcela pequena da variabilidade das variáveis originais de seu bloco.
+Ela é uma medida descritiva construída a partir das cargas e da correlação de um par canônico específico.
 
-Neste capítulo, variância extraída e redundância são utilizadas apenas como ferramentas conceituais de interpretação. Critérios operacionais para selecionar pares canônicos ou avaliar estabilidade pertencem à etapa metodológica posterior.
+Uma correlação canônica elevada pode coexistir com redundância baixa se as duas combinações estiverem fortemente associadas entre si, mas representarem apenas uma parcela pequena das variáveis originais.
+
+Neste capítulo, variância extraída e redundância são utilizadas apenas em nível conceitual. Critérios operacionais para julgar magnitudes, selecionar pares ou avaliar estabilidade serão tratados posteriormente.
 
 ### Correlação canônica e ângulo
 
-A interpretação geométrica de @eq-angulos-canonicos é ilustrada na @fig-angulos-canonicos. Depois que as estruturas internas dos dois blocos são incorporadas pelo branqueamento, as correlações canônicas podem ser interpretadas como cossenos de ângulos principais.
+A interpretação de @eq-angulos-canonicos é ilustrada na @fig-angulos-canonicos.
+
+Depois que as estruturas internas dos dois blocos são incorporadas pelo branqueamento, as correlações canônicas podem ser interpretadas como cossenos de ângulos principais entre os subespaços gerados pelos dois conjuntos.
 
 ```{r}
 #| label: fig-angulos-canonicos
@@ -2271,11 +3893,11 @@ ggplot() +
     ),
     linewidth = 1,
     arrow = grid::arrow(
-  length = grid::unit(
-    0.15,
-    "cm"
-  )
-)
+      length = grid::unit(
+        0.15,
+        "cm"
+      )
+    )
   ) +
   facet_wrap(
     ~ painel
@@ -2306,13 +3928,48 @@ ggplot() +
   )
 ```
 
-Cada painel representa, em um plano auxiliar, duas direções unitárias com o mesmo ângulo que o correspondente par de direções principais. Quando $\rho_j$ aumenta, $\theta_j$ diminui e o alinhamento entre as duas dimensões canônicas torna-se maior.
+Cada painel representa, em um plano auxiliar, duas direções unitárias cujo produto interno é
 
-A figura não identifica diretamente os espaços de coeficientes $\mathbb R^p$ e $\mathbb R^q$. O ângulo refere-se aos subespaços de variáveis aleatórias centradas definidos anteriormente, ou, na formulação amostral, aos subespaços correspondentes no espaço das observações.
+$$
+\rho.
+$$
+
+Como
+
+$$
+\rho
+=
+\cos\theta,
+$$
+
+correlações maiores correspondem a ângulos menores.
+
+A figura é apenas uma representação bidimensional da relação angular. Os ângulos principais da CCA são definidos entre
+
+$$
+\mathcal H_X
+\qquad\text{e}\qquad
+\mathcal H_Y
+$$
+
+no espaço
+
+$$
+L_0^2,
+$$
+
+e não entre os espaços de coeficientes
+
+$$
+\mathbb R^p
+\qquad\text{e}\qquad
+\mathbb R^q.
+$$
 
 ## Formulação amostral
 
-A formulação populacional depende de
+
+A solução populacional depende das matrizes
 
 $$
 \boldsymbol{\Sigma}_{XX},
@@ -2322,7 +3979,45 @@ $$
 \boldsymbol{\Sigma}_{YY}.
 $$
 
-Em uma amostra de $n$ unidades observadas simultaneamente nos dois blocos, sejam
+No Módulo 2, as matrizes de covariâncias amostrais foram distinguidas de suas realizações observadas. Antes da observação dos dados,
+
+$$
+\boldsymbol{\mathsf S}_{XX},
+\qquad
+\boldsymbol{\mathsf S}_{XY},
+\qquad
+\boldsymbol{\mathsf S}_{YY}
+$$
+
+são estatísticas aleatórias utilizadas para estimar
+
+$$
+\boldsymbol{\Sigma}_{XX},
+\qquad
+\boldsymbol{\Sigma}_{XY},
+\qquad
+\boldsymbol{\Sigma}_{YY}.
+$$
+
+Nesta seção,
+
+$$
+\mathbf S_{XX},
+\qquad
+\mathbf S_{XY},
+\qquad
+\mathbf S_{YY}
+$$
+
+denotarão suas realizações após a observação da amostra. As correlações, coeficientes e escores canônicos apresentados a seguir serão, portanto, quantidades calculadas a partir dos dados observados.
+
+Em uma amostra de
+
+$$
+n\geq2
+$$
+
+unidades observadas simultaneamente nos dois blocos, organize os dados nas matrizes
 
 $$
 \mathbf X
@@ -2335,99 +4030,8 @@ e
 $$
 \mathbf Y
 \in
-\mathbb R^{n\times q}
+\mathbb R^{n\times q}.
 $$
-
-as matrizes observadas.
-
-A matriz de covariâncias cruzadas amostral
-
-$$
-\mathbf S_{XY}
-$$
-
-já foi definida em @def-covariancia-cruzada-amostral. Em conjunto com
-
-$$
-\mathbf S_{XX}
-$$
-
-e
-
-$$
-\mathbf S_{YY},
-$$
-
-ela produz a matriz de associação branqueada amostral
-
-$$
-\widehat{\mathbf K}_{\mathrm{CCA}}
-=
-\mathbf S_{XX}^{-1/2}
-\mathbf S_{XY}
-\mathbf S_{YY}^{-1/2}.
-$$ {#eq-k-amostral-cca}
-
-Quando
-
-$$
-\mathbf S_{XX}\succ\mathbf0
-$$
-
-e
-
-$$
-\mathbf S_{YY}\succ\mathbf0,
-$$
-
-aplica-se a SVD
-
-$$
-\widehat{\mathbf K}_{\mathrm{CCA}}
-=
-\widehat{\mathbf L}
-\widehat{\mathbf D}_{\rho}
-\widehat{\mathbf R}^{\top},
-$$ {#eq-svd-amostral-cca}
-
-com
-
-$$
-\widehat{\mathbf D}_{\rho}
-=
-\operatorname{diag}
-\left(
-\widehat\rho_1,
-\ldots,
-\widehat\rho_r
-\right).
-$$
-
-Os valores
-
-$$
-\widehat\rho_j
-$$
-
-são as correlações canônicas amostrais.
-
-Os coeficientes estimados são
-
-$$
-\widehat{\mathbf a}_j
-=
-\mathbf S_{XX}^{-1/2}
-\widehat{\mathbf l}_j
-$$ {#eq-coeficiente-amostral-x-cca}
-
-e
-
-$$
-\widehat{\mathbf b}_j
-=
-\mathbf S_{YY}^{-1/2}
-\widehat{\mathbf r}_j.
-$$ {#eq-coeficiente-amostral-y-cca}
 
 Se
 
@@ -2441,13 +4045,231 @@ $$
 \mathbf Y_c
 $$
 
-são as matrizes centralizadas, os escores canônicos amostrais são
+denotam as correspondentes matrizes centralizadas, então
+
+$$
+\mathbf S_{XX}
+=
+\frac1{n-1}
+\mathbf X_c^\top
+\mathbf X_c,
+$$
+
+$$
+\mathbf S_{YY}
+=
+\frac1{n-1}
+\mathbf Y_c^\top
+\mathbf Y_c
+$$
+
+e
+
+$$
+\mathbf S_{XY}
+=
+\frac1{n-1}
+\mathbf X_c^\top
+\mathbf Y_c.
+$$
+
+A matriz
+
+$$
+\mathbf S_{XY}
+\in
+\mathbb R^{p\times q}
+$$
+
+é a covariância cruzada observada definida em @def-covariancia-cruzada-observada. Sua contraparte como estatística aleatória,
+
+$$
+\boldsymbol{\mathsf S}_{XY},
+$$
+
+foi definida em @def-covariancia-cruzada-amostral.
+
+Na formulação amostral clássica, suponha
+
+$$
+\mathbf S_{XX}
+\succ
+\mathbf0
+$$
+
+e
+
+$$
+\mathbf S_{YY}
+\succ
+\mathbf0.
+$$
+
+Define-se então
+
+$$
+\widehat{\mathbf K}_{\mathrm{CCA}}
+=
+\mathbf S_{XX}^{-1/2}
+\mathbf S_{XY}
+\mathbf S_{YY}^{-1/2}
+\in
+\mathbb R^{p\times q}.
+$$ {#eq-k-amostral-cca}
+
+Se
+
+$$
+m
+=
+\min(p,q),
+$$
+
+escreva a decomposição
+
+$$
+\widehat{\mathbf K}_{\mathrm{CCA}}
+=
+\widehat{\mathbf L}
+\widehat{\mathbf D}_{\rho}
+\widehat{\mathbf R}^{\top},
+$$ {#eq-svd-amostral-cca}
+
+em que
+
+$$
+\widehat{\mathbf L}
+\in
+\mathbb R^{p\times m},
+$$
+
+$$
+\widehat{\mathbf R}
+\in
+\mathbb R^{q\times m}
+$$
+
+possuem colunas ortonormais e
+
+$$
+\widehat{\mathbf D}_{\rho}
+=
+\operatorname{diag}
+\left(
+\widehat\rho_1,
+\ldots,
+\widehat\rho_m
+\right),
+$$
+
+com
+
+$$
+1
+\geq
+\widehat\rho_1
+\geq
+\cdots
+\geq
+\widehat\rho_m
+\geq
+0.
+$$
+
+Os valores
+
+$$
+\widehat\rho_j
+$$
+
+são as **correlações canônicas amostrais**.
+
+Como as duas matrizes utilizadas no branqueamento são invertíveis,
+
+$$
+\operatorname{posto}
+\left(
+\widehat{\mathbf K}_{\mathrm{CCA}}
+\right)
+=
+\operatorname{posto}
+\left(
+\mathbf S_{XY}
+\right).
+$$
+
+Defina
+
+$$
+\widehat r_C
+=
+\operatorname{posto}
+\left(
+\mathbf S_{XY}
+\right).
+$$
+
+Então exatamente
+
+$$
+\widehat r_C
+$$
+
+correlações canônicas amostrais são positivas.
+
+Os coeficientes canônicos amostrais são
+
+$$
+\widehat{\mathbf a}_j
+=
+\mathbf S_{XX}^{-1/2}
+\widehat{\mathbf l}_j,
+$$ {#eq-coeficiente-amostral-x-cca}
+
+e
+
+$$
+\widehat{\mathbf b}_j
+=
+\mathbf S_{YY}^{-1/2}
+\widehat{\mathbf r}_j,
+$$ {#eq-coeficiente-amostral-y-cca}
+
+para
+
+$$
+j=1,\ldots,m.
+$$
+
+Eles satisfazem
+
+$$
+\widehat{\mathbf a}_j^\top
+\mathbf S_{XX}
+\widehat{\mathbf a}_\ell
+=
+\delta_{j\ell}
+$$
+
+e
+
+$$
+\widehat{\mathbf b}_j^\top
+\mathbf S_{YY}
+\widehat{\mathbf b}_\ell
+=
+\delta_{j\ell}.
+$$
+
+Os escores canônicos observados são
 
 $$
 \widehat{\mathbf u}_j
 =
 \mathbf X_c
 \widehat{\mathbf a}_j
+\in
+\mathbb R^n
 $$ {#eq-escores-amostrais-x-cca}
 
 e
@@ -2456,32 +4278,152 @@ $$
 \widehat{\mathbf v}_j
 =
 \mathbf Y_c
-\widehat{\mathbf b}_j.
+\widehat{\mathbf b}_j
+\in
+\mathbb R^n.
 $$ {#eq-escores-amostrais-y-cca}
 
-Cada vetor contém os escores das $n$ unidades na correspondente dimensão canônica.
-
-A solução amostral substitui, portanto, os momentos populacionais por suas estimativas e conserva a mesma estrutura matemática:
+Como
 
 $$
-\text{covariância em blocos}
-\quad
-\text{branqueamento}
-\quad
-\text{SVD}
-\quad
-\text{pares canônicos}.
+\mathbf S_{XX}
+=
+\frac1{n-1}
+\mathbf X_c^\top
+\mathbf X_c,
 $$
 
-As correlações amostrais estimam as correlações canônicas populacionais. Sua variabilidade amostral, seus vieses em pequenas amostras e os testes sobre sua significância pertencem à teoria inferencial posterior.
+tem-se
+
+$$
+\frac1{n-1}
+\widehat{\mathbf u}_j^\top
+\widehat{\mathbf u}_\ell
+=
+\delta_{j\ell}.
+$$
+
+Analogamente,
+
+$$
+\frac1{n-1}
+\widehat{\mathbf v}_j^\top
+\widehat{\mathbf v}_\ell
+=
+\delta_{j\ell}.
+$$
+
+Além disso,
+
+$$
+\begin{aligned}
+\frac1{n-1}
+\widehat{\mathbf u}_j^\top
+\widehat{\mathbf v}_\ell
+&=
+\widehat{\mathbf a}_j^\top
+\mathbf S_{XY}
+\widehat{\mathbf b}_\ell
+\\
+&=
+\widehat\rho_j
+\delta_{j\ell}.
+\end{aligned}
+$$
+
+Portanto, os escores do mesmo par possuem correlação amostral
+
+$$
+\widehat\rho_j,
+$$
+
+enquanto escores pertencentes a pares canônicos distintos são não correlacionados segundo a estrutura construída pela solução.
+
+### População e amostra
+
+A distinção entre os dois níveis deve ser mantida.
+
+Na população, a técnica é determinada por
+
+$$
+\boldsymbol{\Sigma}_{XX},
+\qquad
+\boldsymbol{\Sigma}_{XY},
+\qquad
+\boldsymbol{\Sigma}_{YY},
+$$
+
+e produz
+
+$$
+\rho_j,
+\qquad
+\mathbf a_j,
+\qquad
+\mathbf b_j.
+$$
+
+Na amostra observada, utilizam-se
+
+$$
+\mathbf S_{XX},
+\qquad
+\mathbf S_{XY},
+\qquad
+\mathbf S_{YY},
+$$
+
+obtendo
+
+$$
+\widehat\rho_j,
+\qquad
+\widehat{\mathbf a}_j,
+\qquad
+\widehat{\mathbf b}_j.
+$$
+
+Antes da observação dos dados, a aplicação da mesma construção às matrizes aleatórias
+
+$$
+\boldsymbol{\mathsf S}_{XX},
+\qquad
+\boldsymbol{\mathsf S}_{XY},
+\qquad
+\boldsymbol{\mathsf S}_{YY}
+$$
+
+produz estatísticas aleatórias.
+
+Nesta seção,
+
+$$
+\widehat\rho_j,
+\qquad
+\widehat{\mathbf a}_j,
+\qquad
+\widehat{\mathbf b}_j
+$$
+
+denotam suas realizações após a observação da amostra e são utilizadas como estimativas das estruturas canônicas populacionais, respeitadas as condições de identificação das raízes e dos subespaços canônicos.
+
+A forma matemática da solução permanece a mesma: primeiro são consideradas as estruturas internas dos dois blocos, depois a covariância cruzada é expressa nas geometrias branqueadas e, finalmente, a SVD identifica as associações lineares máximas.
+
+A existência dessas operações na população e na amostra, bem como a identificação das direções quando existem raízes repetidas, serão examinadas a seguir.
 
 ## Invariância, existência e identificação
 
+A formulação clássica da Correlação Canônica utiliza inversas e raízes quadradas inversas das matrizes de covariâncias intrablocos. Por isso, antes de interpretar coeficientes e correlações canônicas, é necessário distinguir três questões:
+
+- quais mudanças de representação preservam a solução;
+- quando a solução clássica existe;
+- quais elementos da solução são identificados unicamente.
+
 ### Invariância a transformações lineares não singulares
 
-Uma característica estrutural da CCA é sua invariância a mudanças invertíveis de coordenadas realizadas separadamente dentro de cada bloco.
+Uma propriedade estrutural importante da CCA é que as correlações canônicas não dependem da base utilizada para representar cada bloco, desde que a mudança de coordenadas seja invertível.
 
-Considere
+Considere transformações
 
 $$
 \boldsymbol{\mathsf X}^{\dagger}
@@ -2512,30 +4454,144 @@ e
 $$
 \mathbf Q
 \in
-\mathbb R^{q\times q}
+\mathbb R^{q\times q}.
 $$
 
-são não singulares.
+Quando
+
+$$
+\mathbf P
+$$
+
+e
+
+$$
+\mathbf Q
+$$
+
+são não singulares, cada transformação apenas fornece uma nova base para o mesmo espaço de combinações lineares do respectivo bloco.
 
 ::: {#prp-invariancia-correlacoes-canonicas}
 ## Invariância das correlações canônicas
 
-Transformações lineares não singulares realizadas separadamente em cada bloco preservam as correlações canônicas.
+Sejam
+
+$$
+\boldsymbol{\mathsf X}
+\in
+\mathbb R^p
+\qquad\text{e}\qquad
+\boldsymbol{\mathsf Y}
+\in
+\mathbb R^q
+$$
+
+vetores aleatórios com segundos momentos finitos e matrizes de covariâncias
+
+$$
+\boldsymbol{\Sigma}_{XX}
+\succ
+\mathbf0
+\qquad\text{e}\qquad
+\boldsymbol{\Sigma}_{YY}
+\succ
+\mathbf0.
+$$
+
+Considere matrizes não singulares
+
+$$
+\mathbf P
+\in
+\mathbb R^{p\times p}
+$$
+
+e
+
+$$
+\mathbf Q
+\in
+\mathbb R^{q\times q},
+$$
+
+e defina
+
+$$
+\boldsymbol{\mathsf X}^{\dagger}
+=
+\mathbf P
+\boldsymbol{\mathsf X},
+\qquad
+\boldsymbol{\mathsf Y}^{\dagger}
+=
+\mathbf Q
+\boldsymbol{\mathsf Y}.
+$$
+
+Então
+
+$$
+\left(
+\boldsymbol{\mathsf X},
+\boldsymbol{\mathsf Y}
+\right)
+$$
+
+e
+
+$$
+\left(
+\boldsymbol{\mathsf X}^{\dagger},
+\boldsymbol{\mathsf Y}^{\dagger}
+\right)
+$$
+
+possuem as mesmas correlações canônicas, incluindo suas multiplicidades.
 :::
 
 ::: {.proof}
-Como $\mathbf P$ é não singular, toda combinação linear do bloco transformado pode ser escrita como
+Como
+
+$$
+E
+\left(
+\boldsymbol{\mathsf X}^{\dagger}
+\right)
+=
+\mathbf P
+\boldsymbol{\mu}_X,
+$$
+
+as combinações lineares centradas do bloco transformado são
 
 $$
 \mathbf a_{\dagger}^{\top}
+\left(
 \boldsymbol{\mathsf X}^{\dagger}
+-
+E(
+\boldsymbol{\mathsf X}^{\dagger}
+)
+\right)
 =
 \mathbf a_{\dagger}^{\top}
 \mathbf P
-\boldsymbol{\mathsf X}.
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_X
+\right).
 $$
 
-Para qualquer vetor $\mathbf a$ do sistema original, escolha
+Para qualquer
+
+$$
+\mathbf a
+\in
+\mathbb R^p,
+$$
+
+escolha
 
 $$
 \mathbf a_{\dagger}
@@ -2544,31 +4600,86 @@ $$
 \mathbf a.
 $$
 
-Então,
+Então
 
 $$
 \mathbf a_{\dagger}^{\top}
+\left(
 \boldsymbol{\mathsf X}^{\dagger}
+-
+E(
+\boldsymbol{\mathsf X}^{\dagger}
+)
+\right)
 =
 \mathbf a^\top
-\boldsymbol{\mathsf X}.
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_X
+\right).
 $$
 
-Portanto, o conjunto de todas as combinações lineares possíveis do primeiro bloco é preservado pela transformação. O mesmo argumento vale para o segundo bloco usando
+Como
+
+$$
+\mathbf P
+$$
+
+é não singular, a correspondência
+
+$$
+\mathbf a
+\longleftrightarrow
+\mathbf a_{\dagger}
+$$
+
+é bijetiva. Portanto, o conjunto de todas as combinações lineares centradas possíveis do primeiro bloco é preservado.
+
+Analogamente, com
 
 $$
 \mathbf b_{\dagger}
 =
 \mathbf Q^{-\top}
-\mathbf b.
+\mathbf b,
 $$
 
-Como o conjunto de pares de combinações possíveis permanece o mesmo, os máximos sucessivos de suas correlações também permanecem os mesmos.
+tem-se
+
+$$
+\mathbf b_{\dagger}^{\top}
+\left(
+\boldsymbol{\mathsf Y}^{\dagger}
+-
+E(
+\boldsymbol{\mathsf Y}^{\dagger}
+)
+\right)
+=
+\mathbf b^\top
+\left(
+\boldsymbol{\mathsf Y}
+-
+\boldsymbol{\mu}_Y
+\right).
+$$
+
+Assim, os dois problemas possuem exatamente os mesmos pares possíveis de variáveis lineares centradas. Consequentemente, os máximos sucessivos de suas correlações são iguais.
 :::
 
-Reescalonar uma ou mais variáveis por constantes não nulas é um caso particular dessa propriedade.
+A invariância inclui, como casos particulares:
 
-Consequentemente, realizar a CCA utilizando variáveis padronizadas não altera as correlações canônicas quando os desvios-padrão são positivos. O que muda são os coeficientes utilizados para expressar as variáveis canônicas na escala escolhida.
+- mudanças de unidades;
+- reescalonamentos por constantes não nulas;
+- rotações;
+- mudanças invertíveis de base dentro de cada bloco.
+
+Além disso, adicionar constantes às variáveis não altera a CCA, porque as combinações são construídas a partir dos vetores centralizados.
+
+Portanto, padronizar as variáveis por desvios-padrão positivos não altera as correlações canônicas.
+
+O que se modifica são os coeficientes utilizados para expressar as mesmas combinações na nova base.
 
 Se
 
@@ -2576,28 +4687,31 @@ $$
 \mathbf a_j
 $$
 
-é um vetor de coeficientes no sistema original, no sistema transformado o vetor correspondente é
+é um vetor de coeficientes no sistema original, então o vetor correspondente no sistema transformado é
 
 $$
 \mathbf a_j^{\dagger}
 =
 \mathbf P^{-\top}
 \mathbf a_j.
+$$ {#eq-transformacao-coeficientes-x-cca}
+
+Analogamente,
+
 $$
+\mathbf b_j^{\dagger}
+=
+\mathbf Q^{-\top}
+\mathbf b_j.
+$$ {#eq-transformacao-coeficientes-y-cca}
 
-Assim, os valores
+Por isso, as correlações canônicas descrevem a associação entre os **espaços lineares gerados pelos blocos**, enquanto os coeficientes dependem das coordenadas utilizadas para representar esses espaços.
 
-$$
-\rho_j
-$$
+Essa distinção também explica por que coeficientes canônicos obtidos em escalas diferentes não devem ser comparados diretamente como medidas absolutas de importância.
 
-descrevem propriedades da associação entre os espaços lineares gerados pelos blocos, enquanto os coeficientes dependem da representação escolhida para esses espaços.
+## Existência da solução clássica
 
-Essa distinção também explica por que coeficientes calculados com variáveis em unidades diferentes não devem ser comparados diretamente como medidas absolutas de importância.
-
-### Existência da solução clássica
-
-A construção por branqueamento pressupõe
+Na população, a construção por branqueamento exige
 
 $$
 \boldsymbol{\Sigma}_{XX}
@@ -2616,36 +4730,127 @@ $$
 Essas condições garantem a existência de
 
 $$
-\boldsymbol{\Sigma}_{XX}^{-1/2}
+\boldsymbol{\Sigma}_{XX}^{-1},
+\qquad
+\boldsymbol{\Sigma}_{YY}^{-1},
 $$
 
-e
+e de
 
 $$
+\boldsymbol{\Sigma}_{XX}^{-1/2},
+\qquad
 \boldsymbol{\Sigma}_{YY}^{-1/2}.
 $$
 
-Se uma combinação linear não nula das variáveis de um bloco possui variância zero, a correspondente matriz de covariâncias é singular e a formulação clássica deixa de estar definida nessa representação.
-
-Na amostra,
+Se existir
 
 $$
-\operatorname{rank}
-(\mathbf S_{XX})
+\mathbf a\neq\mathbf0
+$$
+
+tal que
+
+$$
+\mathbf a^\top
+\boldsymbol{\Sigma}_{XX}
+\mathbf a
+=
+0,
+$$
+
+então a combinação
+
+$$
+\mathbf a^\top
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_X
+\right)
+$$
+
+possui variância zero e o primeiro bloco contém uma dependência linear populacional exata.
+
+Nesse caso,
+
+$$
+\boldsymbol{\Sigma}_{XX}
+$$
+
+é singular.
+
+O mesmo argumento vale para
+
+$$
+\boldsymbol{\Sigma}_{YY}.
+$$
+
+A formulação clássica apresentada neste capítulo pressupõe que essas redundâncias exatas não estejam presentes na representação adotada.
+
+### Existência na amostra
+
+Para uma amostra de tamanho
+
+$$
+n,
+$$
+
+as matrizes centralizadas satisfazem
+
+$$
+\operatorname{posto}
+\left(
+\mathbf X_c
+\right)
 \leq
 \min(p,n-1)
-$$ {#eq-posto-sxx-cca}
+$$
 
 e
 
 $$
-\operatorname{rank}
-(\mathbf S_{YY})
+\operatorname{posto}
+\left(
+\mathbf Y_c
+\right)
+\leq
+\min(q,n-1).
+$$
+
+Como
+
+$$
+\mathbf S_{XX}
+=
+\frac1{n-1}
+\mathbf X_c^\top
+\mathbf X_c,
+$$
+
+tem-se
+
+$$
+\operatorname{posto}
+\left(
+\mathbf S_{XX}
+\right)
+\leq
+\min(p,n-1).
+$$ {#eq-posto-sxx-cca}
+
+Analogamente,
+
+$$
+\operatorname{posto}
+\left(
+\mathbf S_{YY}
+\right)
 \leq
 \min(q,n-1).
 $$ {#eq-posto-syy-cca}
 
-Assim,
+Consequentemente,
 
 $$
 n-1
@@ -2661,155 +4866,65 @@ n-1
 q
 $$ {#eq-condicoes-dimensionais-cca}
 
-são condições necessárias para que as duas matrizes amostrais possam ter posto completo.
-
-Essas desigualdades não são suficientes quando existem dependências lineares exatas entre as variáveis.
-
-### Multicolinearidade
-
-Mesmo quando as matrizes são formalmente invertíveis, autovalores muito pequenos de
+são condições necessárias para que
 
 $$
 \mathbf S_{XX}
 $$
 
-ou
+e
 
 $$
 \mathbf S_{YY}
 $$
 
-tornam suas inversas e raízes inversas sensíveis a pequenas perturbações.
+possam possuir posto completo.
 
-Nesse caso, os coeficientes
+Essas condições não são suficientes para um conjunto de dados arbitrário.
 
-$$
-\widehat{\mathbf a}_j
-$$
-
-e
+Mesmo quando
 
 $$
-\widehat{\mathbf b}_j
-$$
-
-podem variar consideravelmente entre amostras próximas, ainda que as combinações canônicas resultantes sejam mais estáveis.
-
-A formulação clássica desenvolvida neste capítulo pressupõe matrizes suficientemente bem condicionadas para que a solução espectral seja interpretável. Regularização, CCA esparsa e procedimentos específicos para alta dimensão modificam essa formulação e serão tratados em etapas metodológicas posteriores.
-
-### Identificação das direções canônicas
-
-As correlações canônicas são determinadas pelos valores singulares de
-
-$$
-\mathbf K_{\mathrm{CCA}}.
-$$
-
-As direções associadas apresentam as indeterminações usuais da SVD.
-
-Se
-
-$$
-\rho_j
-$$
-
-é um valor singular positivo e simples, os vetores
-
-$$
-\mathbf l_j
-$$
-
-e
-
-$$
-\mathbf r_j
-$$
-
-podem ser substituídos simultaneamente por
-
-$$
--\mathbf l_j
-$$
-
-e
-
-$$
--\mathbf r_j
-$$
-
-sem alterar
-
-$$
-\rho_j.
-$$
-
-Consequentemente,
-
-$$
-(\mathbf a_j,\mathbf b_j)
-$$
-
-e
-
-$$
-(-\mathbf a_j,-\mathbf b_j)
-$$
-
-definem o mesmo par canônico, com orientação invertida nos dois eixos.
-
-Quando um valor singular possui multiplicidade maior que $1$, as direções individuais associadas não são únicas. Diferentes bases ortonormais podem representar o mesmo subespaço singular.
-
-Nesse caso, o objeto identificado é o par de **subespaços canônicos** associado ao valor singular repetido, e não uma orientação particular de seus eixos.
-
-## Pressupostos e limites
-
-A formulação da Correlação Canônica utiliza principalmente momentos de segunda ordem. Suas condições algébricas precisam ser distinguidas das condições utilizadas para inferência.
-
-### Existência de segundos momentos
-
-As matrizes
-
-$$
-\boldsymbol{\Sigma}_{XX},
-\qquad
-\boldsymbol{\Sigma}_{XY},
-\qquad
-\boldsymbol{\Sigma}_{YY}
-$$
-
-precisam existir.
-
-A técnica descreve associações lineares representadas por essas covariâncias. Dependências não lineares que não se manifestam nos segundos momentos podem não ser capturadas pelas correlações canônicas.
-
-### Não singularidade dentro dos blocos
-
-A solução clássica por branqueamento requer matrizes de covariâncias intrablocos positivas definidas.
-
-Dependências lineares exatas reduzem a dimensão efetiva do bloco e impedem a utilização direta das inversas.
-
-### Normalidade
-
-A normalidade multivariada conjunta não é necessária para definir
-
-$$
-\rho_j,
-\qquad
-\mathbf a_j
+n-1\geq p
 \qquad\text{e}\qquad
-\mathbf b_j.
+n-1\geq q,
 $$
 
-A formulação populacional depende das matrizes de covariâncias e, portanto, pode ser construída para distribuições não normais que possuam segundos momentos adequados.
+relações lineares exatas entre as variáveis de um bloco podem tornar sua matriz de covariâncias singular.
 
-A normalidade conjunta passa a desempenhar papel adicional quando se pretende realizar a inferência clássica sobre as correlações canônicas, testar a independência entre os blocos ou derivar distribuições de referência.
+Quando
 
-Esses procedimentos inferenciais não serão desenvolvidos neste capítulo.
+$$
+p>n-1
+$$
 
-### Dimensão amostral
+ou
 
-Quando $p$ ou $q$ se aproximam de $n$, as matrizes amostrais podem tornar-se mal condicionadas mesmo antes de perderem posto.
+$$
+q>n-1,
+$$
 
-Há ainda uma consequência geométrica específica da Correlação Canônica. As colunas das matrizes centralizadas
+a singularidade é inevitável e a formulação clássica baseada nas inversas das matrizes amostrais não pode ser utilizada diretamente.
+
+Pseudoinversas, regularização e versões da CCA destinadas a situações de alta dimensão constituem formulações adicionais e não serão desenvolvidas neste capítulo.
+
+### Dimensão conjunta e correlações amostrais iguais a um
+
+A invertibilidade separada de
+
+$$
+\mathbf S_{XX}
+$$
+
+e
+
+$$
+\mathbf S_{YY}
+$$
+
+não elimina todos os problemas associados à alta dimensão.
+
+As colunas de
 
 $$
 \mathbf X_c
@@ -2821,9 +4936,41 @@ $$
 \mathbf Y_c
 $$
 
-pertencem ao subespaço de $\mathbb R^n$ ortogonal a $\mathbf1_n$, cuja dimensão é $n-1$.
+pertencem ao subespaço
 
-Se $\mathbf S_{XX}$ e $\mathbf S_{YY}$ possuem posto completo, então
+$$
+\mathcal H_n
+=
+\left\{
+\mathbf z
+\in
+\mathbb R^n:
+\mathbf1_n^\top
+\mathbf z
+=
+0
+\right\},
+$$
+
+cuja dimensão é
+
+$$
+n-1.
+$$
+
+Suponha que
+
+$$
+\mathbf S_{XX}
+$$
+
+e
+
+$$
+\mathbf S_{YY}
+$$
+
+tenham posto completo. Então
 
 $$
 \dim
@@ -2847,25 +4994,571 @@ $$
 q.
 $$
 
-Quando
+Como ambos são subespaços de
+
+$$
+\mathcal H_n,
+$$
+
+a fórmula da dimensão da soma fornece
+
+$$
+\begin{aligned}
+&
+\dim
+\left[
+\operatorname{Col}
+(\mathbf X_c)
+\cap
+\operatorname{Col}
+(\mathbf Y_c)
+\right]
+\\
+&=
+p+q
+-
+\dim
+\left[
+\operatorname{Col}
+(\mathbf X_c)
++
+\operatorname{Col}
+(\mathbf Y_c)
+\right]
+\\
+&\geq
+p+q-(n-1).
+\end{aligned}
+$$ {#eq-dimensao-intersecao-cca}
+
+Assim, se
 
 $$
 p+q
 >
 n-1,
+$$ {#eq-condicao-correlacao-unitaria-cca}
+
+a interseção é necessariamente não trivial.
+
+Existe, portanto,
+
+$$
+\mathbf z\neq\mathbf0
 $$
 
-esses dois subespaços possuem necessariamente uma interseção não trivial. Consequentemente, existem combinações lineares dos dois blocos que produzem escores amostrais perfeitamente alinhados, resultando em uma ou mais correlações canônicas amostrais iguais a $1$.
+tal que
 
-Assim, a invertibilidade separada de $\mathbf S_{XX}$ e $\mathbf S_{YY}$ não impede associações canônicas amostrais degeneradas quando a dimensão conjunta dos blocos é elevada.
+$$
+\mathbf z
+=
+\mathbf X_c\mathbf a
+=
+\mathbf Y_c\mathbf b
+$$
 
-Além da existência das inversas, a estimação de muitas covariâncias com uma amostra limitada aumenta a variabilidade da solução canônica.
+para determinados vetores não nulos
 
-Assim, a existência algébrica de uma solução amostral não garante que as direções estimadas sejam estáveis.
+$$
+\mathbf a
+\in
+\mathbb R^p
+\qquad\text{e}\qquad
+\mathbf b
+\in
+\mathbb R^q.
+$$
+
+As duas combinações amostrais são idênticas e, portanto, possuem correlação igual a
+
+$$
+1.
+$$
+
+Mais precisamente, sob as hipóteses anteriores, existem pelo menos
+
+$$
+p+q-(n-1)
+$$
+
+dimensões comuns sempre que essa quantidade é positiva. Consequentemente, a solução amostral pode conter várias correlações canônicas exatamente iguais a $1$.
+
+Esse resultado é importante porque mostra que uma correlação canônica amostral perfeita pode ser consequência da própria relação entre dimensão e tamanho amostral, e não necessariamente evidência de uma relação populacional perfeita entre os blocos.
+
+A existência algébrica de uma solução não garante, portanto, que sua estimação seja informativa ou estável.
+
+### Multicolinearidade e condicionamento
+
+Mesmo quando
+
+$$
+\mathbf S_{XX}
+$$
+
+e
+
+$$
+\mathbf S_{YY}
+$$
+
+são formalmente positivas definidas, autovalores muito pequenos tornam
+
+$$
+\mathbf S_{XX}^{-1/2}
+$$
+
+ou
+
+$$
+\mathbf S_{YY}^{-1/2}
+$$
+
+sensíveis a pequenas perturbações nos dados.
+
+Essa sensibilidade pode afetar:
+
+- os coeficientes canônicos;
+- os subespaços estimados;
+- as correlações canônicas, especialmente quando a separação entre valores singulares é pequena.
+
+Não existe garantia geral de que as combinações canônicas permaneçam estáveis quando as matrizes intrablocos são mal condicionadas.
+
+O problema é particularmente importante porque a CCA utiliza simultaneamente:
+
+$$
+\mathbf S_{XX}^{-1/2},
+\qquad
+\mathbf S_{XY}
+\qquad\text{e}\qquad
+\mathbf S_{YY}^{-1/2}.
+$$
+
+Assim, instabilidade dentro de qualquer um dos dois blocos pode propagar-se para a matriz
+
+$$
+\widehat{\mathbf K}_{\mathrm{CCA}}.
+$$
+
+Diagnósticos de condicionamento, regularização e versões esparsas ou penalizadas pertencem à etapa metodológica posterior.
+
+## Identificação das direções canônicas
+
+As correlações canônicas são os valores singulares de
+
+$$
+\mathbf K_{\mathrm{CCA}}.
+$$
+
+Por isso, sua identificação segue as propriedades da SVD desenvolvidas no Módulo 1.
+
+### Correlação canônica simples
+
+Suponha que
+
+$$
+\rho_j>0
+$$
+
+seja um valor singular simples.
+
+O par de vetores singulares
+
+$$
+(\mathbf l_j,\mathbf r_j)
+$$
+
+é determinado até uma mudança simultânea de sinal:
+
+$$
+(\mathbf l_j,\mathbf r_j)
+$$
+
+e
+
+$$
+(-\mathbf l_j,-\mathbf r_j)
+$$
+
+satisfazem as mesmas relações singulares.
+
+Consequentemente,
+
+$$
+(\mathbf a_j,\mathbf b_j)
+$$
+
+e
+
+$$
+(-\mathbf a_j,-\mathbf b_j)
+$$
+
+produzem
+
+$$
+(\mathsf U_j,\mathsf V_j)
+$$
+
+e
+
+$$
+(-\mathsf U_j,-\mathsf V_j).
+$$
+
+A correlação permanece
+
+$$
+\rho_j.
+$$
+
+Portanto, a orientação dos eixos canônicos não possui significado intrínseco.
+
+Uma convenção de sinal pode ser adotada para facilitar a apresentação, mas não altera a solução matemática.
+
+### Correlações repetidas
+
+Suponha que uma correlação canônica positiva
+
+$$
+\rho
+$$
+
+possua multiplicidade
+
+$$
+d>1.
+$$
+
+Os vetores singulares individuais associados não são únicos. Se
+
+$$
+\mathbf L_{\rho}
+\in
+\mathbb R^{p\times d}
+$$
+
+e
+
+$$
+\mathbf R_{\rho}
+\in
+\mathbb R^{q\times d}
+$$
+
+são bases ortonormais dos subespaços singulares correspondentes, então, para qualquer matriz ortogonal
+
+$$
+\mathbf Q
+\in
+\mathbb R^{d\times d},
+$$
+
+as bases
+
+$$
+\mathbf L_{\rho}\mathbf Q
+$$
+
+e
+
+$$
+\mathbf R_{\rho}\mathbf Q
+$$
+
+produzem outra representação válida do mesmo bloco canônico.
+
+A rotação é coordenada nos dois lados porque
+
+$$
+\mathbf K_{\mathrm{CCA}}
+\mathbf R_{\rho}
+=
+\rho
+\mathbf L_{\rho}.
+$$
+
+Assim, os objetos identificados são:
+
+- o subespaço canônico do primeiro bloco;
+- o subespaço canônico correspondente do segundo bloco;
+- a correlação canônica comum $\rho$.
+
+Os eixos individuais escolhidos dentro desses subespaços dependem da base adotada e não possuem identificação própria.
+
+
+Essa distinção é particularmente importante para interpretar:
+
+- coeficientes;
+- cargas;
+- cargas cruzadas;
+
+associados individualmente a dimensões com correlações repetidas.
+
+### Correlações nulas
+
+Quando
+
+$$
+\rho_j=0,
+$$
+
+as relações
+
+$$
+\mathbf K_{\mathrm{CCA}}
+\mathbf r_j
+=
+\mathbf0
+$$
+
+e
+
+$$
+\mathbf K_{\mathrm{CCA}}^\top
+\mathbf l_j
+=
+\mathbf0
+$$
+
+não determinam uma associação positiva entre um par particular de direções.
+
+Os subespaços associados ao valor singular zero podem possuir alta dimensão e suas bases não são, em geral, únicas.
+
+Por isso, a interpretação substantiva concentra-se normalmente nas dimensões associadas às correlações positivas.
+
+### População e amostra
+
+A mesma questão aparece na estimação.
+
+Quando
+
+$$
+\rho_j
+$$
+
+é positiva, simples e separada das demais correlações canônicas, existe uma correspondência natural entre a dimensão populacional e a correspondente dimensão amostral, a menos das convenções de sinal.
+
+Quando valores populacionais são repetidos ou muito próximos, coeficientes amostrais individuais podem variar consideravelmente mesmo que o subespaço estimado permaneça próximo do subespaço populacional.
+
+Portanto, a interpretação de coeficientes individuais exige considerar a identificação espectral da solução.
+
+## Pressupostos e limites
+
+A Correlação Canônica pode ser formulada a partir de momentos de segunda ordem. Suas condições algébricas devem ser distinguidas das hipóteses necessárias à inferência clássica.
+
+### Existência de segundos momentos
+
+Para definir
+
+$$
+\boldsymbol{\Sigma}_{XX},
+\qquad
+\boldsymbol{\Sigma}_{XY}
+\qquad\text{e}\qquad
+\boldsymbol{\Sigma}_{YY},
+$$
+
+é suficiente assumir, por exemplo,
+
+$$
+E
+\left(
+\|
+\boldsymbol{\mathsf X}
+\|^2
+\right)
+<
+\infty
+$$
+
+e
+
+$$
+E
+\left(
+\|
+\boldsymbol{\mathsf Y}
+\|^2
+\right)
+<
+\infty.
+$$
+
+A técnica descreve associação **linear** entre os blocos por meio dessas covariâncias.
+
+Relações não lineares que não produzam estrutura de covariância cruzada podem não ser detectadas.
+
+Em particular,
+
+$$
+\boldsymbol{\Sigma}_{XY}
+=
+\mathbf0
+$$
+
+significa ausência de associação linear entre todas as combinações dos dois blocos, mas não implica independência em geral.
+
+### Não singularidade dentro dos blocos
+
+A formulação clássica por branqueamento exige
+
+$$
+\boldsymbol{\Sigma}_{XX}
+\succ
+\mathbf0
+$$
+
+e
+
+$$
+\boldsymbol{\Sigma}_{YY}
+\succ
+\mathbf0.
+$$
+
+Na amostra, exige-se analogamente
+
+$$
+\mathbf S_{XX}
+\succ
+\mathbf0
+$$
+
+e
+
+$$
+\mathbf S_{YY}
+\succ
+\mathbf0.
+$$
+
+Essas são condições algébricas para as inversas e raízes quadradas inversas utilizadas na solução clássica.
+
+Elas não decorrem da normalidade.
+
+### Normalidade multivariada
+
+A normalidade conjunta de
+
+$$
+\begin{pmatrix}
+\boldsymbol{\mathsf X}\\
+\boldsymbol{\mathsf Y}
+\end{pmatrix}
+$$
+
+não é necessária para definir:
+
+$$
+\rho_j,
+\qquad
+\mathbf a_j,
+\qquad
+\mathbf b_j,
+$$
+
+nem para obter a solução pela SVD das matrizes de covariâncias populacionais.
+
+A normalidade acrescenta propriedades probabilísticas.
+
+Em particular, sob normalidade conjunta,
+
+$$
+\boldsymbol{\Sigma}_{XY}
+=
+\mathbf0
+$$
+
+é equivalente à independência dos blocos, conforme @eq-independencia-blocos-normais-cca.
+
+Além disso, a normalidade sustenta a teoria inferencial clássica para hipóteses sobre as correlações canônicas e sobre a independência entre os conjuntos.
+
+Essas distribuições de referência e suas transformações não serão desenvolvidas neste capítulo.
+
+### Unidades observacionais
+
+A formulação amostral usual pressupõe que as linhas de
+
+$$
+\mathbf X
+$$
+
+e
+
+$$
+\mathbf Y
+$$
+
+correspondam às mesmas unidades e que o pareamento entre os dois blocos seja preservado.
+
+A covariância cruzada
+
+$$
+\mathbf S_{XY}
+=
+\frac1{n-1}
+\mathbf X_c^\top
+\mathbf Y_c
+$$
+
+depende dessa correspondência.
+
+Permutar as unidades de um bloco independentemente do outro altera, em geral,
+
+$$
+\mathbf S_{XY}
+$$
+
+e destrói a estrutura de associação que a técnica pretende representar.
+
+Para interpretar as matrizes amostrais como estimadores de uma única estrutura populacional e desenvolver a inferência clássica, considera-se usualmente que os pares
+
+$$
+\left(
+\boldsymbol{\mathsf X}_i,
+\boldsymbol{\mathsf Y}_i
+\right),
+\qquad
+i=1,\ldots,n,
+$$
+
+formam uma amostra de unidades independentes e identicamente distribuídas da distribuição conjunta de
+
+$$
+\left(
+\boldsymbol{\mathsf X},
+\boldsymbol{\mathsf Y}
+\right).
+$$
+
+Dependências temporais, espaciais, longitudinais ou hierárquicas requerem estrutura probabilística adicional.
+
+### Dimensão amostral
+
+A condição
+
+$$
+n-1\geq\max(p,q)
+$$
+
+é necessária para que as duas matrizes intrablocos possam ter posto completo.
+
+Entretanto, isso não impede o fenômeno de correlações canônicas iguais a $1$ quando
+
+$$
+p+q>n-1.
+$$
+
+Assim, dois aspectos de dimensão devem ser distinguidos:
+
+- dimensão de cada bloco separadamente, que controla a invertibilidade de suas matrizes de covariâncias;
+- dimensão conjunta dos subespaços amostrais, que pode produzir interseções e correlações perfeitas.
+
+A solução clássica pode, portanto, existir algebricamente e ainda apresentar comportamento degenerado em amostras de alta dimensão.
 
 ### Observações influentes
 
-Como a técnica é construída a partir de médias, variâncias e covariâncias, observações extremas podem modificar
+Como a CCA depende de médias e covariâncias, observações extremas podem modificar
 
 $$
 \mathbf S_{XX},
@@ -2875,72 +5568,137 @@ $$
 \mathbf S_{YY},
 $$
 
-e, consequentemente, as correlações e os coeficientes canônicos.
+e, consequentemente:
 
-Diagnóstico, análise de sensibilidade e procedimentos robustos pertencem à etapa aplicada posterior.
+- correlações canônicas;
+- coeficientes;
+- cargas;
+- subespaços estimados.
+
+Diagnósticos, análise de sensibilidade e procedimentos robustos serão tratados posteriormente.
+
+### Interpretação não causal
+
+A CCA é simétrica em relação aos blocos.
+
+A existência de uma correlação canônica elevada mostra que determinadas combinações lineares dos dois conjuntos estão fortemente associadas.
+
+Ela não estabelece, por si só:
+
+- direção causal;
+- relação de dependência funcional;
+- efeito de um bloco sobre o outro.
+
+A atribuição de papéis substantivos aos conjuntos depende do delineamento e do contexto científico, não da maximização canônica isoladamente.
 
 ## Relações com outras técnicas
 
 ### Análise de Componentes Principais
 
-ACP e Correlação Canônica constroem combinações lineares, mas seus objetivos são distintos.
+ACP e Correlação Canônica constroem combinações lineares, mas resolvem problemas diferentes.
 
-Na ACP, uma direção é escolhida para maximizar a variância dentro de um único conjunto:
+Na ACP, para um único vetor aleatório com matriz de covariâncias
 
 $$
-\max_{\|\mathbf a\|=1}
+\boldsymbol{\Sigma},
+$$
+
+a primeira direção resolve
+
+$$
+\max_{
+\mathbf a^\top\mathbf a=1
+}
 \mathbf a^\top
 \boldsymbol{\Sigma}
 \mathbf a.
 $$
 
-Na Correlação Canônica, duas direções são escolhidas simultaneamente para maximizar
+O objetivo é maximizar variância.
+
+Na CCA, duas direções são escolhidas simultaneamente para maximizar
 
 $$
 \operatorname{Corr}
+\left[
+\mathbf a^\top
 \left(
-\mathbf a^\top\boldsymbol{\mathsf X},
-\mathbf b^\top\boldsymbol{\mathsf Y}
-\right).
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_X
+\right),
+\mathbf b^\top
+\left(
+\boldsymbol{\mathsf Y}
+-
+\boldsymbol{\mu}_Y
+\right)
+\right].
 $$
 
-Assim:
+A comparação é resumida na @tbl-acp-cca.
 
 | Aspecto | ACP | Correlação Canônica |
 |---|---|---|
 | número de blocos | um | dois |
 | função objetivo | variância | correlação entre combinações |
-| informação utilizada | covariância interna | covariâncias internas e cruzadas |
-| decomposição utilizada | autovalores ou SVD | SVD da covariância cruzada branqueada |
+| estrutura principal | covariância interna | covariâncias internas e cruzada |
+| transformação central | decomposição espectral | branqueamento dos dois blocos |
+| decomposição natural | autovalores ou SVD | SVD da covariância cruzada branqueada |
 | resultado | componentes | pares canônicos |
 
 : Diferenças estruturais entre ACP e Correlação Canônica. {#tbl-acp-cca}
 
-Uma direção de grande variância não precisa estar fortemente associada ao outro bloco. A CCA privilegia associação entre os conjuntos, mesmo que essa associação não ocorra nas direções de maior variância de cada bloco separadamente.
+Uma direção de grande variância em um bloco não precisa ser a direção que apresenta maior associação com o outro bloco.
+
+A CCA privilegia associação **entre** conjuntos, e não variabilidade interna isoladamente.
 
 ### Regressão e regressão multivariada
 
-A regressão distingue papéis entre preditores e respostas. A Correlação Canônica trata os dois blocos simetricamente.
+Regressão e Correlação Canônica utilizam estruturas de covariância entre conjuntos, mas diferem quanto ao papel atribuído aos blocos.
 
-Essa diferença aparece mesmo quando os mesmos dados são utilizados.
+Na regressão multivariada, um bloco é definido como resposta e o outro como conjunto de preditores.
 
-Na regressão multivariada, um bloco é modelado condicionalmente ao outro. Na CCA, procura-se um par de combinações cuja associação seja máxima, sem definir previamente uma direção causal ou preditiva.
+A relação é, portanto, direcional no modelo:
 
-Um caso particular evidencia a conexão.
+$$
+E
+\left(
+\boldsymbol{\mathsf Y}
+\mid
+\boldsymbol{\mathsf X}
+\right)
+$$
 
-Suponha que o segundo bloco tenha uma única variável,
+é modelada em função de
+
+$$
+\boldsymbol{\mathsf X}.
+$$
+
+Na Correlação Canônica, os dois blocos são tratados simetricamente. O problema consiste em encontrar simultaneamente uma combinação de cada lado com máxima correlação.
+
+Um caso particular estabelece uma conexão direta.
+
+Suponha
 
 $$
 q=1,
 $$
 
-e denote sua variância por
+de modo que o segundo bloco contém apenas uma variável escalar
 
 $$
-\sigma_Y^2.
+\mathsf Y
 $$
 
-Então existe no máximo uma correlação canônica positiva e
+com variância
+
+$$
+\sigma_Y^2>0.
+$$
+
+Então existe uma única correlação canônica potencialmente positiva e
 
 $$
 \rho_1^2
@@ -2954,15 +5712,33 @@ $$
 }.
 $$ {#eq-cca-correlacao-multipla}
 
-Essa quantidade é o coeficiente de determinação populacional da projeção linear de $\mathsf Y$ sobre o bloco $\boldsymbol{\mathsf X}$.
+A quantidade do lado direito é o coeficiente de determinação populacional da projeção linear de
 
-Assim, a correlação múltipla aparece como caso particular da Correlação Canônica quando um dos blocos possui dimensão $1$.
+$$
+\mathsf Y
+$$
+
+sobre o espaço gerado pelas componentes de
+
+$$
+\boldsymbol{\mathsf X}.
+$$
+
+Assim, a correlação múltipla é um caso particular da Correlação Canônica quando um dos blocos possui dimensão $1$.
+
+A conexão não elimina a diferença conceitual: regressão formula uma relação de resposta condicionada a preditores, enquanto CCA formula associação simétrica entre espaços lineares.
 
 ### MANOVA
 
-A relação com MANOVA decorre novamente de problemas espectrais envolvendo dois espaços.
+A relação com MANOVA aparece quando um dos blocos representa adequadamente o espaço de um efeito e o outro contém as respostas quantitativas.
 
-No capítulo de MANOVA, as raízes características foram transformadas por
+No capítulo de MANOVA, as raízes características
+
+$$
+\lambda_j
+$$
+
+foram transformadas por
 
 $$
 \theta_j
@@ -2976,7 +5752,7 @@ $$
 
 conforme @eq-raizes-transformadas-manova.
 
-Em problemas de comparação de grupos representados por um bloco adequado de indicadores ou contrastes, essas raízes transformadas podem ser interpretadas como correlações canônicas quadradas entre o espaço das respostas e o espaço associado ao efeito:
+Em uma representação canônica do mesmo efeito — por exemplo, utilizando uma codificação apropriada do espaço de contrastes associado aos grupos e, quando necessário, considerando o ajuste pelos demais termos do modelo — as correlações canônicas correspondentes satisfazem
 
 $$
 \rho_j^2
@@ -2988,33 +5764,80 @@ $$
 }.
 $$ {#eq-relacao-manova-cca}
 
-A relação mostra duas representações de uma mesma estrutura de associação entre subespaços.
+A qualificação da representação é importante.
 
-Na MANOVA, as raízes são utilizadas para testar hipóteses sobre efeitos.
+A relação não afirma que qualquer bloco arbitrário de indicadores produz automaticamente as raízes da MANOVA. Os dois problemas precisam representar o mesmo subespaço de efeito e a mesma estrutura residual.
 
-Na Correlação Canônica, as mesmas associações podem ser interpretadas como alinhamentos entre combinações de dois blocos.
+Quando essa correspondência é estabelecida, a transformação mostra que:
+
+- $\lambda_j$ mede hipótese relativamente ao erro na formulação da MANOVA;
+- $\rho_j^2$ mede o alinhamento canônico correspondente entre o espaço das respostas e o espaço associado ao efeito.
+
+A mesma estrutura espectral recebe, portanto, interpretações diferentes segundo o problema estatístico formulado.
 
 ### Análise Discriminante
 
-Se um dos blocos representa grupos por meio de indicadores ou contrastes e o outro contém variáveis quantitativas, o problema canônico relaciona-se às direções discriminantes.
+A relação com a Análise Discriminante aparece de forma semelhante.
 
-A matriz entre grupos introduzida na formulação de Fisher descreve justamente a parcela da variabilidade das respostas associada ao espaço definido pelos grupos.
+Considere um bloco quantitativo
 
-Assim, MANOVA, Fisher e CCA podem compartilhar a mesma estrutura espectral em problemas de grupos, mas atribuem significados diferentes à solução:
+$$
+\boldsymbol{\mathsf X}
+$$
 
-| Técnica | Função da estrutura espectral |
+e um segundo bloco que represente adequadamente a informação de grupos por indicadores ou contrastes.
+
+A associação canônica entre esses blocos depende da parcela da variabilidade de
+
+$$
+\boldsymbol{\mathsf X}
+$$
+
+associada às diferenças entre os grupos.
+
+Na formulação de Fisher, essa mesma estrutura aparece na comparação entre
+
+$$
+\mathbf T_{\mathrm{entre}}
+$$
+
+e
+
+$$
+\mathbf T_{\mathrm{intra}}.
+$$
+
+Sob codificação e ponderação apropriadas, os subespaços canônico e discriminante estão relacionados.
+
+Mais uma vez, os objetivos permanecem distintos:
+
+| Técnica | Uso da estrutura compartilhada |
 |---|---|
-| MANOVA | testar diferenças entre grupos |
-| Fisher | construir direções de separação |
-| CCA | quantificar associação entre o bloco quantitativo e o espaço que representa os grupos |
+| MANOVA | testar uma hipótese multivariada sobre diferenças entre grupos |
+| Fisher | construir direções que maximizam separação relativa |
+| Correlação Canônica | medir associação entre o bloco quantitativo e o espaço que representa os grupos |
 
 : Diferentes interpretações de uma estrutura espectral compartilhada. {#tbl-manova-fisher-cca}
 
-A equivalência algébrica em situações particulares não elimina a diferença entre os problemas estatísticos formulados por cada técnica.
+Essa relação foi antecipada no capítulo de Análise Discriminante e mostra por que técnicas aparentemente diferentes podem produzir subespaços relacionados quando são construídas a partir das mesmas estruturas de covariância.
+
+### Mínimos Quadrados Parciais
+
+A Correlação Canônica também pode ser comparada conceitualmente aos métodos de Mínimos Quadrados Parciais.
+
+Ambos trabalham com dois blocos e constroem combinações lineares.
+
+Entretanto, a CCA maximiza a **correlação** entre combinações depois de normalizar cada bloco por sua própria estrutura de variância.
+
+Métodos de Mínimos Quadrados Parciais utilizam critérios diferentes, frequentemente relacionados à covariância e à capacidade de representação ou predição.
+
+Por isso, a presença de dois blocos e de combinações lineares não torna os problemas de otimização equivalentes.
+
+O desenvolvimento dos métodos de Mínimos Quadrados Parciais não pertence ao escopo deste capítulo.
 
 ## Síntese
 
-A Correlação Canônica é formulada para dois blocos de variáveis,
+A Correlação Canônica estuda a associação linear entre dois vetores aleatórios,
 
 $$
 \boldsymbol{\mathsf X}
@@ -3030,7 +5853,9 @@ $$
 \mathbb R^q,
 $$
 
-cuja estrutura conjunta de segundos momentos é representada por
+observados sobre as mesmas unidades.
+
+Sua estrutura de segundos momentos é representada pela matriz particionada
 
 $$
 \boldsymbol{\Sigma}
@@ -3046,7 +5871,27 @@ $$
 \end{pmatrix}.
 $$
 
-O objetivo é construir
+Os blocos
+
+$$
+\boldsymbol{\Sigma}_{XX}
+$$
+
+e
+
+$$
+\boldsymbol{\Sigma}_{YY}
+$$
+
+descrevem as estruturas internas dos dois conjuntos, enquanto
+
+$$
+\boldsymbol{\Sigma}_{XY}
+$$
+
+reúne sua associação linear cruzada.
+
+A técnica procura combinações
 
 $$
 \mathsf U
@@ -3072,29 +5917,90 @@ $$
 \right)
 $$
 
-com correlação máxima.
-
-Sob as normalizações
+que maximizem
 
 $$
-\operatorname{Var}(\mathsf U)
+\operatorname{Corr}
+(\mathsf U,\mathsf V).
+$$
+
+Com as normalizações
+
+$$
+\mathbf a^\top
+\boldsymbol{\Sigma}_{XX}
+\mathbf a
 =
-\operatorname{Var}(\mathsf V)
+1
+$$
+
+e
+
+$$
+\mathbf b^\top
+\boldsymbol{\Sigma}_{YY}
+\mathbf b
 =
 1,
 $$
 
-o problema torna-se
+o problema torna-se a maximização da forma bilinear
 
 $$
-\max_{\mathbf a,\mathbf b}
-\;
 \mathbf a^\top
 \boldsymbol{\Sigma}_{XY}
 \mathbf b.
 $$
 
-O branqueamento de cada bloco produz
+O branqueamento
+
+$$
+\boldsymbol{\mathsf X}^{*}
+=
+\boldsymbol{\Sigma}_{XX}^{-1/2}
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_X
+\right)
+$$
+
+e
+
+$$
+\boldsymbol{\mathsf Y}^{*}
+=
+\boldsymbol{\Sigma}_{YY}^{-1/2}
+\left(
+\boldsymbol{\mathsf Y}
+-
+\boldsymbol{\mu}_Y
+\right)
+$$
+
+produz
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}^{*}
+\right)
+=
+\mathbf I_p
+$$
+
+e
+
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf Y}^{*}
+\right)
+=
+\mathbf I_q.
+$$
+
+A associação restante é representada pela matriz retangular
 
 $$
 \mathbf K_{\mathrm{CCA}}
@@ -3104,13 +6010,13 @@ $$
 \boldsymbol{\Sigma}_{YY}^{-1/2}.
 $$
 
-Sua decomposição em valores singulares,
+Sua SVD,
 
 $$
 \mathbf K_{\mathrm{CCA}}
 =
 \mathbf L
-\mathbf D_{\rho}
+\mathbf D_\rho
 \mathbf R^\top,
 $$
 
@@ -3121,19 +6027,42 @@ $$
 \geq
 \cdots
 \geq
-\rho_s
->
-0
+\rho_m
+\geq
+0,
+\qquad
+m=\min(p,q).
 $$
 
-e os coeficientes correspondentes,
+Se
+
+$$
+r_C
+=
+\operatorname{posto}
+\left(
+\boldsymbol{\Sigma}_{XY}
+\right),
+$$
+
+então exatamente
+
+$$
+r_C
+$$
+
+dessas correlações são positivas.
+
+Os coeficientes canônicos podem ser obtidos por
 
 $$
 \mathbf a_j
 =
 \boldsymbol{\Sigma}_{XX}^{-1/2}
-\mathbf l_j,
+\mathbf l_j
 $$
+
+e
 
 $$
 \mathbf b_j
@@ -3142,55 +6071,345 @@ $$
 \mathbf r_j.
 $$
 
-O número de associações lineares não nulas é
+Os pares sucessivos possuem variâncias unitárias e satisfazem
 
 $$
-s
+\operatorname{Cov}
+(\mathsf U_j,\mathsf U_\ell)
 =
-\operatorname{rank}
-\left(
+\delta_{j\ell},
+$$
+
+$$
+\operatorname{Cov}
+(\mathsf V_j,\mathsf V_\ell)
+=
+\delta_{j\ell}
+$$
+
+e
+
+$$
+\operatorname{Cov}
+(\mathsf U_j,\mathsf V_\ell)
+=
+\rho_j
+\delta_{j\ell}.
+$$
+
+A SVD também produz os problemas equivalentes de autovalores generalizados,
+
+$$
 \boldsymbol{\Sigma}_{XY}
-\right)
-\leq
-\min(p,q).
+\boldsymbol{\Sigma}_{YY}^{-1}
+\boldsymbol{\Sigma}_{YX}
+\mathbf a_j
+=
+\rho_j^2
+\boldsymbol{\Sigma}_{XX}
+\mathbf a_j
 $$
 
-A mesma solução pode ser expressa por problemas de autovalores generalizados cujas raízes são
+e
 
 $$
-\rho_j^2.
+\boldsymbol{\Sigma}_{YX}
+\boldsymbol{\Sigma}_{XX}^{-1}
+\boldsymbol{\Sigma}_{XY}
+\mathbf b_j
+=
+\rho_j^2
+\boldsymbol{\Sigma}_{YY}
+\mathbf b_j.
 $$
 
-Geometricamente,
+Assim, os autovalores são
+
+$$
+\rho_j^2,
+$$
+
+enquanto os valores singulares da matriz branqueada são diretamente
+
+$$
+\rho_j.
+$$
+
+Geometricamente, as variáveis lineares centradas dos dois blocos pertencem aos subespaços
+
+$$
+\mathcal H_X
+\qquad\text{e}\qquad
+\mathcal H_Y
+$$
+
+de
+
+$$
+L_0^2.
+$$
+
+As correlações canônicas são os cossenos dos ângulos principais:
 
 $$
 \rho_j
 =
-\cos\theta_j,
+\cos\theta_j.
 $$
 
-em que $\theta_j$ é um ângulo principal entre os subespaços lineares gerados pelos dois blocos.
+Portanto, a técnica pode ser interpretada como a procura sucessiva das direções de maior alinhamento entre os dois subespaços.
 
-Os coeficientes canônicos determinam as combinações lineares. As cargas relacionam as variáveis originais às variáveis canônicas de seus próprios blocos, enquanto as cargas cruzadas relacionam uma variável à dimensão canônica do bloco oposto.
+A interpretação das variáveis canônicas exige distinguir:
 
-As medidas de redundância acrescentam uma distinção importante: uma correlação canônica elevada indica forte associação entre duas combinações, mas não garante que essas combinações representem grande parcela da variabilidade das variáveis originais.
+- coeficientes canônicos, que constroem as combinações;
+- cargas canônicas, que relacionam variáveis às combinações de seu próprio bloco;
+- cargas cruzadas, que relacionam variáveis às combinações do outro bloco;
+- redundância, que combina representação interna e correlação canônica.
 
-Na amostra, as matrizes
+Na amostra, as matrizes populacionais são substituídas por
 
 $$
 \mathbf S_{XX},
 \qquad
 \mathbf S_{XY},
 \qquad
+\mathbf S_{YY},
+$$
+
+produzindo
+
+$$
+\widehat\rho_j,
+\qquad
+\widehat{\mathbf a}_j,
+\qquad
+\widehat{\mathbf b}_j.
+$$
+
+A formulação clássica requer matrizes intrablocos positivas definidas.
+
+Na amostra,
+
+$$
+n-1\geq p
+$$
+
+e
+
+$$
+n-1\geq q
+$$
+
+são condições necessárias para que
+
+$$
+\mathbf S_{XX}
+$$
+
+e
+
+$$
 \mathbf S_{YY}
 $$
 
-substituem as covariâncias populacionais.
+possam possuir posto completo.
 
-A solução clássica requer matrizes intrablocos não singulares. Multicolinearidade e alta dimensão podem tornar os coeficientes instáveis ou impedir diretamente o branqueamento.
+Além disso, mesmo com ambas invertíveis, a condição
 
-A normalidade multivariada não é necessária para definir a técnica. Ela fornece condições adicionais para a inferência clássica sobre as correlações canônicas.
+$$
+p+q>n-1
+$$
 
-A CCA utiliza várias estruturas desenvolvidas anteriormente no livro: covariância cruzada, transformação por raízes quadradas inversas, SVD, problemas de autovalores, projeções e geometria de subespaços. Sua característica específica é combinar essas estruturas para responder a uma pergunta própria: **quais combinações lineares de dois conjuntos apresentam a maior associação possível?**
+força uma interseção não trivial entre os espaços coluna dos dois blocos centralizados e pode produzir correlações canônicas amostrais iguais a $1$.
 
-No próximo capítulo, o objeto estatístico deixa de ser a associação entre dois blocos de variáveis. A Análise Conjunta parte de alternativas descritas por atributos e procura decompor avaliações, preferências ou escolhas em contribuições associadas aos níveis desses atributos.
+A normalidade conjunta não é necessária para definir a CCA.
+
+Ela passa a desempenhar papel adicional na inferência clássica e, em particular, transforma
+
+$$
+\boldsymbol{\Sigma}_{XY}
+=
+\mathbf0
+$$
+
+em uma condição equivalente à independência entre os blocos.
+
+As correlações canônicas são invariantes a transformações lineares não singulares realizadas separadamente dentro de cada bloco. Os coeficientes, entretanto, dependem da base escolhida.
+
+Quando uma correlação canônica positiva é simples, seu par de direções é identificado até mudança simultânea de sinal.
+
+Quando há multiplicidade, os objetos identificados são os correspondentes subespaços canônicos, e não uma base particular.
+
+A técnica integra, portanto, resultados dos Módulos 1 e 2 sobre:
+
+- combinações lineares;
+- covariância e covariância cruzada;
+- formas quadráticas;
+- produtos internos;
+- mudanças de base;
+- raízes quadradas de matrizes positivas definidas;
+- branqueamento;
+- SVD;
+- autovalores generalizados;
+- posto;
+- projeções em subespaços;
+- normal multivariada.
+
+O ponto central é que a Correlação Canônica não procura simplesmente o par de variáveis originais mais correlacionado.
+
+Ela procura, simultaneamente, **as combinações lineares dos dois blocos que apresentam a maior associação possível depois de considerada a geometria interna de cada conjunto**.
+
+Essa função objetivo explica por que a técnica possui sua forma matemática específica: duas restrições quadráticas são convertidas por branqueamento em normas euclidianas e o problema bilinear resultante é resolvido naturalmente pela SVD.
+
+Ao final deste capítulo, o estudante deverá ser capaz de:
+
+1. identificar a Correlação Canônica como um problema de associação linear entre dois blocos de variáveis;
+
+2. representar a matriz de covariâncias conjunta na forma particionada
+
+   $$
+   \boldsymbol{\Sigma}
+   =
+   \begin{pmatrix}
+   \boldsymbol{\Sigma}_{XX}
+   &
+   \boldsymbol{\Sigma}_{XY}
+   \\
+   \boldsymbol{\Sigma}_{YX}
+   &
+   \boldsymbol{\Sigma}_{YY}
+   \end{pmatrix};
+   $$
+
+3. explicar os papéis distintos das covariâncias intrablocos e da covariância cruzada;
+
+4. formular as variáveis canônicas
+
+   $$
+   \mathsf U
+   =
+   \mathbf a^\top
+   (
+   \boldsymbol{\mathsf X}
+   -
+   \boldsymbol{\mu}_X
+   )
+   $$
+
+   e
+
+   $$
+   \mathsf V
+   =
+   \mathbf b^\top
+   (
+   \boldsymbol{\mathsf Y}
+   -
+   \boldsymbol{\mu}_Y
+   );
+   $$
+
+5. derivar a expressão da correlação entre duas combinações lineares;
+
+6. explicar por que as restrições
+
+   $$
+   \mathbf a^\top
+   \boldsymbol{\Sigma}_{XX}
+   \mathbf a
+   =
+   1
+   $$
+
+   e
+
+   $$
+   \mathbf b^\top
+   \boldsymbol{\Sigma}_{YY}
+   \mathbf b
+   =
+   1
+   $$
+
+   eliminam a indeterminação de escala;
+
+7. explicar o papel do branqueamento por
+
+   $$
+   \boldsymbol{\Sigma}_{XX}^{-1/2}
+   \qquad\text{e}\qquad
+   \boldsymbol{\Sigma}_{YY}^{-1/2};
+   $$
+
+8. identificar
+
+   $$
+   \mathbf K_{\mathrm{CCA}}
+   =
+   \boldsymbol{\Sigma}_{XX}^{-1/2}
+   \boldsymbol{\Sigma}_{XY}
+   \boldsymbol{\Sigma}_{YY}^{-1/2}
+   $$
+
+   como o objeto matricial central da solução;
+
+9. explicar por que os valores singulares de
+
+   $$
+   \mathbf K_{\mathrm{CCA}}
+   $$
+
+   são as correlações canônicas;
+
+10. caracterizar os pares sucessivos pelas restrições de descorrelação dentro de cada bloco;
+
+11. justificar que
+
+    $$
+    r_C
+    =
+    \operatorname{posto}
+    (
+    \boldsymbol{\Sigma}_{XY}
+    )
+    $$
+
+    determina o número de correlações canônicas positivas;
+
+12. relacionar a SVD aos problemas equivalentes de autovalores generalizados e explicar por que seus autovalores são
+
+    $$
+    \rho_j^2;
+    $$
+
+13. interpretar as correlações canônicas como
+
+    $$
+    \rho_j
+    =
+    \cos\theta_j,
+    $$
+
+    em que $\theta_j$ são ângulos principais entre os subespaços lineares dos dois blocos;
+
+14. distinguir coeficientes, cargas, cargas cruzadas, variância extraída e redundância;
+
+15. distinguir parâmetros populacionais e quantidades canônicas amostrais;
+
+16. explicar a invariância das correlações canônicas sob mudanças lineares invertíveis de coordenadas;
+
+17. reconhecer as condições de posto e não singularidade necessárias à formulação clássica;
+
+18. explicar por que alta dimensão pode produzir correlações canônicas amostrais iguais a $1$ mesmo quando as matrizes intrablocos são invertíveis;
+
+19. distinguir a definição algébrica da CCA do papel adicional da normalidade na inferência clássica;
+
+20. distinguir correlações canônicas simples, múltiplas e nulas quanto à identificação das direções;
+
+21. relacionar a Correlação Canônica com ACP, regressão multivariada, MANOVA e Análise Discriminante.
+
+No próximo capítulo, a estrutura matemática muda novamente.
+
+Na **Análise Conjunta**, não serão construídas duas combinações lineares maximamente associadas. O problema será representar alternativas por atributos e níveis e decompor uma medida de preferência em contribuições associadas a esses componentes.
+
+A formulação utilizará diretamente os fundamentos já desenvolvidos sobre vetores, matrizes de delineamento, posto, parametrização, modelos lineares, estimação e identificação. Assim, o último capítulo do Módulo 3 mostrará como uma técnica multivariada pode surgir não de uma decomposição espectral, mas da construção cuidadosa de um modelo de utilidade associado a um delineamento experimental.

@@ -1,6 +1,6 @@
 # Formulação da Análise de Agrupamentos
 
-A Análise de Agrupamentos reúne métodos destinados a organizar objetos em grupos a partir de suas relações de proximidade. Ao contrário das técnicas estudadas nos dois capítulos anteriores, a definição da solução depende diretamente do critério adotado para representar a semelhança entre os objetos e para caracterizar um grupo [@johnson2007].
+A Análise de Agrupamentos reúne métodos destinados a organizar objetos em grupos a partir de suas relações de proximidade. Ao contrário das técnicas estudadas nos dois capítulos anteriores, a definição da solução depende diretamente do critério adotado para representar a semelhança entre os objetos e para caracterizar um grupo [@johnson2007; @everitt2011cluster].
 
 Os fundamentos geométricos necessários já foram estabelecidos no Módulo 1. A matriz de dados foi definida em @def-matriz-dados, a distância euclidiana em @def-distancia-euclidiana e geometrias determinadas por produtos internos e normas induzidas foram desenvolvidas em @def-produto-interno-induzido e @def-norma-induzida. O Módulo 2 acrescentou a decomposição da dispersão total em parcelas intragrupos e entre grupos em @prp-decomposicao-dispersao-grupos. Neste capítulo, esses resultados passam a definir critérios específicos para construir agrupamentos.
 
@@ -36,7 +36,7 @@ $$
 
 conforme @def-matriz-dados.
 
-Os grupos não são conhecidos previamente. O objetivo é construir uma organização dos índices das observações de modo que a proximidade entre objetos pertencentes ao mesmo grupo seja elevada segundo o critério adotado, enquanto objetos atribuídos a grupos diferentes apresentem maior separação.
+Os grupos não são conhecidos previamente. O objetivo é construir uma organização dos índices das observações de modo que objetos pertencentes ao mesmo grupo apresentem maior proximidade segundo o critério adotado, enquanto objetos atribuídos a grupos diferentes apresentem maior separação.
 
 Essa formulação distingue a Análise de Agrupamentos da Análise Discriminante, que utilizará grupos previamente conhecidos. Aqui, a própria organização dos objetos faz parte da solução.
 
@@ -220,35 +220,84 @@ $$
 
 na qual $\delta_{ij}$ representa a dissimilaridade entre os objetos $i$ e $j$.
 
+## Dissimilaridade
+
 ::: {#def-dissimilaridade-agrupamento}
 ## Dissimilaridade
 
-Uma **dissimilaridade** é uma medida numérica de separação entre objetos na qual valores maiores representam menor proximidade. Uma dissimilaridade não precisa satisfazer todas as propriedades exigidas de uma distância métrica.
-:::
-
-A definição de dissimilaridade amplia a formulação para situações em que a proximidade entre os objetos não satisfaz todas as propriedades de uma distância métrica.
-
-Nos métodos hierárquicos desenvolvidos neste capítulo, será considerada uma matriz de dissimilaridades simétrica, com
+Seja
 
 $$
-\delta_{ij}
-\geq
-0,
-\qquad
-\delta_{ii}
+\mathcal I
 =
-0
+\{1,\ldots,n\}
+$$
+
+um conjunto de objetos. Uma **dissimilaridade** é uma função
+
+$$
+\delta:
+\mathcal I\times\mathcal I
+\longrightarrow
+[0,\infty),
+$$
+
+na qual valores maiores representam menor proximidade entre os objetos.
+
+Neste capítulo, serão consideradas dissimilaridades que satisfazem
+
+$$
+\delta(i,i)=0,
+\qquad
+i\in\mathcal I,
 $$
 
 e
 
 $$
-\delta_{ij}
+\delta(i,j)
 =
-\delta_{ji}.
+\delta(j,i),
+\qquad
+i,j\in\mathcal I.
 $$
 
-A desigualdade triangular não será exigida.
+Não será exigido que
+
+$$
+\delta(i,j)>0
+\qquad
+\text{para}
+\qquad
+i\neq j,
+$$
+
+nem que seja satisfeita a desigualdade triangular.
+:::
+
+A matriz associada a $\delta$ é
+
+$$
+\boldsymbol{\Delta}
+=
+\left(
+\delta_{ij}
+\right),
+\qquad
+\delta_{ij}
+=
+\delta(i,j).
+$$
+
+Assim, uma distância métrica pode ser utilizada como dissimilaridade, mas uma dissimilaridade não precisa satisfazer todas as propriedades exigidas de uma distância métrica [@everitt2011cluster].
+
+A possibilidade de
+
+$$
+\delta(i,j)=0
+$$
+
+para objetos distintos será particularmente relevante quando forem estudadas dissimilaridades produzidas por estruturas hierárquicas.
 
 De forma correspondente, uma similaridade atribui valores maiores a objetos considerados mais semelhantes. A transformação entre similaridade e dissimilaridade depende da medida adotada e não constitui uma operação universal.
 
@@ -364,7 +413,7 @@ ggplot(
     size = 4,
     color = "gray25"
   ) +
-    facet_wrap(
+  facet_wrap(
     vars(painel)
   ) +
   coord_equal() +
@@ -487,7 +536,6 @@ g_{ik}
 i=1,\ldots,n.
 $$ {#eq-restricao-pertinencia-rigida}
 
-
 ### Partições rígidas, difusas e probabilísticas
 
 A partição rígida não é a única forma possível de representar agrupamentos.
@@ -542,7 +590,7 @@ Um critério baseado em homogeneidade interna deve assumir valores melhores quan
 
 Um critério baseado em separação deve favorecer grupos suficientemente distintos entre si.
 
-Essas duas propriedades são relacionadas, mas não são equivalentes em qualquer método. A forma exata de medi-las depende da definição de grupo.
+Essas duas propriedades são relacionadas, mas não são equivalentes em qualquer método. A forma exata de medi-las depende da definição matemática de grupo adotada.
 
 Para agrupamentos representados por centroides e distância euclidiana quadrática, a homogeneidade interna pode ser expressa por somas de quadrados. Essa escolha conduz ao critério das $K$-médias e permite utilizar diretamente a decomposição da dispersão estabelecida no Módulo 2.
 
@@ -697,16 +745,26 @@ $$
 \right).
 $$ {#eq-traco-decomposicao-agrupamento}
 
-Para $K$ fixado, reduzir a dispersão intragrupos aumenta a parcela da dispersão atribuída às diferenças entre os centroides. Essa relação fornece a formulação utilizada pelas $K$-médias.
+Para $K$ fixado, reduzir a dispersão intragrupos aumenta a parcela da dispersão atribuída aos centroides dos grupos em relação ao centroide global. Essa relação fornece a formulação utilizada pelas $K$-médias.
 
 ### Formulação das $K$-médias
 
-O método das $K$-médias define os grupos pela minimização da soma das distâncias euclidianas quadráticas das observações aos centroides correspondentes [@macqueen1967; @johnson2007].
+O método das $K$-médias define os grupos pela minimização da soma das distâncias euclidianas quadráticas das observações aos centroides correspondentes [@macqueen1967; @johnson2007; @everitt2011cluster].
 
 ::: {#def-criterio-kmedias}
 ## Critério das $K$-médias
 
-Para um número fixado de grupos $K$, considere os indicadores de pertinência $g_{ik}$ e os centros
+Para um número fixado de grupos $K$, com
+
+$$
+1
+\leq
+K
+\leq
+n,
+$$
+
+considere os indicadores de pertinência $g_{ik}$ e os centros
 
 $$
 \mathbf c_1,\ldots,\mathbf c_K
@@ -736,10 +794,8 @@ sujeito a
 $$
 g_{ik}
 \in
-\{0,1\}
+\{0,1\},
 $$
-
-e
 
 $$
 \sum_{k=1}^{K}
@@ -761,7 +817,7 @@ g_{ik}
 k=1,\ldots,K.
 $$
 
-A primeira condição atribui cada observação a exatamente um grupo. A segunda garante que os $K$ grupos sejam não vazios.
+As duas primeiras restrições estabelecem uma atribuição rígida: $g_{ik}$ é binário e cada observação pertence a exatamente um dos $K$ grupos. A terceira restrição garante que todos os $K$ grupos sejam não vazios.
 
 Para uma partição
 
@@ -807,8 +863,10 @@ $$
 J_K
 \left(
 \mathcal P
-\right).
+\right),
 $$ {#eq-solucao-global-kmedias}
+
+em que a minimização é realizada sobre as partições admissíveis de $\{1,\ldots,n\}$ em $K$ grupos não vazios.
 :::
 
 Pela relação em @eq-traco-dispersao-intra-agrupamento,
@@ -873,7 +931,37 @@ $$
 \right].
 $$ {#eq-kmedias-maximizacao-entre}
 
-As duas formulações descrevem o mesmo problema para $K$ fixado: procurar grupos compactos em torno de seus centroides produz, simultaneamente, maior separação quadrática entre esses centroides.
+Como a dispersão entre grupos pode ser escrita em função dos centroides e de seus tamanhos,
+
+$$
+\mathbf T_{\mathrm{entre}}
+=
+\sum_{k=1}^{K}
+n_k
+\left(
+\mathbf c_k-\bar{\mathbf x}
+\right)
+\left(
+\mathbf c_k-\bar{\mathbf x}
+\right)^\top,
+$$
+
+tem-se
+
+$$
+\operatorname{tr}
+\left(
+\mathbf T_{\mathrm{entre}}
+\right)
+=
+\sum_{k=1}^{K}
+n_k
+\left\|
+\mathbf c_k-\bar{\mathbf x}
+\right\|^2.
+$$ {#eq-traco-dispersao-entre-agrupamento}
+
+As duas formulações descrevem, portanto, o mesmo problema para $K$ fixado: minimizar a dispersão quadrática das observações em torno dos centroides equivale a maximizar a dispersão ponderada dos centroides dos grupos em torno do centroide global.
 
 ### O centroide como minimizador
 
@@ -1000,7 +1088,7 @@ n_C
 0.
 $$
 
-O valor mínimo ocorre em
+O valor mínimo ocorre unicamente em
 
 $$
 \mathbf c
@@ -1015,25 +1103,15 @@ Alterar a medida de perda pode alterar o representante ótimo do grupo. Por isso
 
 ### Partição para centroides fixados
 
-O critério também possui uma estrutura simples quando os centroides
+Considere agora os centros
 
 $$
 \mathbf c_1,\ldots,\mathbf c_K
 $$
 
-são considerados fixos.
+como fixados.
 
-Para uma observação $\mathbf x_i$, sua contribuição ao critério será
-
-$$
-\left\|
-\mathbf x_i-\mathbf c_k
-\right\|^2
-$$
-
-se ela for atribuída ao grupo $C_k$.
-
-A menor contribuição possível é obtida escolhendo um grupo pertencente a
+Se for considerada somente a restrição de que cada observação pertença a exatamente um grupo, a contribuição de $\mathbf x_i$ ao critério é minimizada atribuindo-a a qualquer centro pertencente a
 
 $$
 \operatorname*{arg\,min}_{1\leq k\leq K}
@@ -1042,18 +1120,33 @@ $$
 \right\|^2.
 $$ {#eq-alocacao-centroide-proximo}
 
-Assim, para centroides fixados, cada observação é associada a um centroide mais próximo.
+Assim, a minimização ponto a ponto é obtida pela atribuição ao centroide mais próximo. Em caso de empate, mais de uma atribuição pode produzir a mesma contribuição mínima.
 
-Os dois resultados anteriores descrevem duas propriedades do critério, sintetizadas na @tbl-subproblemas-kmedias.
+Há, entretanto, uma distinção entre essa regra ponto a ponto e o problema conjunto de @def-criterio-kmedias. Nesse problema, também é exigido que todos os $K$ grupos sejam não vazios.
 
-| Elemento fixado | Quantidade determinada pelo critério |
+Se a regra de @eq-alocacao-centroide-proximo produzir pelo menos uma observação associada a cada centroide, a atribuição obtida é também solução do subproblema com centroides fixados sujeito às restrições completas de @def-criterio-kmedias.
+
+Se algum centroide não receber observações, a restrição
+
+$$
+\sum_{i=1}^{n}
+g_{ik}
+\geq
+1
+$$
+
+impede que o problema admissível seja resolvido exclusivamente por minimizações independentes para cada observação. Nesse caso, a exigência de não vacuidade deve ser considerada conjuntamente na atribuição.
+
+Os dois resultados anteriores são sintetizados na @tbl-subproblemas-kmedias.
+
+| Elemento fixado | Consequência do critério |
 |---|---|
 | Partição $\mathcal P$ | cada centro ótimo é o centroide das observações do grupo |
-| Centroides $\mathbf c_1,\ldots,\mathbf c_K$ | cada observação é atribuída a um centroide de menor distância |
+| Centroides $\mathbf c_1,\ldots,\mathbf c_K$ | a regra ponto a ponto atribui cada observação a um centroide de menor distância; ela resolve também o problema com grupos não vazios quando essa atribuição é admissível |
 
 : Estrutura do critério das $K$-médias quando se fixa uma das partes do problema. {#tbl-subproblemas-kmedias}
 
-Essa estrutura explica a formulação dos procedimentos iterativos utilizados para calcular soluções das $K$-médias. Os algoritmos, as estratégias de inicialização e os critérios de parada pertencem à implementação da técnica e não serão desenvolvidos neste capítulo.
+Essa estrutura está na base dos procedimentos iterativos utilizados para calcular soluções das $K$-médias. Os algoritmos, as estratégias de inicialização, o tratamento computacional de grupos vazios e os critérios de parada pertencem à implementação da técnica e não serão desenvolvidos neste capítulo.
 
 ### Geometria das regiões de alocação
 
@@ -1109,7 +1202,9 @@ $$ {#eq-fronteira-voronoi-kmedias}
 
 A fronteira é, portanto, um hiperplano.
 
-As regiões definidas simultaneamente por todos os centroides formam uma partição de Voronoi do espaço. Essa geometria explica por que as $K$-médias favorecem grupos representáveis por regiões convexas associadas a centros.
+As regiões definidas simultaneamente por todos os centroides formam uma partição de Voronoi do espaço. Uma região de Voronoi pode não conter nenhuma das observações disponíveis para uma determinada configuração de centros; isso não altera sua definição geométrica.
+
+Essa geometria explica por que as $K$-médias favorecem grupos associados a regiões convexas em torno de centros.
 
 A @fig-kmedias-voronoi representa uma solução com três centroides. As regiões de fundo indicam qual centroide é o mais próximo em cada posição do plano, enquanto os símbolos maiores identificam os centroides da solução.
 
@@ -1264,7 +1359,7 @@ ggplot() +
     values = cores,
     name = NULL
   ) +
-      scale_fill_manual(
+  scale_fill_manual(
     values = cores,
     guide = "none"
   ) +
@@ -1415,7 +1510,11 @@ O exemplo também mostra que o método não procura apenas separar pontos distan
 Para uma matriz de dados finita e um valor fixado de
 
 $$
-1\leq K\leq n,
+1
+\leq
+K
+\leq
+n,
 $$
 
 existe pelo menos uma partição que minimiza @eq-criterio-kmedias.
@@ -1493,19 +1592,23 @@ O problema completo das $K$-médias combina duas escolhas:
 - a atribuição de cada observação a um grupo;
 - a posição dos centroides.
 
-Para uma partição fixada, @prp-centroide-minimiza-soma-quadrados fornece diretamente os centroides ótimos. Para centroides fixados, @eq-alocacao-centroide-proximo fornece diretamente a melhor atribuição de cada observação.
+Para uma partição fixada, @prp-centroide-minimiza-soma-quadrados fornece diretamente os centroides ótimos.
 
-O problema conjunto permanece combinatório. A função objetivo pode apresentar diferentes soluções localmente estáveis, e procedimentos iterativos podem atingir soluções distintas conforme seu ponto de partida.
+Para centroides fixados, @eq-alocacao-centroide-proximo fornece a minimização ponto a ponto do critério. Quando essa atribuição produz todos os grupos não vazios, ela também resolve o subproblema sujeito às restrições completas de @def-criterio-kmedias.
 
-Essa propriedade pertence ao problema matemático das $K$-médias. Estratégias computacionais para inicialização, repetição e comparação de soluções serão tratadas na etapa de implementação.
+O problema conjunto permanece combinatório e não é resolvido globalmente apenas pela alternância dessas duas operações. Procedimentos iterativos podem atingir diferentes soluções conforme sua inicialização.
 
-O valor de $K$ também faz parte da especificação do problema em @eq-solucao-global-kmedias. Modificar $K$ altera o conjunto de partições admissíveis e a própria função de otimização considerada. Os critérios utilizados para escolher o número de grupos pertencem à condução aplicada da análise e não serão desenvolvidos neste capítulo.
+Essa distinção será importante também na formulação populacional: resultados de consistência para o minimizador global empírico não devem ser interpretados automaticamente como resultados de consistência para qualquer algoritmo utilizado para aproximá-lo.
+
+Estratégias computacionais para inicialização, tratamento de grupos vazios, repetição e comparação de soluções serão tratadas na etapa de implementação.
+
+O valor de $K$ também faz parte da especificação do problema em @eq-solucao-global-kmedias. Modificar $K$ altera o conjunto de partições admissíveis e o problema de otimização considerado. Os critérios utilizados para escolher o número de grupos pertencem à condução aplicada da análise e não serão desenvolvidos neste capítulo.
 
 ### Formulação populacional do critério das $K$-médias
 
 A formulação das $K$-médias também pode ser expressa no nível populacional.
 
-Considere o vetor aleatório
+Considere um vetor aleatório
 
 $$
 \boldsymbol{\mathsf X}
@@ -1513,10 +1616,25 @@ $$
 \mathbb R^p
 $$
 
-e $K$ centros
+satisfazendo
 
 $$
-\mathbf c_1,\ldots,\mathbf c_K.
+E
+\left(
+\left\|
+\boldsymbol{\mathsf X}
+\right\|^2
+\right)
+<
+\infty,
+$$ {#eq-segundo-momento-kmedias}
+
+e considere $K$ centros
+
+$$
+\mathbf c_1,\ldots,\mathbf c_K
+\in
+\mathbb R^p.
 $$
 
 O risco quadrático de quantização é
@@ -1535,16 +1653,18 @@ E
 -
 \mathbf c_k
 \right\|^2
-\right],
+\right].
 $$ {#eq-risco-populacional-kmedias}
 
-desde que o segundo momento necessário exista.
+A condição em @eq-segundo-momento-kmedias garante que esse risco seja finito para qualquer conjunto fixo de centros finitos.
 
-Uma solução populacional procura centros pertencentes a
+Uma solução populacional, quando o mínimo é atingido, pertence a
 
 $$
 \operatorname*{arg\,min}_{
 \mathbf c_1,\ldots,\mathbf c_K
+\in
+\mathbb R^p
 }
 R_K
 \left(
@@ -1568,7 +1688,7 @@ $$
 \right\|^2.
 $$ {#eq-risco-empirico-kmedias}
 
-Para centros fixados, a atribuição ao centro mais próximo fornece
+Para centros fixados,
 
 $$
 n
@@ -1584,11 +1704,23 @@ n
 \right\|^2.
 $$
 
-Minimizando também em relação aos centros e utilizando @prp-centroide-minimiza-soma-quadrados, obtém-se
+Para
+
+$$
+1
+\leq
+K
+\leq
+n,
+$$
+
+minimizando também em relação aos centros e utilizando @prp-centroide-minimiza-soma-quadrados, o valor ótimo empírico coincide com o menor critério obtido entre as partições em $K$ grupos não vazios:
 
 $$
 \min_{
 \mathbf c_1,\ldots,\mathbf c_K
+\in
+\mathbb R^p
 }
 n
 \widehat R_K
@@ -1605,7 +1737,9 @@ $$ {#eq-equivalencia-risco-empirico-kmedias}
 
 A formulação populacional esclarece o significado estatístico do critério: a solução amostral procura uma configuração de centros que minimize empiricamente a distância quadrática ao centro mais próximo.
 
-Essa interpretação também delimita o alcance de resultados de consistência. Resultados de consistência para $K$-médias referem-se à convergência dos minimizadores empíricos para a solução do problema de quantização populacional, sob condições adicionais sobre a distribuição e a solução [@pollard1981]. Essa convergência não demonstra, por si só, a existência de classes naturais independentes do critério.
+Essa interpretação também delimita o alcance de resultados de consistência. A teoria clássica de consistência das $K$-médias relaciona minimizadores globais do risco empírico a soluções do problema de quantização populacional, sob condições adicionais sobre a distribuição e sobre a solução [@pollard1981].
+
+Esse resultado diz respeito ao problema de otimização estatístico definido pelo critério. Ele não implica que qualquer procedimento iterativo empregado para calcular uma solução alcance necessariamente o minimizador global empírico. Também não demonstra, por si só, a existência de classes naturais independentes da função objetivo adotada.
 
 ### Efeito de transformações sobre as $K$-médias
 
@@ -1651,7 +1785,9 @@ $$
 \mathbf Q\mathbf x_i.
 $$
 
-A preservação de produtos internos, normas, ângulos e distâncias por transformações ortogonais foi estabelecida em @prp-preservacao-geometria-transformacao-ortogonal. Aplicada às observações e aos centroides, essa propriedade mantém as distâncias utilizadas pelo critério das $K$-médias. Os centroides transformados são
+A preservação de produtos internos, normas, ângulos e distâncias por transformações ortogonais foi estabelecida em @prp-preservacao-geometria-transformacao-ortogonal. Aplicada às observações e aos centroides, essa propriedade mantém as distâncias utilizadas pelo critério das $K$-médias.
+
+Os centroides transformados são
 
 $$
 \mathbf c_k^{*}
@@ -1690,13 +1826,15 @@ A @tbl-transformacoes-kmedias resume essas consequências.
 
 : Efeito de transformações geométricas sobre o critério das $K$-médias. {#tbl-transformacoes-kmedias}
 
-Essa análise mostra que as propriedades geométricas das transformações estudadas no Módulo 1 têm consequência direta na técnica: somente transformações que preservam ou modificam uniformemente a geometria euclidiana mantêm a mesma organização relativa das partições.
+Essa análise mostra que transformações que preservam as distâncias euclidianas, ou que multiplicam todas elas pelo mesmo fator, preservam a ordenação das partições segundo o critério das $K$-médias.
 
-A formulação por centroides representa uma definição específica de grupo: regiões compactas organizadas em torno de centros. Os métodos hierárquicos utilizam outra estrutura. Em vez de procurar diretamente uma única partição que minimize uma função global, eles constroem uma sequência de agrupamentos aninhados a partir de uma regra de proximidade entre conjuntos.
+A formulação por centroides representa uma definição específica de grupo: grupos são caracterizados pela compactação quadrática em torno de centros. Os métodos hierárquicos utilizam outra estrutura. Em vez de procurar diretamente uma única partição que minimize uma função global, eles constroem uma sequência de agrupamentos aninhados a partir de uma regra de proximidade entre conjuntos.
 
 ## Estrutura dos métodos hierárquicos
 
-As $K$-médias procuram diretamente uma partição para um número $K$ previamente fixado de grupos. Os métodos hierárquicos utilizam outra representação: constroem uma sequência de partições relacionadas por inclusão.
+As $K$-médias procuram diretamente uma partição para um número $K$ previamente fixado de grupos. Os métodos hierárquicos utilizam outra representação: constroem uma sequência de partições relacionadas por inclusão [@johnson2007; @everitt2011cluster].
+
+Os métodos hierárquicos podem ser construídos de forma aglomerativa ou divisiva. Nos procedimentos **aglomerativos**, grupos menores são sucessivamente reunidos. Nos procedimentos **divisivos**, parte-se de grupos maiores que são progressivamente subdivididos. O desenvolvimento deste capítulo será concentrado nos métodos aglomerativos, pois eles permitem relacionar diretamente a matriz de dissimilaridades às regras de ligação e ao dendrograma.
 
 Em um procedimento aglomerativo, parte-se da partição formada por $n$ grupos unitários,
 
@@ -1818,7 +1956,7 @@ A @tbl-ligacoes-hierarquicas compara as três definições de proximidade entre 
 | Regra de ligação | Dissimilaridade entre $A$ e $B$ | Estrutura privilegiada |
 |---|---|---|
 | simples | menor dissimilaridade entre pares | conexão entre elementos próximos |
-| completa | maior dissimilaridade entre pares | controle da maior separação interna após a fusão |
+| completa | maior dissimilaridade entre pares | controle da maior dissimilaridade entre os grupos candidatos à fusão |
 | média | média das dissimilaridades entre pares | proximidade média entre os conjuntos |
 
 : Critérios de ligação construídos a partir das dissimilaridades entre objetos. {#tbl-ligacoes-hierarquicas}
@@ -1877,9 +2015,37 @@ D_{\mathrm{media}}(A,B)
 5.
 $$
 
-Não há contradição entre os três resultados. Cada valor responde a uma definição diferente da distância entre grupos.
+Não há contradição entre os três resultados. Cada valor responde a uma definição diferente da proximidade entre grupos.
 
 A escolha da ligação faz, portanto, parte da definição matemática do agrupamento hierárquico.
+
+### Empates e não unicidade da hierarquia
+
+Em cada etapa do procedimento aglomerativo, o critério de ligação pode apresentar mais de um par de grupos com o mesmo menor valor.
+
+Suponha, por exemplo, que
+
+$$
+D(A,B)
+=
+D(C,D)
+=
+\min_{G\neq H}
+D(G,H).
+$$
+
+Nesse caso, o critério não determina sozinho qual das fusões deve ocorrer primeiro.
+
+Uma regra de desempate pode selecionar um dos pares. Dependendo da configuração das dissimilaridades e da regra de ligação, escolhas diferentes em uma etapa de empate podem produzir sequências posteriores diferentes e, consequentemente, hierarquias distintas.
+
+Portanto, assim como ocorreu nas $K$-médias, a solução hierárquica não deve ser considerada automaticamente única.
+
+Há ainda uma diferença entre dois tipos de não unicidade:
+
+- a ordem gráfica das folhas de um dendrograma pode ser alterada sem modificar a hierarquia representada;
+- empates no critério de fusão podem, em determinadas situações, produzir hierarquias efetivamente diferentes.
+
+A primeira é apenas uma não unicidade de representação gráfica. A segunda pertence ao próprio procedimento de construção da solução.
 
 ### Método de Ward e dispersão intragrupos
 
@@ -2112,7 +2278,7 @@ n_A+n_B
 $$
 :::
 
-O método de Ward seleciona, em cada etapa, uma fusão com menor aumento em
+O método de Ward seleciona, em cada etapa, uma fusão que produz o menor aumento em
 
 $$
 \operatorname{tr}
@@ -2121,7 +2287,9 @@ $$
 \right).
 $$
 
-A expressão em @eq-incremento-ward apresenta duas componentes. A distância entre os centroides mede a separação geométrica dos grupos, enquanto
+Se houver mais de um par com o mesmo menor incremento, aplica-se a mesma ressalva sobre empates discutida anteriormente.
+
+A expressão em @eq-incremento-ward apresenta duas componentes. A distância entre os centroides mede sua separação geométrica, enquanto
 
 $$
 \frac{
@@ -2131,9 +2299,11 @@ n_A+n_B
 }
 $$
 
-incorpora seus tamanhos.
+incorpora os tamanhos dos grupos.
 
-Ward e $K$-médias compartilham, portanto, a mesma estrutura de dispersão quadrática. A diferença está na forma como a solução é construída. As $K$-médias procuram uma partição para um $K$ fixado; Ward constrói sucessivamente uma hierarquia de fusões e controla o aumento local da dispersão intragrupos.
+Ward e $K$-médias compartilham, portanto, a mesma estrutura de dispersão quadrática. A diferença está na forma como a solução é construída. As $K$-médias procuram uma partição global para um $K$ fixado. Ward constrói sucessivamente uma hierarquia e, em cada etapa, seleciona uma fusão que produz o menor aumento local da dispersão intragrupos entre as fusões disponíveis.
+
+Essa distinção é importante: o procedimento de Ward não resolve, em geral, o problema global das $K$-médias para cada valor de $K$. Mesmo que os dois métodos utilizem a mesma noção de dispersão quadrática, a construção hierárquica impõe que fusões realizadas em etapas anteriores não sejam posteriormente desfeitas.
 
 A @fig-agrupamentos-ligacoes representa a diferença conceitual entre ligação simples, ligação completa e Ward para dois grupos.
 
@@ -2406,7 +2576,7 @@ ggplot() +
   )
 ```
 
-Na ligação simples, apenas o par mais próximo determina a comparação. Na ligação completa, utiliza-se o par mais afastado. Em Ward, a distância entre centroides participa de uma expressão ponderada pelos tamanhos dos grupos e representa o aumento produzido na dispersão intragrupos.
+Na ligação simples, apenas o par mais próximo determina a comparação. Na ligação completa, utiliza-se o par mais afastado. Em Ward, a distância entre centroides participa de uma expressão ponderada pelos tamanhos dos grupos e determina o aumento produzido na dispersão intragrupos.
 
 A ligação média não aparece na figura porque utiliza simultaneamente todos os pares entre os dois grupos e não pode ser representada por um único segmento.
 
@@ -2414,17 +2584,21 @@ A ligação média não aparece na figura porque utiliza simultaneamente todos o
 
 A sequência produzida por um método hierárquico pode ser representada por um dendrograma.
 
-Cada folha corresponde a um objeto. As uniões representam fusões entre grupos, e a altura associada a uma fusão registra o valor do critério no momento em que ela ocorre.
+Cada folha corresponde a um objeto. As junções representam fusões entre grupos, e a altura associada a uma fusão registra o nível atribuído a essa fusão pelo critério utilizado.
 
 ::: {#def-dendrograma}
 ## Dendrograma
 
-Um **dendrograma** é uma representação gráfica de uma hierarquia de agrupamentos na qual as folhas representam os objetos e as alturas das junções registram os níveis em que grupos são fundidos.
+Um **dendrograma** é uma representação gráfica de uma hierarquia de agrupamentos na qual as folhas representam os objetos e as alturas das junções registram os níveis associados às fusões entre grupos.
 :::
 
-O dendrograma representa toda a sequência de partições produzida pelo método. Uma partição específica com $K$ grupos pode ser identificada por uma etapa da sequência hierárquica. Quando as alturas de fusão distinguem essa etapa, a mesma partição pode ser representada por um corte horizontal no dendrograma.
+O dendrograma representa toda a sequência de partições produzida pelo método. Uma partição específica com $K$ grupos corresponde a uma etapa da sequência hierárquica.
 
-Essa operação não deve ser confundida com a escolha do número de grupos. O dendrograma contém as partições aninhadas produzidas pelo critério; a decisão sobre qual delas utilizar pertence à etapa de análise e validação.
+Quando as alturas de fusão distinguem essa etapa das fusões adjacentes, a mesma partição pode ser representada por um corte horizontal no dendrograma.
+
+Em situações com fusões no mesmo nível, um corte horizontal pode não distinguir todas as etapas intermediárias produzidas por uma regra sequencial de desempate. A hierarquia deve, portanto, ser entendida primariamente como a sequência de partições construída pelo procedimento; o corte do dendrograma é uma representação dessa estrutura.
+
+Essa operação também não deve ser confundida com a escolha do número de grupos. O dendrograma contém as partições aninhadas produzidas pelo critério; a decisão sobre qual delas utilizar pertence à etapa de análise e validação.
 
 A @fig-agrupamentos-dendrograma apresenta uma hierarquia simples construída a partir de seis objetos.
 
@@ -2540,15 +2714,15 @@ ggplot() +
   )
 ```
 
-O eixo vertical do dendrograma deve ser interpretado segundo o critério utilizado. Na ligação simples, por exemplo, a altura corresponde à menor dissimilaridade que conecta os grupos. Em Ward, ela está associada ao aumento da dispersão intragrupos segundo a implementação e a escala adotadas.
+O eixo vertical do dendrograma deve ser interpretado segundo o critério utilizado. Na ligação simples, por exemplo, a altura pode ser expressa pela dissimilaridade no nível em que a fusão ocorre. No método de Ward, o nível está associado ao incremento da dispersão intragrupos, podendo sua escala gráfica depender da convenção adotada na implementação.
 
-Por isso, alturas obtidas por critérios diferentes não representam necessariamente a mesma quantidade estatística.
+Por isso, alturas obtidas por critérios diferentes não representam necessariamente a mesma quantidade matemática ou estatística.
 
 ### Ultramétrica induzida pela hierarquia
 
-A hierarquia também define uma nova dissimilaridade entre objetos.
+Uma hierarquia com níveis de fusão também induz uma nova dissimilaridade entre os objetos.
 
-Para dois objetos $i$ e $j$, considere a altura em que eles aparecem pela primeira vez no mesmo grupo do dendrograma. Denote essa altura por
+Para dois objetos $i$ e $j$, considere o menor nível da hierarquia em que eles passam a pertencer ao mesmo grupo. Denote esse valor por
 
 $$
 d_{\mathrm{cop}}
@@ -2562,15 +2736,62 @@ Essa quantidade é denominada **dissimilaridade cofenética**.
 ::: {#def-dissimilaridade-cofenetica}
 ## Dissimilaridade cofenética
 
-A **dissimilaridade cofenética** entre dois objetos é o nível da hierarquia no qual eles passam, pela primeira vez, a pertencer ao mesmo grupo.
+Considere uma hierarquia aglomerativa cujas fusões possuem níveis não decrescentes.
+
+A **dissimilaridade cofenética** entre os objetos $i$ e $j$ é o menor nível da hierarquia no qual ambos passam a pertencer ao mesmo grupo:
+
+$$
+d_{\mathrm{cop}}
+\left(
+i,j
+\right).
+$$
+
+Por convenção,
+
+$$
+d_{\mathrm{cop}}
+\left(
+i,i
+\right)
+=
+0.
+$$
 :::
 
-A estrutura hierárquica impõe uma propriedade mais forte que a desigualdade triangular usual.
+Para formular a propriedade geométrica induzida pela hierarquia, é útil distinguir pseudoultramétrica de ultramétrica.
 
 ::: {#def-ultrametrica}
-## Ultramétrica
+## Pseudoultramétrica e ultramétrica
 
-Uma distância $d_U$ é uma **ultramétrica** quando, para quaisquer três objetos $i$, $j$ e $k$,
+Seja
+
+$$
+d_U:
+\mathcal I\times\mathcal I
+\longrightarrow
+[0,\infty)
+$$
+
+uma função sobre o conjunto de objetos
+
+$$
+\mathcal I
+=
+\{1,\ldots,n\}.
+$$
+
+Ela é uma **pseudoultramétrica** quando satisfaz
+
+$$
+d_U(i,i)=0,
+$$
+
+$$
+d_U(i,j)=d_U(j,i)
+$$
+
+e, para quaisquer $i,j,k\in\mathcal I$,
 
 $$
 d_U
@@ -2590,11 +2811,50 @@ j,k
 \right)
 \right\}.
 $$ {#eq-desigualdade-ultrametrica}
+
+Uma pseudoultramétrica é uma **ultramétrica** quando também satisfaz
+
+$$
+d_U(i,j)>0
+\qquad
+\text{para}
+\qquad
+i\neq j.
+$$
 :::
 
-Quando os níveis de fusão da hierarquia são não decrescentes, a dissimilaridade cofenética definida por essas alturas é ultramétrica.
+A desigualdade em @eq-desigualdade-ultrametrica é mais forte do que a desigualdade triangular usual.
 
-Para compreender essa propriedade, considere três objetos. Se $i$ e $j$ já pertencem ao mesmo grupo em determinado nível e $j$ e $k$ também pertencem ao mesmo grupo nesse nível, então a estrutura aninhada da hierarquia implica que $i$ e $k$ também pertencem ao mesmo grupo nesse nível ou em um nível inferior. Consequentemente,
+Quando os níveis de fusão são não decrescentes, a dissimilaridade cofenética satisfaz essa desigualdade.
+
+Para verificar a propriedade, considere três objetos $i$, $j$ e $k$ e defina
+
+$$
+h
+=
+\max
+\left\{
+d_{\mathrm{cop}}(i,j),
+d_{\mathrm{cop}}(j,k)
+\right\}.
+$$
+
+No nível $h$, os objetos $i$ e $j$ já pertencem ao mesmo grupo e os objetos $j$ e $k$ também pertencem ao mesmo grupo.
+
+Como cada nível da hierarquia é uma partição, o grupo que contém $j$ nesse nível é único. Portanto, $i$, $j$ e $k$ pertencem ao mesmo grupo no nível $h$.
+
+Consequentemente,
+
+$$
+d_{\mathrm{cop}}
+\left(
+i,k
+\right)
+\leq
+h,
+$$
+
+isto é,
 
 $$
 d_{\mathrm{cop}}
@@ -2615,9 +2875,29 @@ j,k
 \right\}.
 $$
 
-Sob essa condição de monotonicidade dos níveis de fusão, o dendrograma pode ser interpretado como uma representação de uma geometria ultramétrica construída a partir das dissimilaridades originais.
+Assim, sob níveis de fusão não decrescentes, a dissimilaridade cofenética é uma **pseudoultramétrica**.
 
-Essa geometria não precisa reproduzir exatamente a matriz $\boldsymbol{\Delta}$. O método hierárquico transforma a estrutura inicial de proximidades em uma estrutura aninhada de grupos e, consequentemente, em uma nova relação de proximidade.
+Se, adicionalmente, objetos distintos somente puderem tornar-se pertencentes ao mesmo grupo em níveis estritamente positivos, então
+
+$$
+d_{\mathrm{cop}}(i,j)>0
+\qquad
+\text{para}
+\qquad
+i\neq j,
+$$
+
+e a dissimilaridade cofenética é uma ultramétrica no sentido estrito.
+
+Essa distinção é compatível com @def-dissimilaridade-agrupamento, na qual foi permitido que objetos distintos apresentem dissimilaridade zero.
+
+A estrutura hierárquica cria, portanto, uma geometria própria a partir das fusões. Essa geometria não precisa reproduzir exatamente a matriz de dissimilaridades original
+
+$$
+\boldsymbol{\Delta}.
+$$
+
+O método transforma a estrutura inicial de proximidades em uma coleção de grupos aninhados e, quando os níveis são monotônicos, em uma pseudoultramétrica cofenética.
 
 ### Uma partição e uma hierarquia representam objetos diferentes
 
@@ -2631,7 +2911,9 @@ C_1,\ldots,C_K
 \right\}.
 $$
 
-Um método hierárquico produz uma coleção ordenada de partições aninhadas. Essa diferença modifica o tipo de informação fornecida pela técnica e é sintetizada na @tbl-particao-hierarquia.
+Um método hierárquico produz uma coleção ordenada de partições aninhadas.
+
+Essa diferença modifica o tipo de informação fornecida pela técnica e é sintetizada na @tbl-particao-hierarquia.
 
 | Estrutura | Resultado principal | Critério |
 |---|---|---|
@@ -2643,7 +2925,11 @@ Um método hierárquico produz uma coleção ordenada de partições aninhadas. 
 
 : Estruturas produzidas por diferentes formulações de agrupamento. {#tbl-particao-hierarquia}
 
-A existência de diferentes critérios mostra que “grupo” não corresponde a um único objeto matemático. Nas $K$-médias, um grupo é representado por proximidade a um centroide. Na ligação simples, a formação de grupos depende da conectividade produzida por pares próximos. Na ligação completa, exige-se controle da maior separação entre os elementos que serão reunidos. Em Ward, a fusão é avaliada por seu efeito sobre a dispersão quadrática interna.
+A existência de diferentes critérios mostra que “grupo” não corresponde a um único objeto matemático.
+
+Nas $K$-médias, um grupo é representado por proximidade a um centroide. Na ligação simples, a formação de grupos depende da conectividade produzida por pares próximos. Na ligação completa, controla-se a maior dissimilaridade entre elementos de grupos candidatos à fusão. Na ligação média, considera-se conjuntamente o conjunto de dissimilaridades entre os dois grupos. Em Ward, a fusão é avaliada por seu efeito sobre a dispersão quadrática intragrupos.
+
+Além disso, uma partição selecionada de uma hierarquia não é equivalente a uma solução obtida diretamente pela otimização de um critério para o mesmo número de grupos. A hierarquia conserva as fusões realizadas anteriormente e, portanto, restringe as partições que podem aparecer nas etapas posteriores.
 
 Essa diferença será ampliada na próxima seção ao considerar formulações nas quais grupos são definidos como componentes de uma distribuição probabilística ou como regiões de elevada densidade.
 
@@ -2662,15 +2948,15 @@ A @tbl-definicoes-grupo sintetiza algumas dessas definições.
 | ligação completa | conjunto cuja maior separação é controlada | maior dissimilaridade entre grupos |
 | Ward | conjunto cuja fusão produz pequeno aumento da dispersão | SSCP intragrupos |
 | modelo de mistura | componente de uma distribuição probabilística | densidades e probabilidades de pertencimento |
-| densidade | região conectada de elevada concentração de observações | densidade e conectividade |
+| densidade | região conectada de elevada concentração | densidade e conectividade |
 
 : Diferentes definições matemáticas de grupo. {#tbl-definicoes-grupo}
 
-A tabela explica por que métodos diferentes podem produzir soluções distintas sem que uma delas seja necessariamente incorreta. Cada método resolve um problema diferente.
+A tabela explica por que métodos diferentes podem produzir soluções distintas sem que uma delas seja necessariamente incorreta. Cada método resolve um problema diferente e define matematicamente o que será entendido por grupo.
 
 ### Formulação probabilística de grupos
 
-Os critérios estudados até aqui foram formulados principalmente por distâncias, dispersões e relações entre conjuntos. Uma definição diferente pode ser obtida por meio de um modelo probabilístico.
+Os critérios estudados até aqui foram formulados principalmente por distâncias, dispersões e relações entre conjuntos. Uma definição diferente pode ser obtida por meio de um modelo probabilístico [@everitt2011cluster].
 
 Considere uma variável categórica latente
 
@@ -2702,7 +2988,7 @@ $$
 1.
 $$
 
-Condicionalmente ao grupo,
+Condicionalmente à componente $k$,
 
 $$
 \boldsymbol{\mathsf X}
@@ -2710,7 +2996,7 @@ $$
 \mathsf G=k
 $$
 
-possui uma distribuição com densidade
+possui densidade
 
 $$
 f_k
@@ -2720,7 +3006,7 @@ f_k
 \right).
 $$
 
-A densidade marginal de $\boldsymbol{\mathsf X}$ é
+Pela lei da probabilidade total, a densidade marginal de $\boldsymbol{\mathsf X}$ é
 
 $$
 f
@@ -2757,10 +3043,43 @@ f_k
 \right),
 $$
 
-em que $\pi_k$ é a probabilidade de pertencimento à componente $k$ e $f_k$ descreve a distribuição das observações condicionada a essa componente.
+em que
+
+$$
+\pi_k
+=
+P
+\left(
+\mathsf G=k
+\right)
+$$
+
+é a proporção ou probabilidade a priori da componente $k$, e
+
+$$
+f_k
+\left(
+\mathbf x;
+\boldsymbol{\theta}_k
+\right)
+$$
+
+descreve a distribuição de $\boldsymbol{\mathsf X}$ condicionada a
+
+$$
+\mathsf G=k.
+$$
 :::
 
-Nessa formulação, o grupo é representado por uma variável aleatória categórica não observada. A posição de uma observação em relação aos grupos pode ser descrita pelas probabilidades condicionais
+Nessa formulação, o grupo é representado por uma variável aleatória categórica não observada.
+
+Para uma observação $\mathbf x$ tal que
+
+$$
+f(\mathbf x)>0,
+$$
+
+o teorema de Bayes fornece
 
 $$
 P
@@ -2768,14 +3087,96 @@ P
 \mathsf G=k
 \mid
 \boldsymbol{\mathsf X}=\mathbf x
+\right)
+=
+\frac{
+\pi_k
+f_k
+\left(
+\mathbf x;
+\boldsymbol{\theta}_k
+\right)
+}{
+\displaystyle
+\sum_{\ell=1}^{K}
+\pi_{\ell}
+f_{\ell}
+\left(
+\mathbf x;
+\boldsymbol{\theta}_{\ell}
+\right)
+}.
+$$ {#eq-probabilidade-posterior-grupo}
+
+Essas probabilidades fornecem uma representação probabilística do pertencimento aos grupos.
+
+Diferentemente de uma partição rígida,
+
+$$
+P
+\left(
+\mathsf G=k
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right)
+$$
+
+pode assumir valores entre $0$ e $1$ para várias componentes. Uma classificação rígida pode ser construída posteriormente, por exemplo escolhendo uma componente com maior probabilidade posterior, mas essa decisão não faz parte da definição do modelo de mistura.
+
+A formulação utiliza os fundamentos probabilísticos do Módulo 2, mas resolve um problema diferente daquele da Análise Fatorial.
+
+No modelo de fatores comuns de @def-modelo-fatores-comuns, as variáveis latentes são contínuas e são utilizadas para representar a estrutura de covariâncias entre variáveis observadas.
+
+No modelo de mistura, a variável latente
+
+$$
+\mathsf G
+$$
+
+é categórica e indica a componente da distribuição associada à observação.
+
+A normalidade multivariada não é necessária para definir um modelo de mistura em geral. Ela aparece somente quando se escolhem, especificamente, densidades componentes normais multivariadas.
+
+### Não unicidade dos rótulos em modelos de mistura
+
+Os rótulos das componentes de uma mistura não possuem significado intrínseco.
+
+Considere uma permutação
+
+$$
+\tau:
+\{1,\ldots,K\}
+\longrightarrow
+\{1,\ldots,K\}.
+$$
+
+Reordenar simultaneamente as proporções e os parâmetros das componentes não modifica a densidade marginal:
+
+$$
+\sum_{k=1}^{K}
+\pi_k
+f_k
+\left(
+\mathbf x;
+\boldsymbol{\theta}_k
+\right)
+=
+\sum_{k=1}^{K}
+\pi_{\tau(k)}
+f_{\tau(k)}
+\left(
+\mathbf x;
+\boldsymbol{\theta}_{\tau(k)}
 \right).
 $$
 
-Essa estrutura utiliza os fundamentos probabilísticos do Módulo 2, mas resolve um problema diferente daquele da Análise Fatorial. No modelo de fatores comuns de @def-modelo-fatores-comuns, as variáveis latentes são contínuas e explicam a estrutura de covariâncias entre variáveis observadas. No modelo de mistura, a variável latente é categórica e representa a componente à qual uma observação está associada.
+Portanto, os nomes atribuídos às componentes são arbitrários.
 
-Os algoritmos utilizados para estimar os parâmetros de uma mistura e calcular probabilidades de pertencimento pertencem à implementação da técnica e não serão desenvolvidos neste capítulo.
+Essa indeterminação de rótulos é análoga, nesse aspecto, à arbitrariedade dos nomes dos grupos em uma partição. Condições adicionais de identificação podem ser necessárias para determinar outros aspectos dos parâmetros de uma mistura, dependendo da família de distribuições especificada.
 
-A formulação probabilística também não estabelece que toda estrutura encontrada corresponda a uma classe substantiva existente fora do modelo. Os grupos são componentes da distribuição especificada, e sua interpretação depende da adequação dessa representação ao problema analisado.
+Os métodos de estimação dos parâmetros de misturas e os algoritmos utilizados para calculá-los pertencem à implementação da técnica e não serão desenvolvidos neste capítulo.
+
+A formulação probabilística também não estabelece que toda componente encontrada corresponda a uma classe substantiva existente fora do modelo. Os grupos são componentes da distribuição especificada, e sua interpretação depende da adequação dessa representação ao problema analisado.
 
 ### Grupos definidos por densidade
 
@@ -2784,7 +3185,10 @@ Uma terceira noção pode ser formulada diretamente a partir da concentração d
 Se $\boldsymbol{\mathsf X}$ possui densidade
 
 $$
-f(\mathbf x),
+f
+\left(
+\mathbf x
+\right),
 $$
 
 considere, para um nível
@@ -2793,30 +3197,57 @@ $$
 \lambda>0,
 $$
 
-o conjunto
+o conjunto de nível superior
 
 $$
 L_{\lambda}
 =
 \left\{
 \mathbf x\in\mathbb R^p:
-f(\mathbf x)\geq\lambda
+f
+\left(
+\mathbf x
+\right)
+\geq
+\lambda
 \right\}.
 $$ {#eq-conjunto-nivel-densidade}
 
-As componentes conectadas de $L_{\lambda}$ podem representar regiões distintas de elevada densidade.
+As componentes conectadas de
 
-Essa definição permite considerar grupos com formas que não precisam ser adequadamente representadas por centroides ou regiões de Voronoi. O critério passa a ser a existência de regiões densas separadas por regiões de menor concentração.
+$$
+L_{\lambda}
+$$
 
-A noção de grupo baseada em densidade também explica por que métodos construídos para esse objetivo podem produzir soluções muito diferentes das $K$-médias. Os dois procedimentos não discordam sobre uma mesma função objetivo; eles adotam definições diferentes de estrutura.
+podem ser utilizadas para representar regiões distintas de elevada densidade.
 
-Métodos computacionais baseados em densidade serão tratados posteriormente. Neste capítulo, a formulação serve para mostrar que proximidade a um centroide, conectividade e concentração probabilística são conceitos distintos.
+Essa definição permite considerar grupos com formas que não precisam ser adequadamente representadas por centroides ou regiões de Voronoi. O critério passa a depender da existência de regiões densas separadas por regiões de menor concentração.
 
+A própria estrutura obtida depende do nível
 
+$$
+\lambda.
+$$
 
-## Dependência da solução
+À medida que o nível varia, componentes conectadas podem aparecer, desaparecer, dividir-se ou unir-se. Portanto, também nessa formulação o conceito de grupo depende de um critério matemático previamente especificado.
 
-Uma solução de agrupamento é condicionada pelas escolhas que definem o problema. Algumas dessas escolhas atuam antes da construção dos grupos; outras pertencem ao próprio critério.
+A noção de grupo baseada em densidade explica por que métodos construídos para esse objetivo podem produzir soluções muito diferentes das $K$-médias. Os procedimentos não estão necessariamente produzindo respostas diferentes para uma mesma função objetivo; eles procuram estruturas diferentes.
+
+Métodos computacionais específicos baseados em densidade serão tratados posteriormente. Neste capítulo, essa formulação serve para mostrar que proximidade a um centroide, conectividade hierárquica, componentes probabilísticas e regiões de elevada densidade constituem conceitos distintos de grupo.
+
+## Dependência da solução e limites da formulação
+
+Não existe um conjunto único de pressupostos probabilísticos válido para toda a Análise de Agrupamentos.
+
+As $K$-médias e os métodos hierárquicos estudados neste capítulo podem ser formulados geometricamente sem hipótese de normalidade multivariada ou de um modelo probabilístico gerador.
+
+Nos modelos de mistura, por outro lado, uma família probabilística é especificada explicitamente e suas hipóteses passam a fazer parte da definição do modelo.
+
+Em métodos baseados em densidade, a própria distribuição ou uma representação de sua concentração participa da definição dos grupos.
+
+Assim, os pressupostos devem ser interpretados em relação à formulação específica considerada, e não como condições universais da Análise de Agrupamentos.
+
+Uma solução também é condicionada pelas escolhas que definem o problema. Algumas dessas escolhas atuam antes da construção dos grupos; outras pertencem ao próprio critério.
 
 A @tbl-dependencia-solucao-agrupamento organiza essas dependências.
 
@@ -2825,11 +3256,11 @@ A @tbl-dependencia-solucao-agrupamento organiza essas dependências.
 | conjunto de variáveis | representação dos objetos | proximidades e grupos podem mudar |
 | escala das variáveis | geometria do espaço | variáveis recebem pesos relativos diferentes |
 | métrica ou dissimilaridade | relação de proximidade | pares considerados próximos podem mudar |
-| número $K$ | conjunto de partições admissíveis | muda o problema das $K$-médias |
+| número $K$ | conjunto de partições ou componentes consideradas | muda o problema formulado |
 | regra de ligação | proximidade entre grupos | muda a hierarquia |
 | função objetivo | definição de agrupamento | muda a estrutura procurada |
-| modelo probabilístico | significado da variável latente de grupo | mudam probabilidades e componentes |
-| critério de densidade | definição de região concentrada | mudam forma e conectividade dos grupos |
+| modelo probabilístico | significado da variável latente de grupo | mudam componentes e probabilidades posteriores |
+| nível ou critério de densidade | definição de região concentrada | mudam forma, número e conectividade dos grupos |
 
 : Elementos dos quais depende uma solução de agrupamento. {#tbl-dependencia-solucao-agrupamento}
 
@@ -2845,7 +3276,7 @@ $$
 \mathbb R^p.
 $$
 
-Adicionar ou retirar uma variável modifica essa representação e pode alterar as distâncias entre os objetos.
+Adicionar, retirar ou transformar uma variável modifica essa representação e pode alterar as relações de proximidade entre os objetos.
 
 O agrupamento obtido pertence, portanto, ao espaço de variáveis escolhido para representar as unidades.
 
@@ -2855,19 +3286,35 @@ Essa característica aproxima a técnica das discussões anteriores sobre ACP e 
 
 O efeito da escala foi ilustrado em @fig-agrupamentos-efeito-escala. A escolha de uma métrica possui efeito mais geral: ela determina a geometria na qual proximidade e separação serão avaliadas.
 
-Os resultados do Módulo 1 sobre normas e geometrias induzidas permitem interpretar essa escolha de forma direta. Alterar a métrica significa alterar comprimentos e distâncias e, portanto, alterar o problema de agrupamento.
+Os resultados do Módulo 1 sobre normas e geometrias induzidas permitem interpretar essa escolha diretamente. Alterar a métrica significa alterar comprimentos e distâncias e, portanto, alterar o problema de agrupamento.
+
+A padronização também não é uma operação neutra. Ela modifica os pesos relativos das variáveis na geometria utilizada para construir as proximidades.
 
 ### Dependência da forma dos grupos
 
 O critério das $K$-médias representa cada grupo por um centroide e utiliza regiões de Voronoi. Essa estrutura favorece grupos adequadamente descritos por proximidade a centros.
 
-A ligação simples utiliza conectividade entre pares próximos e pode representar estruturas alongadas que não são bem resumidas por um único centroide.
+A ligação simples utiliza conectividade por pares próximos e pode produzir estruturas alongadas que não são bem resumidas por um único centroide.
 
-A ligação completa controla separações máximas e tende a privilegiar outra forma de compacidade.
+A ligação completa utiliza a maior dissimilaridade entre os conjuntos candidatos à fusão e, portanto, privilegia outra noção de compacidade.
 
-Métodos baseados em densidade definem grupos por regiões concentradas e conectadas.
+Ward utiliza o incremento de dispersão quadrática intragrupos.
+
+Métodos baseados em densidade definem grupos a partir de regiões de elevada concentração e conectividade.
 
 Não existe, portanto, uma única geometria de grupo compartilhada por todos os métodos.
+
+### Não unicidade
+
+A existência de uma função objetivo ou de uma regra de construção não garante uma solução única.
+
+Nas $K$-médias, diferentes partições podem apresentar o mesmo valor mínimo do critério, além da arbitrariedade dos rótulos dos grupos.
+
+Nos métodos hierárquicos, empates entre fusões candidatas podem exigir uma regra de desempate e, em determinadas configurações, produzir hierarquias distintas.
+
+Nos modelos de mistura, permutações dos rótulos das componentes representam a mesma densidade marginal, e outras questões de identificação podem depender da família probabilística adotada.
+
+A não unicidade deve, portanto, ser distinguida conforme sua origem. Ela pode pertencer à função objetivo, à construção hierárquica, à parametrização de um modelo probabilístico ou apenas aos rótulos utilizados para representar a solução.
 
 ## Ausência de classes naturais automáticas
 
@@ -2875,19 +3322,21 @@ A Análise de Agrupamentos é uma técnica não supervisionada: os rótulos dos 
 
 Esse fato impõe uma diferença importante em relação à Análise Discriminante. Uma partição encontrada nos dados não demonstra automaticamente a existência de populações distintas que tenham gerado as observações.
 
-No caso das $K$-médias, a solução é aquela que minimiza
+No caso das $K$-médias, uma solução global é definida pela minimização de
 
 $$
 J_K.
 $$
 
-No método de Ward, a hierarquia é definida pelo aumento da dispersão intragrupos.
+No método de Ward, a hierarquia é construída a partir dos incrementos de dispersão intragrupos.
 
 Nas ligações simples, completa e média, a hierarquia decorre das respectivas definições de proximidade entre conjuntos.
 
 Em uma mistura probabilística, os grupos são componentes de um modelo especificado.
 
-Cada conclusão deve ser interpretada relativamente à estrutura que produziu a solução.
+Em uma formulação por densidade, os grupos dependem das regiões de concentração definidas pelo critério adotado.
+
+Cada conclusão deve ser interpretada relativamente à estrutura matemática ou probabilística que produziu a solução.
 
 ::: {.callout-caution appearance="simple" icon="false"}
 ## Grupos encontrados e grupos substantivos
@@ -2906,11 +3355,11 @@ A @tbl-relacoes-agrupamentos-tecnicas compara essas relações.
 | Técnica | Objeto relacionado | Função na técnica |
 |---|---|---|
 | ACP | matriz de dados e geometria das observações | construir uma representação de menor dimensão |
-| Análise Fatorial | variáveis observadas e estrutura de covariâncias | modelar dependências por fatores latentes contínuos |
+| Análise Fatorial | variáveis observadas e matriz de covariâncias | modelar a estrutura de covariâncias por fatores latentes contínuos |
 | Agrupamentos | matriz de dados ou dissimilaridades | construir grupos |
-| MDS | matriz de dissimilaridades | reconstruir uma configuração geométrica |
+| MDS | matriz de dissimilaridades | construir uma configuração geométrica que procure representar as proximidades |
 | MANOVA | dispersão intragrupos e entre grupos | testar hipóteses sobre diferenças entre grupos conhecidos |
-| Análise Discriminante | médias, dispersões e distâncias entre grupos | construir direções de separação e regras de classificação |
+| Análise Discriminante | médias, dispersões e distribuições de grupos | construir direções de separação ou regras de classificação |
 
 : Relações entre a Análise de Agrupamentos e outras técnicas multivariadas. {#tbl-relacoes-agrupamentos-tecnicas}
 
@@ -2918,7 +3367,13 @@ A @tbl-relacoes-agrupamentos-tecnicas compara essas relações.
 
 A ACP pode produzir novas coordenadas para as observações. Quando são mantidas todas as componentes correspondentes a uma transformação ortogonal da representação utilizada como entrada, as distâncias euclidianas são preservadas por @prp-preservacao-geometria-transformacao-ortogonal.
 
-Quando apenas $k<p$ componentes são mantidas, as observações são projetadas sobre o subespaço principal definido em @def-subespaco-principal-acp, como representado em @fig-acp-projecao-reconstrucao. Nesse caso, as distâncias passam a ser calculadas na configuração projetada e podem diferir das distâncias anteriores à redução.
+Quando apenas
+
+$$
+k<p
+$$
+
+componentes são mantidas, as observações são projetadas sobre o subespaço principal definido em @def-subespaco-principal-acp, como representado em @fig-acp-projecao-reconstrucao. Nesse caso, as distâncias passam a ser calculadas na configuração projetada e podem diferir das distâncias anteriores à redução.
 
 A interpretação também depende da representação utilizada pela ACP. Se a análise foi realizada sobre variáveis padronizadas, a preservação pela transformação ortogonal refere-se à geometria do espaço padronizado, e não à geometria das variáveis em suas escalas originais.
 
@@ -2934,7 +3389,13 @@ $$
 
 A diferença está no objeto procurado.
 
-Na Análise de Agrupamentos, $\boldsymbol{\Delta}$ é utilizada para construir partições ou hierarquias.
+Na Análise de Agrupamentos,
+
+$$
+\boldsymbol{\Delta}
+$$
+
+é utilizada para construir partições ou hierarquias.
 
 No MDS, ela será utilizada para obter coordenadas
 
@@ -2942,7 +3403,9 @@ $$
 \mathbf y_1,\ldots,\mathbf y_n
 $$
 
-cujas distâncias representem as dissimilaridades originais.
+cujas distâncias procurem representar as dissimilaridades fornecidas.
+
+A representação pode ser exata em situações específicas, mas, em geral, o problema consiste em encontrar uma configuração que preserve ou aproxime a estrutura de proximidades segundo o critério do método.
 
 Essa relação prepara diretamente o próximo capítulo.
 
@@ -2950,9 +3413,9 @@ Essa relação prepara diretamente o próximo capítulo.
 
 Na Análise de Agrupamentos, os grupos fazem parte da solução.
 
-Na Análise Discriminante, os grupos serão observados previamente e serão utilizados para construir funções de separação ou regras de classificação.
+Na Análise Discriminante, os grupos são conhecidos previamente e fazem parte da informação utilizada para construir direções de separação ou regras de classificação.
 
-Na Análise de Agrupamentos, os grupos fazem parte da solução. Na Análise Discriminante, eles pertencem à informação disponível antes da construção da regra. A primeira técnica procura uma organização dos objetos; a segunda utiliza grupos conhecidos para estudar separação e classificar novas observações.
+A primeira técnica procura uma organização dos objetos. A segunda utiliza classes previamente observadas para estudar sua separação e, em formulações classificatórias, atribuir novas observações a essas classes.
 
 ### Agrupamentos e MANOVA
 
@@ -2995,11 +3458,13 @@ $$
 \mathbb R^{n\times p},
 $$
 
-distâncias podem ser construídas diretamente no espaço das variáveis. Quando apenas relações entre objetos estão disponíveis, a análise pode partir de uma matriz de dissimilaridades
+as proximidades podem ser construídas a partir das coordenadas. Quando apenas relações entre objetos estão disponíveis, a análise pode partir de uma matriz de dissimilaridades
 
 $$
 \boldsymbol{\Delta}.
 $$
+
+Uma dissimilaridade é mais geral do que uma distância métrica: neste capítulo, exige-se não negatividade, simetria e diagonal nula, mas não necessariamente separação estrita de objetos distintos nem desigualdade triangular.
 
 Uma partição rígida em $K$ grupos é representada por
 
@@ -3031,7 +3496,9 @@ J_K
 \right).
 $$
 
-O centroide aparece porque a média de um conjunto é o ponto que minimiza a soma das distâncias euclidianas quadráticas às observações. Para centroides fixados, cada objeto é atribuído a um centroide mais próximo, produzindo regiões de Voronoi.
+O centroide aparece porque a média de um conjunto é o único ponto que minimiza a soma das distâncias euclidianas quadráticas às observações.
+
+Para centros fixados, a regra ponto a ponto atribui cada observação a um centroide de menor distância. Quando essa atribuição produz todos os grupos não vazios, ela também satisfaz as restrições completas da formulação das $K$-médias.
 
 A decomposição
 
@@ -3043,9 +3510,52 @@ $$
 \mathbf T_{\mathrm{entre}}
 $$
 
-mostra que, para $K$ fixado, minimizar a dispersão intragrupos equivale a maximizar a parcela entre grupos segundo o traço.
+mostra que, para $K$ fixado, minimizar a dispersão intragrupos equivale a maximizar
 
-Nos métodos hierárquicos, o resultado principal deixa de ser uma única partição e passa a ser uma sequência aninhada de partições. Ligações simples, completas e médias utilizam diferentes definições de proximidade entre conjuntos.
+$$
+\operatorname{tr}
+\left(
+\mathbf T_{\mathrm{entre}}
+\right),
+$$
+
+isto é, a dispersão ponderada dos centroides dos grupos em torno do centroide global.
+
+No nível populacional, o mesmo problema pode ser representado pelo risco
+
+$$
+R_K
+\left(
+\mathbf c_1,\ldots,\mathbf c_K
+\right)
+=
+E
+\left[
+\min_{1\leq k\leq K}
+\left\|
+\boldsymbol{\mathsf X}-\mathbf c_k
+\right\|^2
+\right],
+$$
+
+sob a condição
+
+$$
+E
+\left(
+\left\|
+\boldsymbol{\mathsf X}
+\right\|^2
+\right)
+<
+\infty.
+$$
+
+Essa formulação distingue o minimizador global do problema estatístico dos procedimentos computacionais utilizados para procurá-lo.
+
+Nos métodos hierárquicos aglomerativos, o resultado principal deixa de ser uma única partição e passa a ser uma sequência aninhada de partições.
+
+As ligações simples, completa e média utilizam, respectivamente, a menor, a maior e a média das dissimilaridades entre objetos pertencentes aos grupos comparados.
 
 O método de Ward reutiliza a dispersão quadrática e mede o incremento
 
@@ -3067,10 +3577,72 @@ $$
 
 produzido pela fusão de dois grupos.
 
-A hierarquia pode ser representada por um dendrograma e induz uma estrutura ultramétrica por meio das alturas das fusões.
+Embora Ward e $K$-médias utilizem a mesma estrutura de soma de quadrados intragrupos, eles resolvem problemas diferentes. As $K$-médias procuram diretamente uma partição para $K$ fixado, enquanto Ward constrói uma sequência irreversível de fusões locais.
 
-Outras formulações modificam o significado de grupo. Em modelos de mistura, grupos são componentes de uma distribuição probabilística e o pertencimento é representado por uma variável categórica latente. Em formulações baseadas em densidade, grupos podem ser associados a regiões conectadas de elevada concentração.
+A hierarquia pode ser representada por um dendrograma. Quando seus níveis de fusão são não decrescentes, a dissimilaridade cofenética satisfaz a desigualdade ultramétrica e constitui uma pseudoultramétrica. Ela será uma ultramétrica no sentido estrito quando objetos distintos somente se fundirem em níveis positivos.
 
-A solução depende da representação dos objetos, das variáveis, da escala, da proximidade e do critério de agrupamento. Por isso, uma partição ou hierarquia deve ser interpretada relativamente ao problema matemático que a produziu.
+Empates nas funções objetivo ou nos critérios de fusão podem produzir não unicidade da solução, além da arbitrariedade dos rótulos dos grupos.
 
-O próximo capítulo mantém a matriz de dissimilaridades como objeto de entrada, mas altera o objetivo da análise. O Escalonamento Multidimensional utilizará as proximidades entre objetos para reconstruir uma configuração geométrica cujas distâncias representem a estrutura contida em $\boldsymbol{\Delta}$.
+Outras formulações modificam o significado de grupo. Em modelos de mistura,
+
+$$
+f
+\left(
+\mathbf x
+\right)
+=
+\sum_{k=1}^{K}
+\pi_k
+f_k
+\left(
+\mathbf x;
+\boldsymbol{\theta}_k
+\right),
+$$
+
+e os grupos são representados por componentes de uma distribuição probabilística associadas a uma variável categórica latente.
+
+As probabilidades
+
+$$
+P
+\left(
+\mathsf G=k
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right)
+$$
+
+representam o pertencimento probabilístico às componentes.
+
+Em formulações baseadas em densidade, grupos podem ser associados às componentes conectadas de conjuntos
+
+$$
+L_{\lambda}
+=
+\left\{
+\mathbf x:
+f
+\left(
+\mathbf x
+\right)
+\geq
+\lambda
+\right\}.
+$$
+
+Essas formulações mostram que não existe uma única definição matemática de grupo.
+
+A solução depende da representação dos objetos, das variáveis utilizadas, da escala, da medida de proximidade, do número de grupos, da função objetivo, da regra de ligação ou do modelo probabilístico adotado.
+
+Normalidade multivariada não constitui um pressuposto geral da Análise de Agrupamentos. Métodos geométricos podem ser definidos sem um modelo probabilístico, enquanto modelos de mistura incorporam as hipóteses correspondentes às distribuições escolhidas.
+
+Por isso, uma partição, uma hierarquia ou uma coleção de componentes probabilísticas deve ser interpretada relativamente ao problema matemático e estatístico que a produziu. A existência de uma organização interna dos dados não demonstra, por si só, a existência de classes substantivas externas ao critério utilizado.
+
+O capítulo utiliza, assim, resultados dos Módulos 1 e 2 sobre distâncias, normas, transformações ortogonais, matrizes de dispersão, decomposição intragrupos e entre grupos, esperança e distribuições condicionais para formular diferentes conceitos de agrupamento.
+
+O próximo capítulo mantém a matriz de dissimilaridades como possível objeto de entrada, mas altera o objetivo da análise. O Escalonamento Multidimensional utilizará as proximidades entre objetos para construir uma configuração geométrica cujas distâncias procurem representar a estrutura contida em
+
+$$
+\boldsymbol{\Delta}.
+$$
