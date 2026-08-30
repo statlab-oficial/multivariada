@@ -1,38 +1,20 @@
 # Formulação da Análise Discriminante
 
-A Análise Discriminante estuda problemas em que os grupos de interesse são previamente conhecidos e cada unidade é descrita por um vetor de características quantitativas. Diferentemente da Análise de Agrupamentos, os rótulos das observações utilizadas para caracterizar os grupos são conhecidos.
+A Análise Discriminante estuda problemas com grupos previamente conhecidos e unidades descritas por vetores de características quantitativas. Seus objetivos incluem representar a separação entre os grupos e construir regras para classificar novas observações.
 
-O problema possui objetivos relacionados, mas distintos:
+Duas formulações serão utilizadas. Na formulação probabilística, as classes são descritas por distribuições condicionais e a classificação é tratada como um problema de decisão envolvendo probabilidades *a priori*, perdas e probabilidades posteriores. Na formulação geométrica de Fisher, procuram-se combinações lineares que maximizem a separação entre grupos relativamente à dispersão intragrupos [@anderson2003; @johnson2007; @rencher2012; @fisher1936].
 
-- **discriminação:** identificar características ou combinações das variáveis que diferenciem os grupos;
-- **representação discriminante:** construir coordenadas de menor dimensão nas quais a separação entre grupos possa ser descrita;
-- **classificação:** construir uma regra capaz de atribuir uma nova observação a uma das classes conhecidas.
+As duas construções resolvem problemas distintos, embora possam produzir estruturas matemáticas relacionadas sob condições específicas. O capítulo desenvolve a regra de Bayes, as regras discriminantes linear e quadrática sob normalidade, o critério de Fisher e sua formulação por autovalores generalizados.
 
-Esses objetivos conduzem a duas formulações complementares.
-
-Na **formulação probabilística**, cada classe é descrita por uma distribuição condicional e a classificação é tratada como um problema de decisão. Probabilidades *a priori*, densidades condicionais e perdas determinam a regra ótima segundo o critério considerado.
-
-Na **formulação geométrica de Fisher**, procuram-se combinações lineares das variáveis que apresentem grande separação entre os grupos relativamente à dispersão existente dentro deles [@anderson2003; @johnson2007; @rencher2012; @fisher1936].
-
-A distinção entre as duas formulações deve ser preservada. Uma direção que separa grupos conhecidos não constitui, por si só, uma regra de classificação, e uma regra de classificação não precisa ser obtida por uma projeção de Fisher. Sob condições específicas, entretanto, as duas construções apresentam relações matemáticas diretas.
-
-O objetivo deste capítulo é mostrar como:
-
-- a teoria de decisão e o teorema de Bayes produzem regras de classificação;
-- a distribuição normal multivariada e a distância de Mahalanobis conduzem às regras discriminantes linear e quadrática;
-- a decomposição da dispersão entre e dentro dos grupos conduz ao critério de Fisher;
-- formas quadráticas e autovalores generalizados determinam as direções discriminantes;
-- a mesma estrutura matricial utilizada na MANOVA reaparece com outro objetivo estatístico.
-
-Neste capítulo, os parâmetros populacionais, as quantidades amostrais e as regras estimadas serão distinguidos explicitamente. Algoritmos computacionais, regularização, seleção de variáveis, validação cruzada, taxas de erro e demais procedimentos de avaliação preditiva pertencem à etapa metodológica posterior.
+Parâmetros populacionais, quantidades amostrais e regras estimadas serão distinguidos explicitamente. Algoritmos, regularização, seleção de variáveis e avaliação preditiva pertencem à etapa metodológica posterior.
 
 Os elementos centrais são sintetizados na @tbl-estrutura-discriminante.
 
 | Formulação | Objeto de partida | Problema | Resultado |
 |---|---|---|---|
 | decisão estatística | densidades condicionais, probabilidades *a priori* e perdas | escolher uma ação para uma nova observação | regra de Bayes |
-| normal com covariância comum | $\boldsymbol{\mu}_g$, $\boldsymbol{\Sigma}$ e $\pi_g$ | minimizar risco sob perda zero--um | regra discriminante linear |
-| normal com covariâncias distintas | $\boldsymbol{\mu}_g$, $\boldsymbol{\Sigma}_g$ e $\pi_g$ | minimizar risco sob perda zero--um | regra discriminante quadrática |
+| normal com covariância comum | $\boldsymbol{\mu}_k$, $\boldsymbol{\Sigma}$ e $\pi_k$ | minimizar risco sob perda zero--um | regra discriminante linear |
+| normal com covariâncias distintas | $\boldsymbol{\mu}_k$, $\boldsymbol{\Sigma}_k$ e $\pi_k$ | minimizar risco sob perda zero--um | regra discriminante quadrática |
 | geométrica de Fisher | dispersões intragrupos e entre grupos | maximizar separação relativa | direções e coordenadas discriminantes |
 
 : Formulações complementares da Análise Discriminante. {#tbl-estrutura-discriminante}
@@ -42,11 +24,11 @@ Os elementos centrais são sintetizados na @tbl-estrutura-discriminante.
 Considere uma variável aleatória de classe
 
 $$
-\mathsf G
+\mathsf C
 \in
-\{1,\ldots,G\},
+\{1,\ldots,K\},
 \qquad
-G\geq2,
+K\geq2,
 $$
 
 e um vetor aleatório de características
@@ -66,7 +48,7 @@ $$
 Para cada classe
 
 $$
-g\in\{1,\ldots,G\},
+k\in\{1,\ldots,K\},
 $$
 
 existe uma distribuição condicional de
@@ -74,7 +56,7 @@ existe uma distribuição condicional de
 $$
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g.
+\mathsf C=k.
 $$
 
 Uma realização
@@ -95,7 +77,7 @@ $$
 \psi:
 \mathbb R^p
 \longrightarrow
-\{1,\ldots,G\}
+\{1,\ldots,K\}
 $$
 
 que associe uma nova observação
@@ -129,7 +111,7 @@ a
 \qquad
 \mathcal A
 =
-\{1,\ldots,G\},
+\{1,\ldots,K\},
 $$
 
 em que a ação
@@ -138,7 +120,7 @@ $$
 a=g
 $$
 
-significa classificar a observação na classe $g$.
+significa classificar a observação na classe $k$.
 
 A decisão depende de três objetos:
 
@@ -146,7 +128,7 @@ A decisão depende de três objetos:
 2. distribuições condicionais das características;
 3. perdas associadas às possíveis decisões.
 
-### Probabilidades *a priori*
+### Distribuição prévia das classes
 
 ::: {#def-probabilidades-priori-discriminante}
 ## Probabilidades a priori das classes
@@ -154,9 +136,9 @@ A decisão depende de três objetos:
 Seja
 
 $$
-\mathsf G
+\mathsf C
 \in
-\{1,\ldots,G\}
+\{1,\ldots,K\}
 $$
 
 uma variável aleatória de classe.
@@ -164,27 +146,27 @@ uma variável aleatória de classe.
 As **probabilidades a priori** são
 
 $$
-\pi_g
+\pi_k
 =
 P
 \left(
-\mathsf G=g
+\mathsf C=k
 \right),
 \qquad
-g=1,\ldots,G,
+k=1,\ldots,K,
 $$
 
 tais que
 
 $$
-\pi_g>0
+\pi_k>0
 $$
 
 e
 
 $$
-\sum_{g=1}^{G}
-\pi_g
+\sum_{k=1}^{K}
+\pi_k
 =
 1.
 $$
@@ -196,24 +178,24 @@ Elas são parâmetros do problema de decisão. Não devem ser confundidas automa
 
 ### Densidades condicionais e probabilidades posteriores
 
-Suponha que, para cada classe $g$,
+Suponha que, para cada classe $k$,
 
 $$
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 $$
 
 possua densidade
 
 $$
-f_g(\mathbf x)
+f_k(\mathbf x)
 =
 f
 \left(
 \mathbf x
 \mid
-\mathsf G=g
+\mathsf C=k
 \right).
 $$
 
@@ -232,13 +214,13 @@ o teorema de Bayes fornece
 $$
 P
 \left(
-\mathsf G=g
+\mathsf C=k
 \mid
 \boldsymbol{\mathsf X}=\mathbf x
 \right)
 =
 \frac{
-\pi_g f_g(\mathbf x)
+\pi_k f_k(\mathbf x)
 }{
 \displaystyle
 \sum_{h=1}^{G}
@@ -251,7 +233,7 @@ A probabilidade posterior combina dois tipos de informação.
 O fator
 
 $$
-\pi_g
+\pi_k
 $$
 
 representa a frequência probabilística da classe antes de observar $\mathbf x$.
@@ -259,12 +241,12 @@ representa a frequência probabilística da classe antes de observar $\mathbf x$
 O fator
 
 $$
-f_g(\mathbf x)
+f_k(\mathbf x)
 $$
 
 mede a densidade atribuída à observação $\mathbf x$ pela distribuição condicional da classe.
 
-A classificação, entretanto, não depende necessariamente apenas da classe de maior probabilidade posterior. As consequências das decisões também podem ser diferentes.
+A probabilidade posterior, isoladamente, não determina a decisão quando diferentes erros de classificação possuem consequências distintas. A função de perda incorpora essas consequências ao problema.
 
 ## Perda e risco de classificação
 
@@ -276,7 +258,7 @@ Considere o conjunto de ações
 $$
 \mathcal A
 =
-\{1,\ldots,G\}
+\{1,\ldots,K\}
 $$
 
 e as classes verdadeiras
@@ -284,7 +266,7 @@ e as classes verdadeiras
 $$
 g
 \in
-\{1,\ldots,G\}.
+\{1,\ldots,K\}.
 $$
 
 Uma **função de perda de classificação** é uma função
@@ -293,7 +275,7 @@ $$
 L:
 \mathcal A
 \times
-\{1,\ldots,G\}
+\{1,\ldots,K\}
 \longrightarrow
 [0,\infty)
 $$
@@ -304,7 +286,7 @@ $$
 L(a,g)
 $$
 
-quantifica a consequência de escolher a ação $a$ quando a classe verdadeira é $g$.
+quantifica a consequência de escolher a ação $a$ quando a classe verdadeira é $k$.
 :::
 
 Os valores
@@ -331,9 +313,9 @@ A teoria não exige que todos os erros possuam a mesma consequência.
 Considere
 
 $$
-\mathsf G
+\mathsf C
 \in
-\{1,\ldots,G\},
+\{1,\ldots,K\},
 $$
 
 o conjunto de ações
@@ -341,7 +323,7 @@ o conjunto de ações
 $$
 \mathcal A
 =
-\{1,\ldots,G\},
+\{1,\ldots,K\},
 $$
 
 uma função de perda
@@ -350,7 +332,7 @@ $$
 L:
 \mathcal A
 \times
-\{1,\ldots,G\}
+\{1,\ldots,K\}
 \longrightarrow
 [0,\infty)
 $$
@@ -368,7 +350,7 @@ para a qual as probabilidades posteriores
 $$
 P
 \left(
-\mathsf G=g
+\mathsf C=k
 \mid
 \boldsymbol{\mathsf X}=\mathbf x
 \right)
@@ -390,11 +372,11 @@ R
 a\mid\mathbf x
 \right)
 =
-\sum_{g=1}^{G}
+\sum_{k=1}^{K}
 L(a,g)
 P
 \left(
-\mathsf G=g
+\mathsf C=k
 \mid
 \boldsymbol{\mathsf X}=\mathbf x
 \right).
@@ -403,7 +385,7 @@ $$ {#eq-risco-condicional-classificacao-discriminante}
 
 O risco é uma esperança condicional da perda: para uma observação fixa $\mathbf x$, cada possível consequência é ponderada pela probabilidade posterior da respectiva classe verdadeira.
 
-### Regra de Bayes
+### Minimização do risco condicional
 
 ::: {#def-regra-bayes-classificacao-discriminante}
 ## Regra de Bayes para classificação
@@ -413,7 +395,7 @@ Considere o conjunto de ações
 $$
 \mathcal A
 =
-\{1,\ldots,G\}
+\{1,\ldots,K\}
 $$
 
 e, para cada
@@ -513,7 +495,7 @@ a\mid\mathbf x
 \sum_{g\neq a}
 P
 \left(
-\mathsf G=g
+\mathsf C=k
 \mid
 \boldsymbol{\mathsf X}=\mathbf x
 \right)
@@ -523,7 +505,7 @@ P
 -
 P
 \left(
-\mathsf G=a
+\mathsf C=a
 \mid
 \boldsymbol{\mathsf X}=\mathbf x
 \right).
@@ -536,14 +518,14 @@ O conjunto das classes ótimas é
 
 $$
 \underset{
-g\in\{1,\ldots,G\}
+k\in\{1,\ldots,K\}
 }{
 \operatorname{arg\,max}
 }
 \;
 P
 \left(
-\mathsf G=g
+\mathsf C=k
 \mid
 \boldsymbol{\mathsf X}=\mathbf x
 \right).
@@ -555,26 +537,26 @@ $$
 \psi_{\mathrm B}(\mathbf x)
 \in
 \underset{
-g\in\{1,\ldots,G\}
+k\in\{1,\ldots,K\}
 }{
 \operatorname{arg\,max}
 }
 \;
-\pi_g f_g(\mathbf x).
+\pi_k f_k(\mathbf x).
 $$ {#eq-regra-bayes-classificacao-discriminante}
 
 Quando
 
 $$
-f_g(\mathbf x)>0
+f_k(\mathbf x)>0
 $$
 
 para todas as classes, a mesma comparação pode ser realizada por
 
 $$
-\log\pi_g
+\log\pi_k
 +
-\log f_g(\mathbf x),
+\log f_k(\mathbf x),
 $$ {#eq-escore-log-bayes-discriminante}
 
 pois o logaritmo é estritamente crescente em
@@ -596,21 +578,21 @@ Considere agora a especialização probabilística em que
 $$
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 \sim
 N_p
 \left(
-\boldsymbol{\mu}_g,
+\boldsymbol{\mu}_k,
 \boldsymbol{\Sigma}
 \right),
 \qquad
-g=1,\ldots,G,
+k=1,\ldots,K,
 $$ {#eq-modelo-normal-lda}
 
 com
 
 $$
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 \in
 \mathbb R^p
 $$
@@ -630,15 +612,15 @@ $$
 Além disso, considere probabilidades *a priori*
 
 $$
-\pi_g>0,
+\pi_k>0,
 \qquad
-\sum_{g=1}^{G}\pi_g=1.
+\sum_{k=1}^{K}\pi_k=1.
 $$
 
 A normalidade não foi necessária para definir a regra de Bayes. Ela passa a ser utilizada agora para especificar explicitamente as densidades
 
 $$
-f_g(\mathbf x).
+f_k(\mathbf x).
 $$
 
 O capítulo sobre a distribuição normal multivariada mostrou em @eq-log-razao-normal-covariancia-comum que a comparação entre duas log-densidades normais com a mesma matriz de covariâncias é afim em $\mathbf x$.
@@ -648,12 +630,12 @@ A Análise Discriminante utiliza esse resultado dentro do problema de decisão.
 Sob perda zero--um, deve-se comparar
 
 $$
-\log\pi_g
+\log\pi_k
 +
-\log f_g(\mathbf x).
+\log f_k(\mathbf x).
 $$
 
-A log-densidade normal da classe $g$ contém
+A log-densidade normal da classe $k$ contém
 
 $$
 -\frac12
@@ -663,9 +645,9 @@ $$
 \right|
 -
 \frac12
-(\mathbf x-\boldsymbol{\mu}_g)^\top
+(\mathbf x-\boldsymbol{\mu}_k)^\top
 \boldsymbol{\Sigma}^{-1}
-(\mathbf x-\boldsymbol{\mu}_g),
+(\mathbf x-\boldsymbol{\mu}_k),
 $$
 
 além do termo
@@ -704,9 +686,9 @@ $$
 \begin{aligned}
 &
 -\frac12
-(\mathbf x-\boldsymbol{\mu}_g)^\top
+(\mathbf x-\boldsymbol{\mu}_k)^\top
 \boldsymbol{\Sigma}^{-1}
-(\mathbf x-\boldsymbol{\mu}_g)
+(\mathbf x-\boldsymbol{\mu}_k)
 \\
 &=
 -\frac12
@@ -716,12 +698,12 @@ $$
 +
 \mathbf x^\top
 \boldsymbol{\Sigma}^{-1}
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 -
 \frac12
-\boldsymbol{\mu}_g^\top
+\boldsymbol{\mu}_k^\top
 \boldsymbol{\Sigma}^{-1}
-\boldsymbol{\mu}_g.
+\boldsymbol{\mu}_k.
 \end{aligned}
 $$
 
@@ -736,7 +718,7 @@ $$
 
 também é comum a todas as classes.
 
-Restam apenas os termos que dependem de $g$.
+Restam apenas os termos que dependem de $k$.
 
 ::: {#def-funcao-discriminante-linear}
 ## Função discriminante linear
@@ -744,7 +726,7 @@ Restam apenas os termos que dependem de $g$.
 Considere
 
 $$
-G\geq2
+K\geq2
 $$
 
 classes com
@@ -752,21 +734,21 @@ classes com
 $$
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 \sim
 N_p
 \left(
-\boldsymbol{\mu}_g,
+\boldsymbol{\mu}_k,
 \boldsymbol{\Sigma}
 \right),
 \qquad
-g=1,\ldots,G,
+k=1,\ldots,K,
 $$
 
 em que
 
 $$
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 \in
 \mathbb R^p,
 \qquad
@@ -780,26 +762,26 @@ $$
 e probabilidades *a priori*
 
 $$
-\pi_g>0,
+\pi_k>0,
 \qquad
-\sum_{g=1}^{G}\pi_g=1.
+\sum_{k=1}^{K}\pi_k=1.
 $$
 
-Sob perda zero--um, a **função discriminante linear** da classe $g$ é
+Sob perda zero--um, a **função discriminante linear** da classe $k$ é
 
 $$
-\delta_g(\mathbf x)
+\delta_k(\mathbf x)
 =
 \mathbf x^\top
 \boldsymbol{\Sigma}^{-1}
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 -
 \frac12
-\boldsymbol{\mu}_g^\top
+\boldsymbol{\mu}_k^\top
 \boldsymbol{\Sigma}^{-1}
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 +
-\log\pi_g.
+\log\pi_k.
 $$ {#eq-funcao-discriminante-linear}
 :::
 
@@ -809,54 +791,54 @@ $$
 \psi_{\mathrm{LDA}}(\mathbf x)
 \in
 \underset{
-g\in\{1,\ldots,G\}
+k\in\{1,\ldots,K\}
 }{
 \operatorname{arg\,max}
 }
 \;
-\delta_g(\mathbf x).
+\delta_k(\mathbf x).
 $$ {#eq-regra-classificacao-lda}
 
 Quando o máximo é único, a classificação é determinada sem necessidade de convenção adicional de desempate.
 
-A sigla LDA, de *Linear Discriminant Analysis*, é tradicional. Entretanto,
+A sigla LDA, de *Linear Discriminant Analysis*, é tradicional. A função
 
 $$
-\delta_g(\mathbf x)
+\delta_k(\mathbf x)
 $$
 
-é, matematicamente, uma **função afim** de $\mathbf x$:
+é, matematicamente, **afim** em $\mathbf x$:
 
 $$
-\delta_g(\mathbf x)
+\delta_k(\mathbf x)
 =
 \mathbf x^\top
-\mathbf b_g
+\mathbf b_k
 +
-c_g,
+c_k,
 $$
 
 com
 
 $$
-\mathbf b_g
+\mathbf b_k
 =
 \boldsymbol{\Sigma}^{-1}
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 $$
 
 e
 
 $$
-c_g
+c_k
 =
 -
 \frac12
-\boldsymbol{\mu}_g^\top
+\boldsymbol{\mu}_k^\top
 \boldsymbol{\Sigma}^{-1}
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 +
-\log\pi_g.
+\log\pi_k.
 $$
 
 A denominação “linear” refere-se convencionalmente à estrutura das fronteiras de decisão, que serão hiperplanos.
@@ -872,7 +854,7 @@ $$
 A fronteira de decisão entre elas é o conjunto de pontos para os quais
 
 $$
-\delta_g(\mathbf x)
+\delta_k(\mathbf x)
 =
 \delta_h(\mathbf x).
 $$
@@ -886,7 +868,7 @@ $$
 \mathbf x^\top
 \boldsymbol{\Sigma}^{-1}
 \left(
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 -
 \boldsymbol{\mu}_h
 \right)
@@ -895,9 +877,9 @@ $$
 -
 \frac12
 \left(
-\boldsymbol{\mu}_g^\top
+\boldsymbol{\mu}_k^\top
 \boldsymbol{\Sigma}^{-1}
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 -
 \boldsymbol{\mu}_h^\top
 \boldsymbol{\Sigma}^{-1}
@@ -905,7 +887,7 @@ $$
 \right)
 +
 \log
-\frac{\pi_g}{\pi_h}.
+\frac{\pi_k}{\pi_h}.
 \end{aligned}
 $$ {#eq-fronteira-linear-discriminante}
 
@@ -926,7 +908,7 @@ $$
 =
 \boldsymbol{\Sigma}^{-1}
 \left(
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 -
 \boldsymbol{\mu}_h
 \right)
@@ -937,7 +919,7 @@ $$
 Se
 
 $$
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 \neq
 \boldsymbol{\mu}_h,
 $$
@@ -959,7 +941,7 @@ O vetor normal ao hiperplano é, portanto,
 $$
 \boldsymbol{\Sigma}^{-1}
 \left(
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 -
 \boldsymbol{\mu}_h
 \right).
@@ -968,7 +950,7 @@ $$ {#eq-normal-fronteira-lda}
 A diferença bruta entre os vetores de médias,
 
 $$
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 -
 \boldsymbol{\mu}_h,
 $$
@@ -987,7 +969,7 @@ As probabilidades *a priori* entram apenas pelo termo
 
 $$
 \log
-\frac{\pi_g}{\pi_h}.
+\frac{\pi_k}{\pi_h}.
 $$
 
 Mantidos os vetores de médias e a matriz de covariâncias, alterar as probabilidades *a priori* desloca o hiperplano, mas não modifica seu vetor normal.
@@ -995,7 +977,7 @@ Mantidos os vetores de médias e a matriz de covariâncias, alterar as probabili
 Há um caso degenerado importante. Se
 
 $$
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 =
 \boldsymbol{\mu}_h,
 $$
@@ -1004,19 +986,19 @@ as duas classes possuem a mesma densidade condicional sob o modelo de covariânc
 
 ### Relação com a distância de Mahalanobis
 
-A distância de Mahalanobis foi definida em @def-distancia-mahalanobis. Para a classe $g$,
+A distância de Mahalanobis foi definida em @def-distancia-mahalanobis. Para a classe $k$,
 
 $$
 d_M^2
 \left(
 \mathbf x,
-\boldsymbol{\mu}_g;
+\boldsymbol{\mu}_k;
 \boldsymbol{\Sigma}
 \right)
 =
-(\mathbf x-\boldsymbol{\mu}_g)^\top
+(\mathbf x-\boldsymbol{\mu}_k)^\top
 \boldsymbol{\Sigma}^{-1}
-(\mathbf x-\boldsymbol{\mu}_g).
+(\mathbf x-\boldsymbol{\mu}_k).
 $$
 
 Essa forma quadrática é exatamente a quantidade que aparece no expoente da densidade normal multivariada.
@@ -1028,11 +1010,11 @@ $$
 d_M^2
 \left(
 \mathbf x,
-\boldsymbol{\mu}_g;
+\boldsymbol{\mu}_k;
 \boldsymbol{\Sigma}
 \right)
 +
-\log\pi_g.
+\log\pi_k.
 $$ {#eq-lda-mahalanobis-priori}
 
 Consequentemente,
@@ -1041,7 +1023,7 @@ $$
 \psi_{\mathrm{LDA}}(\mathbf x)
 \in
 \underset{
-g\in\{1,\ldots,G\}
+k\in\{1,\ldots,K\}
 }{
 \operatorname{arg\,min}
 }
@@ -1049,11 +1031,11 @@ g\in\{1,\ldots,G\}
 d_M^2
 \left(
 \mathbf x,
-\boldsymbol{\mu}_g;
+\boldsymbol{\mu}_k;
 \boldsymbol{\Sigma}
 \right)
 -
-2\log\pi_g
+2\log\pi_k
 \right\}.
 $$ {#eq-regra-lda-mahalanobis}
 
@@ -1077,7 +1059,7 @@ $$
 o termo
 
 $$
--2\log\pi_g
+-2\log\pi_k
 $$
 
 é comum a todas as classes e pode ser retirado da comparação.
@@ -1088,7 +1070,7 @@ $$
 \psi_{\mathrm{LDA}}(\mathbf x)
 \in
 \underset{
-g\in\{1,\ldots,G\}
+k\in\{1,\ldots,K\}
 }{
 \operatorname{arg\,min}
 }
@@ -1096,7 +1078,7 @@ g\in\{1,\ldots,G\}
 d_M^2
 \left(
 \mathbf x,
-\boldsymbol{\mu}_g;
+\boldsymbol{\mu}_k;
 \boldsymbol{\Sigma}
 \right).
 $$ {#eq-lda-centroide-mahalanobis}
@@ -1122,7 +1104,7 @@ Essa interpretação não exige reconstruir a teoria da distância de Mahalanobi
 A LDA apresentada até aqui é uma **regra populacional**: utiliza
 
 $$
-\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_G,
+\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_K,
 \qquad
 \boldsymbol{\Sigma},
 \qquad
@@ -1142,21 +1124,21 @@ Considere agora
 $$
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 \sim
 N_p
 \left(
-\boldsymbol{\mu}_g,
-\boldsymbol{\Sigma}_g
+\boldsymbol{\mu}_k,
+\boldsymbol{\Sigma}_k
 \right),
 \qquad
-g=1,\ldots,G,
+k=1,\ldots,K,
 $$ {#eq-modelo-normal-qda}
 
 em que
 
 $$
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 \in
 \mathbb R^p
 $$
@@ -1164,11 +1146,11 @@ $$
 e
 
 $$
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 \in
 \mathbb R^{p\times p},
 \qquad
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 \succ
 \mathbf0.
 $$
@@ -1176,9 +1158,9 @@ $$
 Considere também probabilidades *a priori*
 
 $$
-\pi_g>0,
+\pi_k>0,
 \qquad
-\sum_{g=1}^{G}\pi_g=1.
+\sum_{k=1}^{K}\pi_k=1.
 $$
 
 A regra de Bayes continua sendo determinada pelas probabilidades posteriores e pela função de perda. A diferença em relação à LDA está no modelo utilizado para as distribuições condicionais.
@@ -1186,16 +1168,16 @@ A regra de Bayes continua sendo determinada pelas probabilidades posteriores e p
 Sob perda zero--um, deve-se comparar
 
 $$
-\log\pi_g
+\log\pi_k
 +
-\log f_g(\mathbf x).
+\log f_k(\mathbf x).
 $$
 
-Para a distribuição normal da classe $g$,
+Para a distribuição normal da classe $k$,
 
 $$
 \begin{aligned}
-\log f_g(\mathbf x)
+\log f_k(\mathbf x)
 &=
 -\frac p2
 \log(2\pi)
@@ -1203,23 +1185,23 @@ $$
 \frac12
 \log
 \left|
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 \right|
 \\
 &\quad
 -
 \frac12
-(\mathbf x-\boldsymbol{\mu}_g)^\top
-\boldsymbol{\Sigma}_g^{-1}
-(\mathbf x-\boldsymbol{\mu}_g).
+(\mathbf x-\boldsymbol{\mu}_k)^\top
+\boldsymbol{\Sigma}_k^{-1}
+(\mathbf x-\boldsymbol{\mu}_k).
 \end{aligned}
 $$
 
-O primeiro termo é comum a todas as classes, mas os demais dependem de $g$.
+O primeiro termo é comum a todas as classes, mas os demais dependem de $k$.
 
 Diferentemente do que ocorreu em @eq-modelo-normal-lda, não existe agora uma única matriz de covariâncias que permita cancelar os termos quadráticos em $\mathbf x$.
 
-Esse resultado já foi antecipado no capítulo da distribuição normal multivariada pela comparação de log-densidades com matrizes de covariâncias distintas.
+A comparação de log-densidades normais com matrizes de covariâncias distintas foi estabelecida em @eq-log-razao-normal-covariancias-distintas. Como as matrizes inversas dependem da classe, permanecem, em geral, termos quadráticos em $\mathbf x$.
 
 ::: {#def-funcao-discriminante-quadratica}
 ## Função discriminante quadrática
@@ -1227,7 +1209,7 @@ Esse resultado já foi antecipado no capítulo da distribuição normal multivar
 Considere
 
 $$
-G\geq2
+K\geq2
 $$
 
 classes com
@@ -1235,31 +1217,31 @@ classes com
 $$
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 \sim
 N_p
 \left(
-\boldsymbol{\mu}_g,
-\boldsymbol{\Sigma}_g
+\boldsymbol{\mu}_k,
+\boldsymbol{\Sigma}_k
 \right),
 \qquad
-g=1,\ldots,G,
+k=1,\ldots,K,
 $$
 
 em que
 
 $$
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 \in
 \mathbb R^p,
 $$
 
 $$
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 \in
 \mathbb R^{p\times p},
 \qquad
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 \succ
 \mathbf0,
 $$
@@ -1267,28 +1249,28 @@ $$
 e probabilidades *a priori*
 
 $$
-\pi_g>0,
+\pi_k>0,
 \qquad
-\sum_{g=1}^{G}\pi_g=1.
+\sum_{k=1}^{K}\pi_k=1.
 $$
 
-Sob perda zero--um, a **função discriminante quadrática** da classe $g$ é
+Sob perda zero--um, a **função discriminante quadrática** da classe $k$ é
 
 $$
-\delta_g^{Q}(\mathbf x)
+\delta_k^{Q}(\mathbf x)
 =
 -\frac12
 \log
 \left|
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 \right|
 -
 \frac12
-(\mathbf x-\boldsymbol{\mu}_g)^\top
-\boldsymbol{\Sigma}_g^{-1}
-(\mathbf x-\boldsymbol{\mu}_g)
+(\mathbf x-\boldsymbol{\mu}_k)^\top
+\boldsymbol{\Sigma}_k^{-1}
+(\mathbf x-\boldsymbol{\mu}_k)
 +
-\log\pi_g.
+\log\pi_k.
 $$ {#eq-funcao-discriminante-quadratica}
 :::
 
@@ -1298,12 +1280,12 @@ $$
 \psi_{\mathrm{QDA}}(\mathbf x)
 \in
 \underset{
-g\in\{1,\ldots,G\}
+k\in\{1,\ldots,K\}
 }{
 \operatorname{arg\,max}
 }
 \;
-\delta_g^{Q}(\mathbf x).
+\delta_k^{Q}(\mathbf x).
 $$ {#eq-regra-classificacao-qda}
 
 Quando o máximo é único, a classe fica determinada sem convenção adicional de desempate.
@@ -1316,51 +1298,51 @@ $$
 \begin{aligned}
 &
 -\frac12
-(\mathbf x-\boldsymbol{\mu}_g)^\top
-\boldsymbol{\Sigma}_g^{-1}
-(\mathbf x-\boldsymbol{\mu}_g)
+(\mathbf x-\boldsymbol{\mu}_k)^\top
+\boldsymbol{\Sigma}_k^{-1}
+(\mathbf x-\boldsymbol{\mu}_k)
 \\
 &=
 -\frac12
 \mathbf x^\top
-\boldsymbol{\Sigma}_g^{-1}
+\boldsymbol{\Sigma}_k^{-1}
 \mathbf x
 +
 \mathbf x^\top
-\boldsymbol{\Sigma}_g^{-1}
-\boldsymbol{\mu}_g
+\boldsymbol{\Sigma}_k^{-1}
+\boldsymbol{\mu}_k
 -
 \frac12
-\boldsymbol{\mu}_g^\top
-\boldsymbol{\Sigma}_g^{-1}
-\boldsymbol{\mu}_g.
+\boldsymbol{\mu}_k^\top
+\boldsymbol{\Sigma}_k^{-1}
+\boldsymbol{\mu}_k.
 \end{aligned}
 $$
 
 Como
 
 $$
-\boldsymbol{\Sigma}_g^{-1}
+\boldsymbol{\Sigma}_k^{-1}
 $$
 
 depende da classe, o coeficiente do termo quadrático
 
 $$
 \mathbf x^\top
-\boldsymbol{\Sigma}_g^{-1}
+\boldsymbol{\Sigma}_k^{-1}
 \mathbf x
 $$
 
-também depende de $g$.
+também depende de $k$.
 
 Duas partes da função possuem papéis distintos.
 
 A forma
 
 $$
-(\mathbf x-\boldsymbol{\mu}_g)^\top
-\boldsymbol{\Sigma}_g^{-1}
-(\mathbf x-\boldsymbol{\mu}_g)
+(\mathbf x-\boldsymbol{\mu}_k)^\top
+\boldsymbol{\Sigma}_k^{-1}
+(\mathbf x-\boldsymbol{\mu}_k)
 $$
 
 é a distância de Mahalanobis quadrática entre a observação e o centro da classe segundo a geometria própria daquela população.
@@ -1370,7 +1352,7 @@ Já o termo
 $$
 \log
 \left|
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 \right|
 $$
 
@@ -1380,7 +1362,7 @@ Geometricamente,
 
 $$
 \left|
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 \right|^{1/2}
 $$
 
@@ -1397,7 +1379,7 @@ $$
 Sua fronteira de decisão é o conjunto de pontos que satisfazem
 
 $$
-\delta_g^{Q}(\mathbf x)
+\delta_k^{Q}(\mathbf x)
 =
 \delta_h^{Q}(\mathbf x).
 $$
@@ -1410,7 +1392,7 @@ $$
 \left(
 \boldsymbol{\Sigma}_h^{-1}
 -
-\boldsymbol{\Sigma}_g^{-1}
+\boldsymbol{\Sigma}_k^{-1}
 \right)
 \mathbf x.
 $$
@@ -1441,7 +1423,7 @@ $$
 \left(
 \boldsymbol{\Sigma}_h^{-1}
 -
-\boldsymbol{\Sigma}_g^{-1}
+\boldsymbol{\Sigma}_k^{-1}
 \right).
 $$
 
@@ -1458,7 +1440,7 @@ e a fronteira pertence à família das superfícies quadráticas.
 Se, porém,
 
 $$
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 =
 \boldsymbol{\Sigma}_h,
 $$
@@ -1478,7 +1460,7 @@ $$
 =
 \cdots
 =
-\boldsymbol{\Sigma}_G
+\boldsymbol{\Sigma}_K
 =
 \boldsymbol{\Sigma},
 $$
@@ -1811,7 +1793,7 @@ As funções discriminantes formuladas até aqui utilizam parâmetros populacion
 Na LDA, são necessários
 
 $$
-\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_G,
+\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_K,
 \qquad
 \boldsymbol{\Sigma},
 \qquad
@@ -1821,9 +1803,9 @@ $$
 Na QDA, são necessários
 
 $$
-\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_G,
+\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_K,
 \qquad
-\boldsymbol{\Sigma}_1,\ldots,\boldsymbol{\Sigma}_G,
+\boldsymbol{\Sigma}_1,\ldots,\boldsymbol{\Sigma}_K,
 \qquad
 \pi_1,\ldots,\pi_G.
 $$
@@ -1832,14 +1814,12 @@ Essas quantidades são parâmetros fixos da distribuição populacional.
 
 Em uma aplicação, elas geralmente são desconhecidas. Os grupos conhecidos na amostra fornecem informação para estimá-las.
 
-Essa passagem deve ser distinguida cuidadosamente:
+A distinção entre estimador e estimativa foi formalizada em @def-estimador-estimativa. Neste capítulo, ela se aplica aos parâmetros das distribuições condicionais:
 
 - **parâmetro:** característica fixa e desconhecida da população;
-- **estimador:** estatística aleatória calculada a partir de uma amostra ainda não observada;
+- **estimador:** estatística aleatória utilizada para estimar o parâmetro;
 - **estimativa:** valor assumido pelo estimador após a observação dos dados;
 - **regra estimada:** regra obtida substituindo os parâmetros desconhecidos por suas estimativas.
-
-Essa distinção utiliza diretamente os fundamentos de estatísticas amostrais e estimação desenvolvidos no Módulo 2.
 
 ### Amostra com classes conhecidas
 
@@ -1848,99 +1828,97 @@ Considere uma amostra de treinamento com
 $$
 n
 =
-\sum_{g=1}^{G}
-n_g
+\sum_{k=1}^{K}
+n_k
 $$
 
 observações, em que
 
 $$
-n_g\geq1
+n_k\geq1
 $$
 
-é o número de unidades observadas da classe $g$.
+é o número de unidades observadas da classe $k$.
 
-Para a classe $g$, sejam
+Para a classe $k$, sejam
 
 $$
 \boldsymbol{\mathsf X}_{1g},
 \ldots,
-\boldsymbol{\mathsf X}_{n_g g}
+\boldsymbol{\mathsf X}_{n_k g}
 \in
 \mathbb R^p
 $$
 
 os vetores aleatórios da amostra.
 
-O vetor de médias amostral da classe é o estimador
+Aplicando a média amostral de @eq-media-amostral-aleatoria separadamente às observações da classe $k$, obtém-se
 
 $$
-\overline{\boldsymbol{\mathsf X}}_g
+\overline{\boldsymbol{\mathsf X}}_k
 =
-\frac1{n_g}
-\sum_{i=1}^{n_g}
-\boldsymbol{\mathsf X}_{ig}
+\frac1{n_k}
+\sum_{i=1}^{n_k}
+\boldsymbol{\mathsf X}_{ik}
 \in
 \mathbb R^p.
 $$ {#eq-estimador-media-grupo-discriminante}
 
-Após a observação dos dados, sua realização é
+Após a observação dos dados, conforme @eq-media-amostral-observada,
 
 $$
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 =
-\frac1{n_g}
-\sum_{i=1}^{n_g}
+\frac1{n_k}
+\sum_{i=1}^{n_k}
 \mathbf x_{ig}.
 $$ {#eq-estimativa-media-grupo-discriminante}
 
 Quando
 
 $$
-n_g\geq2,
+n_k\geq2,
 $$
 
-a matriz de covariâncias amostral da classe é
+a matriz de covariâncias amostral definida em @def-matriz-covariancias-amostral-aleatoria, aplicada às observações da classe $k$, é
 
 $$
-\boldsymbol{\mathsf S}_g
+\boldsymbol{\mathsf S}_k
 =
-\frac1{n_g-1}
-\sum_{i=1}^{n_g}
+\frac1{n_k-1}
+\sum_{i=1}^{n_k}
 \left(
-\boldsymbol{\mathsf X}_{ig}
+\boldsymbol{\mathsf X}_{ik}
 -
-\overline{\boldsymbol{\mathsf X}}_g
+\overline{\boldsymbol{\mathsf X}}_k
 \right)
 \left(
-\boldsymbol{\mathsf X}_{ig}
+\boldsymbol{\mathsf X}_{ik}
 -
-\overline{\boldsymbol{\mathsf X}}_g
+\overline{\boldsymbol{\mathsf X}}_k
 \right)^\top.
 $$ {#eq-estimador-covariancia-grupo-discriminante}
 
-Sua estimativa observada é
+Sua realização observada, correspondente à matriz de covariâncias de @def-matriz-covariancias-observada, é
 
 $$
-\mathbf S_g
+\mathbf S_k
 =
-\frac1{n_g-1}
-\sum_{i=1}^{n_g}
+\frac1{n_k-1}
+\sum_{i=1}^{n_k}
 \left(
 \mathbf x_{ig}
 -
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 \right)
 \left(
 \mathbf x_{ig}
 -
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 \right)^\top.
 $$ {#eq-estimativa-covariancia-grupo-discriminante}
 
-Essas estatísticas não dependem da hipótese de normalidade para serem definidas.
-
-Sob o modelo normal, elas passam a ser utilizadas como estimadores dos parâmetros das distribuições condicionais.
+Essas estatísticas são definidas sem exigir normalidade multivariada. Sob o modelo normal discriminante, elas são utilizadas para estimar os parâmetros das distribuições condicionais das classes.
 
 ### Covariância comum na LDA
 
@@ -1951,20 +1929,28 @@ $$
 =
 \cdots
 =
-\boldsymbol{\Sigma}_G
+\boldsymbol{\Sigma}_K
 =
 \boldsymbol{\Sigma},
 $$
 
 as informações de dispersão dentro das classes podem ser reunidas.
 
-Para
+No modelo linear de grupos, @eq-correspondencia-sscp-residual-intragrupos estabelece que a SQPC residual observada coincide com a dispersão intragrupos,
 
 $$
-n>G,
+\mathbf E
+=
+\mathbf T_{\mathrm{intra}}.
 $$
 
-defina a matriz aleatória de covariâncias agrupada por
+Aplicando o estimador residual de covariância de @def-estimador-nao-viesado-covariancia-residual ao modelo com $K$ grupos, cujo posto é $K$, obtém-se, para
+
+$$
+n>K,
+$$
+
+a matriz de covariâncias agrupada
 
 $$
 \boldsymbol{\mathsf S}_p
@@ -1972,20 +1958,12 @@ $$
 \frac{
 1
 }{
-n-G
+n-K
 }
 \boldsymbol{\mathsf T}_{\mathrm{intra}},
 $$ {#eq-estimador-covariancia-agrupada-discriminante}
 
-em que
-
-$$
-\boldsymbol{\mathsf T}_{\mathrm{intra}}
-$$
-
-é a matriz aleatória de dispersão intragrupos.
-
-Após a observação da amostra,
+e, após a observação,
 
 $$
 \mathbf S_p
@@ -1993,7 +1971,7 @@ $$
 \frac{
 1
 }{
-n-G
+n-K
 }
 \mathbf T_{\mathrm{intra}}.
 $$ {#eq-estimativa-covariancia-agrupada-discriminante}
@@ -2003,9 +1981,9 @@ Essa é a estimativa agrupada da matriz de covariâncias comum utilizada na form
 Quando
 
 $$
-n_g\geq2,
+n_k\geq2,
 \qquad
-g=1,\ldots,G,
+k=1,\ldots,K,
 $$
 
 a relação também pode ser escrita como
@@ -2015,11 +1993,11 @@ $$
 =
 \frac{
 \displaystyle
-\sum_{g=1}^{G}
-(n_g-1)
-\mathbf S_g
+\sum_{k=1}^{K}
+(n_k-1)
+\mathbf S_k
 }{
-n-G
+n-K
 }.
 $$
 
@@ -2039,15 +2017,15 @@ também precisam ser conhecidas ou especificadas para construir a regra populaci
 Quando a amostra constitui uma amostra aleatória representativa da mistura populacional das classes, uma possibilidade é o estimador empírico
 
 $$
-\widehat{\pi}_g
+\widehat{\pi}_k
 =
-\frac{n_g}{n}.
+\frac{n_k}{n}.
 $$ {#eq-estimador-priori-empirico-discriminante}
 
 Entretanto,
 
 $$
-\frac{n_g}{n}
+\frac{n_k}{n}
 $$
 
 não deve ser utilizado automaticamente como probabilidade *a priori*.
@@ -2055,7 +2033,7 @@ não deve ser utilizado automaticamente como probabilidade *a priori*.
 Em delineamentos que fixam artificialmente os tamanhos dos grupos, estudos caso-controle, amostragens desbalanceadas por planejamento ou situações em que prevalências externas são conhecidas, as proporções amostrais podem não representar
 
 $$
-P(\mathsf G=g).
+P(\mathsf C=k).
 $$
 
 As probabilidades *a priori* podem, portanto:
@@ -2071,7 +2049,7 @@ Esse ponto é independente da estimação dos vetores de médias e das matrizes 
 Suponha que, após observar a amostra de treinamento, estejam disponíveis
 
 $$
-\overline{\mathbf x}_1,\ldots,\overline{\mathbf x}_G,
+\overline{\mathbf x}_1,\ldots,\overline{\mathbf x}_K,
 $$
 
 uma matriz agrupada
@@ -2085,14 +2063,14 @@ $$
 e valores positivos
 
 $$
-\widehat{\pi}_1,\ldots,\widehat{\pi}_G
+\widehat{\pi}_1,\ldots,\widehat{\pi}_K
 $$
 
 tais que
 
 $$
-\sum_{g=1}^{G}
-\widehat{\pi}_g
+\sum_{k=1}^{K}
+\widehat{\pi}_k
 =
 1.
 $$
@@ -2103,17 +2081,17 @@ $$
 Considere
 
 $$
-G\geq2,
+K\geq2,
 $$
 
 vetores
 
 $$
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 \in
 \mathbb R^p,
 \qquad
-g=1,\ldots,G,
+k=1,\ldots,K,
 $$
 
 uma matriz
@@ -2129,28 +2107,28 @@ $$
 e valores
 
 $$
-\widehat{\pi}_g>0,
+\widehat{\pi}_k>0,
 \qquad
-\sum_{g=1}^{G}
-\widehat{\pi}_g=1.
+\sum_{k=1}^{K}
+\widehat{\pi}_k=1.
 $$
 
-A **função discriminante linear estimada** da classe $g$ é
+A **função discriminante linear estimada** da classe $k$ é
 
 $$
-\widehat{\delta}_g(\mathbf x)
+\widehat{\delta}_k(\mathbf x)
 =
 \mathbf x^\top
 \mathbf S_p^{-1}
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 -
 \frac12
-\overline{\mathbf x}_g^\top
+\overline{\mathbf x}_k^\top
 \mathbf S_p^{-1}
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 +
 \log
-\widehat{\pi}_g,
+\widehat{\pi}_k,
 \qquad
 \mathbf x\in\mathbb R^p.
 $$ {#eq-funcao-discriminante-linear-estimada}
@@ -2162,12 +2140,12 @@ $$
 \widehat{\psi}_{\mathrm{LDA}}(\mathbf x)
 \in
 \underset{
-g\in\{1,\ldots,G\}
+k\in\{1,\ldots,K\}
 }{
 \operatorname{arg\,max}
 }
 \;
-\widehat{\delta}_g(\mathbf x).
+\widehat{\delta}_k(\mathbf x).
 $$ {#eq-regra-estimada-lda}
 
 A expressão possui a mesma forma algébrica da regra populacional, mas seus elementos têm natureza estatística diferente.
@@ -2175,11 +2153,11 @@ A expressão possui a mesma forma algébrica da regra populacional, mas seus ele
 Na regra populacional,
 
 $$
-\boldsymbol{\mu}_g,
+\boldsymbol{\mu}_k,
 \qquad
 \boldsymbol{\Sigma},
 \qquad
-\pi_g
+\pi_k
 $$
 
 são parâmetros.
@@ -2187,11 +2165,11 @@ são parâmetros.
 Na regra estimada,
 
 $$
-\overline{\mathbf x}_g,
+\overline{\mathbf x}_k,
 \qquad
 \mathbf S_p,
 \qquad
-\widehat{\pi}_g
+\widehat{\pi}_k
 $$
 
 são valores obtidos a partir de uma amostra de treinamento ou especificados a partir de informação externa.
@@ -2207,46 +2185,46 @@ Na QDA, cada classe possui sua própria matriz de covariâncias.
 Suponha que, após a observação da amostra,
 
 $$
-\mathbf S_g
+\mathbf S_k
 \succ
 \mathbf0,
 \qquad
-g=1,\ldots,G,
+k=1,\ldots,K,
 $$
 
 e que estejam disponíveis
 
 $$
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 $$
 
 e
 
 $$
-\widehat{\pi}_g>0.
+\widehat{\pi}_k>0.
 $$
 
 ::: {#def-funcao-discriminante-quadratica-estimada}
 ## Função discriminante quadrática estimada
 
-Sob as condições anteriores, a **função discriminante quadrática estimada** da classe $g$ é
+Sob as condições anteriores, a **função discriminante quadrática estimada** da classe $k$ é
 
 $$
-\widehat{\delta}_g^{Q}(\mathbf x)
+\widehat{\delta}_k^{Q}(\mathbf x)
 =
 -\frac12
 \log
 \left|
-\mathbf S_g
+\mathbf S_k
 \right|
 -
 \frac12
-(\mathbf x-\overline{\mathbf x}_g)^\top
-\mathbf S_g^{-1}
-(\mathbf x-\overline{\mathbf x}_g)
+(\mathbf x-\overline{\mathbf x}_k)^\top
+\mathbf S_k^{-1}
+(\mathbf x-\overline{\mathbf x}_k)
 +
 \log
-\widehat{\pi}_g.
+\widehat{\pi}_k.
 $$ {#eq-funcao-discriminante-quadratica-estimada}
 :::
 
@@ -2256,12 +2234,12 @@ $$
 \widehat{\psi}_{\mathrm{QDA}}(\mathbf x)
 \in
 \underset{
-g\in\{1,\ldots,G\}
+k\in\{1,\ldots,K\}
 }{
 \operatorname{arg\,max}
 }
 \;
-\widehat{\delta}_g^{Q}(\mathbf x).
+\widehat{\delta}_k^{Q}(\mathbf x).
 $$ {#eq-regra-estimada-qda}
 
 A QDA exige estimar
@@ -2283,7 +2261,7 @@ $$
 =
 \cdots
 =
-\boldsymbol{\Sigma}_G
+\boldsymbol{\Sigma}_K
 $$
 
 define a estrutura populacional da LDA.
@@ -2299,13 +2277,13 @@ $$
 Analogamente, a hipótese de matrizes populacionais específicas
 
 $$
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 $$
 
 define a QDA, enquanto
 
 $$
-\mathbf S_g
+\mathbf S_k
 $$
 
 são suas estimativas amostrais usuais.
@@ -2316,14 +2294,14 @@ A @tbl-populacional-estimada-discriminante sintetiza os níveis que não devem s
 
 | Papel | LDA | QDA |
 |---|---|---|
-| médias populacionais | $\boldsymbol{\mu}_g$ | $\boldsymbol{\mu}_g$ |
-| covariância populacional | $\boldsymbol{\Sigma}$ comum | $\boldsymbol{\Sigma}_g$ específica |
-| probabilidades *a priori* | $\pi_g$ | $\pi_g$ |
-| estimativa da média | $\overline{\mathbf x}_g$ | $\overline{\mathbf x}_g$ |
-| estimativa de covariância | $\mathbf S_p$ | $\mathbf S_g$ |
-| probabilidade *a priori* utilizada na regra estimada | $\widehat{\pi}_g$ ou valor especificado | $\widehat{\pi}_g$ ou valor especificado |
-| função populacional | $\delta_g(\mathbf x)$ | $\delta_g^Q(\mathbf x)$ |
-| função estimada | $\widehat{\delta}_g(\mathbf x)$ | $\widehat{\delta}_g^Q(\mathbf x)$ |
+| médias populacionais | $\boldsymbol{\mu}_k$ | $\boldsymbol{\mu}_k$ |
+| covariância populacional | $\boldsymbol{\Sigma}$ comum | $\boldsymbol{\Sigma}_k$ específica |
+| probabilidades *a priori* | $\pi_k$ | $\pi_k$ |
+| estimativa da média | $\overline{\mathbf x}_k$ | $\overline{\mathbf x}_k$ |
+| estimativa de covariância | $\mathbf S_p$ | $\mathbf S_k$ |
+| probabilidade *a priori* utilizada na regra estimada | $\widehat{\pi}_k$ ou valor especificado | $\widehat{\pi}_k$ ou valor especificado |
+| função populacional | $\delta_k(\mathbf x)$ | $\delta_k^Q(\mathbf x)$ |
+| função estimada | $\widehat{\delta}_k(\mathbf x)$ | $\widehat{\delta}_k^Q(\mathbf x)$ |
 
 : Distinção entre parâmetros populacionais, estimativas e funções discriminantes estimadas. {#tbl-populacional-estimada-discriminante}
 
@@ -2336,9 +2314,9 @@ A regra *plug-in* utiliza uma aproximação dessa regra construída a partir da 
 Mesmo que o modelo normal esteja corretamente especificado, a regra estimada não coincide necessariamente com a regra populacional porque
 
 $$
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 \neq
-\boldsymbol{\mu}_g,
+\boldsymbol{\mu}_k,
 $$
 
 $$
@@ -2350,14 +2328,14 @@ $$
 ou
 
 $$
-\mathbf S_g
+\mathbf S_k
 \neq
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 $$
 
 em uma amostra finita.
 
-Esse é um uso direto do princípio desenvolvido no Módulo 2: estimadores são variáveis aleatórias e diferentes amostras produzem diferentes estimativas.
+Essa diferença decorre diretamente da distinção entre estimador e estimativa estabelecida em @def-estimador-estimativa: os estimadores são variáveis aleatórias e diferentes amostras podem produzir diferentes regras discriminantes estimadas.
 
 A avaliação de quanto essa variabilidade afeta a classificação exige estudar o desempenho da regra estimada em novas observações. Esse problema pertence à etapa metodológica posterior e não será desenvolvido aqui.
 
@@ -2379,12 +2357,12 @@ A estrutura populacional das duas regras é sintetizada na @tbl-lda-qda.
 
 | Aspecto | LDA | QDA |
 |---|---|---|
-| modelo condicional | $N_p(\boldsymbol{\mu}_g,\boldsymbol{\Sigma})$ | $N_p(\boldsymbol{\mu}_g,\boldsymbol{\Sigma}_g)$ |
+| modelo condicional | $N_p(\boldsymbol{\mu}_k,\boldsymbol{\Sigma})$ | $N_p(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)$ |
 | covariância | comum a todas as classes | específica de cada classe |
 | função discriminante | afim em $\mathbf x$ | quadrática em $\mathbf x$ |
 | fronteira entre duas classes | hiperplano | superfície quadrática em geral |
 | geometria de distância | uma única métrica de Mahalanobis | uma métrica de Mahalanobis para cada classe |
-| probabilidades *a priori* | entram por $\log\pi_g$ | entram por $\log\pi_g$ |
+| probabilidades *a priori* | entram por $\log\pi_k$ | entram por $\log\pi_k$ |
 | perda considerada nas fórmulas apresentadas | zero--um | zero--um |
 | resultado imediato | regra populacional de classificação | regra populacional de classificação |
 
@@ -2415,21 +2393,21 @@ Nenhuma dessas formulações exige, para ser definida, que as distribuições co
 Considere novamente
 
 $$
-\mathsf G
+\mathsf C
 \in
-\{1,\ldots,G\},
+\{1,\ldots,K\},
 $$
 
 com
 
 $$
-P(\mathsf G=g)
+P(\mathsf C=k)
 =
-\pi_g,
+\pi_k,
 \qquad
-\pi_g>0,
+\pi_k>0,
 \qquad
-\sum_{g=1}^{G}\pi_g=1,
+\sum_{k=1}^{K}\pi_k=1,
 $$
 
 e um vetor aleatório
@@ -2445,13 +2423,13 @@ com segundos momentos finitos.
 Para cada classe, defina
 
 $$
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 =
 E
 \left(
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 \right)
 \in
 \mathbb R^p
@@ -2460,13 +2438,13 @@ $$
 e
 
 $$
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 =
 \operatorname{Cov}
 \left(
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 \right)
 \in
 \mathbb R^{p\times p}.
@@ -2488,9 +2466,9 @@ E
 \boldsymbol{\mathsf X}
 \right)
 =
-\sum_{g=1}^{G}
-\pi_g
-\boldsymbol{\mu}_g.
+\sum_{k=1}^{K}
+\pi_k
+\boldsymbol{\mu}_k.
 $$ {#eq-media-populacional-fisher}
 
 ::: {#def-dispersoes-populacionais-fisher}
@@ -2499,17 +2477,17 @@ $$ {#eq-media-populacional-fisher}
 Considere
 
 $$
-\mathsf G
+\mathsf C
 \in
-\{1,\ldots,G\},
+\{1,\ldots,K\},
 $$
 
 com
 
 $$
-P(\mathsf G=g)=\pi_g>0,
+P(\mathsf C=k)=\pi_k>0,
 \qquad
-\sum_{g=1}^{G}\pi_g=1,
+\sum_{k=1}^{K}\pi_k=1,
 $$
 
 e
@@ -2528,26 +2506,26 @@ $$
 Se
 
 $$
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 =
 E
 \left(
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 \right)
 $$
 
 e
 
 $$
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 =
 \operatorname{Cov}
 \left(
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 \right),
 $$
 
@@ -2556,9 +2534,9 @@ defina a **dispersão populacional intragrupos** por
 $$
 \boldsymbol{\Sigma}_W
 =
-\sum_{g=1}^{G}
-\pi_g
-\boldsymbol{\Sigma}_g
+\sum_{k=1}^{K}
+\pi_k
+\boldsymbol{\Sigma}_k
 \in
 \mathbb R^{p\times p},
 $$ {#eq-dispersao-populacional-intra-fisher}
@@ -2568,15 +2546,15 @@ e a **dispersão populacional entre grupos** por
 $$
 \boldsymbol{\Sigma}_B
 =
-\sum_{g=1}^{G}
-\pi_g
+\sum_{k=1}^{K}
+\pi_k
 \left(
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 -
 \boldsymbol{\mu}
 \right)
 \left(
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 -
 \boldsymbol{\mu}
 \right)^\top
@@ -2589,9 +2567,9 @@ em que
 $$
 \boldsymbol{\mu}
 =
-\sum_{g=1}^{G}
-\pi_g
-\boldsymbol{\mu}_g.
+\sum_{k=1}^{K}
+\pi_k
+\boldsymbol{\mu}_k.
 $$
 :::
 
@@ -2625,17 +2603,17 @@ $$
 Considere
 
 $$
-\mathsf G
+\mathsf C
 \in
-\{1,\ldots,G\},
+\{1,\ldots,K\},
 $$
 
 com
 
 $$
-P(\mathsf G=g)=\pi_g>0,
+P(\mathsf C=k)=\pi_k>0,
 \qquad
-\sum_{g=1}^{G}\pi_g=1,
+\sum_{k=1}^{K}\pi_k=1,
 $$
 
 e
@@ -2654,31 +2632,31 @@ $$
 Defina
 
 $$
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 =
 E
 \left(
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 \right),
 \qquad
 \boldsymbol{\mu}
 =
-\sum_{g=1}^{G}
-\pi_g\boldsymbol{\mu}_g,
+\sum_{k=1}^{K}
+\pi_k\boldsymbol{\mu}_k,
 $$
 
 $$
 \boldsymbol{\Sigma}_W
 =
-\sum_{g=1}^{G}
-\pi_g
+\sum_{k=1}^{K}
+\pi_k
 \operatorname{Cov}
 \left(
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 \right)
 $$
 
@@ -2687,10 +2665,10 @@ e
 $$
 \boldsymbol{\Sigma}_B
 =
-\sum_{g=1}^{G}
-\pi_g
-(\boldsymbol{\mu}_g-\boldsymbol{\mu})
-(\boldsymbol{\mu}_g-\boldsymbol{\mu})^\top.
+\sum_{k=1}^{K}
+\pi_k
+(\boldsymbol{\mu}_k-\boldsymbol{\mu})
+(\boldsymbol{\mu}_k-\boldsymbol{\mu})^\top.
 $$
 
 Então,
@@ -2718,11 +2696,11 @@ $$
 \left(
 \boldsymbol{\mathsf X}
 -
-\boldsymbol{\mu}_{\mathsf G}
+\boldsymbol{\mu}_{\mathsf C}
 \right)
 +
 \left(
-\boldsymbol{\mu}_{\mathsf G}
+\boldsymbol{\mu}_{\mathsf C}
 -
 \boldsymbol{\mu}
 \right),
@@ -2731,13 +2709,13 @@ $$
 em que
 
 $$
-\boldsymbol{\mu}_{\mathsf G}
+\boldsymbol{\mu}_{\mathsf C}
 =
 E
 \left(
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G
+\mathsf C
 \right).
 $$
 
@@ -2748,9 +2726,9 @@ E
 \left[
 \boldsymbol{\mathsf X}
 -
-\boldsymbol{\mu}_{\mathsf G}
+\boldsymbol{\mu}_{\mathsf C}
 \mid
-\mathsf G
+\mathsf C
 \right]
 =
 \mathbf0.
@@ -2771,7 +2749,7 @@ E
 \left(
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G
+\mathsf C
 \right)
 \right]
 \\
@@ -2782,7 +2760,7 @@ E
 \left(
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G
+\mathsf C
 \right)
 \right]
 \\
@@ -2794,7 +2772,7 @@ E
 $$
 :::
 
-Essa é a versão populacional da mesma ideia de decomposição da dispersão que, no Módulo 2, apareceu para os dados observados como
+Essa é a versão populacional da decomposição da dispersão que, para os dados observados, foi estabelecida em @prp-decomposicao-dispersao-grupos:
 
 $$
 \mathbf T
@@ -2847,31 +2825,31 @@ $$
 \boldsymbol{\mathsf X}.
 $$
 
-Dentro da classe $g$,
+Dentro da classe $k$,
 
 $$
 \operatorname{Var}
 \left(
 \mathsf Z
 \mid
-\mathsf G=g
+\mathsf C=k
 \right)
 =
 \mathbf a^\top
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 \mathbf a.
 $$
 
 A média ponderada dessas variâncias é
 
 $$
-\sum_{g=1}^{G}
-\pi_g
+\sum_{k=1}^{K}
+\pi_k
 \operatorname{Var}
 \left(
 \mathsf Z
 \mid
-\mathsf G=g
+\mathsf C=k
 \right)
 =
 \mathbf a^\top
@@ -2882,12 +2860,12 @@ $$ {#eq-dispersao-populacional-intra-projetada-fisher}
 Por outro lado, a variabilidade das médias condicionais projetadas é
 
 $$
-\sum_{g=1}^{G}
-\pi_g
+\sum_{k=1}^{K}
+\pi_k
 \left[
 \mathbf a^\top
 \left(
-\boldsymbol{\mu}_g-\boldsymbol{\mu}
+\boldsymbol{\mu}_k-\boldsymbol{\mu}
 \right)
 \right]^2
 =
@@ -2971,17 +2949,17 @@ $$
 =
 \cdots
 =
-\boldsymbol{\Sigma}_G.
+\boldsymbol{\Sigma}_K.
 $$
 
 Se as covariâncias forem comuns,
 
 $$
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 =
 \boldsymbol{\Sigma},
 \qquad
-g=1,\ldots,G,
+k=1,\ldots,K,
 $$
 
 então
@@ -2999,16 +2977,16 @@ situação que posteriormente estabelecerá uma ligação direta entre Fisher e 
 Considere agora uma amostra com grupos conhecidos, contendo
 
 $$
-n_g
+n_k
 $$
 
-observações no grupo $g$ e
+observações no grupo $k$ e
 
 $$
 n
 =
-\sum_{g=1}^{G}
-n_g
+\sum_{k=1}^{K}
+n_k
 $$
 
 observações no total.
@@ -3018,17 +2996,17 @@ As matrizes de dispersão intragrupos e entre grupos foram definidas no Módulo 
 $$
 \mathbf T_{\mathrm{intra}}
 =
-\sum_{g=1}^{G}
-\sum_{i=1}^{n_g}
+\sum_{k=1}^{K}
+\sum_{i=1}^{n_k}
 \left(
 \mathbf x_{ig}
 -
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 \right)
 \left(
 \mathbf x_{ig}
 -
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 \right)^\top
 $$
 
@@ -3037,15 +3015,15 @@ e
 $$
 \mathbf T_{\mathrm{entre}}
 =
-\sum_{g=1}^{G}
-n_g
+\sum_{k=1}^{K}
+n_k
 \left(
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 -
 \overline{\mathbf x}
 \right)
 \left(
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 -
 \overline{\mathbf x}
 \right)^\top.
@@ -3080,7 +3058,7 @@ $$
 são os análogos empíricos das duas parcelas de dispersão quando os pesos dos grupos são
 
 $$
-\frac{n_g}{n}.
+\frac{n_k}{n}.
 $$
 
 A multiplicação de ambas as matrizes por um mesmo escalar positivo não altera o quociente de Fisher. Portanto,
@@ -3112,7 +3090,7 @@ Assim, a formulação amostral pode ser escrita diretamente em termos das matriz
 Os pesos
 
 $$
-n_g
+n_k
 $$
 
 presentes em
@@ -3124,7 +3102,7 @@ $$
 são pesos da decomposição da **amostra observada**. Eles não devem ser confundidos automaticamente com as probabilidades *a priori*
 
 $$
-\pi_g
+\pi_k
 $$
 
 utilizadas na regra de Bayes.
@@ -3132,7 +3110,7 @@ utilizadas na regra de Bayes.
 Em particular, quando os tamanhos dos grupos são fixados pelo delineamento, as proporções
 
 $$
-\frac{n_g}{n}
+\frac{n_k}{n}
 $$
 
 podem não representar as prevalências populacionais.
@@ -3809,7 +3787,7 @@ Assim, cada raiz mede a separação entre grupos na correspondente direção dep
 
 ### Número de direções discriminantes
 
-Pelo resultado estabelecido no Módulo 2,
+Pelo limite de posto da dispersão entre grupos estabelecido em @eq-posto-sscp-entre-grupos,
 
 $$
 \operatorname{posto}
@@ -3819,7 +3797,7 @@ $$
 \leq
 \min
 \left(
-p,G-1
+p,K-1
 \right).
 $$
 
@@ -3841,16 +3819,16 @@ r_F
 \leq
 \min
 \left(
-p,G-1
+p,K-1
 \right).
 $$ {#eq-numero-direcoes-discriminantes}
 
 Esse limite possui uma interpretação direta.
 
-Os $G$ centroides centralizados em torno da média global satisfazem uma relação linear ponderada e, portanto, podem gerar no máximo
+Os $K$ centroides centralizados em torno da média global satisfazem uma relação linear ponderada e, portanto, podem gerar no máximo
 
 $$
-G-1
+K-1
 $$
 
 direções independentes de separação.
@@ -3859,7 +3837,7 @@ Assim:
 
 - dois grupos produzem no máximo uma direção discriminante;
 - três grupos produzem no máximo duas;
-- em geral, $G$ grupos produzem no máximo $G-1$ direções.
+- em geral, $K$ grupos produzem no máximo $K-1$ direções.
 
 O limite também não pode ultrapassar a dimensão original
 
@@ -3870,12 +3848,12 @@ $$
 Por isso,
 
 $$
-\min(p,G-1)
+\min(p,K-1)
 $$
 
 é o número máximo possível de dimensões discriminantes não nulas.
 
-## Coordenadas discriminantes
+## Representação no subespaço discriminante
 
 As direções
 
@@ -3964,14 +3942,14 @@ $$
 
 sem centralização preservaria todas as diferenças entre observações e centroides; modificaria apenas a origem das coordenadas.
 
-O centroide discriminante da classe $g$ na dimensão $j$ é
+O centroide discriminante da classe $k$ na dimensão $j$ é
 
 $$
 \overline z_{gj}
 =
 \mathbf a_j^\top
 \left(
-\overline{\mathbf x}_g
+\overline{\mathbf x}_k
 -
 \overline{\mathbf x}
 \right).
@@ -3984,7 +3962,7 @@ r_F
 \leq
 \min
 \left(
-p,G-1
+p,K-1
 \right).
 $$
 
@@ -4535,9 +4513,9 @@ A mesma estrutura aparece no problema populacional.
 Considere
 
 $$
-P(\mathsf G=1)=\pi_1,
+P(\mathsf C=1)=\pi_1,
 \qquad
-P(\mathsf G=2)=\pi_2,
+P(\mathsf C=2)=\pi_2,
 $$
 
 com
@@ -4608,11 +4586,11 @@ Considere
 $$
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 \sim
 N_p
 \left(
-\boldsymbol{\mu}_g,
+\boldsymbol{\mu}_k,
 \boldsymbol{\Sigma}
 \right),
 \qquad
@@ -4706,15 +4684,15 @@ A posição dessa fronteira depende também dos termos
 
 $$
 -\frac12
-\boldsymbol{\mu}_g^\top
+\boldsymbol{\mu}_k^\top
 \boldsymbol{\Sigma}^{-1}
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 $$
 
 e
 
 $$
-\log\pi_g.
+\log\pi_k.
 $$
 
 As probabilidades *a priori* podem, portanto, deslocar a fronteira sem alterar sua orientação.
@@ -4735,7 +4713,7 @@ $$
 \frac{
 1
 }{
-n-G
+n-K
 }
 \mathbf T_{\mathrm{intra}}.
 $$ {#eq-covariancia-agrupada-fisher}
@@ -4745,7 +4723,7 @@ Consequentemente,
 $$
 \mathbf S_p^{-1}
 =
-(n-G)
+(n-K)
 \mathbf T_{\mathrm{intra}}^{-1}.
 $$
 
@@ -4772,7 +4750,7 @@ Assim, quando a mesma matriz agrupada de covariâncias é utilizada, a orientaç
 Novamente, a equivalência é da direção. A função discriminante estimada ainda contém
 
 $$
-\log\widehat{\pi}_g
+\log\widehat{\pi}_k
 $$
 
 e os termos constantes necessários para definir a posição da fronteira e realizar a classificação.
@@ -4803,7 +4781,7 @@ r_F
 \mathbf T_{\mathrm{entre}}
 \right)
 \leq
-\min(p,G-1)
+\min(p,K-1)
 $$
 
 direções com raízes positivas.
@@ -4888,7 +4866,7 @@ $$
 \mathbf T_{\mathrm{intra}}
 $$
 
-é formada a partir de dados centralizados separadamente em cada um dos $G$ grupos, seu posto satisfaz
+é formada a partir de dados centralizados separadamente em cada um dos $K$ grupos, seu posto satisfaz
 
 $$
 \operatorname{posto}
@@ -4899,7 +4877,7 @@ $$
 \min
 \left(
 p,
-n-G
+n-K
 \right).
 $$ {#eq-posto-tintra-discriminante}
 
@@ -4912,7 +4890,7 @@ $$
 possuir posto completo é
 
 $$
-n-G
+n-K
 \geq
 p.
 $$ {#eq-condicao-dimensao-fisher}
@@ -4922,7 +4900,7 @@ Essa condição não é suficiente para um conjunto de dados arbitrário.
 Mesmo quando
 
 $$
-n-G\geq p,
+n-K\geq p,
 $$
 
 relações lineares exatas entre as características dentro dos grupos podem tornar
@@ -4936,7 +4914,7 @@ singular.
 Quando
 
 $$
-p>n-G,
+p>n-K,
 $$
 
 a singularidade é inevitável.
@@ -4978,7 +4956,7 @@ Como
 $$
 \mathbf S_p
 =
-\frac1{n-G}
+\frac1{n-K}
 \mathbf T_{\mathrm{intra}},
 $$
 
@@ -5007,29 +4985,29 @@ Na QDA, cada classe possui uma matriz de covariâncias própria.
 A regra populacional clássica supõe
 
 $$
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 \succ
 \mathbf0,
 \qquad
-g=1,\ldots,G.
+k=1,\ldots,K.
 $$
 
 Na regra estimada, cada matriz é substituída por
 
 $$
-\mathbf S_g.
+\mathbf S_k.
 $$
 
 Como
 
 $$
-\mathbf S_g
+\mathbf S_k
 $$
 
 é construída a partir de
 
 $$
-n_g
+n_k
 $$
 
 observações centralizadas pelo próprio centroide,
@@ -5037,25 +5015,25 @@ observações centralizadas pelo próprio centroide,
 $$
 \operatorname{posto}
 \left(
-\mathbf S_g
+\mathbf S_k
 \right)
 \leq
 \min
 \left(
 p,
-n_g-1
+n_k-1
 \right).
 $$
 
 Logo,
 
 $$
-n_g-1
+n_k-1
 \geq
 p
 $$ {#eq-condicao-dimensao-qda}
 
-é condição necessária para que a covariância amostral usual da classe $g$ possa possuir posto completo.
+é condição necessária para que a covariância amostral usual da classe $k$ possa possuir posto completo.
 
 A QDA precisa satisfazer essa condição separadamente em cada grupo.
 
@@ -5170,7 +5148,7 @@ A @tbl-pressupostos-discriminante separa as principais condições.
 | segundos momentos finitos | necessários para a formulação populacional | satisfeitos sob normalidade | satisfeitos sob normalidade |
 | normalidade multivariada | não necessária para definir Fisher | necessária para a derivação normal da regra apresentada | necessária para a derivação normal da regra apresentada |
 | covariância comum entre grupos | não necessária | assumida | não assumida |
-| matriz não singular na formulação clássica | $\boldsymbol{\Sigma}_W\succ0$ ou $\mathbf T_{\mathrm{intra}}\succ0$ | $\boldsymbol{\Sigma}\succ0$ e, na regra estimada, $\mathbf S_p$ invertível | $\boldsymbol{\Sigma}_g\succ0$ e, na regra estimada, $\mathbf S_g$ invertível |
+| matriz não singular na formulação clássica | $\boldsymbol{\Sigma}_W\succ0$ ou $\mathbf T_{\mathrm{intra}}\succ0$ | $\boldsymbol{\Sigma}\succ0$ e, na regra estimada, $\mathbf S_p$ invertível | $\boldsymbol{\Sigma}_k\succ0$ e, na regra estimada, $\mathbf S_k$ invertível |
 | probabilidades *a priori* | não entram no critério | entram na regra de decisão | entram na regra de decisão |
 | função de perda | não entra no critério | as funções apresentadas correspondem à perda zero--um | as funções apresentadas correspondem à perda zero--um |
 
@@ -5217,7 +5195,7 @@ $$
 =
 \cdots
 =
-\boldsymbol{\Sigma}_G
+\boldsymbol{\Sigma}_K
 =
 \boldsymbol{\Sigma}.
 $$
@@ -5233,7 +5211,7 @@ sejam comuns às classes e se cancelem na comparação.
 Na QDA, as matrizes
 
 $$
-\boldsymbol{\Sigma}_g
+\boldsymbol{\Sigma}_k
 $$
 
 podem diferir e esse cancelamento não ocorre.
@@ -5253,7 +5231,7 @@ Essa é uma questão da estrutura probabilística dos dados, e não do problema 
 As probabilidades
 
 $$
-\pi_g
+\pi_k
 $$
 
 pertencem ao modelo de decisão.
@@ -5267,7 +5245,7 @@ $$
 Sob perda zero--um, aparecem nas funções discriminantes por meio de
 
 $$
-\log\pi_g.
+\log\pi_k.
 $$
 
 A função de perda possui papel distinto.
@@ -5306,11 +5284,7 @@ A avaliação empírica do desempenho de uma regra estimada — incluindo valida
 
 ## Relações com outras técnicas
 
-### MANOVA
-
-A relação mais direta é com a MANOVA.
-
-Na comparação de grupos,
+A relação mais direta ocorre com a MANOVA. Na comparação de grupos,
 
 $$
 \mathbf H
@@ -5326,9 +5300,7 @@ $$
 \mathbf T_{\mathrm{intra}},
 $$
 
-conforme @eq-correspondencia-manova-fisher.
-
-Portanto, o problema
+conforme @eq-correspondencia-manova-fisher. Assim, o problema espectral
 
 $$
 \mathbf H\mathbf a
@@ -5337,7 +5309,7 @@ $$
 \mathbf E\mathbf a
 $$
 
-da MANOVA e o problema
+da MANOVA coincide com
 
 $$
 \mathbf T_{\mathrm{entre}}
@@ -5348,33 +5320,19 @@ $$
 \mathbf a
 $$
 
-de Fisher são o mesmo problema de autovalores generalizados quando representam a mesma estrutura de grupos.
+na formulação de Fisher quando as matrizes representam a mesma estrutura de grupos.
 
-As raízes positivas são as mesmas, e os subespaços característicos são os mesmos.
+As raízes e os subespaços característicos são os mesmos, mas recebem funções estatísticas diferentes. Na MANOVA, as raízes são utilizadas para construir critérios de teste sobre efeitos multivariados. Em Fisher, os autovetores associados às raízes positivas definem direções de separação. A formulação probabilística da Análise Discriminante acrescenta ainda uma regra de decisão para classificar novas observações.
 
-O objetivo estatístico é diferente.
-
-Na MANOVA, as raízes alimentam critérios globais destinados à inferência sobre diferenças entre grupos.
-
-Em Fisher, os autovetores associados às raízes positivas são utilizados para construir direções de separação.
-
-A formulação probabilística da Análise Discriminante acrescenta ainda um objeto que não é produzido pela MANOVA: uma regra de decisão para classificar novas observações.
-
-A identidade da estrutura matricial não implica identidade entre as técnicas.
-
-### Análise de Componentes Principais
-
-ACP e Fisher constroem combinações lineares das características, mas otimizam quantidades diferentes.
-
-Na ACP, uma direção é escolhida de acordo com a variabilidade total:
+A relação com a ACP decorre do uso comum de combinações lineares e problemas espectrais. A ACP procura direções de grande variabilidade total,
 
 $$
 \mathbf v^\top
 \mathbf S
-\mathbf v.
+\mathbf v,
 $$
 
-Em Fisher, a direção é escolhida segundo
+enquanto Fisher maximiza
 
 $$
 \frac{
@@ -5388,13 +5346,7 @@ $$
 }.
 $$
 
-A ACP não utiliza os rótulos dos grupos na construção das direções.
-
-Fisher utiliza os rótulos para decompor a dispersão em componentes entre e dentro dos grupos.
-
-Por isso, uma direção de grande variância total não precisa ser uma direção de boa separação entre classes.
-
-A @tbl-acp-fisher sintetiza a diferença.
+A diferença decorre do uso dos rótulos de grupo. Uma direção de grande variância total não precisa produzir boa separação entre classes. A @tbl-acp-fisher sintetiza essa distinção.
 
 | Aspecto | ACP | Fisher |
 |---|---|---|
@@ -5402,159 +5354,102 @@ A @tbl-acp-fisher sintetiza a diferença.
 | objeto matricial principal | covariância ou correlação total | dispersões entre e dentro dos grupos |
 | critério | variância total | separação entre grupos relativa à dispersão intragrupos |
 | tipo de representação | não supervisionada em relação aos grupos | supervisionada |
-| dimensão máxima não nula | limitada pelo posto da matriz de covariâncias/dados | $\min(p,G-1)$ |
+| dimensão máxima não nula | limitada pelo posto da matriz de covariâncias/dados | $\min(p,K-1)$ |
 | interpretação das direções | variabilidade | separação relativa |
 
 : Diferença entre as projeções da ACP e de Fisher. {#tbl-acp-fisher}
 
-As duas técnicas utilizam projeções e decomposição espectral, mas a função objetivo determina o significado estatístico das direções.
+Análise Discriminante e Análise de Agrupamentos também utilizam centroides, distâncias e dispersões, mas partem de informações distintas. Na Discriminante, os grupos são conhecidos e seus rótulos participam da construção. Em Agrupamentos, os grupos precisam ser definidos a partir dos dados.
 
-### Análise de Agrupamentos
-
-Análise Discriminante e Análise de Agrupamentos trabalham com estruturas de grupos, mas partem de informações diferentes.
-
-Na Análise de Agrupamentos, os rótulos não são conhecidos e precisam ser construídos a partir das características observadas.
-
-Na Análise Discriminante, os grupos já estão definidos e seus rótulos são utilizados para caracterizar as populações, construir dispersões e, quando apropriado, classificar novas observações.
-
-Assim:
-
-- Agrupamentos procura uma estrutura de partição;
-- Discriminante estuda separação e classificação relativamente a classes conhecidas.
-
-Centroides, distâncias e dispersões podem aparecer em ambas as técnicas, mas possuem funções diferentes dentro de cada problema.
-
-### Correlação Canônica
-
-Há também uma relação entre a Análise Discriminante e a Correlação Canônica.
-
-Se a informação de classe for representada por um conjunto apropriado de variáveis indicadoras ou contrastes, a associação entre o bloco quantitativo
-
-$$
-\boldsymbol{\mathsf X}
-$$
-
-e o bloco que representa os grupos pode ser estudada por combinações lineares dos dois conjuntos.
-
-Sob codificações e ponderações apropriadas, o subespaço obtido relaciona-se ao subespaço discriminante de Fisher.
-
-Essa conexão não será derivada aqui porque a Correlação Canônica é o objeto do próximo capítulo.
-
-Ela antecipa, entretanto, uma ideia importante: técnicas com objetivos aparentemente distintos podem conduzir a subespaços relacionados quando são formuladas a partir das mesmas estruturas de covariância e projeção.
+A relação com a Correlação Canônica aparece quando a informação de classe é representada por variáveis indicadoras ou contrastes. Sob codificações e ponderações apropriadas, o subespaço obtido pode ser relacionado ao subespaço discriminante de Fisher. Essa conexão será retomada no próximo capítulo.
 
 ## Síntese
 
-A Análise Discriminante reúne uma formulação de decisão e uma formulação geométrica.
+A Análise Discriminante reúne uma formulação probabilística para classificação e uma formulação geométrica para separação entre grupos conhecidos.
 
-Na formulação probabilística, cada classe possui probabilidade *a priori*
+Na formulação de decisão, cada classe possui probabilidade *a priori*
 
 $$
-\pi_g
+\pi_k
 $$
 
 e densidade condicional
 
 $$
-f_g(\mathbf x).
+f_k(\mathbf x).
 $$
 
-A regra de Bayes minimiza o risco condicional
+Para uma função de perda $L(a,g)$, a regra de Bayes escolhe uma ação que minimize o risco condicional
 
 $$
 R(a\mid\mathbf x).
 $$
 
-Sob perda zero--um, essa decisão equivale a maximizar a probabilidade posterior e, portanto,
+Sob perda zero--um, essa regra equivale a selecionar uma classe que maximize
+
+$$
+P
+\left(
+\mathsf C=k
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right),
+$$
+
+ou, de forma equivalente,
 
 $$
 \pi_gf_g(\mathbf x).
 $$
 
-Para populações normais com covariância comum,
+Quando
 
 $$
 \boldsymbol{\mathsf X}
 \mid
-\mathsf G=g
+\mathsf C=k
 \sim
 N_p
 \left(
-\boldsymbol{\mu}_g,
+\boldsymbol{\mu}_k,
 \boldsymbol{\Sigma}
-\right),
+\right)
 $$
 
-a comparação produz a função
+com covariância comum, os termos quadráticos comuns às classes se cancelam e a regra é determinada pelas funções discriminantes lineares
 
 $$
-\delta_g(\mathbf x)
+\delta_k(\mathbf x)
 =
 \mathbf x^\top
 \boldsymbol{\Sigma}^{-1}
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 -
 \frac12
-\boldsymbol{\mu}_g^\top
+\boldsymbol{\mu}_k^\top
 \boldsymbol{\Sigma}^{-1}
-\boldsymbol{\mu}_g
+\boldsymbol{\mu}_k
 +
-\log\pi_g.
+\log\pi_k.
 $$
 
-As fronteiras são lineares porque os termos quadráticos comuns às classes se cancelam.
-
-Quando as covariâncias são específicas,
+Quando as matrizes de covariâncias
 
 $$
-\boldsymbol{\Sigma}_g,
+\boldsymbol{\Sigma}_k
 $$
 
-esse cancelamento não ocorre e a função discriminante torna-se quadrática.
+diferem entre as classes, esse cancelamento deixa de ocorrer e a função discriminante passa a conter termos quadráticos em $\mathbf x$, produzindo a QDA.
 
-As regras populacionais utilizam parâmetros desconhecidos.
+As regras populacionais dependem de parâmetros desconhecidos. Na prática amostral, médias, covariâncias e, quando apropriado, probabilidades *a priori* são substituídas por estimativas. Essa passagem distingue parâmetros, estimadores, estimativas e regras discriminantes estimadas.
 
-As regras *plug-in* substituem
-
-$$
-\boldsymbol{\mu}_g,
-\qquad
-\boldsymbol{\Sigma},
-\qquad
-\boldsymbol{\Sigma}_g
-$$
-
-por estimativas como
+Na formulação geométrica de Fisher, a variabilidade é decomposta em dispersões dentro e entre os grupos. Para uma direção
 
 $$
-\overline{\mathbf x}_g,
-\qquad
-\mathbf S_p,
-\qquad
-\mathbf S_g.
+\mathbf a,
 $$
 
-Essa passagem distingue regra populacional, estimadores, estimativas e regra estimada.
-
-Na formulação geométrica de Fisher, a dispersão populacional é decomposta em
-
-$$
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf X}
-\right)
-=
-\boldsymbol{\Sigma}_W
-+
-\boldsymbol{\Sigma}_B.
-$$
-
-A separação numa direção
-
-$$
-\mathbf a
-$$
-
-é medida relativamente à dispersão intragrupos por
+a separação populacional é medida por
 
 $$
 J_F^{(P)}
@@ -5568,10 +5463,10 @@ J_F^{(P)}
 \mathbf a^\top
 \boldsymbol{\Sigma}_W
 \mathbf a
-}.
+},
 $$
 
-Na amostra, o critério correspondente é
+e sua versão amostral utiliza
 
 $$
 J_F(\mathbf a)
@@ -5587,7 +5482,15 @@ J_F(\mathbf a)
 }.
 $$
 
-Sua maximização conduz ao problema
+Quando
+
+$$
+\mathbf T_{\mathrm{intra}}
+\succ
+\mathbf0,
+$$
+
+a maximização conduz ao problema de autovalores generalizados
 
 $$
 \mathbf T_{\mathrm{entre}}
@@ -5598,50 +5501,17 @@ $$
 \mathbf a.
 $$
 
-Quando
-
-$$
-\mathbf T_{\mathrm{intra}}
-\succ
-\mathbf0,
-$$
-
-o problema é equivalente à decomposição espectral da matriz simétrica
-
-$$
-\mathbf T_{\mathrm{intra}}^{-1/2}
-\mathbf T_{\mathrm{entre}}
-\mathbf T_{\mathrm{intra}}^{-1/2}.
-$$
-
-Se
-
-$$
-r_F
-=
-\operatorname{posto}
-\left(
-\mathbf T_{\mathrm{entre}}
-\right),
-$$
-
-existem exatamente
-
-$$
-r_F
-$$
-
-raízes positivas e
+As direções associadas às raízes positivas formam o subespaço discriminante, cuja dimensão satisfaz
 
 $$
 r_F
 \leq
-\min(p,G-1).
+\min(p,K-1).
 $$
 
-Os autovetores correspondentes definem as direções discriminantes.
+Raízes simples identificam direções até mudança de sinal. Raízes repetidas identificam os respectivos subespaços, e não uma base particular.
 
-Para dois grupos,
+No caso de dois grupos,
 
 $$
 \mathbf a_1
@@ -5654,17 +5524,9 @@ $$
 \right).
 $$
 
-No nível populacional, se as duas classes compartilham
+Sob normalidade e covariância comum, a direção populacional correspondente é proporcional a
 
 $$
-\boldsymbol{\Sigma},
-$$
-
-então
-
-$$
-\mathbf a_F
-\propto
 \boldsymbol{\Sigma}^{-1}
 \left(
 \boldsymbol{\mu}_1
@@ -5673,111 +5535,12 @@ $$
 \right),
 $$
 
-que é também a orientação da fronteira da LDA.
+que também determina a orientação da fronteira da LDA. Essa coincidência relaciona as duas formulações, mas não iguala seus objetivos: Fisher constrói direções de separação, enquanto a LDA constrói uma regra de decisão.
 
-Essa coincidência não transforma Fisher e LDA no mesmo problema.
+A normalidade multivariada não é necessária para definir o critério de Fisher. Ela é utilizada na derivação das regras normais LDA e QDA. A covariância comum é específica da LDA, enquanto probabilidades *a priori* e perdas pertencem ao problema de decisão.
 
-Fisher constrói direções de separação.
+As formulações clássicas também dependem de condições de posto e não singularidade. Na amostra, a possibilidade de inverter as matrizes de dispersão ou covariância depende da dimensão, do tamanho dos grupos e da estrutura das variáveis.
 
-A LDA constrói uma regra de decisão e incorpora também probabilidades *a priori* e, no problema geral de Bayes, uma função de perda.
+A Análise Discriminante integra decisão estatística, teorema de Bayes, normal multivariada, distância de Mahalanobis, formas quadráticas, decomposição da dispersão, projeções e autovalores generalizados. Sua relação espectral com a MANOVA mostra como a mesma estrutura matricial pode sustentar inferência sobre grupos ou construção de direções discriminantes, conforme o problema estatístico formulado.
 
-A formulação clássica exige ainda condições de posto.
-
-Para Fisher e LDA estimada,
-
-$$
-\operatorname{posto}
-\left(
-\mathbf T_{\mathrm{intra}}
-\right)
-\leq
-\min(p,n-G),
-$$
-
-de modo que
-
-$$
-n-G\geq p
-$$
-
-é condição necessária para uma matriz intragrupos de posto completo.
-
-Na QDA estimada,
-
-$$
-n_g-1\geq p
-$$
-
-é condição necessária em cada classe para que a covariância amostral usual possa ter posto completo.
-
-A normalidade possui papel específico: ela não é necessária para definir Fisher, mas é utilizada para derivar as regras normais LDA e QDA apresentadas neste capítulo.
-
-A Análise Discriminante reutiliza, assim, fundamentos dos Módulos 1 e 2 sobre esperança condicional, covariância, normal multivariada, teorema de Bayes, decisão estatística, distância de Mahalanobis, formas quadráticas, posto, raízes quadradas de matrizes positivas definidas, projeções e autovalores generalizados.
-
-O capítulo mostra também por que uma mesma estrutura matemática pode sustentar técnicas diferentes. O problema espectral de Fisher coincide com aquele utilizado pela MANOVA na comparação de grupos, mas as raízes e autovetores recebem funções estatísticas distintas.
-
-Ao final deste capítulo, o estudante deverá ser capaz de:
-
-1. distinguir discriminação, representação discriminante e classificação;
-
-2. formular a classificação como um problema de decisão envolvendo probabilidades *a priori*, densidades condicionais e perdas;
-
-3. explicar por que, sob perda zero--um, a regra de Bayes seleciona a classe de maior probabilidade posterior;
-
-4. derivar a função discriminante linear a partir da distribuição normal multivariada com covariância comum;
-
-5. explicar por que a igualdade das covariâncias produz fronteiras lineares;
-
-6. derivar a função discriminante quadrática quando as classes possuem covariâncias distintas;
-
-7. interpretar o papel da distância de Mahalanobis nas regras normais de classificação;
-
-8. distinguir parâmetros populacionais, estimadores, estimativas e regras discriminantes *plug-in*;
-
-9. explicar por que as proporções amostrais dos grupos não são automaticamente probabilidades *a priori* populacionais;
-
-10. decompor a covariância populacional em dispersão dentro e entre grupos;
-
-11. formular os critérios populacional e amostral de Fisher;
-
-12. explicar por que o critério de Fisher conduz a um problema de autovalores generalizados;
-
-13. interpretar o branqueamento pela dispersão intragrupos e as raízes discriminantes;
-
-14. justificar o limite
-
-    $$
-    r_F
-    \leq
-    \min(p,G-1);
-    $$
-
-15. distinguir raízes, direções e subespaços discriminantes, incluindo a não unicidade associada a raízes repetidas;
-
-16. demonstrar, no caso de dois grupos, que
-
-    $$
-    \mathbf a_1
-    \propto
-    \mathbf T_{\mathrm{intra}}^{-1}
-    \left(
-    \overline{\mathbf x}_1
-    -
-    \overline{\mathbf x}_2
-    \right);
-    $$
-
-17. explicar em quais condições Fisher e LDA possuem a mesma direção e por que isso não torna projeção e classificação problemas idênticos;
-
-18. reconhecer as condições de posto e não singularidade necessárias às formulações clássicas de Fisher, LDA e QDA;
-
-19. distinguir o papel da normalidade, da covariância comum, das probabilidades *a priori* e da função de perda nas diferentes formulações;
-
-20. relacionar a Análise Discriminante com MANOVA, ACP, Análise de Agrupamentos e, conceitualmente, Correlação Canônica.
-
-No próximo capítulo, a construção de combinações lineares será novamente central, mas os rótulos de grupos deixam de ser o objeto que organiza a análise.
-
-Na **Correlação Canônica**, dois blocos de variáveis quantitativas serão considerados simultaneamente. O problema será construir uma combinação linear de cada bloco de modo que a correlação entre as duas combinações seja máxima.
-
-A solução reutilizará matrizes de covariâncias particionadas, formas quadráticas, branqueamento, autovalores generalizados e SVD, permitindo integrar novamente os fundamentos dos Módulos 1 e 2 em uma nova pergunta estatística.
-
+No próximo capítulo, os grupos deixam de organizar a análise. A Correlação Canônica considerará dois blocos de variáveis quantitativas e construirá combinações lineares de cada bloco cuja correlação seja máxima.
