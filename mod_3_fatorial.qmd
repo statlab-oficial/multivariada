@@ -1,23 +1,23 @@
-# Formulação da Análise Fatorial
+# Formulação da Análise Fatorial {#sec-fatorial}
 
-A Análise Fatorial representa a estrutura de covariâncias entre variáveis observadas por meio de um número menor de variáveis latentes, denominadas **fatores comuns**. O modelo assume que parte das covariâncias entre as variáveis pode ser atribuída a esses fatores, enquanto a variabilidade restante é específica de cada variável [@lawley1971factor].
+A Análise Fatorial representa a estrutura de covariâncias entre variáveis observadas por meio de um número menor de variáveis latentes, denominadas **fatores comuns**. No modelo ortogonal desenvolvido neste capítulo, as covariâncias entre variáveis distintas são atribuídas aos fatores comuns, enquanto a variância de cada variável é decomposta em uma parcela comum e uma parcela específica [@lawley1971factor].
 
 Diferentemente da ACP, que decompõe a variabilidade total em direções, a Análise Fatorial especifica um modelo para a matriz de covariâncias. No modelo ortogonal, sua estrutura é
 
 $$
 \boldsymbol{\Sigma}
 =
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi},
 $$
 
-em que $\mathbf L\mathbf L^{\top}$ representa a parcela comum da covariância e $\boldsymbol{\Psi}$ representa a variabilidade específica.
+em que $\boldsymbol{\Phi}\boldsymbol{\Phi}^{\top}$ representa a parcela comum da covariância e $\boldsymbol{\Psi}$ representa a variabilidade específica.
 
-A formulação reutiliza a matriz de covariâncias populacional definida na @def-matriz-covariancias-populacional, a noção de posto na @def-posto-matriz e, na formulação probabilística posterior, a distribuição normal multivariada na @def-normal-multivariada. O capítulo desenvolve o modelo de fatores comuns, suas condições de identificação, a indeterminação rotacional, as formulações ortogonal e oblíqua, a estimação e o problema dos escores fatoriais.
+A formulação reutiliza a matriz de covariâncias populacional definida na @def-matriz-covariancias-populacional, a noção de posto na @def-posto-matriz e, na formulação probabilística posterior, a distribuição normal multivariada na @def-normal-multivariada. O capítulo desenvolve o modelo ortogonal de fatores comuns, suas condições de identificação, a indeterminação rotacional, a avaliação da adequação da matriz de correlações, a estimação e o problema dos escores fatoriais.
 
-Neste capítulo, $\mathbf L$ será utilizada exclusivamente para a matriz de cargas fatoriais. 
+Neste capítulo, a matriz de cargas fatoriais será denotada por $\boldsymbol{\Phi}=(\phi_{ij})$, seguindo a notação adotada por Artes e Barroso [@artes2023metodos].
 
 ## O problema da estrutura latente
 
@@ -157,7 +157,7 @@ $$
 =
 \boldsymbol{\mu}
 +
-\mathbf L
+\boldsymbol{\Phi}
 \boldsymbol{\mathsf F}
 +
 \boldsymbol{\varepsilon},
@@ -166,7 +166,7 @@ $$ {#eq-modelo-fatores-comuns}
 em que
 
 $$
-\mathbf L
+\boldsymbol{\Phi}
 \in
 \mathbb R^{p\times m}
 $$
@@ -181,7 +181,7 @@ Os elementos do modelo são organizados na @tbl-elementos-modelo-fatorial.
 | $\boldsymbol{\mathsf X}$ | $p\times1$ | Vetor de variáveis observadas |
 | $\boldsymbol{\mu}$ | $p\times1$ | Vetor de médias |
 | $\boldsymbol{\mathsf F}$ | $m\times1$ | Vetor de fatores comuns latentes |
-| $\mathbf L$ | $p\times m$ | Matriz de cargas fatoriais |
+| $\boldsymbol{\Phi}$ | $p\times m$ | Matriz de cargas fatoriais |
 | $\boldsymbol{\varepsilon}$ | $p\times1$ | Vetor de fatores específicos |
 | $\boldsymbol{\Psi}$ | $p\times p$ | Matriz de covariâncias dos fatores específicos no modelo ortogonal |
 
@@ -194,13 +194,13 @@ X_i
 =
 \mu_i
 +
-l_{i1}F_1
+\phi_{i1}F_1
 +
-l_{i2}F_2
+\phi_{i2}F_2
 +
 \cdots
 +
-l_{im}F_m
+\phi_{im}F_m
 +
 \varepsilon_i.
 $$ {#eq-modelo-fatorial-variavel}
@@ -208,15 +208,29 @@ $$ {#eq-modelo-fatorial-variavel}
 A linha $i$ da matriz de cargas será denotada por
 
 $$
-\mathbf l_i^\top
+\boldsymbol{\phi}_i^\top
 =
 \begin{pmatrix}
-l_{i1}
+\phi_{i1}
 &
 \cdots
 &
-l_{im}
+\phi_{im}
 \end{pmatrix}.
+$$
+
+A coluna $j$ será denotada por
+
+$$
+\boldsymbol{\phi}_{\cdot j}
+=
+\begin{pmatrix}
+\phi_{1j}\\
+\vdots\\
+\phi_{pj}
+\end{pmatrix}
+\in
+\mathbb R^p.
 $$
 
 Assim,
@@ -224,13 +238,13 @@ Assim,
 $$
 X_i-\mu_i
 =
-\mathbf l_i^\top
+\boldsymbol{\phi}_i^\top
 \boldsymbol{\mathsf F}
 +
 \varepsilon_i.
 $$
 
-A carga $l_{ij}$ representa o coeficiente associado ao fator $F_j$ na expressão linear da variável $X_i$. Sua interpretação depende da escala dos fatores, da escala das variáveis e da parametrização utilizada.
+A carga $\phi_{ij}$ representa o coeficiente associado ao fator $F_j$ na expressão linear da variável $X_i$. Sua interpretação depende da escala dos fatores, da escala das variáveis e da parametrização utilizada.
 
 A @fig-modelo-fatores-comuns representa a estrutura de um modelo com dois fatores e três variáveis observadas. As setas azuis representam as contribuições dos fatores comuns e as setas vermelhas representam os fatores específicos.
 
@@ -281,9 +295,9 @@ variaveis <- data.frame(
 
 especificos <- data.frame(
   nome = c(
-    "eps1",
-    "eps2",
-    "eps3"
+    "epsilon[1]",
+    "epsilon[2]",
+    "epsilon[3]"
   ),
   x = c(
     5.5,
@@ -414,7 +428,7 @@ ggplot() +
     label.size = 0.7,
     color = "#d62728",
     fill = "white",
-    parse = FALSE
+    parse = TRUE
   ) +
   annotate(
     "text",
@@ -657,27 +671,6 @@ Essas hipóteses são suficientes para obter a estrutura de segunda ordem que de
 
 ## Estrutura da matriz de covariâncias
 
-O vetor de médias observadas, definido matricialmente na @eq-media-observada-matricial, será denotado por
-
-$$
-\bar{\mathbf x}
-=
-\frac{1}{n}
-\sum_{i=1}^{n}
-\mathbf x_i.
-$$
-
-A matriz de dados centralizada, definida na @eq-matriz-dados-centralizada, é
-
-$$
-\mathbf X_c
-=
-\mathbf X
--
-\mathbf 1_n
-\bar{\mathbf x}^{\top}.
-$$
-
 De @eq-modelo-fatores-comuns,
 
 $$
@@ -685,7 +678,7 @@ $$
 -
 \boldsymbol{\mu}
 =
-\mathbf L
+\boldsymbol{\Phi}
 \boldsymbol{\mathsf F}
 +
 \boldsymbol{\varepsilon}.
@@ -713,25 +706,25 @@ $$
 &=
 \operatorname{Cov}
 \left(
-\mathbf L
+\boldsymbol{\Phi}
 \boldsymbol{\mathsf F}
 +
 \boldsymbol{\varepsilon}
 \right)\\
 &=
-\mathbf L
+\boldsymbol{\Phi}
 \operatorname{Cov}
 \left(
 \boldsymbol{\mathsf F}
 \right)
-\mathbf L^{\top}
+\boldsymbol{\Phi}^{\top}
 +
 \operatorname{Cov}
 \left(
 \boldsymbol{\varepsilon}
 \right)\\
 &\quad+
-\mathbf L
+\boldsymbol{\Phi}
 \operatorname{Cov}
 \left(
 \boldsymbol{\mathsf F},
@@ -743,7 +736,7 @@ $$
 \boldsymbol{\varepsilon},
 \boldsymbol{\mathsf F}
 \right)
-\mathbf L^{\top}.
+\boldsymbol{\Phi}^{\top}.
 \end{aligned}
 $$
 
@@ -786,8 +779,8 @@ Portanto,
 $$
 \boldsymbol{\Sigma}
 =
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi}.
 $$ {#eq-covariancia-modelo-fatorial}
@@ -800,8 +793,8 @@ Sob as hipóteses na @def-modelo-fatorial-ortogonal, a matriz de covariâncias d
 $$
 \boldsymbol{\Sigma}
 =
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi},
 $$
@@ -809,8 +802,8 @@ $$
 em que
 
 $$
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 \succeq
 \mathbf0
 $$
@@ -834,14 +827,14 @@ A expressão na @eq-covariancia-modelo-fatorial é o núcleo matemático da Aná
 A matriz
 
 $$
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 $$
 
 é a matriz de covariâncias da parcela comum do modelo. Como
 
 $$
-\mathbf L
+\boldsymbol{\Phi}
 \in
 \mathbb R^{p\times m},
 $$
@@ -851,8 +844,8 @@ tem-se
 $$
 \operatorname{posto}
 \left(
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 \right)
 \leq
 m.
@@ -879,8 +872,8 @@ $$
 \boldsymbol{\Sigma}
 =
 \underbrace{
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 }_{\text{estrutura comum}}
 +
 \underbrace{
@@ -888,7 +881,7 @@ $$
 }_{\text{estrutura específica}}
 $$
 
-mostra a diferença essencial em relação à ACP. A Análise Fatorial não procura uma decomposição espectral completa de $\boldsymbol{\Sigma}$. Ela procura representar a matriz de covariâncias por uma estrutura comum de posto reduzido acrescida de uma matriz diagonal de variâncias específicas.
+explicita a diferença em relação à ACP. A Análise Fatorial não procura uma decomposição espectral completa de $\boldsymbol{\Sigma}$. Ela procura representar a matriz de covariâncias por uma estrutura comum de posto reduzido acrescida de uma matriz diagonal de variâncias específicas.
 
 ### Covariâncias entre variáveis
 
@@ -897,7 +890,7 @@ Considere duas variáveis distintas $X_i$ e $X_j$. Pelo modelo,
 $$
 X_i-\mu_i
 =
-\mathbf l_i^\top
+\boldsymbol{\phi}_i^\top
 \boldsymbol{\mathsf F}
 +
 \varepsilon_i
@@ -908,7 +901,7 @@ e
 $$
 X_j-\mu_j
 =
-\mathbf l_j^\top
+\boldsymbol{\phi}_j^\top
 \boldsymbol{\mathsf F}
 +
 \varepsilon_j.
@@ -922,8 +915,8 @@ $$
 X_i,X_j
 \right)
 =
-\mathbf l_i^\top
-\mathbf l_j,
+\boldsymbol{\phi}_i^\top
+\boldsymbol{\phi}_j,
 \qquad
 i\neq j.
 $$
@@ -934,15 +927,15 @@ $$
 \sigma_{ij}
 =
 \sum_{h=1}^m
-l_{ih}
-l_{jh},
+\phi_{ih}
+\phi_{jh},
 \qquad
 i\neq j.
 $$ {#eq-covariancia-variaveis-fatorial}
 
 A covariância entre duas variáveis observadas é, portanto, reproduzida pelo produto interno entre seus vetores de cargas.
 
-Esse resultado fornece uma interpretação geométrica importante. As linhas de $\mathbf L$ podem ser vistas como vetores em $\mathbb R^m$. Variáveis cujos vetores de cargas apresentam grande produto interno positivo possuem covariância positiva segundo o modelo; vetores com produto interno negativo correspondem a covariância negativa; e vetores ortogonais correspondem a covariância nula entre as variáveis no modelo fatorial ortogonal.
+Esse resultado fornece uma interpretação geométrica importante. As linhas de $\boldsymbol{\Phi}$ podem ser vistas como vetores em $\mathbb R^m$. Variáveis cujos vetores de cargas apresentam grande produto interno positivo possuem covariância positiva segundo o modelo; vetores com produto interno negativo correspondem a covariância negativa; e vetores ortogonais correspondem a covariância nula entre as variáveis no modelo fatorial ortogonal.
 
 Essa geometria será representada mais adiante por meio dos vetores de cargas.
 
@@ -959,14 +952,14 @@ X_i
 &=
 \operatorname{Var}
 \left(
-\mathbf l_i^\top
+\boldsymbol{\phi}_i^\top
 \boldsymbol{\mathsf F}
 +
 \varepsilon_i
 \right)\\
 &=
-\mathbf l_i^\top
-\mathbf l_i
+\boldsymbol{\phi}_i^\top
+\boldsymbol{\phi}_i
 +
 \psi_i.
 \end{aligned}
@@ -978,7 +971,7 @@ $$
 \sigma_{ii}
 =
 \sum_{h=1}^m
-l_{ih}^2
+\phi_{ih}^2
 +
 \psi_i.
 $$ {#eq-variancia-variavel-fatorial}
@@ -997,11 +990,11 @@ No modelo fatorial ortogonal na @def-modelo-fatorial-ortogonal, a **comunalidade
 $$
 h_i^2
 =
-\mathbf l_i^\top
-\mathbf l_i
+\boldsymbol{\phi}_i^\top
+\boldsymbol{\phi}_i
 =
 \sum_{h=1}^m
-l_{ih}^2.
+\phi_{ih}^2.
 $$ {#eq-comunalidade}
 :::
 
@@ -1092,8 +1085,8 @@ h_i^2
 =
 \operatorname{tr}
 \left(
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 \right).
 $$
 
@@ -1107,8 +1100,8 @@ $$
 =
 \operatorname{tr}
 \left(
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 \right)
 +
 \operatorname{tr}
@@ -1142,7 +1135,7 @@ Considere três variáveis padronizadas e centralizadas representadas por um ún
 $$
 \boldsymbol{\mathsf X}
 =
-\mathbf{L F}
+\boldsymbol{\Phi} F
 +
 \boldsymbol{\varepsilon},
 $$
@@ -1150,7 +1143,7 @@ $$
 com
 
 $$
-\mathbf L
+\boldsymbol{\Phi}
 =
 \begin{pmatrix}
 0{,}80\\
@@ -1210,8 +1203,8 @@ para cada variável.
 A matriz de covariâncias comuns é
 
 $$
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 =
 \begin{pmatrix}
 0{,}64 & 0{,}56 & 0{,}48\\
@@ -1225,8 +1218,8 @@ Somando as variâncias específicas,
 $$
 \boldsymbol{\mathcal R}
 =
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi}
 =
@@ -1257,7 +1250,7 @@ O exemplo mostra que a Análise Fatorial procura representar simultaneamente as 
 
 ## Cargas fatoriais e associação com os fatores
 
-A matriz $\mathbf L$ reúne as cargas fatoriais do modelo. Seus elementos aparecem tanto na representação das variáveis quanto na matriz de covariâncias reproduzida.
+A matriz $\boldsymbol{\Phi}$ reúne as cargas fatoriais do modelo. Seus elementos aparecem tanto na representação das variáveis quanto na matriz de covariâncias reproduzida.
 
 No modelo ortogonal,
 
@@ -1270,7 +1263,7 @@ $$
 =
 \operatorname{Cov}
 \left(
-\mathbf L
+\boldsymbol{\Phi}
 \boldsymbol{\mathsf F}
 +
 \boldsymbol{\varepsilon},
@@ -1310,7 +1303,7 @@ $$
 \boldsymbol{\mathsf F}
 \right)
 =
-\mathbf L.
+\boldsymbol{\Phi}.
 $$ {#eq-covariancia-variaveis-fatores}
 
 Portanto,
@@ -1321,7 +1314,7 @@ $$
 X_i,F_j
 \right)
 =
-l_{ij}.
+\phi_{ij}.
 $$
 
 Essa igualdade decorre da parametrização em que os fatores possuem variância unitária.
@@ -1335,7 +1328,7 @@ X_i,F_j
 \right)
 =
 \frac{
-l_{ij}
+\phi_{ij}
 }{
 \sqrt{\sigma_{ii}}
 }.
@@ -1355,7 +1348,7 @@ $$
 X_i,F_j
 \right)
 =
-l_{ij}.
+\phi_{ij}.
 $$
 
 Essa distinção é semelhante àquela estabelecida no capítulo anterior entre coeficientes das componentes principais e correlações das variáveis com as componentes. Na Análise Fatorial, entretanto, as cargas são parâmetros do próprio modelo de covariâncias.
@@ -1365,27 +1358,27 @@ A formulação construída até este ponto mostra que o problema da estrutura la
 $$
 \boldsymbol{\Sigma}
 =
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi}.
 $$
 
-O passo seguinte consiste em analisar a geometria da matriz de cargas e uma propriedade que distingue profundamente a Análise Fatorial da ACP: diferentes matrizes de cargas podem produzir exatamente a mesma estrutura de covariâncias comuns. Essa indeterminação conduz ao problema de identificação e às rotações fatoriais.
+O passo seguinte consiste em analisar a geometria da matriz de cargas e uma propriedade que distingue a Análise Fatorial da ACP: diferentes matrizes de cargas podem produzir exatamente a mesma estrutura de covariâncias comuns. Essa indeterminação conduz ao problema de identificação e às rotações fatoriais.
 
 ## Geometria das cargas fatoriais
 
 No modelo ortogonal, cada linha da matriz de cargas
 
 $$
-\mathbf l_i^\top
+\boldsymbol{\phi}_i^\top
 =
 \begin{pmatrix}
-l_{i1}
+\phi_{i1}
 &
 \cdots
 &
-l_{im}
+\phi_{im}
 \end{pmatrix}
 $$
 
@@ -1396,11 +1389,11 @@ Essa representação reúne duas propriedades obtidas anteriormente:
 $$
 h_i^2
 =
-\mathbf l_i^\top
-\mathbf l_i
+\boldsymbol{\phi}_i^\top
+\boldsymbol{\phi}_i
 =
 \left\|
-\mathbf l_i
+\boldsymbol{\phi}_i
 \right\|^2
 $$
 
@@ -1409,25 +1402,25 @@ e, para $i\neq j$,
 $$
 \sigma_{ij}
 =
-\mathbf l_i^\top
-\mathbf l_j.
+\boldsymbol{\phi}_i^\top
+\boldsymbol{\phi}_j.
 $$
 
 Portanto, o comprimento do vetor de cargas da variável $X_i$ determina sua comunalidade, enquanto o produto interno entre os vetores de cargas de duas variáveis determina a covariância comum reproduzida entre elas.
 
-Aplicando a relação entre produto interno e ângulo definida em @def-angulo-vetores, para $\mathbf l_i\neq\mathbf 0$ e $\mathbf l_j\neq\mathbf 0$,
+Aplicando a relação entre produto interno e ângulo definida em @def-angulo-vetores, para $\boldsymbol{\phi}_i\neq\mathbf 0$ e $\boldsymbol{\phi}_j\neq\mathbf 0$,
 
 $$
 \sigma_{ij}
 =
-\mathbf l_i^\top
-\mathbf l_j
+\boldsymbol{\phi}_i^\top
+\boldsymbol{\phi}_j
 =
 \left\|
-\mathbf l_i
+\boldsymbol{\phi}_i
 \right\|
 \left\|
-\mathbf l_j
+\boldsymbol{\phi}_j
 \right\|
 \cos
 \left(
@@ -1435,7 +1428,7 @@ $$
 \right),
 $$
 
-em que $\theta_{ij}\in[0,\pi]$ é o ângulo entre os vetores de cargas $\mathbf l_i$ e $\mathbf l_j$. Assim, a covariância comum depende simultaneamente dos comprimentos dos vetores e de sua orientação relativa.
+em que $\theta_{ij}\in[0,\pi]$ é o ângulo entre os vetores de cargas $\boldsymbol{\phi}_i$ e $\boldsymbol{\phi}_j$. Assim, a covariância comum depende simultaneamente dos comprimentos dos vetores e de sua orientação relativa.
 
 Vetores próximos em direção produzem produto interno positivo. Vetores orientados em sentidos aproximadamente opostos produzem produto interno negativo. Vetores aproximadamente ortogonais produzem pequena covariância comum.
 
@@ -1591,7 +1584,7 @@ Essa representação não transforma os fatores em variáveis observadas. Ela re
 
 ## Matriz de covariâncias comuns
 
-A estrutura fatorial comum pode ser isolada pela diferença entre a matriz total de covariâncias e a matriz de especificidades.
+A estrutura fatorial comum pode ser isolada pela diferença entre a matriz total de covariâncias e a matriz de variâncias específicas.
 
 Defina
 
@@ -1608,8 +1601,8 @@ Pela @eq-covariancia-modelo-fatorial,
 $$
 \boldsymbol{\Sigma}_{\mathrm{com}}
 =
-\mathbf L
-\mathbf L^{\top}.
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}.
 $$ {#eq-matriz-covariancias-comuns}
 
 ::: {#def-matriz-covariancias-comuns}
@@ -1620,8 +1613,8 @@ No modelo fatorial ortogonal na @def-modelo-fatorial-ortogonal, a **matriz de co
 $$
 \boldsymbol{\Sigma}_{\mathrm{com}}
 =
-\mathbf L
-\mathbf L^{\top}.
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}.
 $$
 
 Seus elementos diagonais são as comunalidades e seus elementos fora da diagonal são as covariâncias reproduzidas pelos fatores comuns.
@@ -1679,8 +1672,8 @@ A dimensão da estrutura comum é limitada pelo número de fatores. Como
 $$
 \operatorname{posto}
 \left(
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 \right)
 \leq
 m,
@@ -1709,15 +1702,15 @@ A equação
 $$
 \boldsymbol{\Sigma}
 =
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi}
 $$
 
 não determina automaticamente valores únicos para todos os parâmetros.
 
-Na formulação de segunda ordem desenvolvida até aqui, a identificação diz respeito às características de $\mathbf L$ e $\boldsymbol{\Psi}$ que podem ser determinadas de forma única a partir de $\boldsymbol{\Sigma}$. Quando uma distribuição probabilística completa for especificada posteriormente, o conceito de identificação poderá ser considerado em relação à distribuição das variáveis observadas.
+Na formulação de segunda ordem desenvolvida até aqui, a identificação diz respeito às características de $\boldsymbol{\Phi}$ e $\boldsymbol{\Psi}$ que podem ser determinadas de forma única a partir de $\boldsymbol{\Sigma}$. Quando uma distribuição probabilística completa for especificada posteriormente, o conceito de identificação poderá ser considerado em relação à distribuição das variáveis observadas.
 
 Algumas indeterminações decorrem diretamente da parametrização dos fatores. Entre elas estão a escala, o sinal e a orientação dos eixos fatoriais.
 
@@ -1730,7 +1723,7 @@ $$
 =
 \boldsymbol{\mu}
 +
-\mathbf{L F}
+\boldsymbol{\Phi} F
 +
 \boldsymbol{\varepsilon}.
 $$
@@ -1738,10 +1731,10 @@ $$
 Para qualquer constante não nula $c$,
 
 $$
-\mathbf{L F}
+\boldsymbol{\Phi} F
 =
 \left(
-c\mathbf l
+c\boldsymbol{\Phi}
 \right)
 \left(
 \frac{F}{c}
@@ -1765,15 +1758,15 @@ fixa a variância de cada fator e remove essa indeterminação de escala.
 
 ### Indeterminação do sinal
 
-Se uma coluna de $\mathbf L$ e o fator correspondente tiverem seus sinais invertidos simultaneamente, o produto permanece inalterado.
+Se uma coluna de $\boldsymbol{\Phi}$ e o fator correspondente tiverem seus sinais invertidos simultaneamente, o produto permanece inalterado.
 
 Para o fator $F_j$,
 
 $$
-\mathbf l_{\cdot j}F_j
+\boldsymbol{\phi}_{\cdot j}F_j
 =
 \left(
--\mathbf l_{\cdot j}
+-\boldsymbol{\phi}_{\cdot j}
 \right)
 \left(
 -F_j
@@ -1786,16 +1779,18 @@ Essa propriedade é semelhante à indeterminação de sinal dos autovetores obse
 
 ### Indeterminação rotacional
 
-A indeterminação mais importante ocorre quando
+Quando
 
 $$
-m\geq2.
+m\geq2,
 $$
+
+surge também a indeterminação rotacional.
 
 Considere uma matriz ortogonal
 
 $$
-\mathbf T
+\mathbf Q
 \in
 \mathbb R^{m\times m},
 $$
@@ -1803,11 +1798,11 @@ $$
 definida na @def-matriz-ortogonal, de modo que
 
 $$
-\mathbf T^\top
-\mathbf T
+\mathbf Q^\top
+\mathbf Q
 =
-\mathbf T
-\mathbf T^\top
+\mathbf Q
+\mathbf Q^\top
 =
 \mathbf I_m.
 $$
@@ -1815,10 +1810,10 @@ $$
 Defina
 
 $$
-\mathbf L^{*}
+\boldsymbol{\Phi}^{*}
 =
-\mathbf L
-\mathbf T
+\boldsymbol{\Phi}
+\mathbf Q
 $$
 
 e
@@ -1826,7 +1821,7 @@ e
 $$
 \boldsymbol{\mathsf F}^{*}
 =
-\mathbf T^\top
+\mathbf Q^\top
 \boldsymbol{\mathsf F}.
 $$
 
@@ -1834,15 +1829,15 @@ Então,
 
 $$
 \begin{aligned}
-\mathbf L^{*}
+\boldsymbol{\Phi}^{*}
 \boldsymbol{\mathsf F}^{*}
 &=
-\mathbf L
-\mathbf T
-\mathbf T^\top
+\boldsymbol{\Phi}
+\mathbf Q
+\mathbf Q^\top
 \boldsymbol{\mathsf F}\\
 &=
-\mathbf L
+\boldsymbol{\Phi}
 \boldsymbol{\mathsf F}.
 \end{aligned}
 $$
@@ -1856,15 +1851,15 @@ $$
 \boldsymbol{\mathsf F}^{*}
 \right)
 &=
-\mathbf T^\top
+\mathbf Q^\top
 \operatorname{Cov}
 \left(
 \boldsymbol{\mathsf F}
 \right)
-\mathbf T\\
+\mathbf Q\\
 &=
-\mathbf T^\top
-\mathbf T\\
+\mathbf Q^\top
+\mathbf Q\\
 &=
 \mathbf I_m.
 \end{aligned}
@@ -1876,27 +1871,27 @@ Para a matriz de covariâncias comuns,
 
 $$
 \begin{aligned}
-\mathbf L^{*}
-\mathbf L^{*\top}
+\boldsymbol{\Phi}^{*}
+\boldsymbol{\Phi}^{*\top}
 &=
-\mathbf L
-\mathbf T
-\mathbf T^\top
-\mathbf L^{\top}\\
+\boldsymbol{\Phi}
+\mathbf Q
+\mathbf Q^\top
+\boldsymbol{\Phi}^{\top}\\
 &=
-\mathbf L
-\mathbf L^{\top}.
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}.
 \end{aligned}
 $$
 
 Portanto,
 
 $$
-\mathbf L^{*}
-\mathbf L^{*\top}
+\boldsymbol{\Phi}^{*}
+\boldsymbol{\Phi}^{*\top}
 =
-\mathbf L
-\mathbf L^{\top}.
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}.
 $$ {#eq-invariancia-rotacao-fatorial}
 
 ::: {#prp-indeterminacao-rotacional-fatorial}
@@ -1905,7 +1900,7 @@ $$ {#eq-invariancia-rotacao-fatorial}
 Considere um modelo fatorial ortogonal com
 
 $$
-\mathbf L
+\boldsymbol{\Phi}
 \in
 \mathbb R^{p\times m}
 $$
@@ -1913,7 +1908,7 @@ $$
 e seja
 
 $$
-\mathbf T
+\mathbf Q
 \in
 \mathbb R^{m\times m}
 $$
@@ -1921,19 +1916,19 @@ $$
 qualquer matriz ortogonal. Então a matriz de cargas
 
 $$
-\mathbf L^{*}
+\boldsymbol{\Phi}^{*}
 =
-\mathbf L\mathbf T
+\boldsymbol{\Phi}\mathbf Q
 $$
 
 produz a mesma matriz de covariâncias comuns:
 
 $$
-\mathbf L^{*}
-\mathbf L^{*\top}
+\boldsymbol{\Phi}^{*}
+\boldsymbol{\Phi}^{*\top}
 =
-\mathbf L
-\mathbf L^{\top}.
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}.
 $$
 
 Além disso, com
@@ -1941,7 +1936,7 @@ Além disso, com
 $$
 \boldsymbol{\mathsf F}^{*}
 =
-\mathbf T^\top
+\mathbf Q^\top
 \boldsymbol{\mathsf F},
 $$
 
@@ -1964,17 +1959,17 @@ O resultado utiliza diretamente as propriedades das transformações ortogonais 
 A indeterminação rotacional mostra que diferentes matrizes de cargas relacionadas por transformações ortogonais podem representar a mesma matriz
 
 $$
-\mathbf L
-\mathbf L^{\top}.
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}.
 $$
 
-Esse resultado demonstra a não unicidade da orientação dos fatores. Ele não implica, por si só, que $\mathbf L\mathbf L^{\top}$ e $\boldsymbol{\Psi}$ sejam identificáveis de forma única a partir de $\boldsymbol{\Sigma}$; essa questão requer condições adicionais de identificação.
+Esse resultado demonstra a não unicidade da orientação dos fatores. Ele não implica, por si só, que $\boldsymbol{\Phi}\boldsymbol{\Phi}^{\top}$ e $\boldsymbol{\Psi}$ sejam identificáveis de forma única a partir de $\boldsymbol{\Sigma}$; essa questão requer condições adicionais de identificação.
 
 ## Rotação dos eixos fatoriais
 
 A rotação modifica a representação das cargas em relação aos eixos fatoriais. No caso de uma rotação ortogonal, ela preserva exatamente a matriz de covariâncias comuns e, consequentemente, a matriz de covariâncias reproduzida quando $\boldsymbol{\Psi}$ é mantida.
 
-A @fig-rotacao-cargas-fatoriais compara uma matriz de cargas com uma solução obtida por uma rotação ortogonal. Para fins ilustrativos, os eixos são girados em $35^\circ$. Esse valor não corresponde a um critério específico de rotação: em uma aplicação, a orientação é determinada pelo critério adotado. Os vetores mudam de coordenadas em relação aos eixos, mas seus comprimentos e produtos internos são preservados.
+A @fig-rotacao-cargas-fatoriais compara uma matriz de cargas com uma solução obtida por uma rotação ortogonal. Para fins ilustrativos, aplica-se uma transformação ortogonal correspondente a uma rotação de $35^\circ$. Esse valor não corresponde a um critério específico de rotação: em uma aplicação, a orientação é determinada pelo critério adotado. Os vetores mudam de coordenadas em relação aos eixos, mas seus comprimentos e produtos internos são preservados.
 
 ```{r}
 #| label: fig-rotacao-cargas-fatoriais
@@ -1988,7 +1983,7 @@ A @fig-rotacao-cargas-fatoriais compara uma matriz de cargas com uma solução o
 
 library(ggplot2)
 
-L_cargas <- matrix(
+Phi_cargas <- matrix(
   c(
     0.88, 0.22,
     0.72, 0.42,
@@ -2010,7 +2005,7 @@ T_rot <- matrix(
   byrow = TRUE
 )
 
-L_rot <- L_cargas %*% T_rot
+Phi_rot <- Phi_cargas %*% T_rot
 
 dados_original <- data.frame(
   variavel = c(
@@ -2019,8 +2014,8 @@ dados_original <- data.frame(
     "X3",
     "X4"
   ),
-  F1 = L_cargas[, 1],
-  F2 = L_cargas[, 2],
+  F1 = Phi_cargas[, 1],
+  F2 = Phi_cargas[, 2],
   painel = "Antes da rotação"
 )
 
@@ -2031,8 +2026,8 @@ dados_rotacao <- data.frame(
     "X3",
     "X4"
   ),
-  F1 = L_rot[, 1],
-  F2 = L_rot[, 2],
+  F1 = Phi_rot[, 1],
+  F2 = Phi_rot[, 2],
   painel = "Após rotação ortogonal"
 )
 
@@ -2160,12 +2155,12 @@ A rotação altera os coeficientes individuais da matriz de cargas. As comunalid
 
 $$
 \left\|
-\mathbf l_i^\top
-\mathbf T
+\boldsymbol{\phi}_i^\top
+\mathbf Q
 \right\|^2
 =
 \left\|
-\mathbf l_i
+\boldsymbol{\phi}_i
 \right\|^2.
 $$
 
@@ -2173,16 +2168,16 @@ As covariâncias comuns também permanecem invariantes porque
 
 $$
 \left(
-\mathbf l_i^\top
-\mathbf T
+\boldsymbol{\phi}_i^\top
+\mathbf Q
 \right)
 \left(
-\mathbf l_j^\top
-\mathbf T
+\boldsymbol{\phi}_j^\top
+\mathbf Q
 \right)^\top
 =
-\mathbf l_i^\top
-\mathbf l_j.
+\boldsymbol{\phi}_i^\top
+\boldsymbol{\phi}_j.
 $$
 
 Assim, a rotação ortogonal modifica a parametrização das cargas sem alterar a estrutura comum reproduzida.
@@ -2192,13 +2187,13 @@ A variância comum total também permanece inalterada:
 $$
 \operatorname{tr}
 \left(
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 \right)
 =
 \sum_{j=1}^m
 \left\|
-\mathbf l_{\cdot j}
+\boldsymbol{\phi}_{\cdot j}
 \right\|^2.
 $$
 
@@ -2206,7 +2201,7 @@ A distribuição dessa quantidade entre fatores individuais, entretanto, pode mu
 
 $$
 \sum_{i=1}^p
-l_{ij}^2
+\phi_{ij}^2
 $$
 
 não é preservada separadamente para cada coluna $j$.
@@ -2215,7 +2210,15 @@ Por isso, fatores rotacionados não devem ser interpretados como uma sequência 
 
 A rotação deve ser distinguida da estimação inicial. Primeiro é obtida uma solução que reproduz a estrutura de covariâncias segundo determinado critério. Depois, uma transformação pode ser aplicada às cargas para selecionar outra representação da estrutura fatorial.
 
-O objetivo de uma rotação interpretativa é escolher uma estrutura de cargas cuja organização favoreça uma interpretação mais simples. A diferença entre rotações ortogonais e oblíquas será estabelecida nas seções seguintes; somente depois dessa distinção serão apresentados critérios específicos de rotação.
+O objetivo de uma rotação interpretativa é favorecer uma **estrutura simples**, na qual cada variável apresente cargas concentradas em um número reduzido de fatores e cargas pequenas nos demais. Neste capítulo serão consideradas apenas rotações ortogonais, que preservam a ortogonalidade dos fatores e a matriz de covariâncias comuns reproduzida.
+
+Em uma solução com dois fatores, uma transformação ortogonal pode ser visualizada como uma rotação dos eixos por determinado ângulo $\theta$. Esse ângulo não é fixado previamente pelo método: a orientação resulta do critério adotado. Os eixos permanecem perpendiculares entre si, formando $90^\circ$. Com mais de dois fatores, uma transformação ortogonal não é descrita, em geral, por um único ângulo.
+
+O **Varimax** é um critério de rotação ortogonal que procura tornar mais contrastantes os quadrados das cargas dentro de cada fator, favorecendo uma solução em que cada fator apresente algumas cargas elevadas e outras próximas de zero [@kaiser1958varimax].
+
+O **Equamax** também é um critério de rotação ortogonal e pertence à família Orthomax. Ele combina características do Varimax, que favorece a simplificação dos fatores, e do Quartimax, que favorece a simplificação das variáveis.
+
+A formulação matemática completa desses critérios e seus algoritmos não será desenvolvida aqui. Para a formulação deste capítulo, interessa que a rotação altera a orientação dos eixos fatoriais sem modificar a estrutura comum reproduzida pelo modelo ortogonal.
 
 ## Contagem de parâmetros e identificação
 
@@ -2258,7 +2261,7 @@ Em pontos regulares da parametrização, supondo em particular que
 $$
 \operatorname{posto}
 \left(
-\mathbf L
+\boldsymbol{\Phi}
 \right)
 =
 m,
@@ -2310,7 +2313,7 @@ $$ {#eq-condicao-contagem-fatorial}
 
 Essa desigualdade compara a dimensão usual da parametrização com o número de elementos distintos de $\boldsymbol{\Sigma}$. Ela constitui uma condição necessária de disponibilidade de informação em pontos regulares, mas não é, isoladamente, uma condição suficiente de identificação.
 
-::: {.callout-caution appearance="simple" icon="false"}
+::: {.callout-caution appearance="simple" icon=false}
 ## Contagem de parâmetros e identificação
 
 Ter número de elementos observáveis igual ou superior à dimensão da parametrização não garante, por si só, identificação do modelo. A identificação também depende da estrutura das cargas, das restrições impostas e da posição do parâmetro no espaço paramétrico.
@@ -2318,662 +2321,11 @@ Ter número de elementos observáveis igual ou superior à dimensão da parametr
 
 Para selecionar uma parametrização particular, podem ser impostas restrições adicionais às cargas ou à orientação dos fatores. Essas restrições assumem formas diferentes conforme o tipo de modelo e o objetivo da análise.
 
-Na Análise Fatorial Exploratória, a indeterminação rotacional é reconhecida como parte da estrutura da técnica, e diferentes orientações podem ser escolhidas posteriormente para interpretação. Em modelos fatoriais confirmatórios, restrições previamente especificadas sobre cargas e covariâncias fatoriais passam a desempenhar papel explícito na identificação.
+Na Análise Fatorial Exploratória, a indeterminação rotacional é reconhecida como parte da estrutura da técnica, e diferentes orientações podem ser escolhidas posteriormente para interpretação. Em modelos fatoriais confirmatórios, restrições previamente especificadas sobre as cargas passam a desempenhar papel explícito na identificação.
 
 O desenvolvimento completo das condições algébricas de identificação pertence à teoria de modelos de variáveis latentes e não é necessário para a formulação deste capítulo.
 
-## Fatores ortogonais e fatores oblíquos
-
-A formulação desenvolvida até aqui utilizou fatores com matriz de covariâncias
-
-$$
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf F}
-\right)
-=
-\mathbf I_m.
-$$
-
-Essa condição define a formulação ortogonal padronizada: os fatores possuem variância unitária e covariâncias nulas entre si.
-
-O modelo pode ser generalizado permitindo covariâncias diferentes de zero entre os fatores.
-
-::: {#def-modelo-fatorial-obliquo}
-## Modelo fatorial oblíquo
-
-Considere o modelo de fatores comuns na @def-modelo-fatores-comuns,
-
-$$
-\boldsymbol{\mathsf X}
-=
-\boldsymbol{\mu}
-+
-\mathbf L
-\boldsymbol{\mathsf F}
-+
-\boldsymbol{\varepsilon},
-$$
-
-com
-
-$$
-\mathbf L
-\in
-\mathbb R^{p\times m}.
-$$
-
-O modelo é denominado **fatorial oblíquo** quando
-
-$$
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf F}
-\right)
-=
-\boldsymbol{\Phi},
-$$
-
-em que
-
-$$
-\boldsymbol{\Phi}
-\in
-\mathbb R^{m\times m},
-\qquad
-\boldsymbol{\Phi}
-\succeq
-\mathbf0,
-$$
-
-e continuam válidas as condições
-
-$$
-E
-\left(
-\boldsymbol{\mathsf F}
-\right)
-=
-\mathbf0,
-$$
-
-$$
-E
-\left(
-\boldsymbol{\varepsilon}
-\right)
-=
-\mathbf0,
-$$
-
-$$
-\operatorname{Cov}
-\left(
-\boldsymbol{\varepsilon}
-\right)
-=
-\boldsymbol{\Psi}
-=
-\operatorname{diag}
-\left(
-\psi_1,\ldots,\psi_p
-\right),
-\qquad
-\psi_i
-\geq
-0,
-$$
-
-e
-
-$$
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf F},
-\boldsymbol{\varepsilon}
-\right)
-=
-\mathbf0.
-$$
-:::
-
-A matriz $\boldsymbol{\Phi}$ é a matriz de covariâncias dos fatores. Quando a escala de cada fator é fixada em variância unitária,
-
-$$
-\operatorname{diag}
-\left(
-\boldsymbol{\Phi}
-\right)
-=
-\mathbf1_m,
-$$
-
-e $\boldsymbol{\Phi}$ passa a ser também a matriz de correlações entre os fatores.
-
-A matriz de covariâncias das variáveis observadas é
-
-$$
-\boldsymbol{\Sigma}
-=
-\mathbf L
-\boldsymbol{\Phi}
-\mathbf L^{\top}
-+
-\boldsymbol{\Psi}.
-$$ {#eq-covariancia-modelo-fatorial-obliquo}
-
-De fato,
-
-$$
-\begin{aligned}
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf X}
-\right)
-&=
-\operatorname{Cov}
-\left(
-\mathbf L
-\boldsymbol{\mathsf F}
-+
-\boldsymbol{\varepsilon}
-\right)\\
-&=
-\mathbf L
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf F}
-\right)
-\mathbf L^{\top}
-+
-\operatorname{Cov}
-\left(
-\boldsymbol{\varepsilon}
-\right)\\
-&=
-\mathbf L
-\boldsymbol{\Phi}
-\mathbf L^{\top}
-+
-\boldsymbol{\Psi}.
-\end{aligned}
-$$
-
-No caso particular
-
-$$
-\boldsymbol{\Phi}
-=
-\mathbf I_m,
-$$
-
-recupera-se o modelo fatorial ortogonal na @def-modelo-fatorial-ortogonal.
-
-No modelo oblíquo, a parcela comum da covariância é
-
-$$
-\boldsymbol{\Sigma}_{\mathrm{com}}
-=
-\mathbf L
-\boldsymbol{\Phi}
-\mathbf L^{\top}.
-$$
-
-Assim, para a variável $X_i$,
-
-$$
-h_i^2
-=
-\mathbf l_i^\top
-\boldsymbol{\Phi}
-\mathbf l_i.
-$$ {#eq-comunalidade-obliqua}
-
-A expressão
-
-$$
-h_i^2
-=
-\sum_{j=1}^m
-l_{ij}^2
-$$
-
-é, portanto, específica da formulação ortogonal com fatores de variância unitária.
-
-A comparação entre as duas formulações é sintetizada na @tbl-fatores-ortogonais-obliquos.
-
-| Aspecto | Modelo ortogonal padronizado | Modelo oblíquo |
-|---|---|---|
-| Covariância dos fatores | $\mathbf I_m$ | $\boldsymbol{\Phi}$ |
-| Relação entre fatores | Covariâncias nulas | Podem existir covariâncias diferentes de zero |
-| Covariância comum | $\mathbf L\mathbf L^{\top}$ | $\mathbf L\boldsymbol{\Phi}\mathbf L^{\top}$ |
-| Comunalidade de $X_i$ | $\mathbf l_i^\top\mathbf l_i$ | $\mathbf l_i^\top\boldsymbol{\Phi}\mathbf l_i$ |
-| Covariância variável--fator | $\mathbf L$ | $\mathbf L\boldsymbol{\Phi}$ |
-
-: Estruturas dos modelos fatoriais ortogonal e oblíquo. {#tbl-fatores-ortogonais-obliquos}
-
-## Reparametrização do espaço fatorial
-
-A relação entre representações fatoriais pode ser compreendida por meio de transformações das coordenadas latentes.
-
-Considere uma matriz não singular
-
-$$
-\mathbf T
-\in
-\mathbb R^{m\times m}
-$$
-
-e defina
-
-$$
-\boldsymbol{\mathsf F}^{*}
-=
-\mathbf T^{-1}
-\boldsymbol{\mathsf F}.
-$$
-
-Então,
-
-$$
-\boldsymbol{\mathsf F}
-=
-\mathbf T
-\boldsymbol{\mathsf F}^{*},
-$$
-
-e o modelo pode ser escrito como
-
-$$
-\boldsymbol{\mathsf X}
--
-\boldsymbol{\mu}
-=
-\mathbf L^{*}
-\boldsymbol{\mathsf F}^{*}
-+
-\boldsymbol{\varepsilon},
-$$
-
-com
-
-$$
-\mathbf L^{*}
-=
-\mathbf L
-\mathbf T.
-$$
-
-A matriz de covariâncias dos novos fatores é
-
-$$
-\boldsymbol{\Phi}^{*}
-=
-\mathbf T^{-1}
-\boldsymbol{\Phi}
-\mathbf T^{-\top}.
-$$
-
-Consequentemente,
-
-$$
-\begin{aligned}
-\mathbf L^{*}
-\boldsymbol{\Phi}^{*}
-\mathbf L^{*\top}
-&=
-\mathbf L
-\mathbf T
-\mathbf T^{-1}
-\boldsymbol{\Phi}
-\mathbf T^{-\top}
-\mathbf T^{\top}
-\mathbf L^{\top}\\
-&=
-\mathbf L
-\boldsymbol{\Phi}
-\mathbf L^{\top}.
-\end{aligned}
-$$
-
-::: {#prp-reparametrizacao-fatorial}
-## Invariância da estrutura comum por reparametrização
-
-Considere uma representação fatorial com
-
-$$
-\mathbf L
-\in
-\mathbb R^{p\times m}
-$$
-
-e
-
-$$
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf F}
-\right)
-=
-\boldsymbol{\Phi}.
-$$
-
-Se
-
-$$
-\mathbf T
-\in
-\mathbb R^{m\times m}
-$$
-
-é não singular e cargas, fatores e covariâncias fatoriais são transformados conjuntamente por
-
-$$
-\mathbf L^{*}
-=
-\mathbf L\mathbf T,
-$$
-
-$$
-\boldsymbol{\mathsf F}^{*}
-=
-\mathbf T^{-1}
-\boldsymbol{\mathsf F}
-$$
-
-e
-
-$$
-\boldsymbol{\Phi}^{*}
-=
-\mathbf T^{-1}
-\boldsymbol{\Phi}
-\mathbf T^{-\top},
-$$
-
-então
-
-$$
-\mathbf L^{*}
-\boldsymbol{\Phi}^{*}
-\mathbf L^{*\top}
-=
-\mathbf L
-\boldsymbol{\Phi}
-\mathbf L^{\top}.
-$$
-
-Portanto, a matriz de covariâncias comuns permanece inalterada sob essa reparametrização.
-:::
-
-A indeterminação rotacional do modelo ortogonal, apresentada na @prp-indeterminacao-rotacional-fatorial, é um caso particular desse resultado.
-
-Se inicialmente
-
-$$
-\boldsymbol{\Phi}
-=
-\mathbf I_m
-$$
-
-e $\mathbf T$ é ortogonal, então
-
-$$
-\boldsymbol{\Phi}^{*}
-=
-\mathbf I_m,
-$$
-
-e os fatores transformados continuam ortogonais.
-
-Se $\mathbf T$ é não ortogonal, a matriz
-
-$$
-\boldsymbol{\Phi}^{*}
-=
-\mathbf T^{-1}
-\mathbf T^{-\top}
-$$
-
-pode possuir elementos fora da diagonal. A nova representação passa, então, a utilizar fatores correlacionados.
-
-O que permanece invariável é a estrutura comum reproduzida,
-
-$$
-\mathbf L
-\boldsymbol{\Phi}
-\mathbf L^{\top},
-$$
-
-enquanto as coordenadas utilizadas para representar essa estrutura podem mudar.
-
-## Matriz de padrões e matriz de estrutura
-
-Quando os fatores são correlacionados, os coeficientes que aparecem diretamente no modelo e as associações entre variáveis e fatores deixam de coincidir.
-
-A matriz
-
-$$
-\mathbf L
-$$
-
-contém os coeficientes que aparecem em
-
-$$
-\boldsymbol{\mathsf X}
--
-\boldsymbol{\mu}
-=
-\mathbf L
-\boldsymbol{\mathsf F}
-+
-\boldsymbol{\varepsilon}.
-$$
-
-Ela é denominada **matriz de padrões**.
-
-Por outro lado,
-
-$$
-\begin{aligned}
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf X},
-\boldsymbol{\mathsf F}
-\right)
-&=
-\operatorname{Cov}
-\left(
-\mathbf L
-\boldsymbol{\mathsf F}
-+
-\boldsymbol{\varepsilon},
-\boldsymbol{\mathsf F}
-\right)\\
-&=
-\mathbf L
-\boldsymbol{\Phi}.
-\end{aligned}
-$$
-
-Defina
-
-$$
-\boldsymbol{\Gamma}_{\mathrm{cov}}
-=
-\mathbf L
-\boldsymbol{\Phi}.
-$$ {#eq-covariancia-variaveis-fatores-obliquo}
-
-Essa matriz contém as covariâncias entre as variáveis observadas e os fatores.
-
-Quando os fatores possuem variância unitária, defina
-
-$$
-\mathbf D_{\Sigma}
-=
-\operatorname{diag}
-\left(
-\sigma_{11},
-\ldots,
-\sigma_{pp}
-\right).
-$$
-
-Se
-
-$$
-\sigma_{ii}>0,
-\qquad
-i=1,\ldots,p,
-$$
-
-a matriz das correlações entre as variáveis observadas e os fatores é
-
-$$
-\boldsymbol{\Gamma}
-=
-\mathbf D_{\Sigma}^{-1/2}
-\mathbf L
-\boldsymbol{\Phi}.
-$$ {#eq-matriz-estrutura-fatorial}
-
-Quando as variáveis observadas também estão padronizadas,
-
-$$
-\mathbf D_{\Sigma}
-=
-\mathbf I_p,
-$$
-
-e, portanto,
-
-$$
-\boldsymbol{\Gamma}
-=
-\mathbf L
-\boldsymbol{\Phi}.
-$$
-
-::: {#def-matriz-padroes-estrutura-fatorial}
-## Matrizes de padrões e de estrutura
-
-Considere um modelo fatorial oblíquo com fatores de variância unitária e variáveis observadas com variâncias positivas.
-
-A **matriz de padrões** é
-
-$$
-\mathbf L,
-$$
-
-formada pelos coeficientes que relacionam diretamente as variáveis observadas aos fatores no modelo linear.
-
-A **matriz de estrutura** é
-
-$$
-\boldsymbol{\Gamma}
-=
-\mathbf D_{\Sigma}^{-1/2}
-\mathbf L
-\boldsymbol{\Phi},
-$$
-
-cujos elementos são as correlações entre as variáveis observadas e os fatores.
-
-Se as variáveis observadas são padronizadas,
-
-$$
-\boldsymbol{\Gamma}
-=
-\mathbf L
-\boldsymbol{\Phi}.
-$$
-:::
-
-No modelo ortogonal padronizado,
-
-$$
-\boldsymbol{\Phi}
-=
-\mathbf I_m.
-$$
-
-Se as variáveis observadas também são padronizadas,
-
-$$
-\boldsymbol{\Gamma}
-=
-\mathbf L.
-$$
-
-Assim, matriz de padrões e matriz de estrutura coincidem nessa parametrização ortogonal padronizada.
-
-No modelo oblíquo, elas geralmente diferem. Um elemento da matriz de padrões representa o coeficiente diretamente associado a determinado fator no modelo, enquanto um elemento da matriz de estrutura representa a correlação da variável com esse fator. Como os fatores podem estar correlacionados, essas duas quantidades não precisam coincidir.
-
-Essa distinção orienta a interpretação das soluções oblíquas. Uma correlação elevada entre uma variável e um fator pode resultar do coeficiente diretamente associado a esse fator e das correlações existentes entre os fatores.
-
-## Rotação e estrutura simples
-
-A indeterminação rotacional permite escolher, entre representações equivalentes da estrutura comum, uma orientação das cargas que favoreça sua interpretação.
-
-A rotação é aplicada após a obtenção de uma solução fatorial inicial. Ela não constitui um método de extração ou de estimação da matriz de covariâncias. Seu papel é selecionar outra parametrização do espaço fatorial preservando a estrutura compatível com a classe de transformação adotada.
-
-Uma orientação frequentemente procurada é a de **estrutura simples**, na qual cada variável apresenta cargas concentradas em um número reduzido de fatores e cargas pequenas nos demais.
-
-As rotações podem ser classificadas em duas classes principais.
-
-Nas **rotações ortogonais**, a transformação satisfaz
-
-$$
-\mathbf T^\top
-\mathbf T
-=
-\mathbf I_m,
-$$
-
-de modo que os fatores permanecem não correlacionados. Se
-
-$$
-\mathbf L^{*}
-=
-\mathbf L\mathbf T,
-$$
-
-então
-
-$$
-\mathbf L^{*}
-\mathbf L^{*\top}
-=
-\mathbf L
-\mathbf L^{\top}.
-$$
-
-Consequentemente, a matriz de covariâncias comuns e as comunalidades são preservadas. Em uma solução com dois fatores, uma transformação ortogonal pode ser visualizada como uma rotação dos eixos por determinado ângulo $\theta$, mas esse ângulo não é fixado previamente pelo método. Os eixos permanecem perpendiculares entre si, formando $90^\circ$, enquanto sua orientação é escolhida segundo o critério de rotação. Com mais de dois fatores, a transformação ortogonal não é descrita, em geral, por um único ângulo.
-
-O **Varimax** é um critério de rotação ortogonal que procura tornar mais contrastantes os quadrados das cargas dentro de cada fator, favorecendo uma estrutura em que cada fator apresente algumas cargas elevadas e outras próximas de zero [@kaiser1958varimax]. O **Equamax** também é ortogonal e pertence à família de critérios Orthomax; ele combina características do Varimax, que favorece a simplificação dos fatores, e do Quartimax, que favorece a simplificação das variáveis.
-
-Nas **rotações oblíquas**, a transformação não precisa ser ortogonal e os fatores podem tornar-se correlacionados. A estrutura comum deve então ser representada por
-
-$$
-\mathbf L
-\boldsymbol{\Phi}
-\mathbf L^{\top},
-$$
-
-com
-
-$$
-\boldsymbol{\Phi}
-\neq
-\mathbf I_m
-$$
-
-em geral. O **Promax** é um procedimento de rotação oblíqua que parte usualmente de uma solução ortogonal, em geral obtida por Varimax, e constrói uma estrutura-alvo na qual as cargas maiores são acentuadas em relação às menores por meio de uma transformação de potência. Em seguida, uma transformação não ortogonal aproxima a solução dessa estrutura-alvo [@hendrickson1964promax]. Como consequência, os eixos fatoriais não precisam permanecer perpendiculares e os fatores podem apresentar correlações. O Promax não possui um ângulo de rotação fixo: os ângulos entre os eixos resultam da solução obtida, enquanto o parâmetro de potência controla a acentuação da estrutura-alvo, e não um ângulo geométrico.
-
-Nessa classe de soluções, a interpretação exige distinguir a matriz de padrões $\mathbf L$, a matriz de estrutura $\boldsymbol{\Gamma}$ e a matriz de correlações fatoriais $\boldsymbol{\Phi}$.
-
-A formulação matemática completa dos critérios de rotação e seus algoritmos pertence à etapa metodológica posterior. Neste capítulo, interessa compreender o objetivo desses critérios, distinguir as transformações ortogonais das oblíquas e identificar quais características do modelo são preservadas em cada caso.
+Estabelecida a estrutura populacional do modelo e suas principais indeterminações, passa-se agora ao nível amostral. A matriz de covariâncias ou de correlações observada fornece a informação utilizada para avaliar a adequação da estrutura fatorial e, posteriormente, estimar seus parâmetros.
 
 ## Formulação populacional e amostral
 
@@ -2982,13 +2334,13 @@ No nível populacional, o modelo fatorial especifica uma estrutura para a matriz
 $$
 \boldsymbol{\Sigma}
 =
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi}.
 $$
 
-Os parâmetros de interesse incluem as cargas fatoriais, as variâncias específicas e, no modelo oblíquo, as covariâncias ou correlações entre os fatores, conforme a parametrização adotada.
+Os parâmetros de interesse incluem as cargas fatoriais e as variâncias específicas.
 
 Na prática, $\boldsymbol{\Sigma}$ é desconhecida. A informação disponível provém de uma amostra
 
@@ -3029,85 +2381,350 @@ $$
 
 A matriz de covariâncias observada $\mathbf S$, definida na @def-matriz-covariancias-observada, e a matriz de correlações observada $\mathbf R$, definida na @def-matriz-correlacoes-observada, fornecem as estruturas de segunda ordem utilizadas no ajuste.
 
-Após a escolha do número de fatores e de uma parametrização apropriada, a formulação amostral procura estimar
+A escolha entre $\mathbf S$ e $\mathbf R$ modifica a estrutura que está sendo modelada. Na análise baseada em $\mathbf S$, as variâncias e covariâncias permanecem nas escalas originais. Na análise baseada em $\mathbf R$, as variáveis são padronizadas e as comunalidades e especificidades passam a decompor variâncias unitárias.
+
+Essa distinção é análoga à discutida na ACP, mas seu efeito deve ser interpretado no contexto do modelo fatorial. A padronização modifica a matriz de segunda ordem que o modelo procura reproduzir e, consequentemente, pode modificar cargas, comunalidades e especificidades.
+
+## Avaliação da adequação da matriz de correlações à Análise Fatorial
+
+A existência de várias correlações entre as variáveis não garante, por si só, que uma representação por fatores comuns seja adequada. Antes da extração dos fatores, é útil examinar se a matriz de correlações apresenta uma estrutura compatível com esse tipo de representação.
+
+Na Análise Fatorial Exploratória, procura-se uma situação em que as correlações simples entre as variáveis sejam suficientemente expressivas, enquanto as correlações parciais, após controlar as demais variáveis, sejam relativamente pequenas. Se associações elevadas permanecerem mesmo após esse controle, a estrutura compartilhada pode não ser bem representada por um número reduzido de fatores comuns [@hair2019multivariate].
+
+A matriz anti-imagem, a MSA e o KMO utilizam a inversa da matriz de correlações e, na formulação apresentada a seguir, requerem que $\mathbf R$ seja não singular. Supondo variâncias amostrais positivas, a matriz de correlações calculada a partir de $n$ observações de $p$ variáveis satisfaz
 
 $$
-\mathbf L,
+\operatorname{posto}
+\left(
+\mathbf R
+\right)
+\leq
+\min
+\left(
+p,n-1
+\right).
+$$
+
+Assim, $n>p$ é uma condição necessária para que $\mathbf R$ tenha posto completo, embora não seja suficiente. Mesmo quando essa condição é satisfeita, dependências lineares exatas entre as colunas padronizadas da matriz de dados podem tornar $\mathbf R$ singular.
+
+Apesar da expressão *sampling adequacy*, MSA e KMO não avaliam diretamente o tamanho da amostra. Eles comparam a magnitude das correlações simples com a das correlações parciais.
+
+Os procedimentos apresentados a seguir avaliam aspectos complementares dessa estrutura. Eles não demonstram que determinado modelo fatorial possui bom ajuste, mas fornecem evidências sobre a adequação da matriz de correlações para prosseguir com a análise.
+
+### Matriz anti-imagem
+
+Considere a matriz de correlações observada
+
+$$
+\mathbf R
+=
+(r_{ij}),
+$$
+
+positiva definida, e sua inversa
+
+$$
+\mathbf C
+=
+\mathbf R^{-1}
+=
+(c_{ij}).
+$$
+
+Para $i\neq j$, a correlação parcial entre $X_i$ e $X_j$, controlando-se as demais variáveis, é
+
+$$
+p_{ij}
+=
+-
+\frac{
+c_{ij}
+}{
+\sqrt{
+c_{ii}c_{jj}
+}
+}.
+$$
+
+Defina
+
+$$
+\mathbf D
+=
+\operatorname{diag}
+\left(
+\frac{1}{c_{11}},
+\ldots,
+\frac{1}{c_{pp}}
+\right).
+$$
+
+A matriz de covariâncias anti-imagem é
+
+$$
+\mathbf S_{\mathrm{AI}}
+=
+\mathbf D
+\mathbf C
+\mathbf D.
+$$ {#eq-matriz-covariancias-anti-imagem-fatorial}
+
+Seus elementos diagonais são
+
+$$
+s_{ii}^{(\mathrm{AI})}
+=
+\frac{1}{c_{ii}},
+$$
+
+enquanto, para $i\neq j$,
+
+$$
+s_{ij}^{(\mathrm{AI})}
+=
+\frac{
+c_{ij}
+}{
+c_{ii}c_{jj}
+}.
+$$
+
+A padronização dessa matriz produz a matriz de correlações anti-imagem. Definindo
+
+$$
+\mathbf D_C
+=
+\operatorname{diag}
+\left(
+c_{11},
+\ldots,
+c_{pp}
+\right),
+$$
+
+tem-se
+
+$$
+\mathbf R_{\mathrm{AI}}
+=
+\mathbf D_C^{-1/2}
+\mathbf C
+\mathbf D_C^{-1/2}.
+$$ {#eq-matriz-anti-imagem-fatorial}
+
+Sua diagonal é unitária e, para $i\neq j$,
+
+$$
+r_{ij}^{(\mathrm{AI})}
+=
+\frac{
+c_{ij}
+}{
+\sqrt{
+c_{ii}c_{jj}
+}
+}
+=
+-p_{ij}.
+$$
+
+Portanto, os elementos fora da diagonal da matriz de correlações anti-imagem correspondem aos negativos das correlações parciais entre pares de variáveis, controlando-se as demais. Valores pequenos em módulo indicam que resta pouca associação entre cada par após esse controle, situação favorável à representação por fatores comuns.
+
+Em apresentações computacionais usuais da matriz de correlações anti-imagem, os valores unitários da diagonal são frequentemente substituídos pelas medidas individuais de adequação amostral, definidas a seguir.
+
+### Medida de adequação amostral — MSA
+
+A **Measure of Sampling Adequacy (MSA)** avalia individualmente cada variável comparando suas correlações simples com suas correlações parciais.
+
+Para a variável $X_i$, desde que o denominador seja positivo,
+
+$$
+\operatorname{MSA}_i
+=
+\frac{
+\displaystyle
+\sum_{j\neq i}
+r_{ij}^2
+}{
+\displaystyle
+\sum_{j\neq i}
+r_{ij}^2
++
+\sum_{j\neq i}
+p_{ij}^2
+}.
+$$ {#eq-msa-fatorial}
+
+Quando as correlações parciais são pequenas em relação às correlações simples,
+
+$$
+\operatorname{MSA}_i
+$$
+
+se aproxima de $1$. Valores baixos indicam que a variável mantém associações parciais relativamente elevadas com outras variáveis e pode não se integrar adequadamente à estrutura fatorial comum.
+
+Como regra prática, valores inferiores a $0{,}50$ são usualmente considerados problemáticos e indicam que a variável deve ser examinada antes de prosseguir com a análise [@hair2019multivariate]. Esse valor constitui um critério operacional, e não uma condição matemática necessária para a existência do modelo.
+
+### Kaiser-Meyer-Olkin — KMO
+
+O índice de **Kaiser-Meyer-Olkin (KMO)** aplica ao conjunto de variáveis o mesmo princípio utilizado pela MSA individual.
+
+Define-se
+
+$$
+\operatorname{KMO}
+=
+\frac{
+\displaystyle
+\sum_{i<j}
+r_{ij}^2
+}{
+\displaystyle
+\sum_{i<j}
+r_{ij}^2
++
+\sum_{i<j}
+p_{ij}^2
+}.
+$$ {#eq-kmo-fatorial}
+
+Quando o denominador é positivo,
+
+$$
+0
+\leq
+\operatorname{KMO}
+\leq
+1.
+$$
+
+Valores próximos de $1$ ocorrem quando as correlações parciais são pequenas em comparação com as correlações simples. Isso indica que grande parte das associações entre pares de variáveis pode estar relacionada a uma estrutura compartilhada com as demais variáveis.
+
+Valores baixos indicam que as correlações parciais permanecem relativamente grandes e, portanto, que a representação por fatores comuns pode ser pouco apropriada. Como referência prática, valores abaixo de $0{,}50$ são geralmente considerados inadequados, enquanto valores progressivamente maiores indicam condições mais favoráveis à aplicação da Análise Fatorial [@hair2019multivariate].
+
+A diferença entre MSA e KMO é, portanto, de abrangência: a MSA examina cada variável separadamente, enquanto o KMO resume a adequação do conjunto.
+
+### Teste de esfericidade de Bartlett
+
+O teste de esfericidade de Bartlett avalia a hipótese de que a matriz de correlações populacional $\boldsymbol{\mathcal R}$, definida na @def-matriz-correlacoes-populacional, seja a matriz identidade.
+
+Considere uma amostra aleatória
+
+$$
+\boldsymbol{\mathsf X}_1,
+\ldots,
+\boldsymbol{\mathsf X}_n
+\overset{\mathrm{iid}}{\sim}
+N_p
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right),
+$$
+
+com variâncias marginais positivas, e seja $\mathbf R$ a matriz de correlações amostral calculada a partir das $n$ observações completas. A hipótese nula é
+
+$$
+H_0:
+\boldsymbol{\mathcal R}
+=
+\mathbf I_p,
+$$
+
+contra
+
+$$
+H_1:
+\boldsymbol{\mathcal R}
+\neq
+\mathbf I_p.
+$$
+
+Supondo $\mathbf R$ positiva definida, uma estatística aproximada para o teste é
+
+$$
+\chi_B^2
+=
+-
+\left[
+n
+-
+1
+-
+\frac{
+2p+5
+}{
+6
+}
+\right]
+\log
+\left|
+\mathbf R
+\right|.
+$$ {#eq-bartlett-esfericidade-fatorial}
+
+Sob $H_0$,
+
+$$
+\chi_B^2
+\overset{\mathrm{aprox}}{\sim}
+\chi^2_{
+p(p-1)/2
+}.
+$$
+
+A rejeição de $H_0$ indica que a matriz de correlações difere da identidade e, portanto, que existe associação linear entre as variáveis que pode justificar a investigação de uma estrutura fatorial.
+
+A não rejeição de $H_0$ indica ausência de evidência suficiente de correlações conjuntas diferentes de zero, situação pouco favorável à Análise Fatorial.
+
+O teste deve ser interpretado em conjunto com a matriz anti-imagem, as medidas MSA e o KMO. Em amostras grandes, mesmo correlações pequenas podem produzir rejeição de $H_0$; por isso, significância estatística no teste de Bartlett não garante, isoladamente, uma estrutura fatorial adequada.
+
+
+## Ajuste amostral, matriz reproduzida e resíduos
+
+Uma vez examinada a adequação da matriz de correlações e escolhido o número de fatores, a formulação amostral procura estimar
+
+$$
+\boldsymbol{\Phi},
 \qquad
-\boldsymbol{\Psi}
-$$
-
-e, no caso oblíquo,
-
-$$
-\boldsymbol{\Phi}.
+\boldsymbol{\Psi}.
 $$
 
 As estimativas serão denotadas por
 
 $$
-\widehat{\mathbf L},
-\qquad
-\widehat{\boldsymbol{\Psi}}
-$$
-
-e
-
-$$
 \widehat{\boldsymbol{\Phi}},
+\qquad
+\widehat{\boldsymbol{\Psi}},
 $$
 
 respectivamente.
 
-Como discutido nas seções de identificação e rotação, a matriz de cargas não é determinada unicamente sem restrições ou convenções adicionais. Portanto, uma matriz $\widehat{\mathbf L}$ representa uma parametrização particular da estrutura fatorial estimada.
+Como discutido nas seções de identificação e rotação, a matriz de cargas não é determinada unicamente sem restrições ou convenções adicionais. Portanto, $\widehat{\boldsymbol{\Phi}}$ representa uma parametrização particular da estrutura fatorial estimada.
 
 No modelo ortogonal, a matriz de covariâncias reproduzida é
 
 $$
 \widehat{\boldsymbol{\Sigma}}_{\mathrm{fat}}
 =
-\widehat{\mathbf L}
-\widehat{\mathbf L}^{\top}
+\widehat{\boldsymbol{\Phi}}
+\widehat{\boldsymbol{\Phi}}^{\top}
 +
 \widehat{\boldsymbol{\Psi}}.
 $$ {#eq-covariancia-reproduzida-fatorial}
 
-No modelo oblíquo,
-
-$$
-\widehat{\boldsymbol{\Sigma}}_{\mathrm{fat}}
-=
-\widehat{\mathbf L}
-\widehat{\boldsymbol{\Phi}}
-\widehat{\mathbf L}^{\top}
-+
-\widehat{\boldsymbol{\Psi}}.
-$$
-
-Quando a análise é baseada em correlações, a matriz reproduzida será denotada por
-
-$$
-\widehat{\boldsymbol{\mathcal R}}_{\mathrm{fat}},
-$$
-
-com parametrização correspondente às variáveis padronizadas.
-
-No caso ortogonal,
+Quando a análise é baseada em correlações,
 
 $$
 \widehat{\boldsymbol{\mathcal R}}_{\mathrm{fat}}
 =
-\widehat{\mathbf L}
-\widehat{\mathbf L}^{\top}
+\widehat{\boldsymbol{\Phi}}
+\widehat{\boldsymbol{\Phi}}^{\top}
 +
-\widehat{\boldsymbol{\Psi}}.
+\widehat{\boldsymbol{\Psi}},
 $$
 
-A escolha entre $\mathbf S$ e $\mathbf R$ modifica a estrutura que está sendo modelada. Na análise baseada em $\mathbf S$, as variâncias e covariâncias permanecem nas escalas originais. Na análise baseada em $\mathbf R$, as variáveis são padronizadas e as comunalidades e especificidades passam a decompor variâncias unitárias.
-
-Essa distinção é análoga à discutida na ACP, mas seu efeito deve ser interpretado no contexto do modelo fatorial. A padronização modifica a matriz de segunda ordem que o modelo procura reproduzir e, consequentemente, pode modificar cargas, comunalidades e especificidades.
-
-## Matriz reproduzida e resíduos
+com parametrização correspondente às variáveis padronizadas.
 
 A adequação da representação da estrutura de segunda ordem pode ser examinada pela diferença entre a matriz observada e a matriz reproduzida.
 
@@ -3138,25 +2755,11 @@ No modelo populacional exato,
 $$
 \boldsymbol{\Sigma}
 =
-\mathbf L
-\mathbf L^{\top}
-+
-\boldsymbol{\Psi}
-$$
-
-no caso ortogonal, ou
-
-$$
-\boldsymbol{\Sigma}
-=
-\mathbf L
 \boldsymbol{\Phi}
-\mathbf L^{\top}
+\boldsymbol{\Phi}^{\top}
 +
-\boldsymbol{\Psi}
+\boldsymbol{\Psi}.
 $$
-
-no caso oblíquo.
 
 A matriz residual populacional correspondente é, então, nula.
 
@@ -3176,7 +2779,7 @@ A @fig-decomposicao-covariancia-fatorial representa a decomposição de uma matr
 
 library(ggplot2)
 
-L_cargas <- matrix(
+Phi_cargas <- matrix(
   c(
     0.80,  0.20,
     0.70,  0.30,
@@ -3196,8 +2799,8 @@ Psi <- diag(
   )
 )
 
-Sigma_comum <- L_cargas %*%
-  t(L_cargas)
+Sigma_comum <- Phi_cargas %*%
+  t(Phi_cargas)
 
 Sigma_total <- Sigma_comum +
   Psi
@@ -3302,9 +2905,14 @@ ggplot(
   ) +
   geom_text(
     aes(
-      label = sprintf(
-        "%.2f",
-        valor
+            label = sub(
+        ".",
+        ",",
+        sprintf(
+          "%.2f",
+          valor
+        ),
+        fixed = TRUE
       )
     ),
     size = 3.6
@@ -3341,9 +2949,11 @@ A matriz comum reproduz as covariâncias entre variáveis distintas e contribui 
 
 ## O problema de estimação
 
-Diferentemente da ACP, a Análise Fatorial não fornece, em geral, todos os parâmetros do modelo por uma única decomposição direta da matriz observada. É necessário estabelecer um critério para aproximar a estrutura observada pela estrutura permitida pelo modelo.
+Diferentes procedimentos podem ser utilizados para obter uma estrutura fatorial compatível com a matriz de covariâncias ou correlações observada. Esses procedimentos não possuem uma única formulação matemática.
 
-Para uma análise baseada em covariâncias, o problema pode ser representado genericamente por
+O método de fatores principais utiliza uma construção espectral baseada em uma matriz reduzida, cuja diagonal representa comunalidades estimadas. Outros métodos formulam a estimação por meio de uma função de discrepância entre a matriz observada e a matriz reproduzida pelo modelo.
+
+Para uma análise baseada em covariâncias, essa segunda classe pode ser representada genericamente por
 
 $$
 \min_{\boldsymbol{\theta}}
@@ -3357,7 +2967,7 @@ D
 \right],
 $$ {#eq-problema-estimacao-fatorial}
 
-em que $\boldsymbol{\theta}$ reúne os parâmetros livres e, no modelo ortogonal,
+em que $\boldsymbol{\theta}$ reúne os parâmetros livres e
 
 $$
 \boldsymbol{\Sigma}
@@ -3365,23 +2975,8 @@ $$
 \boldsymbol{\theta}
 \right)
 =
-\mathbf L
-\mathbf L^{\top}
-+
-\boldsymbol{\Psi}.
-$$
-
-No modelo oblíquo,
-
-$$
-\boldsymbol{\Sigma}
-\left(
-\boldsymbol{\theta}
-\right)
-=
-\mathbf L
 \boldsymbol{\Phi}
-\mathbf L^{\top}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi}.
 $$
@@ -3399,17 +2994,13 @@ D
 \right]
 $$
 
-mede a discrepância entre a matriz de covariâncias observada e a matriz reproduzida.
+mede a discrepância entre a matriz de covariâncias observada e a matriz reproduzida. Quando a análise é baseada em correlações, a formulação correspondente utiliza $\mathbf R$ e a parametrização das variáveis padronizadas.
 
-Quando a análise é baseada em correlações, a mesma ideia é aplicada substituindo $\mathbf S$ por $\mathbf R$ e utilizando uma parametrização correspondente às variáveis padronizadas.
-
-Diferentes métodos de estimação correspondem a diferentes critérios de ajuste ou diferentes estratégias para obter os parâmetros da estrutura fatorial. O objetivo deste capítulo é apresentar sua estrutura matemática, sem desenvolver os algoritmos iterativos utilizados para calculá-los.
-
-A estimação deve ser distinguida da rotação. O método de estimação procura obter uma estrutura fatorial compatível com a matriz observada. A rotação atua posteriormente sobre uma representação dessa estrutura, segundo as propriedades estudadas nas seções anteriores.
+A estimação deve ser distinguida da rotação. A extração ou estimação produz inicialmente uma representação da estrutura fatorial; a rotação ortogonal pode ser aplicada posteriormente às cargas para selecionar uma orientação mais adequada à interpretação.
 
 ### Fatores principais
 
-Uma abordagem procura concentrar a decomposição espectral na parte comum da matriz de covariâncias ou correlações.
+O método de **fatores principais** utiliza a decomposição espectral para concentrar a extração na parcela comum da estrutura de covariâncias ou correlações. A operação matemática é a mesma utilizada na ACP, mas a matriz decomposta é diferente.
 
 No nível populacional, para o modelo ortogonal,
 
@@ -3420,11 +3011,11 @@ $$
 -
 \boldsymbol{\Psi}
 =
-\mathbf L
-\mathbf L^{\top}.
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}.
 $$
 
-Se $\boldsymbol{\Psi}$ fosse conhecida, a matriz comum, por ser simétrica e positiva semidefinida, poderia ser decomposta pelo Teorema Espectral do @thm-teorema-espectral. Como
+Como
 
 $$
 \operatorname{posto}
@@ -3435,9 +3026,17 @@ $$
 m,
 $$
 
-até $m$ direções seriam suficientes para representar sua parte de variância positiva quando o modelo possui $m$ fatores.
+um modelo com $m$ fatores representa a estrutura comum por uma matriz de posto não superior a $m$.
 
-Na amostra, entretanto, as especificidades e comunalidades são desconhecidas. Para uma análise baseada em correlações, uma matriz reduzida pode ser construída substituindo a diagonal unitária de $\mathbf R$ por estimativas das comunalidades:
+Na aplicação amostral baseada em correlações, as comunalidades são desconhecidas. O procedimento parte de estimativas iniciais
+
+$$
+\widehat h_1^2,
+\ldots,
+\widehat h_p^2
+$$
+
+e substitui a diagonal unitária de $\mathbf R$ por esses valores, formando a denominada **matriz de correlações reduzida**
 
 $$
 \mathbf R_{\mathrm{red}}
@@ -3450,53 +3049,253 @@ r_{p1} & r_{p2} & \cdots & \widehat h_p^2
 \end{pmatrix}.
 $$ {#eq-matriz-correlacoes-reduzida}
 
-A decomposição dessa matriz procura representar a parcela comum da estrutura de correlações, e não a variância total padronizada.
+A denominação é tradicional: depois da substituição dos elementos diagonais, $\mathbf R_{\mathrm{red}}$ não é, em geral, uma matriz de correlações no sentido estrito. Sua diagonal passa a representar a parcela estimada da variância de cada variável atribuída aos fatores comuns.
 
-Esse procedimento distingue o método de **fatores principais** da ACP baseada em $\mathbf R$. Na ACP, a diagonal da matriz de correlações permanece igual a
+Como $\mathbf R_{\mathrm{red}}$ é simétrica, considere seus autovalores
 
 $$
-1,
+\widehat{\lambda}_1
+\geq
+\widehat{\lambda}_2
+\geq
+\cdots
+\geq
+\widehat{\lambda}_p
 $$
 
-porque toda a variância padronizada participa da decomposição. Na abordagem por fatores principais, a diagonal é substituída por estimativas das comunalidades porque a variabilidade específica não pertence à estrutura comum que se pretende representar.
+e autovetores unitários associados
 
-As comunalidades e as cargas dependem umas das outras. Por isso, sua estimação pode envolver atualizações sucessivas. Os valores iniciais das comunalidades e o algoritmo utilizado para atualizá-las pertencem à implementação do método e não serão desenvolvidos neste capítulo.
+$$
+\widehat{\boldsymbol{\alpha}}_1,
+\ldots,
+\widehat{\boldsymbol{\alpha}}_p,
+$$
+
+satisfazendo
+
+$$
+\mathbf R_{\mathrm{red}}
+\widehat{\boldsymbol{\alpha}}_j
+=
+\widehat{\lambda}_j
+\widehat{\boldsymbol{\alpha}}_j,
+\qquad
+\widehat{\boldsymbol{\alpha}}_j^\top
+\widehat{\boldsymbol{\alpha}}_j
+=
+1.
+$$
+
+Reunindo os autovetores em
+
+$$
+\widehat{\mathbf A}
+=
+\begin{pmatrix}
+\widehat{\boldsymbol{\alpha}}_1
+&
+\cdots
+&
+\widehat{\boldsymbol{\alpha}}_p
+\end{pmatrix}
+$$
+
+e definindo
+
+$$
+\widehat{\boldsymbol{\Lambda}}
+=
+\operatorname{diag}
+\left(
+\widehat{\lambda}_1,
+\ldots,
+\widehat{\lambda}_p
+\right),
+$$
+
+a decomposição espectral é
+
+$$
+\mathbf R_{\mathrm{red}}
+=
+\widehat{\mathbf A}
+\widehat{\boldsymbol{\Lambda}}
+\widehat{\mathbf A}^{\top}.
+$$ {#eq-decomposicao-espectral-matriz-reduzida}
+
+A decomposição utiliza os mesmos objetos matemáticos empregados na ACP: autovalores e autovetores unitários. O significado estatístico da solução é diferente porque a matriz de origem é a matriz reduzida, construída para representar a variância comum estimada.
+
+Suponha que sejam retidos $m$ autovalores positivos,
+
+$$
+\widehat{\lambda}_1
+\geq
+\cdots
+\geq
+\widehat{\lambda}_m
+>
+0.
+$$
+
+Defina
+
+$$
+\widehat{\mathbf A}_m
+=
+\begin{pmatrix}
+\widehat{\boldsymbol{\alpha}}_1
+&
+\cdots
+&
+\widehat{\boldsymbol{\alpha}}_m
+\end{pmatrix}
+\in
+\mathbb R^{p\times m}
+$$
+
+e
+
+$$
+\widehat{\boldsymbol{\Lambda}}_m
+=
+\operatorname{diag}
+\left(
+\widehat{\lambda}_1,
+\ldots,
+\widehat{\lambda}_m
+\right).
+$$
+
+Uma solução inicial não rotacionada para a matriz de cargas é
+
+$$
+\widehat{\boldsymbol{\Phi}}_0
+=
+\widehat{\mathbf A}_m
+\widehat{\boldsymbol{\Lambda}}_m^{1/2}.
+$$ {#eq-cargas-fatores-principais}
+
+Se $\widehat a_{ij}$ denota o $i$-ésimo elemento de $\widehat{\boldsymbol{\alpha}}_j$, então a carga inicial da variável $X_i$ no fator $j$ é
+
+$$
+\widehat{\phi}_{ij}^{(0)}
+=
+\sqrt{
+\widehat{\lambda}_j
+}
+\,
+\widehat a_{ij}.
+$$ {#eq-carga-fator-principal}
+
+A matriz comum reproduzida pela solução retida é
+
+$$
+\widehat{\boldsymbol{\Phi}}_0
+\widehat{\boldsymbol{\Phi}}_0^\top
+=
+\widehat{\mathbf A}_m
+\widehat{\boldsymbol{\Lambda}}_m
+\widehat{\mathbf A}_m^\top.
+$$
+
+As comunalidades correspondentes são obtidas pelos elementos diagonais dessa matriz. Para a variável $X_i$,
+
+$$
+\widehat h_i^2
+=
+\sum_{j=1}^{m}
+\left(
+\widehat{\phi}_{ij}^{(0)}
+\right)^2.
+$$
+
+Essas comunalidades podem substituir os valores utilizados anteriormente na diagonal de $\mathbf R_{\mathrm{red}}$, produzindo uma nova matriz reduzida e uma nova decomposição espectral. O procedimento pode ser repetido até que o critério de convergência adotado seja satisfeito. A escolha das comunalidades iniciais e os detalhes do algoritmo iterativo pertencem à etapa metodológica da técnica e não serão desenvolvidos neste capítulo.
+
+A solução espectral obtida é uma solução inicial. Se uma rotação ortogonal
+
+$$
+\mathbf Q
+\in
+\mathbb R^{m\times m}
+$$
+
+for posteriormente utilizada, as cargas rotacionadas são
+
+$$
+\widehat{\boldsymbol{\Phi}}
+=
+\widehat{\boldsymbol{\Phi}}_0
+\mathbf Q,
+$$
+
+com
+
+$$
+\mathbf Q^\top
+\mathbf Q
+=
+\mathbf I_m.
+$$
+
+Pela invariância demonstrada em @eq-invariancia-rotacao-fatorial,
+
+$$
+\widehat{\boldsymbol{\Phi}}
+\widehat{\boldsymbol{\Phi}}^\top
+=
+\widehat{\boldsymbol{\Phi}}_0
+\widehat{\boldsymbol{\Phi}}_0^\top.
+$$
+
+Assim, a extração determina inicialmente a estrutura comum reproduzida, enquanto a rotação modifica sua orientação para fins de interpretação.
+
+A relação com a ACP decorre da matriz que recebe a decomposição espectral. Na ACP baseada em $\mathbf R$, decompõe-se a própria matriz de correlações, cuja diagonal é unitária e representa a variância total padronizada. No método de fatores principais, decompõe-se $\mathbf R_{\mathrm{red}}$, cuja diagonal contém comunalidades estimadas e direciona a extração para a parcela comum da variância.
+
+Como $\mathbf R_{\mathrm{red}}$ depende de comunalidades estimadas, ela não é necessariamente positiva semidefinida em todas as etapas do procedimento. Autovalores negativos podem ocorrer e não permitem a construção de cargas reais pela expressão em @eq-carga-fator-principal. A solução espectral para os fatores retidos utiliza os autovalores positivos correspondentes.
 
 ### Mínimos quadrados
 
-Outra possibilidade é estimar os parâmetros pela minimização dos resíduos entre a matriz observada e a matriz reproduzida.
-
-Para uma análise baseada em covariâncias, uma formulação de mínimos quadrados não ponderados pode ser escrita como
+Outra possibilidade é estimar a estrutura fatorial minimizando a discrepância entre a matriz observada e a matriz reproduzida pelo modelo. Para uma análise baseada em covariâncias, o critério de mínimos quadrados não ponderados pode ser escrito como
 
 $$
 F_{\mathrm{MQ}}
 \left(
-\mathbf L,
+\boldsymbol{\Phi},
 \boldsymbol{\Psi}
 \right)
 =
 \left\|
 \mathbf S
 -
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 -
 \boldsymbol{\Psi}
 \right\|_F^2.
 $$ {#eq-criterio-minimos-quadrados-fatorial}
 
-A norma de Frobenius, definida na @def-norma-frobenius, mede conjuntamente os desvios entre os elementos da matriz observada e da matriz reproduzida.
-
-No modelo ortogonal, como $\boldsymbol{\Psi}$ é diagonal, as covariâncias fora da diagonal são reproduzidas exclusivamente pela parcela
+A norma de Frobenius definida na @def-norma-frobenius reúne os resíduos entre os elementos correspondentes das matrizes observada e reproduzida. No modelo ortogonal, como $\boldsymbol{\Psi}$ é diagonal, as covariâncias fora da diagonal são reproduzidas pela parcela comum
 
 $$
-\mathbf L
-\mathbf L^{\top}.
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top},
 $$
 
-Os elementos diagonais são decompostos entre comunalidades e especificidades.
+enquanto os elementos diagonais são decompostos entre comunalidades e variâncias específicas.
 
-Critérios ponderados podem atribuir pesos diferentes aos resíduos, inclusive em função de sua variabilidade amostral. Essas extensões modificam a função de discrepância, mas preservam o mesmo objetivo estrutural: aproximar a matriz observada por uma matriz pertencente à classe especificada pelo modelo fatorial.
+Critérios de mínimos quadrados ponderados modificam a contribuição relativa dos resíduos, mas preservam o mesmo objetivo: encontrar uma matriz pertencente à classe especificada pelo modelo fatorial que reproduza adequadamente a estrutura observada. Os critérios de ponderação e os algoritmos de otimização serão tratados na etapa aplicada.
+
+Independentemente do método de estimação, uma solução admissível deve satisfazer
+
+$$
+\psi_i
+\geq
+0,
+\qquad
+i=1,\ldots,p.
+$$
+
+Estimativas com $\psi_i<0$ são soluções impróprias e estão associadas aos chamados **casos de Heywood** [@lawley1971factor]. Para variáveis padronizadas, essa situação corresponde a $\widehat h_i^2>1$. O caso $\psi_i=0$ pertence à fronteira do espaço paramétrico e requer cuidado quando são utilizados resultados inferenciais que pressupõem uma solução interior.
 
 ## Modelo fatorial normal
 
@@ -3537,14 +3336,14 @@ $$
 \boldsymbol{\varepsilon}.
 $$
 
-A variável observada é
+O vetor aleatório observado é
 
 $$
 \boldsymbol{\mathsf X}
 =
 \boldsymbol{\mu}
 +
-\mathbf L
+\boldsymbol{\Phi}
 \boldsymbol{\mathsf F}
 +
 \boldsymbol{\varepsilon}.
@@ -3570,8 +3369,8 @@ com
 $$
 \boldsymbol{\Sigma}
 =
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi}.
 $$ {#eq-distribuicao-modelo-fatorial-normal}
@@ -3594,15 +3393,7 @@ Essa formulação probabilística permite utilizar a função de verossimilhanç
 
 ## Estimação por máxima verossimilhança
 
-Considere
-
-$$
-\boldsymbol{\theta}
-\in
-\Theta_{\mathrm{fat}},
-$$
-
-em que $\boldsymbol{\theta}$ reúne os parâmetros livres de uma parametrização identificada do modelo e
+Seja $\Theta_{\mathrm{fat}}$ o espaço paramétrico admissível de uma parametrização identificada do modelo fatorial, com
 
 $$
 \boldsymbol{\Sigma}
@@ -3610,24 +3401,32 @@ $$
 \boldsymbol{\theta}
 \right)
 =
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi}.
 $$
 
-Para que a densidade normal multivariada não singular, sua inversa e seu log-determinante sejam utilizados na forma seguinte, restringe-se a estimação a valores de $\boldsymbol{\theta}$ para os quais
+A verossimilhança normal requer uma matriz de covariâncias positiva definida. Define-se, portanto,
 
 $$
+\Theta_{\mathrm{fat}}^{+}
+=
+\left\{
+\boldsymbol{\theta}
+\in
+\Theta_{\mathrm{fat}}
+:
 \boldsymbol{\Sigma}
 \left(
 \boldsymbol{\theta}
 \right)
 \succ
-\mathbf0.
+\mathbf0
+\right\}.
 $$ {#eq-condicao-positividade-ml-fatorial}
 
-Considere então uma amostra
+Considere uma amostra
 
 $$
 \boldsymbol{\mathsf X}_1,
@@ -3644,7 +3443,7 @@ N_p
 \right].
 $$
 
-Para um valor fixado de $\boldsymbol{\theta}$, a maximização em relação à média produz
+A maximização em relação à média fornece
 
 $$
 \widehat{\boldsymbol{\mu}}
@@ -3652,28 +3451,20 @@ $$
 \bar{\mathbf x},
 $$
 
-como no resultado geral da @prp-estimadores-normais-mv.
-
-Defina a matriz de covariâncias com divisor $n$,
+como na @prp-estimadores-normais-mv. Definindo
 
 $$
 \mathbf S_{\mathrm{MV}}
 =
 \frac{1}{n}
-\mathbf X_c^{\top}
-\mathbf X_c.
-$$ {#eq-covariancia-mv-fatorial}
-
-Como a matriz $\mathbf S$ utilizada descritivamente no livro possui divisor $n-1$,
-
-$$
-\mathbf S_{\mathrm{MV}}
+\mathbf X_c^\top
+\mathbf X_c
 =
 \frac{n-1}{n}
-\mathbf S.
-$$
+\mathbf S,
+$$ {#eq-covariancia-mv-fatorial}
 
-Desconsiderando termos que não dependem de $\boldsymbol{\theta}$, a log-verossimilhança concentrada pode ser escrita como
+a log-verossimilhança concentrada, desconsiderando termos constantes em relação a $\boldsymbol{\theta}$, é
 
 $$
 \ell
@@ -3704,9 +3495,7 @@ C
 \right\}.
 $$ {#eq-logverossimilhanca-fatorial}
 
-A condição na @eq-condicao-positividade-ml-fatorial garante que o determinante seja positivo e que a inversa da matriz modelada exista.
-
-Maximizar a verossimilhança equivale, portanto, a minimizar
+Assim, a estimação por máxima verossimilhança equivale a minimizar
 
 $$
 \log
@@ -3724,180 +3513,10 @@ $$
 \left(
 \boldsymbol{\theta}
 \right)^{-1}
-\right].
+\right]
 $$
 
-Se, adicionalmente,
-
-$$
-\mathbf S_{\mathrm{MV}}
-\succ
-\mathbf0,
-$$
-
-pode-se definir a função de discrepância normalizada
-
-$$
-\begin{aligned}
-F_{\mathrm{ML}}
-\left(
-\boldsymbol{\theta}
-\right)
-&=
-\log
-\left|
-\boldsymbol{\Sigma}
-\left(
-\boldsymbol{\theta}
-\right)
-\right|\\
-&\quad+
-\operatorname{tr}
-\left[
-\mathbf S_{\mathrm{MV}}
-\boldsymbol{\Sigma}
-\left(
-\boldsymbol{\theta}
-\right)^{-1}
-\right]\\
-&\quad-
-\log
-\left|
-\mathbf S_{\mathrm{MV}}
-\right|
--p.
-\end{aligned}
-$$ {#eq-criterio-ml-fatorial}
-
-A constante foi escolhida de modo que
-
-$$
-F_{\mathrm{ML}}
-=
-0
-$$
-
-quando
-
-$$
-\boldsymbol{\Sigma}
-\left(
-\boldsymbol{\theta}
-\right)
-=
-\mathbf S_{\mathrm{MV}}.
-$$
-
-Se $\mathbf S_{\mathrm{MV}}$ é singular, a log-verossimilhança concentrada na @eq-logverossimilhanca-fatorial continua definida para matrizes modeladas positivas definidas, mas a forma normalizada na @eq-criterio-ml-fatorial não pode ser utilizada diretamente porque
-
-$$
-\log
-\left|
-\mathbf S_{\mathrm{MV}}
-\right|
-$$
-
-não é finito.
-
-A presença simultânea do log-determinante e da inversa da matriz de covariâncias decorre diretamente da densidade normal multivariada. As ferramentas de cálculo matricial necessárias para diferenciar esse critério já foram desenvolvidas no Capítulo 7, incluindo o diferencial do log-determinante na @prp-diferencial-logdet.
-
-A estimação por máxima verossimilhança pode ser expressa por
-
-$$
-\widehat{\boldsymbol{\theta}}_{\mathrm{MV}}
-\in
-\underset{
-\boldsymbol{\theta}
-\in
-\Theta_{\mathrm{fat}}
-}{
-\operatorname*{arg\,min}
-}
-\;
-F_{\mathrm{ML}}
-\left(
-\boldsymbol{\theta}
-\right),
-$$
-
-quando a forma normalizada está definida.
-
-O espaço paramétrico deve respeitar as condições do modelo, entre elas
-
-$$
-\psi_i
-\geq
-0,
-\qquad
-i=1,\ldots,p,
-$$
-
-e
-
-$$
-\boldsymbol{\Sigma}
-\left(
-\boldsymbol{\theta}
-\right)
-\succ
-\mathbf0.
-$$
-
-A solução não é obtida, em geral, por uma única decomposição matricial explícita. Métodos numéricos são utilizados para resolver o problema de otimização. O desenvolvimento desses algoritmos pertence à implementação da técnica [@lawley1971factor].
-
-### Ajuste global e graus de liberdade
-
-A formulação por máxima verossimilhança permite comparar o modelo fatorial com o modelo normal de covariâncias sem restrições estruturais.
-
-Uma matriz simétrica $p\times p$ possui
-
-$$
-\frac{
-p(p+1)
-}{
-2
-}
-$$
-
-elementos distintos.
-
-Em um ponto regular do modelo fatorial ortogonal exploratório com $m$ fatores, após considerar a indeterminação rotacional conforme @eq-numero-parametros-fatorial, a dimensão da estrutura de covariâncias modelada é
-
-$$
-pm
-+
-p
--
-\frac{
-m(m-1)
-}{
-2
-}.
-$$
-
-Assim, o número de restrições independentes impostas à matriz de covariâncias é
-
-$$
-\nu_{\mathrm{fat}}
-=
-\frac{
-p(p+1)
-}{
-2
-}
--
-pm
--
-p
-+
-\frac{
-m(m-1)
-}{
-2
-}.
-$$ {#eq-graus-liberdade-modelo-fatorial}
-
-Essa quantidade fornece os graus de liberdade usuais do teste de ajuste quando o modelo está identificado e as condições regulares necessárias são satisfeitas.
+sobre $\Theta_{\mathrm{fat}}^{+}$.
 
 Quando
 
@@ -3907,21 +3526,68 @@ $$
 \mathbf0,
 $$
 
-o modelo normal irrestrito possui estimativa de máxima verossimilhança
+pode-se utilizar a função de discrepância normalizada
 
 $$
-\widehat{\boldsymbol{\Sigma}}_{\mathrm{sat}}
+F_{\mathrm{ML}}
+\left(
+\boldsymbol{\theta}
+\right)
 =
-\mathbf S_{\mathrm{MV}}.
+\log
+\left|
+\boldsymbol{\Sigma}
+\left(
+\boldsymbol{\theta}
+\right)
+\right|
++
+\operatorname{tr}
+\left[
+\mathbf S_{\mathrm{MV}}
+\boldsymbol{\Sigma}
+\left(
+\boldsymbol{\theta}
+\right)^{-1}
+\right]
+-
+\log
+\left|
+\mathbf S_{\mathrm{MV}}
+\right|
+-
+p.
+$$ {#eq-criterio-ml-fatorial}
+
+Essa função satisfaz
+
+$$
+F_{\mathrm{ML}}=0
 $$
 
-Se
+quando a matriz reproduzida coincide com $\mathbf S_{\mathrm{MV}}$. Se $\mathbf S_{\mathrm{MV}}$ é singular, a log-verossimilhança na @eq-logverossimilhanca-fatorial permanece utilizável para matrizes modeladas positivas definidas, mas a forma normalizada em @eq-criterio-ml-fatorial não está definida.
+
+A solução é obtida, em geral, por otimização numérica; os algoritmos correspondentes não serão desenvolvidos neste capítulo [@lawley1971factor].
+
+### Ajuste global e graus de liberdade
+
+A formulação por máxima verossimilhança permite comparar o modelo fatorial com o modelo normal de covariâncias sem restrições estruturais.
+
+Em um ponto regular de um modelo fatorial ortogonal exploratório identificado com $m$ fatores, o número de restrições independentes impostas à matriz de covariâncias é
 
 $$
-\widehat{\boldsymbol{\theta}}_{\mathrm{MV}}
-$$
+\nu_{\mathrm{fat}}
+=
+\frac{p(p+1)}{2}
+-
+pm
+-
+p
++
+\frac{m(m-1)}{2}.
+$$ {#eq-graus-liberdade-modelo-fatorial}
 
-é a estimativa sob o modelo fatorial, a estatística da razão de verossimilhanças pode ser escrita como
+Quando $\mathbf S_{\mathrm{MV}}\succ\mathbf0$, a estatística da razão de verossimilhanças pode ser escrita como
 
 $$
 -2
@@ -3935,17 +3601,13 @@ F_{\mathrm{ML}}
 \right).
 $$ {#eq-rv-ajuste-fatorial}
 
-O resultado assintótico de Wilks foi estabelecido no @thm-resultado-assintotico-wilks. Aplicado a uma parametrização identificada do modelo fatorial, ele exige as condições regulares correspondentes, incluindo solução populacional interior, diferenciabilidade apropriada, identificabilidade e informação de Fisher não singular para os parâmetros livres.
-
-Sob essas condições e mantendo $p$ e $m$ fixos enquanto
+Sob identificação, solução populacional interior e as demais condições regulares do resultado assintótico de Wilks em @thm-resultado-assintotico-wilks, mantendo $p$ e $m$ fixos e fazendo
 
 $$
-n
-\to
-\infty,
+n\to\infty,
 $$
 
-se o modelo fatorial está corretamente especificado,
+tem-se, se o modelo está corretamente especificado,
 
 $$
 -2
@@ -3955,99 +3617,8 @@ $$
 \chi_{\nu_{\mathrm{fat}}}^2.
 $$ {#eq-assintotica-ajuste-fatorial}
 
-A distribuição qui-quadrado é, portanto, um **resultado assintótico**, e não uma distribuição exata em amostras finitas.
+A distribuição qui-quadrado é, portanto, um resultado assintótico. O número de fatores altera simultaneamente a flexibilidade do modelo e seus graus de liberdade; os critérios práticos para escolha de $m$ serão tratados na etapa aplicada.
 
-Esse resultado também esclarece por que identificação e interioridade não são detalhes apenas algébricos. Elas participam das condições necessárias para que a aproximação assintótica regular possa ser utilizada.
-
-O número de fatores modifica diretamente a classe de matrizes representáveis. Aumentar $m$ amplia essa classe e reduz
-
-$$
-\nu_{\mathrm{fat}}.
-$$
-
-A determinação prática do número de fatores envolve critérios adicionais e será tratada na etapa aplicada. Neste capítulo, $m$ é considerado parte da especificação do modelo.
-
-## Soluções admissíveis e casos de fronteira
-
-As variâncias específicas pertencem ao espaço paramétrico somente quando
-
-$$
-\psi_i
-\geq
-0,
-\qquad
-i=1,\ldots,p.
-$$
-
-Uma solução com
-
-$$
-\psi_i<0
-$$
-
-é uma solução imprópria, pois atribui valor negativo a uma quantidade definida como variância.
-
-Como
-
-$$
-\sigma_{ii}
-=
-h_i^2
-+
-\psi_i,
-$$
-
-uma especificidade negativa corresponderia a
-
-$$
-h_i^2
->
-\sigma_{ii}.
-$$
-
-Para variáveis padronizadas,
-
-$$
-\sigma_{ii}=1,
-$$
-
-e, portanto,
-
-$$
-h_i^2>1.
-$$
-
-Problemas envolvendo estimativas de especificidades na fronteira ou fora do espaço admissível são tradicionalmente associados aos chamados **casos de Heywood** na literatura de Análise Fatorial [@lawley1971factor].
-
-Também podem ocorrer soluções na fronteira com
-
-$$
-\psi_i=0.
-$$
-
-Nesse caso,
-
-$$
-h_i^2
-=
-\sigma_{ii},
-$$
-
-e toda a variância da variável é atribuída à parcela comum do modelo.
-
-Para uma variável padronizada,
-
-$$
-h_i^2=1.
-$$
-
-::: {.callout-caution appearance="simple" icon="false"}
-## Fronteira do espaço paramétrico
-
-Uma solução com variância específica nula pertence à fronteira do espaço paramétrico. Resultados inferenciais assintóticos obtidos sob hipóteses de solução interior, como a aplicação regular de Wilks na @eq-assintotica-ajuste-fatorial, não podem ser transferidos automaticamente para essa situação.
-:::
-
-Esses casos mostram que a existência de uma solução numérica não garante, por si só, uma solução admissível nem o atendimento às condições regulares utilizadas pela teoria inferencial.
 
 ## Escores fatoriais
 
@@ -4074,7 +3645,7 @@ Depois que os parâmetros do modelo são conhecidos ou estimados, pode-se procur
 ::: {#def-escore-fatorial}
 ## Escore fatorial
 
-Um **escore fatorial** é uma estimativa ou predição do valor dos fatores latentes associado a uma observação, obtida a partir das variáveis observadas e de um modelo fatorial especificado ou ajustado.
+Um **escore fatorial** é uma estimativa ou predição de uma realização do vetor de fatores latentes associada a uma unidade observacional, obtida a partir das variáveis observadas e de um modelo fatorial especificado ou ajustado.
 :::
 
 A @tbl-fatores-cargas-escores sintetiza as funções distintas desempenhadas pelos fatores, pelas cargas e pelos escores fatoriais.
@@ -4082,19 +3653,19 @@ A @tbl-fatores-cargas-escores sintetiza as funções distintas desempenhadas pel
 | Objeto | Natureza |
 |---|---|
 | $\boldsymbol{\mathsf F}$ | Vetor aleatório latente especificado pelo modelo |
-| $\mathbf L$ | Matriz de parâmetros que relaciona fatores e variáveis |
+| $\boldsymbol{\Phi}$ | Matriz de parâmetros que relaciona fatores e variáveis |
 | $\mathbf f_i$ | Realização latente dos fatores associada à unidade $i$, não diretamente observada |
 | $\widehat{\mathbf f}_i$ | Escore utilizado para estimar ou predizer $\mathbf f_i$ |
 
 : Distinção entre fatores, cargas e escores fatoriais. {#tbl-fatores-cargas-escores}
 
-Essa distinção é importante. As cargas fatoriais são parâmetros da estrutura de covariâncias, enquanto os escores são quantidades associadas às unidades observacionais.
+As cargas fatoriais são parâmetros da estrutura de covariâncias, enquanto os escores são quantidades associadas às unidades observacionais.
 
 A formulação normal permite compreender probabilisticamente por que a obtenção dos escores é um problema de predição.
 
 ## Distribuição condicional dos fatores
 
-Considere o modelo fatorial normal ortogonal na @def-modelo-fatorial-normal e suponha, adicionalmente, que
+Considere o modelo fatorial normal ortogonal da @def-modelo-fatorial-normal e suponha
 
 $$
 \boldsymbol{\Sigma}
@@ -4102,110 +3673,19 @@ $$
 \mathbf0.
 $$
 
-Tem-se
-
-$$
-\boldsymbol{\mathsf F}
-\sim
-N_m
-\left(
-\mathbf0,
-\mathbf I_m
-\right)
-$$
-
-e
-
-$$
-\boldsymbol{\mathsf X}
-\sim
-N_p
-\left(
-\boldsymbol{\mu},
-\boldsymbol{\Sigma}
-\right),
-$$
-
-com
-
-$$
-\boldsymbol{\Sigma}
-=
-\mathbf L
-\mathbf L^{\top}
-+
-\boldsymbol{\Psi}.
-$$
-
-Além disso,
-
-$$
-\begin{aligned}
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf F},
-\boldsymbol{\mathsf X}
-\right)
-&=
-\operatorname{Cov}
-\left[
-\boldsymbol{\mathsf F},
-\mathbf L
-\boldsymbol{\mathsf F}
-+
-\boldsymbol{\varepsilon}
-\right]\\
-&=
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf F}
-\right)
-\mathbf L^{\top}\\
-&=
-\mathbf L^{\top}.
-\end{aligned}
-$$
-
-Portanto, o vetor conjunto
-
-$$
-\begin{pmatrix}
-\boldsymbol{\mathsf F}\\
-\boldsymbol{\mathsf X}
-\end{pmatrix}
-$$
-
-possui distribuição normal com vetor de médias
-
-$$
-\begin{pmatrix}
-\mathbf0\\
-\boldsymbol{\mu}
-\end{pmatrix}
-$$
-
-e matriz de covariâncias
-
-$$
-\begin{pmatrix}
-\mathbf I_m
-&
-\mathbf L^{\top}\\
-\mathbf L
-&
-\boldsymbol{\Sigma}
-\end{pmatrix}.
-$$ {#eq-covariancia-conjunta-fator-x}
-
 Como
 
 $$
-\boldsymbol{\Sigma}
-\succ
-\mathbf0,
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf F},
+\boldsymbol{\mathsf X}
+\right)
+=
+\boldsymbol{\Phi}^{\top},
 $$
 
-o resultado de distribuição condicional normal da @prp-distribuicao-condicional-normal pode ser aplicado. Assim,
+a distribuição condicional normal da @prp-distribuicao-condicional-normal fornece diretamente
 
 $$
 \boldsymbol{\mathsf F}
@@ -4218,7 +3698,7 @@ $$
 \sim
 N_m
 \left[
-\mathbf L^{\top}
+\boldsymbol{\Phi}^{\top}
 \boldsymbol{\Sigma}^{-1}
 \left(
 \mathbf x-\boldsymbol{\mu}
@@ -4226,9 +3706,9 @@ N_m
 \;
 \mathbf I_m
 -
-\mathbf L^{\top}
+\boldsymbol{\Phi}^{\top}
 \boldsymbol{\Sigma}^{-1}
-\mathbf L
+\boldsymbol{\Phi}
 \right].
 $$ {#eq-distribuicao-condicional-fatores}
 
@@ -4244,7 +3724,7 @@ E
 \mathbf x
 \right)
 =
-\mathbf L^{\top}
+\boldsymbol{\Phi}^{\top}
 \boldsymbol{\Sigma}^{-1}
 \left(
 \mathbf x-\boldsymbol{\mu}
@@ -4263,53 +3743,26 @@ $$
 =
 \mathbf I_m
 -
-\mathbf L^{\top}
+\boldsymbol{\Phi}^{\top}
 \boldsymbol{\Sigma}^{-1}
-\mathbf L.
+\boldsymbol{\Phi}.
 $$ {#eq-covariancia-condicional-fatores}
 
-A média condicional fornece uma predição natural dos fatores sob o modelo normal:
+A média condicional fornece o **escore fatorial por regressão**:
 
 $$
 \widehat{\mathbf f}
 =
-\mathbf L^{\top}
+\boldsymbol{\Phi}^{\top}
 \boldsymbol{\Sigma}^{-1}
 \left(
 \mathbf x-\boldsymbol{\mu}
 \right).
 $$ {#eq-escore-regressao-populacional}
 
-Quando os parâmetros são desconhecidos, uma versão amostral pode ser obtida substituindo-os por estimativas compatíveis com o modelo ajustado.
+Quando os parâmetros são desconhecidos, eles são substituídos por estimativas obtidas do modelo ajustado.
 
-A expressão evidencia uma diferença importante em relação à ACP. Depois que as direções principais são determinadas, o escore de uma componente é uma coordenada calculada diretamente pela projeção da observação. No modelo fatorial, o fator permanece latente mesmo quando
-
-$$
-\boldsymbol{\mathsf X}
-=
-\mathbf x
-$$
-
-é conhecido.
-
-Quando
-
-$$
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf F}
-\mid
-\boldsymbol{\mathsf X}
-\right)
-\neq
-\mathbf0,
-$$
-
-a observação das variáveis não determina exatamente o valor dos fatores. Permanece variabilidade condicional sobre o vetor latente.
-
-Essa é uma manifestação probabilística da **indeterminação dos escores fatoriais**. Além disso, mesmo para uma mesma solução fatorial, diferentes critérios de predição ou estimação podem produzir escores distintos.
-
-A média condicional utilizada acima corresponde a um critério específico sob o modelo normal. Outros métodos de obtenção de escores, incluindo critérios baseados em regressão ou mínimos quadrados, serão tratados na etapa aplicada.
+A covariância condicional mostra que, em geral, conhecer $\boldsymbol{\mathsf X}=\mathbf x$ não determina exatamente a realização dos fatores. Os fatores permanecem latentes e diferentes critérios de obtenção dos escores podem produzir valores distintos para a mesma solução fatorial. Outros critérios serão tratados na etapa aplicada.
 
 ## Pressupostos e limites do modelo
 
@@ -4331,105 +3784,17 @@ A @tbl-pressupostos-limites-fatorial organiza essas distinções.
 
 : Pressupostos e limites da formulação fatorial. {#tbl-pressupostos-limites-fatorial}
 
-### Linearidade e estrutura de segunda ordem
-
-O modelo básico especifica
-
-$$
-\boldsymbol{\mathsf X}
--
-\boldsymbol{\mu}
-=
-\mathbf L
-\boldsymbol{\mathsf F}
-+
-\boldsymbol{\varepsilon}.
-$$
-
-Consequentemente, a formulação desenvolvida neste capítulo descreve uma estrutura linear baseada em momentos de segunda ordem.
-
-Associações entre as variáveis que não sejam adequadamente representadas por covariâncias podem não ser capturadas por um modelo fatorial linear simples.
-
-A formulação básica também não implica, por si só, que os fatores expliquem toda forma de dependência probabilística entre as variáveis. O objeto diretamente modelado é sua estrutura de covariâncias.
-
-### Diagonalidade da estrutura específica
-
-A condição
-
-$$
-\boldsymbol{\Psi}
-=
-\operatorname{diag}
-\left(
-\psi_1,\ldots,\psi_p
-\right)
-$$
-
-é um pressuposto definidor do modelo de fatores comuns básico.
-
-Ela implica
-
-$$
-\operatorname{Cov}
-\left(
-\varepsilon_i,\varepsilon_j
-\right)
-=
-0,
-\qquad
-i\neq j.
-$$
-
-Portanto, no modelo básico, as covariâncias entre variáveis distintas devem ser reproduzidas pela parcela comum.
-
-Se permanecer as covariâncias sistemáticas entre fatores específicos de variáveis diferentes, a estrutura
-
-$$
-\mathbf L
-\mathbf L^{\top}
-+
-\boldsymbol{\Psi}
-$$
-
-no modelo ortogonal pode ser insuficiente para representar a matriz de covariâncias.
-
-A diagonalidade de $\boldsymbol{\Psi}$ estabelece covariâncias nulas entre fatores específicos distintos. Ela não implica independência em uma formulação probabilística geral. No modelo fatorial normal na @def-modelo-fatorial-normal, a normalidade conjunta permite fortalecer essa conclusão para independência.
-
 ### Número de fatores
 
-Para valores pequenos de $m$, o modelo impõe uma estrutura mais restritiva à matriz de covariâncias. À medida que $m$ aumenta, cresce a flexibilidade da parcela comum.
+O número $m$ determina a dimensão da estrutura comum e a classe de matrizes de covariâncias que o modelo pode representar. Valores pequenos impõem uma estrutura mais restritiva; valores maiores aumentam sua flexibilidade.
 
-Um número insuficiente de fatores pode deixar covariâncias sistemáticas sem representação. Um número excessivo pode reduzir a utilidade da representação latente, aumentar a complexidade da parametrização e agravar problemas de identificação ou estabilidade.
-
-O número de fatores faz parte da especificação do problema. Os critérios operacionais para sua escolha não pertencem à formulação desenvolvida neste capítulo e serão tratados posteriormente.
+Um número insuficiente de fatores pode deixar associações sistemáticas sem representação, enquanto um número excessivo reduz a parcimônia da solução. Neste capítulo, $m$ é tratado como parte da especificação do modelo. Os critérios práticos para sua escolha serão desenvolvidos na etapa aplicada.
 
 ### Dependência do conjunto e da escala das variáveis
 
-Os fatores são definidos em relação ao conjunto de variáveis incluído no modelo.
+A estrutura fatorial é definida em relação às variáveis incluídas no modelo. Adicionar, retirar ou transformar variáveis modifica a matriz de covariâncias ou correlações e pode alterar a solução.
 
-Adicionar, retirar ou transformar variáveis modifica
-
-$$
-\boldsymbol{\Sigma}
-$$
-
-ou
-
-$$
-\boldsymbol{\mathcal R}
-$$
-
-e pode modificar a estrutura fatorial obtida.
-
-Mudanças individuais de escala também modificam a matriz de covariâncias e, portanto, podem alterar uma análise baseada em
-
-$$
-\boldsymbol{\Sigma}.
-$$
-
-A utilização de uma matriz de correlações remove as diferenças de escala marginal antes do ajuste, mas define outro problema estatístico, assim como ocorreu na ACP.
-
-Os fatores não devem, portanto, ser interpretados como objetos independentes do conjunto de variáveis e da forma como sua estrutura de segunda ordem foi definida.
+Uma análise baseada em covariâncias também depende das escalas marginais. A utilização da matriz de correlações remove essas diferenças de escala antes do ajuste, mas define uma estrutura de segunda ordem distinta, assim como ocorre na ACP.
 
 ### Papel da normalidade
 
@@ -4438,32 +3803,19 @@ A decomposição
 $$
 \boldsymbol{\Sigma}
 =
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi}
 $$
 
-não exige normalidade multivariada. Ela decorre das hipóteses sobre médias e covariâncias do modelo de fatores comuns.
+é uma estrutura de segunda ordem e não exige normalidade multivariada.
 
-A normalidade é introduzida na @def-modelo-fatorial-normal para especificar uma distribuição conjunta para fatores, fatores específicos e variáveis observadas. Essa hipótese sustenta a formulação da verossimilhança normal, a inferência correspondente e a distribuição condicional dos fatores.
-
-A estrutura de segunda ordem
-
-$$
-\boldsymbol{\Sigma}
-=
-\mathbf L
-\mathbf L^{\top}
-+
-\boldsymbol{\Psi}
-$$
-
-não depende dessa hipótese. A normalidade pertence à formulação probabilística específica, e não à definição geral do modelo de fatores comuns.
+A normalidade integra o modelo fatorial normal da @def-modelo-fatorial-normal e sustenta a estimação por máxima verossimilhança, a distribuição condicional utilizada nos escores por regressão e os resultados inferenciais correspondentes. Ela deve, portanto, ser distinguida das hipóteses que definem o modelo de fatores comuns.
 
 ## Análise Fatorial e Análise de Componentes Principais
 
-A Análise de Componentes Principais e a Análise Fatorial utilizam matrizes de covariâncias ou correlações, mas resolvem problemas estatísticos distintos. Essa diferença pode agora ser formulada matematicamente com maior precisão.
+A Análise de Componentes Principais e a Análise Fatorial utilizam matrizes de covariâncias ou correlações e podem recorrer a decomposições espectrais, mas resolvem problemas estatísticos distintos.
 
 Na ACP,
 
@@ -4471,124 +3823,64 @@ $$
 \boldsymbol{\Sigma}
 =
 \mathbf A
-\mathbf \Lambda
-\mathbf A^{\top},
+\boldsymbol{\Lambda}
+\mathbf A^\top,
 $$
 
-em que
-
-$$
-\mathbf \Lambda
-=
-\operatorname{diag}
-\left(
-\lambda_1,\ldots,\lambda_p
-\right).
-$$
-
-Os autovetores definem as direções principais e os autovalores representam as variâncias das componentes.
+em que as colunas de $\mathbf A$ são os autovetores unitários $\boldsymbol{\alpha}_1,\ldots,\boldsymbol{\alpha}_p$ e os elementos diagonais de $\boldsymbol{\Lambda}$ são os autovalores.
 
 No modelo fatorial ortogonal,
 
 $$
 \boldsymbol{\Sigma}
 =
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi}.
 $$
 
-A matriz $\mathbf L$ contém cargas fatoriais e, em geral, suas colunas não são autovetores de $\boldsymbol{\Sigma}$.
-
-A @tbl-acp-fatorial-formulacao reúne as diferenças estruturais.
+A @tbl-acp-fatorial-formulacao reúne as diferenças principais.
 
 | Aspecto | ACP | Análise Fatorial |
 |---|---|---|
 | Problema | Representar a variabilidade em poucas direções | Representar as covariâncias por fatores latentes |
 | Objeto populacional | $\boldsymbol{\Sigma}$ ou $\boldsymbol{\mathcal R}$ | $\boldsymbol{\Sigma}$ ou $\boldsymbol{\mathcal R}$ |
-| Estrutura matemática | Decomposição espectral | Modelo de covariâncias |
-| Formulação ortogonal | $\boldsymbol{\Sigma}=\mathbf A\mathbf \Lambda \mathbf A^\top$ | $\boldsymbol{\Sigma}=\mathbf L\mathbf L^\top+\boldsymbol{\Psi}$ |
+| Estrutura definidora | Decomposição espectral da matriz analisada | Modelo de fatores comuns |
+| Formulação ortogonal | $\boldsymbol{\Sigma}=\mathbf A\boldsymbol{\Lambda}\mathbf A^\top$ | $\boldsymbol{\Sigma}=\boldsymbol{\Phi}\boldsymbol{\Phi}^\top+\boldsymbol{\Psi}$ |
 | Variabilidade considerada | Variância total | Variância comum separada da específica |
-| Dimensões de menor ordem | Combinações lineares determinadas pelas variáveis observadas | Variáveis latentes especificadas pelo modelo |
-| Diagonal da matriz analisada | Participa integralmente da decomposição | É decomposta entre comunalidade e especificidade |
-| Coeficientes principais | Autovetores | Cargas fatoriais |
-| Não unicidade | Autovetores associados a autovalores simples são determinados até sinal; multiplicidades identificam subespaços | Após fixada a escala dos fatores, permanecem indeterminações de sinal e rotação |
-| Escores | Coordenadas calculadas pela projeção das observações | Estimativas ou predições de valores latentes, dependentes do critério adotado |
-| Normalidade | Não necessária para definir a técnica | Não necessária para o modelo de segunda ordem; integra a formulação normal e a inferência correspondente |
+| Dimensões de menor ordem | Combinações lineares das variáveis observadas | Variáveis latentes |
+| Coeficientes | Autovetores $\boldsymbol{\alpha}_j$ | Cargas fatoriais $\phi_{ij}$ |
+| Escores | Coordenadas obtidas por projeção | Estimativas ou predições dos fatores |
+| Não unicidade | Sinal e, sob multiplicidade, autoespaços | Sinal e rotação após fixada a escala |
+| Normalidade | Não necessária para definir a técnica | Não necessária para o modelo de segunda ordem; necessária para a formulação normal |
 
 : Diferenças matemáticas e estatísticas entre ACP e Análise Fatorial. {#tbl-acp-fatorial-formulacao}
 
-Uma decomposição espectral truncada de $\boldsymbol{\Sigma}$ não resolve, em geral, o problema fatorial.
-
-Na ACP,
+A utilização de autovalores e autovetores nos dois métodos não torna as técnicas equivalentes. Na ACP baseada em correlações, decompõe-se a própria matriz
 
 $$
-\boldsymbol{\Sigma}_k
-=
-\mathbf A_k
-\mathbf D_k
-\mathbf A_k^{\top},
+\mathbf R.
 $$
 
-em que
+No método de fatores principais, a decomposição espectral é aplicada à matriz reduzida
 
 $$
-\mathbf D_k
-=
-\operatorname{diag}
-\left(
-\lambda_1,\ldots,\lambda_k
-\right),
+\mathbf R_{\mathrm{red}},
 $$
 
-é uma aproximação de posto reduzido da matriz de covariâncias inteira.
+cuja diagonal contém comunalidades estimadas. A matriz decomposta e a parcela de variabilidade representada são, portanto, diferentes.
 
-Na Análise Fatorial, o modelo populacional postula
-
-$$
-\boldsymbol{\Sigma}
-=
-\mathbf L
-\mathbf L^{\top}
-+
-\boldsymbol{\Psi}
-$$
-
-no caso ortogonal.
-
-Somente a parcela
+Na ACP, uma aproximação com $k$ componentes atua sobre a variabilidade total. Na Análise Fatorial, apenas a parcela
 
 $$
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 $$
 
-possui posto limitado pelo número de fatores. A matriz diagonal
+representa a estrutura comum, enquanto $\boldsymbol{\Psi}$ permanece explicitamente no modelo como variância específica.
 
-$$
-\boldsymbol{\Psi}
-$$
-
-permanece explicitamente no modelo e representa variabilidade específica.
-
-No ajuste amostral, procura-se então uma estrutura dessa forma que reproduza adequadamente
-
-$$
-\mathbf S
-$$
-
-ou
-
-$$
-\mathbf R,
-$$
-
-segundo o método de estimação escolhido.
-
-Portanto, utilizar uma ACP com o mesmo número de dimensões não equivale a estimar um modelo de fatores comuns. As duas técnicas podem produzir representações de menor dimensão, mas resolvem problemas estatísticos diferentes.
-
-A formulação deste capítulo corresponde à Análise Fatorial Exploratória, na qual a estrutura de cargas apresenta indeterminação rotacional. Modelos fatoriais confirmatórios e modelos de equações estruturais acrescentam restrições previamente especificadas e problemas próprios de identificação e estimação. Essas extensões não serão desenvolvidas aqui.
+A formulação desenvolvida neste capítulo corresponde à Análise Fatorial Exploratória. Modelos fatoriais confirmatórios e modelos de equações estruturais acrescentam restrições previamente especificadas e não serão desenvolvidos neste livro.
 
 ## Síntese
 
@@ -4599,97 +3891,40 @@ $$
 =
 \boldsymbol{\mu}
 +
-\mathbf L
+\boldsymbol{\Phi}
 \boldsymbol{\mathsf F}
 +
 \boldsymbol{\varepsilon},
 $$
 
-com
-
-$$
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf F}
-\right)
-=
-\mathbf I_m,
-\qquad
-\operatorname{Cov}
-\left(
-\boldsymbol{\varepsilon}
-\right)
-=
-\boldsymbol{\Psi},
-\qquad
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf F},
-\boldsymbol{\varepsilon}
-\right)
-=
-\mathbf0,
-$$
-
-o que conduz a
+e
 
 $$
 \boldsymbol{\Sigma}
 =
-\mathbf L
-\mathbf L^{\top}
+\boldsymbol{\Phi}
+\boldsymbol{\Phi}^{\top}
 +
 \boldsymbol{\Psi}.
 $$
 
-A parcela
-
-$$
-\mathbf L
-\mathbf L^{\top}
-$$
-
-representa a covariância comum e possui posto não superior ao número de fatores. A matriz diagonal $\boldsymbol{\Psi}$ reúne as variâncias específicas.
-
-Para cada variável, a variância é decomposta entre comunalidade e especificidade. No modelo ortogonal padronizado,
+A matriz $\boldsymbol{\Phi}\boldsymbol{\Phi}^{\top}$ representa a estrutura comum, enquanto a matriz diagonal $\boldsymbol{\Psi}$ reúne as variâncias específicas. Para variáveis padronizadas,
 
 $$
 h_i^2
 =
-\sum_{j=1}^{m}
-l_{ij}^2,
+\sum_{j=1}^m
+\phi_{ij}^2,
+\qquad
+h_i^2+\psi_i=1.
 $$
 
-e os produtos internos entre os vetores de cargas reproduzem as covariâncias comuns.
+A solução fatorial apresenta indeterminação de sinal e rotação. Rotações ortogonais modificam a orientação das cargas sem alterar a matriz de covariâncias comuns nem as comunalidades.
 
-A escala dos fatores precisa ser fixada para definir as cargas, e a solução permanece sujeita a indeterminações de sinal e rotação. As rotações ortogonais preservam fatores não correlacionados; as oblíquas permitem
+No nível amostral, a adequação da matriz de correlações pode ser examinada por meio da matriz anti-imagem, das medidas MSA e KMO e do teste de esfericidade de Bartlett. A estimação pode seguir diferentes critérios. O método de fatores principais utiliza a decomposição espectral de uma matriz reduzida; mínimos quadrados minimiza a discrepância entre a matriz observada e a reproduzida; sob normalidade multivariada, a máxima verossimilhança fornece uma formulação probabilística e permite avaliar o ajuste global do modelo.
 
-$$
-\boldsymbol{\Phi}
-\neq
-\mathbf I_m
-$$
+Os fatores permanecem latentes após o ajuste. Os escores fatoriais são estimativas ou predições associadas às unidades observacionais e dependem do critério utilizado.
 
-e conduzem à estrutura
+A ACP e a Análise Fatorial podem utilizar os mesmos fundamentos de álgebra linear, mas representam parcelas diferentes da variabilidade. A ACP atua sobre a variabilidade total, enquanto a Análise Fatorial separa estrutura comum e variabilidade específica.
 
-$$
-\boldsymbol{\Sigma}
-=
-\mathbf L
-\boldsymbol{\Phi}
-\mathbf L^{\top}
-+
-\boldsymbol{\Psi}.
-$$
-
-Nesse caso, matriz de padrões, matriz de estrutura e matriz de correlações fatoriais representam objetos distintos.
-
-No nível amostral, diferentes critérios podem ser utilizados para estimar uma estrutura fatorial compatível com a matriz de covariâncias ou correlações observada. Fatores principais e mínimos quadrados formulam o problema a partir da reprodução da estrutura de segunda ordem. Sob normalidade multivariada, a máxima verossimilhança acrescenta uma formulação probabilística e inferencial.
-
-Os fatores são variáveis latentes. Os escores fatoriais são estimativas ou predições de suas posições e dependem do critério utilizado; não correspondem a coordenadas observadas diretamente.
-
-A diferença em relação à ACP decorre do problema formulado. A ACP decompõe a variabilidade total em direções principais. A Análise Fatorial modela a matriz de covariâncias separando variabilidade comum e específica por meio de variáveis latentes.
-
-O capítulo integra transformações lineares, posto, matrizes de covariâncias, identificação, normal multivariada, estimação e distribuições condicionais na formulação de um modelo de estrutura latente.
-
-No próximo capítulo, o objeto deixa de ser a covariância entre variáveis. A Análise de Agrupamentos organizará observações em grupos a partir de medidas de proximidade e critérios de homogeneidade, sem classes previamente conhecidas.
+No próximo capítulo, o objeto passa das relações entre variáveis para as relações entre observações. A Análise de Agrupamentos utilizará medidas de proximidade e critérios de homogeneidade para construir grupos sem classes previamente conhecidas.
