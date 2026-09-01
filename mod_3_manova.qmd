@@ -2,43 +2,21 @@
 
 A Análise de Variância Multivariada, MANOVA, testa hipóteses sobre funções estimáveis dos parâmetros de um modelo linear com várias respostas. O problema inclui comparações de vetores de médias associados a grupos, tratamentos, fatores, covariáveis ou outros termos representados no delineamento.
 
-O modelo linear multivariado, definido em @def-modelo-linear-multivariado, é
+O modelo linear multivariado definido em @def-modelo-linear-multivariado é
 
 $$
 \boldsymbol{\mathcal Y}
 =
 \mathbf Z\mathbf B
 +
-\boldsymbol{\mathcal E},
+\boldsymbol{\mathcal E}.
 $$
 
-com
+Neste capítulo, essa estrutura será utilizada sem reconstruir a teoria do modelo linear desenvolvida no Módulo 2. A MANOVA compara a variação multivariada atribuída a uma hipótese com a variação residual, representadas pelas matrizes $\mathbf H$ e $\mathbf E$.
 
-$$
-\boldsymbol{\mathcal Y}
-\in
-\mathbb R^{n\times p},
-\qquad
-\mathbf Z
-\in
-\mathbb R^{n\times q},
-\qquad
-\mathbf B
-\in
-\mathbb R^{q\times p}
-$$
+Essa comparação conduz a um problema de autovalores generalizados. Suas raízes características são agregadas pelos critérios de Wilks, Pillai, Hotelling--Lawley e Roy [@anderson2003; @rencher2012].
 
-e
-
-$$
-\boldsymbol{\mathcal E}
-\in
-\mathbb R^{n\times p}.
-$$
-
-A MANOVA utiliza esse modelo para comparar a variação atribuída a uma hipótese com a variação residual conjunta. Essa construção produz as matrizes de hipótese e erro e conduz a um problema de autovalores generalizados. Os critérios de Wilks, Pillai, Hotelling--Lawley e Roy são funções das raízes obtidas desse mesmo problema [@anderson2003; @rencher2012].
-
-O capítulo desenvolve essa formulação e distingue sua estrutura algébrica e geométrica da teoria probabilística utilizada na inferência clássica. Algoritmos, diagnósticos, procedimentos posteriores à rejeição da hipótese e extensões serão tratados posteriormente.
+O desenvolvimento será concentrado na construção das matrizes de hipótese e erro, na formulação espectral e na interpretação dos quatro critérios. A base probabilística necessária à inferência clássica será retomada apenas na extensão necessária.
 
 Os elementos da formulação são resumidos na @tbl-estrutura-manova.
 
@@ -51,7 +29,7 @@ Os elementos da formulação são resumidos na @tbl-estrutura-manova.
 | variação atribuída à hipótese | $\mathbf H$ | mede o afastamento observado em relação a $H_0$ |
 | variação residual | $\mathbf E$ | mede a variabilidade conjunta não explicada pelo modelo |
 | comparação direcional | $\mathbf a^\top\mathbf H\mathbf a/\mathbf a^\top\mathbf E\mathbf a$ | compara hipótese e erro para uma combinação das respostas |
-| solução espectral | raízes características | resume as direções de maior efeito relativo |
+| solução espectral | raízes e direções características | identifica direções extremas e quantifica o efeito relativo |
 | critérios de teste | Wilks, Pillai, Hotelling--Lawley e Roy | agregam as mesmas raízes de formas distintas |
 
 : Elementos da formulação da MANOVA. {#tbl-estrutura-manova}
@@ -125,13 +103,9 @@ Por isso, o problema não é equivalente a realizar $p$ análises de variância 
 
 ## A hipótese no modelo linear multivariado
 
-O caso de grupos é uma aplicação do modelo linear multivariado, e não uma formulação separada. Indicadores de grupos, tratamentos, fatores e covariáveis podem ser incorporados à matriz
+O problema de comparação entre grupos é uma aplicação do modelo linear multivariado. Indicadores de grupos, tratamentos, fatores e covariáveis são incorporados à matriz de delineamento $\mathbf Z$.
 
-$$
-\mathbf Z.
-$$
-
-No Módulo 2, a hipótese linear geral foi definida em @def-hipotese-linear-geral-multivariada como
+A hipótese linear geral foi definida em @def-hipotese-linear-geral-multivariada como
 
 $$
 H_0:
@@ -139,46 +113,18 @@ H_0:
 \mathbf B
 \mathbf C_2
 =
-\boldsymbol{\Theta}_0,
+\boldsymbol{\Theta}_0.
 $$ {#eq-hipotese-geral-manova}
 
-com
-
-$$
-\mathbf C_1
-\in
-\mathbb R^{g\times q},
-\qquad
-\mathbf C_2
-\in
-\mathbb R^{p\times s}
-$$
-
-e
-
-$$
-\boldsymbol{\Theta}_0
-\in
-\mathbb R^{g\times s}.
-$$
-
-A matriz $\mathbf C_1$ combina ou contrasta os termos do modelo, enquanto $\mathbf C_2$ seleciona ou combina as respostas.
-
-Para testar efeitos sobre todas as $p$ respostas originais, toma-se
+Na MANOVA formulada para as $p$ respostas originais,
 
 $$
 \mathbf C_2
 =
-\mathbf I_p.
+\mathbf I_p,
 $$
 
-Nesse caso,
-
-$$
-s=p
-$$
-
-na notação da hipótese bilateral do Módulo 2, e a hipótese torna-se
+e a hipótese torna-se
 
 $$
 H_0:
@@ -188,7 +134,7 @@ H_0:
 \boldsymbol{\Theta}_0,
 $$ {#eq-hipotese-manova-respostas-originais}
 
-em que
+com
 
 $$
 \mathbf C_1
@@ -204,9 +150,7 @@ $$
 \mathbb R^{g\times p}.
 $$
 
-Essa será a formulação utilizada no restante deste capítulo.
-
-Consideraremos $\mathbf C_1$ sem linhas redundantes,
+A matriz $\mathbf C_1$ reúne os contrastes ou combinações dos parâmetros que definem o efeito testado. Consideraremos suas linhas linearmente independentes,
 
 $$
 \operatorname{posto}
@@ -217,13 +161,7 @@ $$
 g,
 $$ {#eq-posto-contrastes-manova}
 
-e a função
-
-$$
-\mathbf C_1\mathbf B
-$$
-
-estimável. Pela condição matricial de estimabilidade estabelecida em @eq-condicao-matricial-estimabilidade,
+e a função $\mathbf C_1\mathbf B$ estimável. Pela condição de @eq-condicao-matricial-estimabilidade,
 
 $$
 \mathbf C_1
@@ -233,7 +171,7 @@ $$
 \mathbf Z.
 $$ {#eq-estimabilidade-hipotese-manova}
 
-Nessas condições, os graus de liberdade associados à hipótese são
+Nessas condições, os graus de liberdade da hipótese são
 
 $$
 \nu_H
@@ -241,43 +179,27 @@ $$
 g.
 $$ {#eq-gl-hipotese-manova}
 
-No problema de comparação entre $K$ grupos, uma matriz $\mathbf C_1$ apropriada pode representar os contrastes necessários para expressar @eq-hipotese-medias-grupos-manova. Quando se testa o efeito completo de grupos, existem
-
-$$
-G-1
-$$
-
-contrastes linearmente independentes e, portanto,
+Para o efeito completo de $K$ grupos,
 
 $$
 g
 =
-G-1.
+K-1.
 $$ {#eq-gl-hipotese-grupos-manova}
 
-A hipótese de igualdade de vetores de médias é, assim, um caso particular da hipótese linear geral já construída no Módulo 2.
+Assim, a hipótese de igualdade dos vetores de médias em @eq-hipotese-medias-grupos-manova é um caso particular da hipótese linear geral já construída no Módulo 2.
 
 ### Matrizes de hipótese e erro
 
-A SQPC associada à hipótese foi definida em @def-sscp-hipotese-linear. Especializando aquela construção para
-
-$$
-\mathbf C_2
-=
-\mathbf I_p,
-$$
-
-denote por
+A SQPC associada à hipótese foi definida em @def-sscp-hipotese-linear. Para a hipótese em @eq-hipotese-manova-respostas-originais, denote-a por
 
 $$
 \mathbf H
 \in
-\mathbb R^{p\times p}
+\mathbb R^{p\times p},
 $$
 
-a SQPC observada da hipótese em @eq-hipotese-manova-respostas-originais.
-
-Sob as condições de estimabilidade anteriores,
+com
 
 $$
 \mathbf H
@@ -287,28 +209,20 @@ $$
 \mathbf0.
 $$
 
-A matriz $\mathbf H$ reúne a variação associada ao afastamento observado de
+A matriz $\mathbf H$ representa a variação multivariada associada ao afastamento observado da hipótese. Seus elementos diagonais correspondem às parcelas das respostas individuais, enquanto os elementos fora da diagonal registram produtos cruzados entre esses afastamentos.
 
-$$
-\mathbf C_1\mathbf B
-=
-\boldsymbol{\Theta}_0.
-$$
-
-Sua diagonal contém as parcelas correspondentes às respostas individuais, enquanto seus elementos fora da diagonal contêm os produtos cruzados associados aos afastamentos entre respostas.
-
-A SQPC residual foi definida em @def-sscp-residual-modelo-multivariado. Após a observação,
+A SQPC residual definida em @def-sscp-residual-modelo-multivariado é
 
 $$
 \mathbf E
 =
-\widehat{\mathbf U}^\top
+\widehat{\mathbf U}^{\top}
 \widehat{\mathbf U}
 \in
-\mathbb R^{p\times p}.
+\mathbb R^{p\times p},
 $$
 
-Ela satisfaz
+com
 
 $$
 \mathbf E
@@ -318,11 +232,9 @@ $$
 \mathbf0.
 $$
 
-A matriz $\mathbf E$ reúne a variabilidade residual das respostas e suas covariâncias residuais na escala de somas de quadrados e produtos cruzados.
+Ela representa a variação residual conjunta utilizada como referência para avaliar o efeito.
 
-No caso de um fator com grupos, $\mathbf H$ e $\mathbf E$ correspondem às estruturas multivariadas análogas às somas de quadrados entre grupos e dentro dos grupos. Essa relação já foi construída no modelo linear multivariado; aqui, essas matrizes passam a constituir os dois objetos comparados pela MANOVA.
-
-A @tbl-interpretacao-he-manova distingue suas funções.
+A @tbl-interpretacao-he-manova resume essas funções.
 
 | Matriz | Origem | Interpretação |
 |---|---|---|
@@ -339,21 +251,9 @@ $$
 \mathbf0,
 $$
 
-não existe afastamento observado da hipótese nas funções paramétricas consideradas.
+não há afastamento observado da hipótese nas funções paramétricas consideradas. Quando $\mathbf H\neq\mathbf0$, sua magnitude deve ser interpretada relativamente à estrutura residual representada por $\mathbf E$.
 
-Entretanto, a magnitude de $\mathbf H$ isoladamente não determina a relevância desse afastamento. Uma mesma variação associada à hipótese possui significado diferente quando a variabilidade residual é pequena ou grande.
-
-A MANOVA compara, portanto, a estrutura de
-
-$$
-\mathbf H
-$$
-
-com a estrutura de
-
-$$
-\mathbf E.
-$$
+A formulação da MANOVA consiste, portanto, em comparar essas duas estruturas matriciais.
 
 ## Hipótese e erro em uma combinação linear das respostas
 
@@ -447,15 +347,13 @@ $$
 }.
 $$ {#eq-razao-hipotese-erro-manova}
 
-A expressão em @eq-razao-hipotese-erro-manova é exatamente o quociente de Rayleigh generalizado definido em @def-quociente-rayleigh-generalizado, aplicado ao par
+A expressão em @eq-razao-hipotese-erro-manova é o quociente de Rayleigh generalizado definido em @def-quociente-rayleigh-generalizado, aplicado ao par
 
 $$
 (\mathbf H,\mathbf E).
 $$
 
-Essa identificação é o ponto em que a estrutura estatística da MANOVA encontra o problema espectral desenvolvido no Módulo 1.
-
-A teoria geral não precisa ser reconstruída: as matrizes $\mathbf H$ e $\mathbf E$ fornecem, respectivamente, as formas quadráticas do numerador e do denominador.
+As matrizes $\mathbf H$ e $\mathbf E$ fornecem, respectivamente, as formas quadráticas associadas à hipótese e ao erro.
 
 A razão é invariante à escala de $\mathbf a$. Para qualquer
 
@@ -477,9 +375,7 @@ Uma direção apresenta grande razão hipótese/erro quando a combinação corre
 
 ## Problema espectral da MANOVA
 
-O problema passa a ser identificar as direções nas quais @eq-razao-hipotese-erro-manova assume seus valores extremos.
-
-Pelo resultado de @thm-extremos-rayleigh-generalizado, aplicado ao par simétrico
+O problema consiste em identificar as direções nas quais a razão em @eq-razao-hipotese-erro-manova assume seus valores extremos. Pelo resultado de @thm-extremos-rayleigh-generalizado, aplicado ao par simétrico
 
 $$
 (\mathbf H,\mathbf E),
@@ -488,14 +384,16 @@ $$
 com
 
 $$
-\mathbf H\succeq\mathbf0
-\qquad
-\text{e}
-\qquad
-\mathbf E\succ\mathbf0,
+\mathbf H
+\succeq
+\mathbf0
+\qquad\text{e}\qquad
+\mathbf E
+\succ
+\mathbf0,
 $$
 
-os extremos do problema
+os extremos de
 
 $$
 \max_{\mathbf a\neq\mathbf0}
@@ -510,7 +408,7 @@ $$
 }
 $$ {#eq-maximizacao-manova}
 
-são determinados pelos autovalores generalizados que satisfazem
+são determinados pelo problema
 
 $$
 \mathbf H
@@ -521,7 +419,7 @@ $$
 \mathbf a.
 $$ {#eq-autovalor-generalizado-manova}
 
-Essa é precisamente a estrutura definida em @def-autovalor-generalizado.
+Essa é a estrutura de autovalor generalizado definida em @def-autovalor-generalizado.
 
 ::: {#def-raizes-caracteristicas-manova}
 ## Raízes características da MANOVA
@@ -534,7 +432,7 @@ $$
 \mathbb R^{p\times p}
 $$
 
-matrizes simétricas tais que
+simétricas, com
 
 $$
 \mathbf H
@@ -564,31 +462,25 @@ $$
 0
 $$
 
-do par
+do par $(\mathbf H,\mathbf E)$. Como $\mathbf E\succ\mathbf0$, os autovetores generalizados associados podem ser escolhidos com a normalização
 
 $$
-(\mathbf H,\mathbf E),
+\boldsymbol{\alpha}_j^\top
+\mathbf E
+\boldsymbol{\alpha}_j
+=
+1.
 $$
 
-isto é, os valores para os quais existe
-
-$$
-\mathbf a_j
-\in
-\mathbb R^p,
-\qquad
-\mathbf a_j\neq\mathbf0,
-$$
-
-satisfazendo
+Com essa convenção,
 
 $$
 \mathbf H
-\mathbf a_j
+\boldsymbol{\alpha}_j
 =
 \lambda_j
 \mathbf E
-\mathbf a_j.
+\boldsymbol{\alpha}_j.
 $$
 
 Se
@@ -602,112 +494,10 @@ r_H
 \right),
 $$
 
-então exatamente $r_H$ raízes são positivas:
-
-$$
-\lambda_1
-\geq
-\cdots
-\geq
-\lambda_{r_H}
->
-0
-=
-\lambda_{r_H+1}
-=
-\cdots
-=
-\lambda_p,
-$$
-
-quando
-
-$$
-r_H<p.
-$$
+então exatamente $r_H$ raízes são positivas.
 :::
 
-A afirmação sobre o número de raízes positivas pode ser vista diretamente pela redução do problema generalizado a um problema espectral simétrico.
-
-Defina
-
-$$
-\mathbf K_{\mathrm{HE}}
-=
-\mathbf E^{-1/2}
-\mathbf H
-\mathbf E^{-1/2}.
-$$
-
-Como
-
-$$
-\mathbf E^{-1/2}
-$$
-
-é invertível,
-
-$$
-\operatorname{posto}
-\left(
-\mathbf K_{\mathrm{HE}}
-\right)
-=
-\operatorname{posto}
-\left(
-\mathbf H
-\right)
-=
-r_H.
-$$
-
-Além disso,
-
-$$
-\mathbf K_{\mathrm{HE}}
-\succeq
-\mathbf0.
-$$
-
-Logo, $\mathbf K_{\mathrm{HE}}$ possui exatamente $r_H$ autovalores positivos, e esses autovalores são as raízes generalizadas do par
-
-$$
-(\mathbf H,\mathbf E).
-$$
-
-Consequentemente,
-
-$$
-r_H
-=
-\operatorname{posto}
-\left(
-\mathbf H
-\right)
-\leq
-p.
-$$ {#eq-numero-raizes-manova}
-
-Para a hipótese
-
-$$
-\mathbf C_1\mathbf B
-=
-\boldsymbol{\Theta}_0,
-$$
-
-com
-
-$$
-\operatorname{posto}
-\left(
-\mathbf C_1
-\right)
-=
-g,
-$$
-
-a construção de $\mathbf H$ em @def-sscp-hipotese-linear implica
+Como a matriz de hipótese associada a uma função de posto $g$ satisfaz
 
 $$
 \operatorname{posto}
@@ -715,10 +505,10 @@ $$
 \mathbf H
 \right)
 \leq
-\min(p,g).
+\min(p,g),
 $$
 
-Portanto,
+tem-se
 
 $$
 r_H
@@ -726,7 +516,7 @@ r_H
 \min(p,g).
 $$ {#eq-numero-raizes-hipotese-manova}
 
-No caso do efeito completo de $K$ grupos,
+No efeito completo de $K$ grupos,
 
 $$
 g
@@ -734,7 +524,7 @@ g
 K-1,
 $$
 
-e
+logo
 
 $$
 r_H
@@ -742,53 +532,25 @@ r_H
 \min
 \left(
 p,
-G-1
+K-1
 \right).
 $$ {#eq-numero-raizes-grupos-manova}
 
-Assim, mesmo quando existem muitas respostas, o número de direções não nulas em que um efeito de grupos pode aparecer é limitado pelo número de contrastes independentes da hipótese.
+Assim, o número de direções nas quais um efeito pode aparecer é limitado simultaneamente pelo número de respostas e pelo número de contrastes independentes da hipótese.
 
-A maior raiz,
-
-$$
-\lambda_1,
-$$
-
-é o maior valor possível do quociente em @eq-razao-hipotese-erro-manova.
-
-Pela propriedade estabelecida em @prp-ortogonalidade-autovetores-generalizados, os autovetores generalizados podem ser escolhidos de modo que
+Os autovetores generalizados podem ser escolhidos ortonormais segundo o produto interno induzido por $\mathbf E$:
 
 $$
-\mathbf a_j^\top
+\boldsymbol{\alpha}_j^\top
 \mathbf E
-\mathbf a_\ell
+\boldsymbol{\alpha}_\ell
 =
 \delta_{j\ell}.
 $$ {#eq-ortogonalidade-direcoes-manova}
 
-Em particular,
+As direções características não precisam, portanto, ser ortogonais na geometria euclidiana original das respostas.
 
-$$
-\mathbf a_j^\top
-\mathbf E
-\mathbf a_\ell
-=
-0,
-\qquad
-j\neq\ell.
-$$
-
-As direções características não precisam ser ortogonais na geometria euclidiana usual. Elas podem ser escolhidas ortonormais segundo o produto interno induzido por
-
-$$
-\mathbf E.
-$$
-
-As raízes subsequentes descrevem, nessa geometria residual, direções adicionais de comparação entre hipótese e erro.
-
-### Padronização pela dispersão residual
-
-A relação com a geometria euclidiana torna-se explícita ao transformar o problema pela matriz de erro.
+### Padronização pela dispersão residual e interpretação geométrica
 
 Como
 
@@ -798,7 +560,7 @@ $$
 \mathbf0,
 $$
 
-sua raiz quadrada principal e sua inversa existem por @def-raiz-quadrada-principal.
+a raiz quadrada principal de $\mathbf E$ e sua inversa existem por @def-raiz-quadrada-principal.
 
 Defina
 
@@ -815,42 +577,23 @@ $$
 \mathbf a
 =
 \mathbf E^{-1/2}
-\mathbf z.
+\mathbf z,
 $$
 
-Substituindo em
+e o problema generalizado transforma-se em
 
 $$
-\mathbf H
-\mathbf a
-=
-\lambda
-\mathbf E
-\mathbf a
-$$
-
-e multiplicando à esquerda por
-
-$$
-\mathbf E^{-1/2},
-$$
-
-obtém-se
-
-$$
-\mathbf E^{-1/2}
-\mathbf H
-\mathbf E^{-1/2}
+\mathbf M_{\mathrm{HE}}
 \mathbf z
 =
 \lambda
-\mathbf z.
+\mathbf z,
 $$ {#eq-problema-simetrico-manova}
 
-Defina
+em que
 
 $$
-\mathbf K_{\mathrm{HE}}
+\mathbf M_{\mathrm{HE}}
 =
 \mathbf E^{-1/2}
 \mathbf H
@@ -859,52 +602,35 @@ $$
 \mathbb R^{p\times p}.
 $$ {#eq-matriz-hipotese-padronizada-manova}
 
-Como
+Como $\mathbf H\succeq\mathbf0$,
 
 $$
-\mathbf H
+\mathbf M_{\mathrm{HE}}
 =
-\mathbf H^\top
-\succeq
-\mathbf0,
-$$
-
-e
-
-$$
-\mathbf E^{-1/2}
-$$
-
-é simétrica,
-
-$$
-\mathbf K_{\mathrm{HE}}
-=
-\mathbf K_{\mathrm{HE}}^\top
+\mathbf M_{\mathrm{HE}}^\top
 \succeq
 \mathbf0.
 $$
 
-O problema generalizado da MANOVA é, portanto, equivalente ao problema espectral ordinário
+Além disso,
 
 $$
-\mathbf K_{\mathrm{HE}}
-\mathbf z
+\operatorname{posto}
+\left(
+\mathbf M_{\mathrm{HE}}
+\right)
 =
-\lambda
-\mathbf z.
-$$
-
-Se
-
-$$
-\mathbf a
+\operatorname{posto}
+\left(
+\mathbf H
+\right)
 =
-\mathbf E^{-1/2}
-\mathbf z,
+r_H,
 $$
 
-então
+de modo que seus $r_H$ autovalores positivos são exatamente as raízes positivas da MANOVA.
+
+A transformação também produz
 
 $$
 \mathbf a^\top
@@ -923,11 +649,11 @@ $$
 \mathbf a
 =
 \mathbf z^\top
-\mathbf K_{\mathrm{HE}}
+\mathbf M_{\mathrm{HE}}
 \mathbf z.
 $$
 
-Logo,
+Portanto,
 
 $$
 \mathcal R_{\mathbf H,\mathbf E}
@@ -935,7 +661,7 @@ $$
 =
 \frac{
 \mathbf z^\top
-\mathbf K_{\mathrm{HE}}
+\mathbf M_{\mathrm{HE}}
 \mathbf z
 }{
 \mathbf z^\top
@@ -943,49 +669,35 @@ $$
 }.
 $$ {#eq-rayleigh-padronizado-manova}
 
-A transformação por
+A transformação pela matriz de erro converte a geometria residual em uma geometria euclidiana. Nesse sistema, $\mathbf M_{\mathrm{HE}}$ representa a magnitude da hipótese relativamente à dispersão residual.
+
+Se uma direção característica for normalizada por
 
 $$
-\mathbf E^{-1/2}
+\boldsymbol{\alpha}_j^\top
+\mathbf E
+\boldsymbol{\alpha}_j
+=
+1,
 $$
 
-converte, assim, a geometria definida pela variação residual em uma geometria euclidiana.
-
-Nesse sistema de coordenadas, a matriz de erro é normalizada e
+então
 
 $$
-\mathbf K_{\mathrm{HE}}
-$$
-
-representa a magnitude da hipótese relativamente à estrutura residual.
-
-As raízes
-
-$$
-\lambda_1,\ldots,\lambda_{r_H}
-$$
-
-são os autovalores positivos dessa matriz e quantificam as intensidades da hipótese nas direções espectrais do espaço residual padronizado.
-
-Essa construção explica por que a MANOVA não pode ser reduzida à comparação isolada dos elementos diagonais de
-
-$$
+\boldsymbol{\alpha}_j^\top
 \mathbf H
-$$
+\boldsymbol{\alpha}_j
+=
+\lambda_j.
+$$ {#eq-interpretacao-raiz-direcao-manova}
 
-e
+Cada raiz $\lambda_j$ representa, assim, a razão hipótese/erro na respectiva direção característica normalizada. As raízes ordenam as direções segundo a intensidade do efeito relativamente à estrutura residual.
 
-$$
-\mathbf E.
-$$
-
-As direções relevantes dependem da estrutura completa das duas matrizes, incluindo seus produtos cruzados.
-
-A hipótese matricial é, desse modo, convertida em uma coleção ordenada de razões hipótese/erro. Os quatro critérios clássicos da MANOVA serão construídos a partir dessa mesma coleção de raízes.
+A hipótese matricial é, desse modo, convertida em uma coleção ordenada de razões hipótese/erro. Os quatro critérios clássicos da MANOVA agregam essa mesma coleção de formas distintas.
 
 ## Critérios multivariados
 
-As raízes características
+Considere as raízes características
 
 $$
 \lambda_1
@@ -999,7 +711,17 @@ $$
 0
 $$
 
-resumem a comparação entre a variação atribuída à hipótese e a variação residual nas diferentes direções do espaço das respostas.
+do par $(\mathbf H,\mathbf E)$ definido em @def-raizes-caracteristicas-manova, sob
+
+$$
+\mathbf H
+\succeq
+\mathbf0
+\qquad\text{e}\qquad
+\mathbf E
+\succ
+\mathbf0.
+$$
 
 Se
 
@@ -1012,23 +734,15 @@ r_H
 \right),
 $$
 
-então apenas
+apenas
 
 $$
 \lambda_1,\ldots,\lambda_{r_H}
 $$
 
-são positivas, quando
+são positivas, quando $r_H>0$.
 
-$$
-r_H>0,
-$$
-
-e as demais são nulas.
-
-A hipótese multivariada não é avaliada testando separadamente cada raiz. Os critérios clássicos agregam a coleção de raízes em uma única estatística global.
-
-Para facilitar algumas dessas representações, defina as raízes transformadas
+Os quatro critérios clássicos da MANOVA agregam essa mesma coleção de raízes em uma estatística global. Para algumas representações, é útil definir
 
 $$
 \theta_j
@@ -1042,230 +756,22 @@ $$
 j=1,\ldots,p.
 $$ {#eq-raizes-transformadas-manova}
 
-Como
-
-$$
-\lambda_j
-\geq
-0,
-$$
-
-tem-se
+Como $\lambda_j\geq0$,
 
 $$
 0
 \leq
 \theta_j
 <
-1.
+1,
 $$
 
-A transformação
+e a transformação preserva a ordenação das raízes.
 
-$$
-\lambda
-\longmapsto
-\frac{\lambda}{1+\lambda}
-$$
-
-é estritamente crescente em
-
-$$
-[0,\infty),
-$$
-
-de modo que as raízes $\lambda_j$ e $\theta_j$ preservam a mesma ordenação. A transformação apenas coloca cada razão hipótese/erro em uma escala limitada.
-
-### Forma determinantal
-
-Considere
-
-$$
-\mathbf H,\mathbf E
-\in
-\mathbb R^{p\times p},
-$$
-
-com
-
-$$
-\mathbf H
-\succeq
-\mathbf0
-$$
-
-e
-
-$$
-\mathbf E
-\succ
-\mathbf0.
-$$
-
-A matriz
-
-$$
-\mathbf E+\mathbf H
-$$
-
-também é positiva definida e, portanto, possui determinante positivo.
-
-A razão
-
-$$
-\Lambda_{\mathrm W}
-=
-\frac{
-|\mathbf E|
-}{
-|\mathbf E+\mathbf H|
-}
-$$ {#eq-lambda-wilks-manova}
-
-compara, por meio de seus determinantes, a dispersão residual multivariada do modelo irrestrito com a do modelo sujeito às restrições da hipótese.
-
-
-Como
-
-$$
-\begin{aligned}
-|\mathbf E+\mathbf H|
-&=
-\left|
-\mathbf E
-\left(
-\mathbf I_p
-+
-\mathbf E^{-1}\mathbf H
-\right)
-\right|
-\\
-&=
-|\mathbf E|
-\left|
-\mathbf I_p
-+
-\mathbf E^{-1}\mathbf H
-\right|,
-\end{aligned}
-$$
-
-segue que
-
-$$
-\Lambda_{\mathrm W}
-=
-\frac{1}{
-\left|
-\mathbf I_p
-+
-\mathbf E^{-1}\mathbf H
-\right|
-}.
-$$
-
-Os autovalores de
-
-$$
-\mathbf E^{-1}\mathbf H
-$$
-
-são as raízes características
-
-$$
-\lambda_1,\ldots,\lambda_p.
-$$
-
-Logo,
-
-$$
-\left|
-\mathbf I_p
-+
-\mathbf E^{-1}\mathbf H
-\right|
-=
-\prod_{j=1}^{p}
-\left(
-1+\lambda_j
-\right),
-$$
-
-e
-
-$$
-\Lambda_{\mathrm W}
-=
-\prod_{j=1}^{p}
-\frac{1}{
-1+\lambda_j
-}.
-$$ {#eq-lambda-wilks-raizes-manova}
-
-As raízes nulas não modificam o produto. Assim, quando
-
-$$
-r_H>0,
-$$
-
-a expressão também pode ser escrita como
-
-$$
-\Lambda_{\mathrm W}
-=
-\prod_{j=1}^{r_H}
-\frac{1}{
-1+\lambda_j
-}.
-$$
-
-Em termos de @eq-raizes-transformadas-manova,
-
-$$
-\Lambda_{\mathrm W}
-=
-\prod_{j=1}^{p}
-\left(
-1-\theta_j
-\right).
-$$ {#eq-lambda-wilks-theta-manova}
+### Lambda de Wilks
 
 ::: {#def-lambda-wilks-manova}
 ## Lambda de Wilks
-
-Sejam
-
-$$
-\mathbf H,\mathbf E
-\in
-\mathbb R^{p\times p}
-$$
-
-matrizes simétricas tais que
-
-$$
-\mathbf H
-\succeq
-\mathbf0
-\qquad
-\text{e}
-\qquad
-\mathbf E
-\succ
-\mathbf0,
-$$
-
-e sejam
-
-$$
-\lambda_1,\ldots,\lambda_p
-$$
-
-as raízes características do par
-
-$$
-(\mathbf H,\mathbf E).
-$$
 
 A **lambda de Wilks** é
 
@@ -1282,9 +788,43 @@ $$
 \frac{1}{
 1+\lambda_j
 }.
+$$ {#eq-lambda-wilks-manova}
+:::
+
+De fato,
+
+$$
+\begin{aligned}
+|\mathbf E+\mathbf H|
+&=
+|\mathbf E|
+\left|
+\mathbf I_p+\mathbf E^{-1}\mathbf H
+\right|
+\\
+&=
+|\mathbf E|
+\prod_{j=1}^{p}
+\left(
+1+\lambda_j
+\right),
+\end{aligned}
 $$
 
-Ela satisfaz
+o que produz a representação pelas raízes.
+
+Em termos de @eq-raizes-transformadas-manova,
+
+$$
+\Lambda_{\mathrm W}
+=
+\prod_{j=1}^{p}
+\left(
+1-\theta_j
+\right).
+$$ {#eq-lambda-wilks-theta-manova}
+
+A lambda de Wilks satisfaz
 
 $$
 0
@@ -1294,7 +834,7 @@ $$
 1,
 $$
 
-e
+com
 
 $$
 \Lambda_{\mathrm W}=1
@@ -1305,76 +845,13 @@ se, e somente se,
 $$
 \mathbf H=\mathbf0.
 $$
-:::
 
-Quanto maiores forem as raízes, menores serão os fatores
+Valores menores correspondem a maior afastamento relativo entre hipótese e erro. Sua ligação com a razão de verossimilhanças será retomada na base probabilística [@wilks1932].
 
-$$
-\frac1{1+\lambda_j}.
-$$
-
-Por isso, valores menores de
-
-$$
-\Lambda_{\mathrm W}
-$$
-
-correspondem a maior afastamento relativo entre hipótese e erro.
-
-A estrutura multiplicativa faz com que todas as raízes contribuam para o critério. Uma única raiz elevada pode reduzir substancialmente o produto, mas várias raízes moderadas também podem produzir uma lambda pequena.
-
-A ligação da lambda de Wilks com a razão de verossimilhanças será retomada após a apresentação dos quatro critérios.
-
-### Agregação das raízes transformadas
-
-Outra forma de resumir as raízes utiliza as quantidades transformadas
-
-$$
-\theta_j
-=
-\frac{
-\lambda_j
-}{
-1+\lambda_j
-}.
-$$
+### Traço de Pillai
 
 ::: {#def-traco-pillai-manova}
 ## Traço de Pillai
-
-Sejam
-
-$$
-\mathbf H,\mathbf E
-\in
-\mathbb R^{p\times p}
-$$
-
-matrizes simétricas tais que
-
-$$
-\mathbf H
-\succeq
-\mathbf0
-\qquad
-\text{e}
-\qquad
-\mathbf E
-\succ
-\mathbf0,
-$$
-
-e sejam
-
-$$
-\lambda_1,\ldots,\lambda_p
-$$
-
-as raízes características do par
-
-$$
-(\mathbf H,\mathbf E).
-$$
 
 O **traço de Pillai** é
 
@@ -1407,76 +884,12 @@ V
 \theta_j.
 $$
 
-Se
+Cada raiz contribui por uma quantidade limitada ao intervalo $[0,1)$, de modo que raízes muito elevadas não produzem contribuições ilimitadas ao critério [@pillai1955].
 
-$$
-\mathbf H=\mathbf0,
-$$
-
-todas as raízes são nulas e
-
-$$
-V=0.
-$$
-
-Para cada dimensão,
-
-$$
-0
-\leq
-\frac{
-\lambda_j
-}{
-1+\lambda_j
-}
-<
-1.
-$$
-
-Assim, uma raiz que cresce indefinidamente produz uma contribuição que se aproxima de $1$, em vez de crescer sem limite.
-
-O critério agrega aditivamente as razões hipótese/erro após essa transformação limitada [@pillai1955].
-
-### Soma das raízes características
-
-O traço de Hotelling--Lawley utiliza diretamente as raízes características, sem transformá-las para uma escala limitada.
+### Traço de Hotelling--Lawley
 
 ::: {#def-traco-hotelling-lawley-manova}
 ## Traço de Hotelling--Lawley
-
-Sejam
-
-$$
-\mathbf H,\mathbf E
-\in
-\mathbb R^{p\times p}
-$$
-
-matrizes simétricas tais que
-
-$$
-\mathbf H
-\succeq
-\mathbf0
-\qquad
-\text{e}
-\qquad
-\mathbf E
-\succ
-\mathbf0,
-$$
-
-e sejam
-
-$$
-\lambda_1,\ldots,\lambda_p
-$$
-
-as raízes características do par
-
-$$
-(\mathbf H,\mathbf E).
-$$
 
 O **traço de Hotelling--Lawley** é
 
@@ -1494,7 +907,7 @@ U
 $$ {#eq-traco-hotelling-lawley-manova}
 :::
 
-Como
+O critério utiliza diretamente a soma das razões hipótese/erro. Como
 
 $$
 \lambda_j\geq0,
@@ -1503,85 +916,22 @@ $$
 tem-se
 
 $$
-U\geq0.
+U\geq0,
 $$
 
-Além disso,
+com igualdade se, e somente se, $\mathbf H=\mathbf0$.
 
-$$
-U=0
-$$
-
-se, e somente se,
-
-$$
-\mathbf H=\mathbf0.
-$$
-
-Diferentemente do traço de Pillai, as contribuições
-
-$$
-\lambda_j
-$$
-
-não possuem limite superior. Uma direção com razão hipótese/erro muito elevada pode, portanto, exercer forte influência sobre o valor do critério.
-
-### Direção característica dominante
-
-O quarto critério concentra toda a comparação na direção de maior razão entre hipótese e erro.
+### Maior raiz de Roy
 
 ::: {#def-maior-raiz-roy-manova}
 ## Maior raiz de Roy
-
-Sejam
-
-$$
-\mathbf H,\mathbf E
-\in
-\mathbb R^{p\times p}
-$$
-
-matrizes simétricas tais que
-
-$$
-\mathbf H
-\succeq
-\mathbf0
-\qquad
-\text{e}
-\qquad
-\mathbf E
-\succ
-\mathbf0,
-$$
-
-e sejam
-
-$$
-\lambda_1
-\geq
-\cdots
-\geq
-\lambda_p
-\geq
-0
-$$
-
-as raízes características do par
-
-$$
-(\mathbf H,\mathbf E).
-$$
 
 A **maior raiz de Roy** é
 
 $$
 \Theta_{\mathrm R}
 =
-\lambda_1
-=
-\max_{1\leq j\leq p}
-\lambda_j.
+\lambda_1.
 $$ {#eq-maior-raiz-roy-manova}
 :::
 
@@ -1602,27 +952,11 @@ $$
 }.
 $$ {#eq-roy-rayleigh-manova}
 
-Assim, a maior raiz de Roy é a maior razão hipótese/erro que pode ser obtida entre todas as combinações lineares não nulas das respostas.
-
-Se
-
-$$
-\mathbf H=\mathbf0,
-$$
-
-então
-
-$$
-\Theta_{\mathrm R}=0.
-$$
-
-Ao contrário de Wilks, Pillai e Hotelling--Lawley, que utilizam toda a coleção de raízes, Roy utiliza somente a direção característica dominante.
+Esse critério utiliza apenas a direção característica de maior razão hipótese/erro.
 
 ## Uma mesma estrutura, quatro formas de agregação
 
-Os quatro critérios não correspondem a quatro decomposições diferentes da MANOVA.
-
-Todos são funções da mesma coleção de raízes características
+Os quatro critérios são funções da mesma coleção de raízes características
 
 $$
 \lambda_1,\ldots,\lambda_p
@@ -1631,107 +965,44 @@ $$
 obtida do problema
 
 $$
-\mathbf H\mathbf a
+\mathbf H
+\mathbf a
 =
 \lambda
-\mathbf E\mathbf a.
+\mathbf E
+\mathbf a.
 $$
 
-As raízes nulas não contribuem para nenhum dos critérios, de modo que as expressões também podem ser restritas às primeiras
-
-$$
-r_H
-=
-\operatorname{posto}
-\left(
-\mathbf H
-\right)
-$$
-
-raízes positivas.
-
-A @tbl-criterios-manova resume as diferenças.
+As raízes nulas não alteram os critérios. A @tbl-criterios-manova resume as diferentes formas de agregação.
 
 | Critério | Expressão em função das raízes | Forma de agregação | Evidência crescente contra $H_0$ |
 |---|---|---|---|
 | Wilks | $\displaystyle \prod_{j=1}^{p}(1+\lambda_j)^{-1}$ | produto | valores menores |
-| Pillai | $\displaystyle \sum_{j=1}^{p}\frac{\lambda_j}{1+\lambda_j}$ | soma das raízes transformadas | valores maiores |
+| Pillai | $\displaystyle \sum_{j=1}^{p}\frac{\lambda_j}{1+\lambda_j}$ | soma limitada | valores maiores |
 | Hotelling--Lawley | $\displaystyle \sum_{j=1}^{p}\lambda_j$ | soma direta | valores maiores |
 | Roy | $\lambda_1$ | maior raiz | valores maiores |
 
 : Critérios clássicos da MANOVA como funções das mesmas raízes características. {#tbl-criterios-manova}
 
-Considere duas situações hipotéticas.
+Roy concentra a comparação na direção dominante; Hotelling--Lawley soma diretamente as magnitudes das raízes; Pillai limita a contribuição individual de cada raiz; e Wilks combina multiplicativamente toda a coleção.
 
-Na primeira, uma única raiz é muito elevada e as demais são pequenas. Na segunda, o afastamento da hipótese está distribuído entre várias raízes moderadas.
+Os critérios podem, portanto, responder de forma diferente à distribuição do efeito entre as direções características, embora todos sejam construídos a partir da mesma relação espectral entre $\mathbf H$ e $\mathbf E$.
 
-A maior raiz de Roy enfatiza especialmente a primeira situação, pois utiliza somente
-
-$$
-\lambda_1.
-$$
-
-O traço de Hotelling--Lawley utiliza todas as raízes e mantém diretamente suas magnitudes.
-
-O traço de Pillai utiliza todas as raízes, mas limita a contribuição de cada uma pela transformação
-
-$$
-\frac{
-\lambda_j
-}{
-1+\lambda_j
-}.
-$$
-
-A lambda de Wilks combina multiplicativamente todas as raízes por meio dos fatores
-
-$$
-\frac1{1+\lambda_j}.
-$$
-
-Os critérios podem, portanto, produzir sensibilidades diferentes diante da mesma distribuição do efeito entre as direções características.
-
-Essa diferença não altera sua origem comum: todos resumem a relação espectral entre
-
-$$
-\mathbf H
-$$
-
-e
-
-$$
-\mathbf E.
-$$
-
-As distribuições de referência e as transformações utilizadas para converter esses critérios em testes com níveis de significância especificados dependem das dimensões e dos graus de liberdade envolvidos. O desenvolvimento operacional dessas calibrações não é necessário para explicar a formulação matemática da técnica e será tratado posteriormente.
+As transformações utilizadas para obter distribuições de referência ou valores críticos dependem de $p$, dos graus de liberdade da hipótese e do erro e do modelo probabilístico adotado. Essas calibrações pertencem à etapa inferencial aplicada e não serão desenvolvidas neste capítulo.
 
 ## Base probabilística dos critérios
 
-Até este ponto,
+As matrizes observadas
 
 $$
 \mathbf H
-$$
-
-e
-
-$$
+\qquad\text{e}\qquad
 \mathbf E
 $$
 
-foram tratadas como matrizes **observadas**.
+e os quatro critérios podem ser construídos algebricamente sempre que as condições matriciais da formulação forem satisfeitas. A normalidade multivariada não é necessária para definir essas quantidades.
 
-As raízes
-
-$$
-\lambda_1,\ldots,\lambda_p
-$$
-
-e os quatro critérios podem ser calculados algebricamente sempre que as condições matriciais necessárias forem satisfeitas. A normalidade multivariada não é necessária para definir essas quantidades.
-
-Para transformá-las em estatísticas de teste com a teoria de referência clássica, é necessário introduzir o modelo probabilístico.
-
-Considere novamente
+A calibração inferencial clássica acrescenta um modelo probabilístico. Considere
 
 $$
 \boldsymbol{\mathcal Y}
@@ -1741,25 +1012,7 @@ $$
 \boldsymbol{\mathcal E},
 $$
 
-e denote por
-
-$$
-\boldsymbol{\mathsf e}_i
-\in
-\mathbb R^p
-$$
-
-a linha $i$ da matriz aleatória de erros.
-
-Na formulação normal clássica, assume-se
-
-$$
-\boldsymbol{\mathsf e}_1,
-\ldots,
-\boldsymbol{\mathsf e}_n
-$$
-
-independentes, com
+com erros independentes
 
 $$
 \boldsymbol{\mathsf e}_i
@@ -1777,31 +1030,13 @@ em que
 
 $$
 \boldsymbol{\Sigma}
-\in
-\mathbb R^{p\times p}
-$$
-
-satisfaz
-
-$$
-\boldsymbol{\Sigma}
 \succ
-\mathbf0.
+\mathbf0
 $$
 
-A mesma matriz
+é comum às unidades consideradas pelo modelo.
 
-$$
-\boldsymbol{\Sigma}
-$$
-
-é utilizada para todas as unidades, enquanto a média das respostas é determinada por
-
-$$
-\mathbf Z\mathbf B.
-$$
-
-Considere a hipótese estimável
+Para uma hipótese estimável
 
 $$
 H_0:
@@ -1814,68 +1049,41 @@ $$
 com
 
 $$
-\mathbf C_1
-\in
-\mathbb R^{g\times q},
-$$
-
-$$
 \operatorname{posto}
 \left(
 \mathbf C_1
 \right)
 =
-g
+g,
 $$
 
-e
-
-$$
-\mathbf C_1
-=
-\mathbf C_1
-\mathbf Z^+
-\mathbf Z.
-$$
-
-Pelos graus de liberdade residuais definidos em @def-graus-liberdade-residuais,
+os graus de liberdade residuais são
 
 $$
 \nu_E
 =
-n
--
+n-
 \operatorname{posto}
 \left(
 \mathbf Z
 \right),
 $$
 
-conforme @eq-graus-liberdade-residuais.
+conforme @def-graus-liberdade-residuais e @eq-graus-liberdade-residuais.
 
-Para distinguir as estatísticas matriciais aleatórias de suas realizações observadas, denote por
+Denote por
 
 $$
 \boldsymbol{\mathsf H}
 $$
 
-a SQPC aleatória associada à hipótese e por
+a SQPC aleatória da hipótese e por
 
 $$
 \boldsymbol{\mathsf E}_{\mathrm{res}}
 $$
 
-a SQPC residual aleatória.
-
-Especializando @prp-distribuicao-sscp-hipotese-nula para
-
-$$
-\mathbf C_2
-=
-\mathbf I_p,
-$$
-
-tem-se, sob $H_0$,
+a SQPC residual aleatória. Especializando @prp-distribuicao-sscp-hipotese-nula para as respostas originais, sob $H_0$,
 
 $$
 \boldsymbol{\mathsf H}
@@ -1898,7 +1106,7 @@ W_p
 \left(
 \nu_E,
 \boldsymbol{\Sigma}
-\right)
+\right),
 $$ {#eq-distribuicao-e-manova}
 
 e
@@ -1911,146 +1119,23 @@ $$
 \mathbf Z.
 $$ {#eq-independencia-he-manova}
 
-Esses resultados não precisam ser novamente demonstrados aqui. Eles foram obtidos no Módulo 2 a partir do modelo linear normal multivariado e da distribuição de Wishart.
+A distribuição da SQPC residual também foi estabelecida em @prp-distribuicao-sscp-residual-modelo-normal. Esses resultados não precisam ser novamente demonstrados.
 
-Há duas consequências estruturais importantes.
-
-Primeiro, as duas matrizes aleatórias possuem a mesma matriz de escala
-
-$$
-\boldsymbol{\Sigma}.
-$$
-
-Segundo, sob $H_0$, elas são independentes.
-
-É essa estrutura normal--Wishart que fornece a base probabilística dos testes clássicos da MANOVA.
-
-A matriz
-
-$$
-\boldsymbol{\mathsf H}
-$$
-
-pode ser singular. De fato, se
-
-$$
-g<p,
-$$
-
-então
-
-$$
-\operatorname{posto}
-\left(
-\boldsymbol{\mathsf H}
-\right)
-\leq
-g
-<
-p.
-$$
-
-Isso é compatível com a formulação da MANOVA, pois somente as raízes correspondentes ao posto da hipótese podem ser positivas.
-
-A situação da matriz de erro é diferente. Para a formulação clássica baseada em
-
-$$
-\mathbf E^{-1},
-$$
-
-é necessário que a realização residual seja positiva definida.
-
-Sob
-
-$$
-\boldsymbol{\mathsf E}_{\mathrm{res}}
-\sim
-W_p
-\left(
-\nu_E,
-\boldsymbol{\Sigma}
-\right)
-$$
-
-com
-
-$$
-\boldsymbol{\Sigma}
-\succ
-\mathbf0,
-$$
-
-a condição
-
-$$
-\nu_E
-\geq
-p
-$$
-
-garante
-
-$$
-\boldsymbol{\mathsf E}_{\mathrm{res}}
-\succ
-\mathbf0
-$$
-
-quase certamente.
-
-As implicações de posto e singularidade serão retomadas na seção de existência da formulação clássica.
-
-### Papel da covariância residual comum
-
-A matriz
+A estrutura normal--Wishart fornece a base probabilística dos testes clássicos da MANOVA. A mesma matriz populacional
 
 $$
 \boldsymbol{\Sigma}
 $$
 
-define a estrutura populacional da variabilidade residual conjunta.
+descreve a dispersão residual das respostas e sustenta a utilização de uma única matriz de erro como referência para a comparação com $\mathbf H$.
 
-No problema de grupos, assumir uma única matriz
-
-$$
-\boldsymbol{\Sigma}
-$$
-
-significa que as diferentes condições possuem a mesma geometria residual, embora seus vetores de médias possam diferir.
-
-Essa estrutura comum é o fundamento populacional da utilização de uma única matriz observada
-
-$$
-\mathbf E
-$$
-
-como referência para comparar os efeitos presentes em
-
-$$
-\mathbf H.
-$$
-
-Depois da transformação pela métrica residual, a mesma matriz de erro é utilizada para medir todas as direções da hipótese.
-
-Se diferentes grupos possuem matrizes de covariâncias populacionais distintas, uma única matriz residual agrupada deixa de representar exatamente a dispersão de todas as populações.
-
-Isso não impede o cálculo puramente algébrico de
-
-$$
-\mathbf H,
-\qquad
-\mathbf E
-$$
-
-e dos critérios quando as matrizes necessárias existem, mas modifica a justificativa probabilística do procedimento clássico e sua distribuição nula.
-
-Procedimentos heterocedásticos, robustos, permutacionais ou regularizados constituem outras formulações e não serão desenvolvidos neste capítulo.
+Quando diferentes grupos possuem matrizes de covariâncias populacionais distintas, essa interpretação comum deixa de ser exata. As consequências dessa violação serão retomadas em `Pressupostos e limites`.
 
 ### Lambda de Wilks e razão de verossimilhanças
 
-Entre os quatro critérios, a lambda de Wilks possui uma ligação direta com a razão de verossimilhanças do modelo linear normal multivariado.
+A lambda de Wilks possui uma ligação direta com a razão de verossimilhanças do modelo linear normal multivariado.
 
-Para modelos lineares multivariados encaixados, a decomposição das SQPCs estabelecida em @prp-decomposicao-modelos-encaixados fornece
+Para modelos encaixados, @prp-decomposicao-modelos-encaixados fornece
 
 $$
 \mathbf E_R
@@ -2060,9 +1145,9 @@ $$
 \mathbf H,
 $$
 
-em que $\mathbf E_F$ é a SQPC residual do modelo completo e $\mathbf E_R$ é a SQPC residual do modelo reduzido.
+em que $\mathbf E_F$ e $\mathbf E_R$ são as SQPCs residuais dos modelos completo e reduzido.
 
-Sob normalidade, a razão de verossimilhanças foi escrita em @eq-razao-verossimilhancas-modelos-encaixados-hipotese como
+No Módulo 2, @eq-razao-verossimilhancas-modelos-encaixados-hipotese estabeleceu
 
 $$
 \Lambda_{\mathrm{RV}}
@@ -2076,35 +1161,27 @@ $$
 \right]^{n/2}.
 $$
 
-A razão de determinantes
-
-$$
-\frac{
-|\mathbf E_F|
-}{
-|\mathbf E_F+\mathbf H|
-}
-$$
-
-foi definida em @eq-lambda-wilks-modelos-encaixados como a lambda de Wilks.
-
-Na notação da MANOVA,
+Na notação deste capítulo,
 
 $$
 \mathbf E_F
 =
-\mathbf E
-$$
-
-e
-
-$$
+\mathbf E,
+\qquad
 \mathbf E_R
 =
 \mathbf E+\mathbf H.
 $$
 
-Portanto,
+Como @eq-lambda-wilks-modelos-encaixados define a razão de determinantes como lambda de Wilks,
+
+$$
+\Lambda_{\mathrm{RV}}
+=
+\Lambda_{\mathrm W}^{\,n/2}.
+$$ {#eq-relacao-rv-wilks-manova}
+
+A representação
 
 $$
 \Lambda_{\mathrm W}
@@ -2116,19 +1193,7 @@ $$
 }
 $$
 
-e, pela relação já estabelecida no Módulo 2,
-
-$$
-\Lambda_{\mathrm{RV}}
-=
-\Lambda_{\mathrm W}^{\,n/2}.
-$$ {#eq-relacao-rv-wilks-manova}
-
-A razão de verossimilhanças e a lambda de Wilks são, portanto, funções monotônicas uma da outra no modelo normal considerado.
-
-A formulação por determinantes evidencia a comparação entre modelos completo e reduzido.
-
-A formulação
+evidencia sua origem na comparação entre modelos encaixados, enquanto
 
 $$
 \Lambda_{\mathrm W}
@@ -2137,740 +1202,51 @@ $$
 \frac1{1+\lambda_j}
 $$
 
-evidencia a mesma comparação como agregação das razões hipótese/erro nas direções características.
+evidencia sua representação espectral [@wilks1932].
 
-Essas duas representações explicam simultaneamente a origem inferencial e a origem espectral da lambda de Wilks [@wilks1932].
+Os critérios de Pillai, Hotelling--Lawley e Roy são construídos a partir da mesma estrutura aleatória $(\boldsymbol{\mathsf H},\boldsymbol{\mathsf E}_{\mathrm{res}})$, embora não correspondam diretamente à razão de verossimilhanças do modelo normal.
 
-Os outros três critérios também são estatísticas construídas a partir da mesma estrutura aleatória
+A formulação distingue, portanto:
 
-$$
-\left(
-\boldsymbol{\mathsf H},
-\boldsymbol{\mathsf E}_{\mathrm{res}}
-\right),
-$$
+1. as matrizes observadas $\mathbf H$ e $\mathbf E$ e suas raízes características;
+2. os quatro critérios globais calculados a partir dessas raízes;
+3. a calibração inferencial clássica, que utiliza a estrutura probabilística normal--Wishart.
 
-mas não correspondem simplesmente à razão de verossimilhanças do modelo normal.
-
-A teoria de suas distribuições de referência depende de
-
-$$
-p,
-\qquad
-g
-\qquad\text{e}\qquad
-\nu_E,
-$$
-
-além das hipóteses probabilísticas utilizadas.
-
-O ponto necessário neste capítulo é separar claramente três níveis:
-
-- **estrutura algébrica:** $\mathbf H$, $\mathbf E$ e suas raízes características;
-- **estatísticas globais:** Wilks, Pillai, Hotelling--Lawley e Roy;
-- **inferência clássica:** distribuição dos critérios derivada da estrutura normal--Wishart sob $H_0$.
-
-Essa separação permite compreender por que os critérios podem ser calculados sem normalidade, ao mesmo tempo em que suas calibrações clássicas dependem do modelo probabilístico.
-
-## Casos particulares
-
-A formulação matricial da MANOVA deve recuperar procedimentos já conhecidos quando a dimensão da resposta ou o posto da hipótese são reduzidos. Esses casos ajudam a interpretar as raízes características e mostram que ANOVA, $T^2$ de Hotelling e MANOVA pertencem à mesma estrutura de comparação entre hipótese e erro.
-
-### Uma única resposta
-
-Considere
-
-$$
-p=1.
-$$
-
-Nesse caso,
-
-$$
-\mathbf H
-=
-(H)
-$$
-
-e
-
-$$
-\mathbf E
-=
-(E)
-$$
-
-são matrizes $1\times1$. Sob a condição
-
-$$
-E>0,
-$$
-
-existe no máximo uma raiz característica não nula, dada por
-
-$$
-\lambda
-=
-\frac{H}{E}.
-$$ {#eq-raiz-manova-univariada}
-
-Os quatro critérios tornam-se
-
-$$
-\Lambda_{\mathrm W}
-=
-\frac{1}{1+\lambda},
-$$
-
-$$
-V
-=
-\frac{\lambda}{1+\lambda},
-$$
-
-$$
-U
-=
-\lambda
-$$
-
-e
-
-$$
-\Theta_{\mathrm R}
-=
-\lambda.
-$$
-
-Todos são funções monotônicas da mesma razão
-
-$$
-\frac{H}{E}.
-$$
-
-Se
-
-$$
-\nu_H
-$$
-
-e
-
-$$
-\nu_E
-$$
-
-são, respectivamente, os graus de liberdade da hipótese e do erro, a estatística usual da ANOVA é construída a partir das médias quadráticas:
-
-$$
-F
-=
-\frac{
-H/\nu_H
-}{
-E/\nu_E
-}
-=
-\frac{\nu_E}{\nu_H}
-\lambda.
-$$ {#eq-relacao-f-raiz-manova}
-
-Assim, quando existe uma única resposta, os quatro critérios multivariados e a estatística $F$ contêm a mesma informação sobre a razão entre variação atribuída à hipótese e variação residual.
-
-A MANOVA recupera, portanto, a estrutura da ANOVA quando
-
-$$
-p=1.
-$$
-
-A diferença essencial no caso multivariado aparece quando
-
-$$
-p>1,
-$$
-
-pois a relação entre hipótese e erro deixa de ser descrita por uma única razão escalar e passa a depender das diferentes direções do espaço das respostas.
-
-### Duas populações
-
-Considere agora duas populações, com vetores de médias
-
-$$
-\boldsymbol{\mu}_1,
-\boldsymbol{\mu}_2
-\in
-\mathbb R^p,
-$$
-
-e a hipótese
-
-$$
-H_0:
-\boldsymbol{\mu}_1
-=
-\boldsymbol{\mu}_2.
-$$
-
-Há somente um contraste independente entre os dois grupos. Portanto,
-
-$$
-g=1
-$$
-
-e
-
-$$
-\operatorname{posto}
-\left(
-\mathbf H
-\right)
-\leq
-1.
-$$
-
-Consequentemente, existe no máximo uma raiz característica positiva,
-
-$$
-\lambda_1.
-$$
-
-Nessa situação,
-
-$$
-\Lambda_{\mathrm W}
-=
-\frac1{1+\lambda_1},
-$$
-
-$$
-V
-=
-\frac{\lambda_1}{1+\lambda_1},
-$$
-
-$$
-U
-=
-\lambda_1
-$$
-
-e
-
-$$
-\Theta_{\mathrm R}
-=
-\lambda_1.
-$$
-
-Os quatro critérios são novamente funções monotônicas de uma única quantidade.
-
-Considere o caso clássico de duas amostras independentes de tamanhos
-
-$$
-n_1
-\qquad\text{e}\qquad
-n_2,
-$$
-
-provenientes de populações com matriz de covariâncias comum.
-
-Defina a diferença observada entre os vetores de médias amostrais por
-
-$$
-\mathbf d
-=
-\bar{\mathbf y}_1
--
-\bar{\mathbf y}_2
-\in
-\mathbb R^p
-$$
-
-e seja
-
-$$
-\mathbf S_p
-\in
-\mathbb R^{p\times p}
-$$
-
-a matriz de covariâncias agrupada observada definida em @eq-covariancia-agrupada-observada.
-
-A matriz residual de somas de quadrados e produtos cruzados é
-
-$$
-\mathbf E
-=
-(n_1+n_2-2)
-\mathbf S_p.
-$$
-
-A matriz associada à hipótese de igualdade dos dois vetores de médias é
-
-$$
-\mathbf H
-=
-\frac{
-n_1n_2
-}{
-n_1+n_2
-}
-\mathbf d\mathbf d^\top.
-$$
-
-Como
-
-$$
-\operatorname{posto}
-\left(
-\mathbf d\mathbf d^\top
-\right)
-\leq1,
-$$
-
-a matriz $\mathbf H$ possui posto no máximo $1$.
-
-Supondo
-
-$$
-\mathbf E\succ\mathbf0,
-$$
-
-a única raiz potencialmente positiva é
-
-$$
-\lambda_1
-=
-\frac{
-n_1n_2
-}{
-n_1+n_2
-}
-\mathbf d^\top
-\mathbf E^{-1}
-\mathbf d.
-$$
-
-Por outro lado, a estatística definida em @def-t2-duas-amostras-independentes é
-
-$$
-T^2
-=
-\frac{
-n_1n_2
-}{
-n_1+n_2
-}
-\mathbf d^\top
-\mathbf S_p^{-1}
-\mathbf d.
-$$
-
-Como
-
-$$
-\mathbf E^{-1}
-=
-\frac1{
-n_1+n_2-2
-}
-\mathbf S_p^{-1},
-$$
-
-segue que
-
-$$
-\lambda_1
-=
-\frac{
-T^2
-}{
-n_1+n_2-2
-}.
-$$ {#eq-relacao-raiz-t2-manova}
-
-A relação é algébrica e mostra que a comparação de duas populações por $T^2$ e a MANOVA de dois grupos são construídas a partir da mesma razão multivariada entre diferença de médias e dispersão residual.
-
-A direção característica correspondente pode ser escolhida proporcionalmente a
-
-$$
-\mathbf E^{-1}
-\left(
-\bar{\mathbf y}_1
--
-\bar{\mathbf y}_2
-\right).
-$$
-
-De fato, tomando
-
-$$
-\mathbf a
-=
-\mathbf E^{-1}\mathbf d,
-$$
-
-tem-se
-
-$$
-\mathbf E\mathbf a
-=
-\mathbf d,
-$$
-
-enquanto
-
-$$
-\begin{aligned}
-\mathbf H\mathbf a
-&=
-\frac{
-n_1n_2
-}{
-n_1+n_2
-}
-\mathbf d\mathbf d^\top
-\mathbf E^{-1}\mathbf d
-\\
-&=
-\lambda_1
-\mathbf d
-\\
-&=
-\lambda_1
-\mathbf E\mathbf a.
-\end{aligned}
-$$
-
-Essa direção combina as respostas levando em conta a estrutura residual de covariâncias.
-
-Com três ou mais grupos, ou com qualquer hipótese para a qual
-
-$$
-\operatorname{posto}
-\left(
-\mathbf H
-\right)
->1,
-$$
-
-várias raízes podem ser positivas. É nesse caso que as diferentes formas de agregação utilizadas por Wilks, Pillai, Hotelling--Lawley e Roy podem produzir resumos efetivamente distintos da mesma estrutura espectral.
-
-## Geometria da MANOVA
-
-A equação
-
-$$
-\mathbf H\mathbf a
-=
-\lambda
-\mathbf E\mathbf a
-$$
-
-mostra que a geometria da MANOVA é definida relativamente à variabilidade residual.
-
-Como
-
-$$
-\mathbf E\succ\mathbf0,
-$$
-
-pode-se impor a normalização
-
-$$
-\mathbf a^\top
-\mathbf E
-\mathbf a
-=
-1
-$$ {#eq-normalizacao-direcao-manova}
-
-sem perda de generalidade, pois o quociente de Rayleigh generalizado é invariante à multiplicação de $\mathbf a$ por um escalar não nulo.
-
-Sob essa restrição, maximizar
-
-$$
-\frac{
-\mathbf a^\top
-\mathbf H
-\mathbf a
-}{
-\mathbf a^\top
-\mathbf E
-\mathbf a
-}
-$$
-
-equivale a maximizar
-
-$$
-\mathbf a^\top
-\mathbf H
-\mathbf a.
-$$
-
-A restrição
-
-$$
-\mathbf a^\top
-\mathbf E
-\mathbf a
-=
-1
-$$
-
-fixa a variação residual da combinação linear definida por $\mathbf a$.
-
-Assim, uma direção com valor elevado de
-
-$$
-\mathbf a^\top
-\mathbf H
-\mathbf a
-$$
-
-é uma combinação das respostas na qual o efeito associado à hipótese é grande depois de controlar a escala residual dessa mesma combinação.
-
-Se
-
-$$
-\mathbf a_j
-$$
-
-é um autovetor generalizado satisfazendo
-
-$$
-\mathbf H\mathbf a_j
-=
-\lambda_j
-\mathbf E\mathbf a_j
-$$
-
-e normalizado de modo que
-
-$$
-\mathbf a_j^\top
-\mathbf E
-\mathbf a_j
-=
-1,
-$$
-
-então
-
-$$
-\begin{aligned}
-\mathbf a_j^\top
-\mathbf H
-\mathbf a_j
-&=
-\lambda_j
-\mathbf a_j^\top
-\mathbf E
-\mathbf a_j
-\\
-&=
-\lambda_j.
-\end{aligned}
-$$ {#eq-raiz-como-hipotese-normalizada-manova}
-
-Cada raiz característica pode, portanto, ser interpretada como a magnitude da hipótese na correspondente direção quando a variação residual dessa combinação foi normalizada para $1$.
-
-Além disso, as direções podem ser escolhidas de modo que
-
-$$
-\mathbf a_j^\top
-\mathbf E
-\mathbf a_\ell
-=
-0,
-\qquad
-j\neq\ell,
-$$
-
-conforme @eq-ortogonalidade-direcoes-manova.
-
-A ortogonalidade relevante não é, em geral, a ortogonalidade euclidiana usual. Ela é definida pela métrica induzida por
-
-$$
-\mathbf E.
-$$
-
-### Geometria após padronização pelo erro
-
-A transformação introduzida em @eq-problema-simetrico-manova torna essa geometria explícita.
-
-Defina
-
-$$
-\mathbf z
-=
-\mathbf E^{1/2}\mathbf a.
-$$
-
-Como
-
-$$
-\mathbf E\succ\mathbf0,
-$$
-
-a transformação é invertível e
-
-$$
-\mathbf a
-=
-\mathbf E^{-1/2}\mathbf z.
-$$
-
-Então,
-
-$$
-\mathbf a^\top
-\mathbf E
-\mathbf a
-=
-\mathbf z^\top
-\mathbf z.
-$$
-
-Consequentemente, a restrição
-
-$$
-\mathbf a^\top
-\mathbf E
-\mathbf a
-=
-1
-$$
-
-transforma-se em
-
-$$
-\mathbf z^\top
-\mathbf z
-=
-1.
-$$
-
-O elipsoide definido pela forma quadrática residual é convertido na esfera unitária da geometria euclidiana.
-
-Ao mesmo tempo,
-
-$$
-\mathbf a^\top
-\mathbf H
-\mathbf a
-=
-\mathbf z^\top
-\mathbf K_{\mathrm{HE}}
-\mathbf z,
-$$
-
-em que
-
-$$
-\mathbf K_{\mathrm{HE}}
-=
-\mathbf E^{-1/2}
-\mathbf H
-\mathbf E^{-1/2}
-$$
-
-foi definida em @eq-matriz-hipotese-padronizada-manova.
-
-O problema torna-se
-
-$$
-\max_{
-\mathbf z^\top\mathbf z=1
-}
-\mathbf z^\top
-\mathbf K_{\mathrm{HE}}
-\mathbf z.
-$$ {#eq-maximizacao-branqueada-manova}
-
-Esse é o problema de Rayleigh ordinário para a matriz simétrica semidefinida positiva
-
-$$
-\mathbf K_{\mathrm{HE}}.
-$$
-
-A primeira direção transformada é um autovetor associado ao maior autovalor
-
-$$
-\lambda_1,
-$$
-
-e as direções seguintes podem ser escolhidas ortonormais e associadas às demais raízes positivas.
-
-A transformação não elimina a variabilidade residual do problema. Ela a incorpora à mudança de coordenadas por
-
-$$
-\mathbf E^{-1/2},
-$$
-
-fazendo com que a comparação entre hipótese e erro seja expressa em uma geometria euclidiana padronizada.
-
-Assim, a MANOVA não procura simplesmente direções em que
-
-$$
-\mathbf H
-$$
-
-seja grande.
-
-Ela procura direções em que o efeito representado por $\mathbf H$ seja grande **relativamente à estrutura residual representada por $\mathbf E$**.
-
-Essa distinção é central. Uma direção pode apresentar grande diferença absoluta entre grupos e, ainda assim, produzir raiz pequena se também apresentar grande dispersão residual. Inversamente, um afastamento absoluto moderado pode produzir uma razão elevada quando ocorre em uma direção de baixa variabilidade residual.
+As condições de não singularidade, homogeneidade da covariância residual e validade da inferência clássica serão reunidas posteriormente em `Pressupostos e limites`.
 
 ## Invariância a transformações lineares das respostas
 
-A formulação da MANOVA não deve depender da base particular utilizada para representar o mesmo espaço de respostas.
-
-Considere uma matriz não singular
-
-$$
-\mathbf A
-\in
-\mathbb R^{p\times p}
-$$
-
-e transforme as respostas por
+Considere uma transformação linear não singular das respostas,
 
 $$
 \boldsymbol{\mathcal Y}^{*}
 =
-\boldsymbol{\mathcal Y}\mathbf A.
+\boldsymbol{\mathcal Y}\mathbf A,
 $$ {#eq-transformacao-respostas-manova}
-
-No modelo transformado,
-
-$$
-\boldsymbol{\mathcal Y}^{*}
-=
-\mathbf Z
-\mathbf B^{*}
-+
-\boldsymbol{\mathcal E}^{*},
-$$
 
 com
 
 $$
+\mathbf A
+\in
+\mathbb R^{p\times p},
+\qquad
+\det(\mathbf A)\neq0.
+$$
+
+No sistema transformado,
+
+$$
 \mathbf B^{*}
 =
-\mathbf B\mathbf A
-$$
-
-e
-
-$$
+\mathbf B\mathbf A,
+\qquad
 \boldsymbol{\mathcal E}^{*}
 =
 \boldsymbol{\mathcal E}\mathbf A.
 $$
 
-Para representar a mesma hipótese no novo sistema de coordenadas, transforma-se também seu valor de referência:
+Para representar a mesma hipótese, utiliza-se
 
 $$
 \boldsymbol{\Theta}_0^{*}
@@ -2878,23 +1254,7 @@ $$
 \boldsymbol{\Theta}_0\mathbf A.
 $$
 
-Assim,
-
-$$
-\mathbf C_1\mathbf B
-=
-\boldsymbol{\Theta}_0
-$$
-
-se, e somente se,
-
-$$
-\mathbf C_1\mathbf B^{*}
-=
-\boldsymbol{\Theta}_0^{*}.
-$$
-
-As matrizes observadas de hipótese e erro transformam-se por congruência:
+As matrizes de hipótese e erro transformam-se por congruência:
 
 $$
 \mathbf H^{*}
@@ -2914,88 +1274,10 @@ $$
 \mathbf A.
 $$ {#eq-transformacao-e-manova}
 
-Como $\mathbf A$ é não singular,
-
-$$
-\mathbf H^{*}
-\succeq
-\mathbf0
-$$
-
-sempre que
-
-$$
-\mathbf H\succeq\mathbf0,
-$$
-
-e
-
-$$
-\mathbf E^{*}
-\succ
-\mathbf0
-$$
-
-sempre que
-
-$$
-\mathbf E\succ\mathbf0.
-$$
-
 ::: {#prp-invariancia-raizes-manova}
 ## Invariância das raízes características
 
-Sejam
-
-$$
-\mathbf H,\mathbf E
-\in
-\mathbb R^{p\times p}
-$$
-
-matrizes simétricas tais que
-
-$$
-\mathbf H
-\succeq
-\mathbf0
-\qquad
-\text{e}
-\qquad
-\mathbf E
-\succ
-\mathbf0.
-$$
-
-Considere uma matriz não singular
-
-$$
-\mathbf A
-\in
-\mathbb R^{p\times p}
-$$
-
-e defina
-
-$$
-\mathbf H^{*}
-=
-\mathbf A^\top
-\mathbf H
-\mathbf A
-$$
-
-e
-
-$$
-\mathbf E^{*}
-=
-\mathbf A^\top
-\mathbf E
-\mathbf A.
-$$
-
-Então os pares
+Se $\mathbf A$ é não singular, os pares
 
 $$
 (\mathbf H,\mathbf E)
@@ -3011,20 +1293,7 @@ possuem as mesmas raízes características, incluindo suas multiplicidades.
 :::
 
 ::: {.proof}
-As raízes características do par transformado são os valores de $\lambda$ que satisfazem
-
-$$
-\det
-\left(
-\mathbf H^{*}
--
-\lambda\mathbf E^{*}
-\right)
-=
-0.
-$$
-
-Pelas definições de $\mathbf H^{*}$ e $\mathbf E^{*}$,
+Tem-se
 
 $$
 \begin{aligned}
@@ -3045,24 +1314,7 @@ $$
 \right]
 \\
 &=
-\det
-\left(
-\mathbf A^\top
-\right)
-\det
-\left(
-\mathbf H-\lambda\mathbf E
-\right)
-\det
-\left(
-\mathbf A
-\right)
-\\
-&=
-\det
-\left(
-\mathbf A
-\right)^2
+\det(\mathbf A)^2
 \det
 \left(
 \mathbf H-\lambda\mathbf E
@@ -3073,656 +1325,42 @@ $$
 Como
 
 $$
-\det
-\left(
-\mathbf A
-\right)
-\neq
-0,
+\det(\mathbf A)\neq0,
 $$
 
-as duas equações características possuem exatamente os mesmos zeros, com as mesmas multiplicidades.
+as duas equações características possuem os mesmos zeros, com as mesmas multiplicidades.
 :::
 
-Como os quatro critérios clássicos dependem apenas das raízes
+Como Wilks, Pillai, Hotelling--Lawley e Roy dependem somente das raízes características, os quatro critérios são invariantes a transformações lineares não singulares das respostas, desde que a hipótese seja expressa no sistema transformado correspondente.
+
+As direções características mudam de coordenadas. Se $\boldsymbol{\alpha}_j$ é uma direção característica normalizada no sistema original, pode-se tomar
 
 $$
-\lambda_1,\ldots,\lambda_p,
-$$
-
-eles também permanecem invariantes sob transformações lineares não singulares das respostas, desde que a hipótese seja expressa no sistema transformado correspondente.
-
-Essa propriedade inclui mudanças de unidades realizadas por fatores não nulos e mudanças invertíveis de coordenadas no espaço das respostas.
-
-As coordenadas das direções características, entretanto, dependem da representação escolhida.
-
-Se
-
-$$
-\mathbf a_j
-$$
-
-é uma direção característica no sistema original, defina
-
-$$
-\mathbf a_j^{*}
+\boldsymbol{\alpha}_j^{*}
 =
 \mathbf A^{-1}
-\mathbf a_j.
-$$
-
-Então a combinação linear das respostas é preservada:
-
-$$
-\boldsymbol{\mathcal Y}^{*}
-\mathbf a_j^{*}
-=
-\boldsymbol{\mathcal Y}
-\mathbf A
-\mathbf A^{-1}
-\mathbf a_j
-=
-\boldsymbol{\mathcal Y}
-\mathbf a_j.
-$$
-
-Além disso,
-
-$$
-\begin{aligned}
-\mathbf H^{*}\mathbf a_j^{*}
-&=
-\mathbf A^\top
-\mathbf H
-\mathbf A
-\mathbf A^{-1}
-\mathbf a_j
-\\
-&=
-\mathbf A^\top
-\mathbf H
-\mathbf a_j
-\\
-&=
-\lambda_j
-\mathbf A^\top
-\mathbf E
-\mathbf a_j
-\\
-&=
-\lambda_j
-\mathbf E^{*}
-\mathbf a_j^{*}.
-\end{aligned}
-$$
-
-Portanto, as coordenadas dos vetores mudam com a base, enquanto as raízes que quantificam a relação entre hipótese e erro permanecem invariantes.
-
-Essa distinção é importante para a interpretação: os coeficientes numéricos de uma direção característica dependem das unidades e da base utilizadas para representar as respostas, mas a estrutura espectral da comparação entre hipótese e erro não depende de uma mudança invertível de coordenadas.
-
-## Existência, posto e identificação das direções
-
-A formulação espectral desenvolvida neste capítulo utilizou a condição
-
-$$
-\mathbf E
-\succ
-\mathbf0.
-$$
-
-Essa condição possui papel algébrico e geométrico. Ela garante a existência de
-
-$$
-\mathbf E^{-1},
-\qquad
-\mathbf E^{1/2}
-\qquad\text{e}\qquad
-\mathbf E^{-1/2},
-$$
-
-e assegura que
-
-$$
-\mathbf a^\top
-\mathbf E
-\mathbf a
->
-0
-$$
-
-para todo
-
-$$
-\mathbf a
-\neq
-\mathbf0.
-$$
-
-Consequentemente, o quociente de Rayleigh generalizado
-
-$$
-\frac{
-\mathbf a^\top
-\mathbf H
-\mathbf a
-}{
-\mathbf a^\top
-\mathbf E
-\mathbf a
-}
-$$
-
-está definido em todas as direções não nulas e o problema generalizado pode ser convertido no problema espectral simétrico de @eq-problema-simetrico-manova.
-
-A existência da formulação clássica depende, entretanto, de outras condições relacionadas ao posto da hipótese, ao posto da matriz residual e à estimabilidade da função paramétrica testada.
-
-### Posto da matriz de hipótese
-
-Considere a hipótese
-
-$$
-H_0:
-\mathbf C_1
-\mathbf B
-=
-\boldsymbol{\Theta}_0,
-$$
-
-com
-
-$$
-\mathbf C_1
-\in
-\mathbb R^{g\times q},
-$$
-
-$$
-\operatorname{posto}
-\left(
-\mathbf C_1
-\right)
-=
-g
-$$
-
-e função
-
-$$
-\mathbf C_1\mathbf B
-$$
-
-estimável.
-
-A construção da SQPC da hipótese implica
-
-$$
-\operatorname{posto}
-\left(
-\mathbf H
-\right)
-\leq
-\min
-\left(
-p,g
-\right).
-$$ {#eq-posto-h-manova}
-
-Como
-
-$$
-r_H
-=
-\operatorname{posto}
-\left(
-\mathbf H
-\right),
-$$
-
-existem exatamente
-
-$$
-r_H
-$$
-
-raízes características positivas, conforme @def-raizes-caracteristicas-manova.
-
-Portanto,
-
-$$
-r_H
-\leq
-\min
-\left(
-p,g
-\right),
-$$
-
-como estabelecido em @eq-numero-raizes-hipotese-manova.
-
-No caso do efeito completo de um fator com
-
-$$
-K
-$$
-
-grupos,
-
-$$
-g
-=
-K-1,
-$$
-
-e, consequentemente,
-
-$$
-r_H
-\leq
-\min
-\left(
-p,K-1
-\right).
-$$
-
-O número de respostas não determina sozinho o número de direções relevantes para a hipótese.
-
-Uma hipótese de baixo posto pode produzir apenas poucas raízes positivas mesmo quando
-
-$$
-p
-$$
-
-é elevado.
-
-Esse resultado possui uma interpretação estatística direta: o número de direções nas quais a hipótese pode produzir separação é limitado simultaneamente pela dimensão do espaço das respostas e pelo número de restrições linearmente independentes impostas pelo contraste testado.
-
-### Não singularidade da matriz de erro
-
-A matriz residual observada
-
-$$
-\mathbf E
-=
-\widehat{\mathbf U}^\top
-\widehat{\mathbf U}
-$$
-
-possui posto no máximo
-
-$$
-\min
-\left(
-p,\nu_E
-\right),
-$$
-
-em que
-
-$$
-\nu_E
-=
-n
--
-\operatorname{posto}
-\left(
-\mathbf Z
-\right)
-$$
-
-é o número de graus de liberdade residuais.
-
-Consequentemente, uma condição necessária para que
-
-$$
-\mathbf E
-$$
-
-possa ser positiva definida é
-
-$$
-\nu_E
-\geq
-p.
-$$ {#eq-condicao-posto-e-manova}
-
-A condição é apenas necessária em termos puramente algébricos: mesmo quando
-
-$$
-\nu_E
-\geq
-p,
-$$
-
-dependências lineares exatas entre as colunas residuais observadas podem tornar
-
-$$
-\mathbf E
-$$
-
-singular.
-
-Sob o modelo linear normal multivariado utilizado na seção probabilística,
-
-$$
-\boldsymbol{\mathsf E}_{\mathrm{res}}
-\mid
-\mathbf Z
-\sim
-W_p
-\left(
-\nu_E,
-\boldsymbol{\Sigma}
-\right),
-$$
-
-com
-
-$$
-\boldsymbol{\Sigma}
-\succ
-\mathbf0,
-$$
-
-a condição
-
-$$
-\nu_E
-\geq
-p
-$$
-
-garante
-
-$$
-\boldsymbol{\mathsf E}_{\mathrm{res}}
-\succ
-\mathbf0
-$$
-
-quase certamente.
-
-Nesse caso, a inversa e a raiz quadrada inversa utilizadas na formulação clássica existem com probabilidade $1$.
-
-Quando
-
-$$
-p>\nu_E,
-$$
-
-tem-se necessariamente
-
-$$
-\operatorname{posto}
-\left(
-\mathbf E
-\right)
-\leq
-\nu_E
-<
-p,
+\boldsymbol{\alpha}_j,
 $$
 
 de modo que
 
 $$
-\mathbf E
-$$
-
-é singular.
-
-Nesse cenário, a formulação clássica baseada em
-
-$$
-\mathbf E^{-1}
-$$
-
-e
-
-$$
-\mathbf E^{-1/2}
-$$
-
-não pode ser aplicada diretamente.
-
-Pseudoinversas, regularização e métodos desenvolvidos para situações de alta dimensão alteram o problema espectral ou sua teoria inferencial e pertencem ao tratamento metodológico posterior.
-
-### Estimabilidade da hipótese
-
-A existência de
-
-$$
-\mathbf H
-$$
-
-como representação de uma hipótese estatisticamente identificada exige que a função paramétrica testada seja estimável.
-
-No modelo
-
-$$
+\boldsymbol{\mathcal Y}^{*}
+\boldsymbol{\alpha}_j^{*}
+=
 \boldsymbol{\mathcal Y}
-=
-\mathbf Z\mathbf B
-+
-\boldsymbol{\mathcal E},
+\boldsymbol{\alpha}_j.
 $$
 
-a matriz
-
-$$
-\mathbf B
-$$
-
-é identificada de forma usual quando
-
-$$
-\mathbf Z
-$$
-
-possui posto completo de colunas.
-
-Entretanto, posto deficiente de
-
-$$
-\mathbf Z
-$$
-
-não implica que nenhuma hipótese possa ser testada.
-
-Para a hipótese utilizada neste capítulo,
-
-$$
-H_0:
-\mathbf C_1
-\mathbf B
-=
-\boldsymbol{\Theta}_0,
-$$
-
-é necessário que
-
-$$
-\mathbf C_1\mathbf B
-$$
-
-seja estimável.
-
-A condição foi escrita em @eq-estimabilidade-hipotese-manova como
-
-$$
-\mathbf C_1
-=
-\mathbf C_1
-\mathbf Z^+
-\mathbf Z.
-$$
-
-Quando essa condição é satisfeita, o valor de
-
-$$
-\mathbf C_1\mathbf B
-$$
-
-não depende da escolha particular de uma solução para
-
-$$
-\mathbf B
-$$
-
-em uma parametrização não identificada.
-
-Assim, o objeto inferencial da MANOVA é a **função estimável especificada pela hipótese**, e não necessariamente cada elemento de
-
-$$
-\mathbf B
-$$
-
-considerado isoladamente.
-
-
-A hipótese linear geral definida em @def-hipotese-linear-geral-multivariada permite a formulação bilateral
-
-$$
-\mathbf C_1
-\mathbf B
-\mathbf C_2
-=
-\boldsymbol{\Theta}_0.
-$$
-
-Neste capítulo foi utilizado
-
-$$
-\mathbf C_2
-=
-\mathbf I_p
-$$
-
-para testar simultaneamente o efeito sobre as respostas originais.
-
-### Identificação das direções características
-
-As raízes características positivas
-
-$$
-\lambda_1,\ldots,\lambda_{r_H}
-$$
-
-são determinadas pelo par
-
-$$
-(\mathbf H,\mathbf E).
-$$
-
-Os autovetores generalizados correspondentes possuem as indeterminações próprias de problemas espectrais.
-
-Considere uma raiz positiva simples
-
-$$
-\lambda_j.
-$$
-
-Se
-
-$$
-\mathbf a_j
-$$
-
-satisfaz
-
-$$
-\mathbf H
-\mathbf a_j
-=
-\lambda_j
-\mathbf E
-\mathbf a_j,
-$$
-
-então, para qualquer
-
-$$
-c\neq0,
-$$
-
-o vetor
-
-$$
-c\mathbf a_j
-$$
-
-satisfaz a mesma equação.
-
-A direção, e não o comprimento do vetor, é o objeto determinado pelo problema.
-
-Utilizando a normalização
-
-$$
-\mathbf a_j^\top
-\mathbf E
-\mathbf a_j
-=
-1,
-$$
-
-a indeterminação de escala é eliminada e permanece a indeterminação de sinal:
-
-$$
-\mathbf a_j
-\qquad\text{e}\qquad
--\mathbf a_j
-$$
-
-representam a mesma direção.
-
-Se uma raiz positiva possui multiplicidade maior que $1$, os autovetores individuais associados não são determinados unicamente.
-
-Nesse caso, o objeto identificado é o **subespaço característico** associado à raiz repetida. Diferentes bases ortonormais segundo a métrica de
-
-$$
-\mathbf E
-$$
-
-podem representar o mesmo subespaço sem alterar as raízes nem os quatro critérios globais.
-
-As raízes nulas também podem possuir alta multiplicidade. As direções pertencentes ao subespaço associado a
-
-$$
-\lambda=0
-$$
-
-não representam variação atribuída à hipótese relativamente ao erro, pois
-
-$$
-\mathbf a^\top
-\mathbf H
-\mathbf a
-=
-0
-$$
-
-nessas direções.
-
-Por isso, a interpretação substantiva das combinações lineares concentra-se normalmente nas direções associadas às raízes positivas.
-
-A distinção entre raízes e direções é importante:
-
-- as raízes quantificam a intensidade relativa da hipótese;
-- as direções indicam combinações das respostas em que essa intensidade é observada;
-- em caso de multiplicidade, o subespaço pode estar identificado mesmo quando uma base particular não está.
+Assim, os coeficientes numéricos das combinações lineares dependem da representação das respostas, enquanto as raízes e os quatro critérios permanecem invariantes sob mudanças invertíveis de coordenadas.
 
 ## Pressupostos e limites
 
-A MANOVA reúne três níveis distintos de estrutura:
+A MANOVA combina uma estrutura para as médias, uma comparação algébrica entre hipótese e erro e, na inferência clássica, um modelo probabilístico. As condições abaixo possuem funções diferentes dentro dessa construção.
 
-- o modelo para as médias;
-- a comparação algébrica entre hipótese e erro;
-- a teoria probabilística utilizada para realizar inferência.
+### Estrutura da média e estimabilidade
 
-As condições necessárias não possuem todas a mesma função.
-
-### Estrutura correta da média
-
-O modelo pressupõe que
+O modelo pressupõe
 
 $$
 E
@@ -3735,47 +1373,32 @@ E
 \mathbf Z\mathbf B.
 $$
 
-Assim, grupos, tratamentos, covariáveis e demais efeitos relevantes devem estar representados adequadamente em
+Grupos, tratamentos, covariáveis e demais efeitos relevantes devem estar representados adequadamente em $\mathbf Z$, pois a especificação da média determina tanto os resíduos quanto a hipótese avaliada.
 
-$$
-\mathbf Z.
-$$
-
-Uma especificação inadequada da estrutura média modifica os resíduos e, consequentemente,
-
-$$
-\mathbf E.
-$$
-
-Ela também modifica o significado da variação atribuída à hipótese e representada por
-
-$$
-\mathbf H.
-$$
-
-Portanto, uma raiz elevada não possui interpretação isolada da hipótese e do modelo que produziram essas duas matrizes.
-
-### Estimabilidade da hipótese
-
-A hipótese precisa corresponder a uma função estimável do modelo.
-
-Para a formulação utilizada neste capítulo,
+Para
 
 $$
 H_0:
-\mathbf C_1
-\mathbf B
+\mathbf C_1\mathbf B
 =
 \boldsymbol{\Theta}_0,
 $$
 
-isso exige a condição de @eq-estimabilidade-hipotese-manova.
+a função paramétrica deve ser estimável. Conforme @eq-estimabilidade-hipotese-manova,
 
-Essa é uma condição de **identificação do objeto inferencial**. Ela não decorre de normalidade e deve ser verificada antes da construção de uma interpretação probabilística para o teste.
+$$
+\mathbf C_1
+=
+\mathbf C_1
+\mathbf Z^+
+\mathbf Z.
+$$
+
+Essa é uma condição de identificação da hipótese e não depende da normalidade multivariada.
 
 ### Independência entre unidades
 
-Na formulação probabilística clássica, as linhas da matriz de erros são independentes:
+Na formulação probabilística clássica, os vetores de erros associados a unidades distintas são independentes:
 
 $$
 \boldsymbol{\mathsf e}_1,
@@ -3783,19 +1406,11 @@ $$
 \boldsymbol{\mathsf e}_n.
 $$
 
-A dependência entre as componentes de uma mesma resposta vetorial é permitida e representada por
-
-$$
-\boldsymbol{\Sigma}.
-$$
-
-O que a formulação clássica exclui é dependência não modelada entre unidades distintas.
-
-Medidas repetidas, séries temporais, observações agrupadas, estruturas espaciais ou outros mecanismos de dependência entre unidades exigem modelos de covariância apropriados. A MANOVA clássica formulada neste capítulo não incorpora automaticamente essas estruturas.
+A dependência entre as componentes de um mesmo vetor resposta é permitida e representada por $\boldsymbol{\Sigma}$. Dependência não modelada entre unidades, como em medidas repetidas, séries temporais ou estruturas espaciais, exige uma formulação de covariância apropriada.
 
 ### Covariância residual comum
 
-A formulação normal clássica utiliza
+O modelo clássico utiliza
 
 $$
 \operatorname{Cov}
@@ -3810,27 +1425,11 @@ $$
 i=1,\ldots,n.
 $$
 
-Portanto, a mesma matriz de covariâncias residual é utilizada para todas as unidades.
+No problema de comparação entre grupos, isso corresponde à utilização de uma matriz de covariâncias residual populacional comum.
 
-No caso de grupos, isso corresponde à homogeneidade das matrizes de covariâncias populacionais dentro dos grupos.
+Essa estrutura justifica o uso de uma única matriz $\mathbf E$ como referência para a comparação com $\mathbf H$. Se as matrizes de covariâncias diferem entre grupos ou unidades, os critérios ainda podem ser calculados quando as operações matriciais necessárias existem, mas a calibração inferencial clássica normal--Wishart não corresponde exatamente a esse mecanismo.
 
-Essa condição fornece uma geometria residual comum e justifica a utilização de uma única matriz
-
-$$
-\mathbf E
-$$
-
-para padronizar as diferentes direções da hipótese.
-
-Se diferentes grupos possuem matrizes de covariâncias distintas, a matriz residual combinada deixa de representar exatamente a dispersão de todas as populações sob um único
-
-$$
-\boldsymbol{\Sigma}.
-$$
-
-Os critérios ainda podem ser calculados algebricamente quando as matrizes necessárias existem, mas a teoria inferencial clássica baseada na estrutura normal--Wishart deixa de corresponder exatamente ao mecanismo gerador considerado.
-
-### Não singularidade da covariância residual
+### Não singularidade populacional e amostral
 
 A formulação clássica considera
 
@@ -3840,17 +1439,9 @@ $$
 \mathbf0.
 $$
 
-Isso exclui relações lineares exatas entre as respostas no modelo populacional.
+Essa condição populacional exclui relações lineares exatas entre as respostas.
 
-A condição populacional
-
-$$
-\boldsymbol{\Sigma}
-\succ
-\mathbf0
-$$
-
-não deve ser confundida com a condição amostral
+A condição amostral necessária ao problema espectral desenvolvido neste capítulo é
 
 $$
 \mathbf E
@@ -3858,41 +1449,76 @@ $$
 \mathbf0.
 $$
 
-A primeira pertence ao modelo probabilístico.
+Como
 
-A segunda depende também do número de graus de liberdade residuais e da configuração observada dos resíduos.
+$$
+\mathbf E
+=
+\widehat{\mathbf U}^{\top}
+\widehat{\mathbf U},
+$$
 
-Sob normalidade e
+tem-se
+
+$$
+\operatorname{posto}
+\left(
+\mathbf E
+\right)
+\leq
+\min
+\left(
+p,\nu_E
+\right).
+$$
+
+Consequentemente, uma condição necessária para que $\mathbf E$ seja positiva definida é
+
+$$
+\nu_E
+\geq
+p.
+$$ {#eq-condicao-posto-e-manova}
+
+Essa condição não é suficiente em termos puramente algébricos, pois dependências lineares exatas entre os resíduos podem tornar $\mathbf E$ singular.
+
+Sob o modelo normal com
+
+$$
+\boldsymbol{\Sigma}
+\succ
+\mathbf0
+$$
+
+e
 
 $$
 \nu_E\geq p,
 $$
 
-a distribuição Wishart fornece
+a distribuição Wishart em @eq-distribuicao-e-manova implica que
 
 $$
-\mathbf E
+\boldsymbol{\mathsf E}_{\mathrm{res}}
 \succ
 \mathbf0
 $$
 
 quase certamente.
 
+Quando $\mathbf E$ é singular, não existem diretamente
+
+$$
+\mathbf E^{-1}
+\qquad\text{e}\qquad
+\mathbf E^{-1/2},
+$$
+
+e a formulação espectral clássica adotada neste capítulo deixa de se aplicar. Pseudoinversas, regularização e métodos para situações de alta dimensão pertencem ao tratamento metodológico posterior.
+
 ### Normalidade multivariada
 
-A hipótese
-
-$$
-\boldsymbol{\mathsf e}_i
-\sim
-N_p
-\left(
-\mathbf0,
-\boldsymbol{\Sigma}
-\right)
-$$
-
-não é necessária para construir:
+A normalidade não é necessária para construir
 
 $$
 \mathbf H,
@@ -3900,124 +1526,127 @@ $$
 \mathbf E,
 $$
 
-o quociente
+as raízes características ou os quatro critérios, desde que as operações matriciais utilizadas estejam definidas.
+
+Ela é necessária na formulação inferencial clássica desenvolvida aqui para obter as distribuições Wishart de $\boldsymbol{\mathsf H}$ e $\boldsymbol{\mathsf E}_{\mathrm{res}}$, sua independência sob $H_0$ e as distribuições de referência dos critérios.
+
+Devem ser distinguidos, portanto:
+
+- a formulação algébrica baseada em $\mathbf H$ e $\mathbf E$;
+- o modelo probabilístico normal com covariância residual comum;
+- a calibração inferencial clássica dos critérios.
+
+Procedimentos robustos, heterocedásticos, de permutação ou reamostragem pertencem à etapa metodológica.
+
+### Posto e identificação das direções
+
+O número de raízes positivas é
 
 $$
-\frac{
-\mathbf a^\top
+r_H
+=
+\operatorname{posto}
+\left(
 \mathbf H
-\mathbf a
-}{
-\mathbf a^\top
+\right)
+\leq
+\min(p,g),
+$$
+
+conforme @eq-numero-raizes-hipotese-manova.
+
+Assim, o número de respostas não determina sozinho a quantidade de direções associadas ao efeito. Uma hipótese de baixo posto pode produzir poucas raízes positivas mesmo quando $p$ é elevado.
+
+Para uma raiz simples, a direção característica é determinada apenas até multiplicação por um escalar não nulo. Adotando a normalização
+
+$$
+\boldsymbol{\alpha}_j^\top
 \mathbf E
-\mathbf a
-},
+\boldsymbol{\alpha}_j
+=
+1,
 $$
 
-as raízes características ou os quatro critérios clássicos, desde que as operações matriciais envolvidas estejam definidas.
-
-A normalidade é utilizada na teoria inferencial clássica para obter as distribuições Wishart de
+permanece a indeterminação de sinal:
 
 $$
-\boldsymbol{\mathsf H}
+\boldsymbol{\alpha}_j
+\qquad\text{e}\qquad
+-\boldsymbol{\alpha}_j
 $$
 
-e
+representam a mesma direção.
 
-$$
-\boldsymbol{\mathsf E}_{\mathrm{res}},
-$$
+Quando uma raiz possui multiplicidade maior que $1$, os autovetores individuais não são únicos; o subespaço característico correspondente é o objeto identificado.
 
-sua independência sob
+### Associação entre as respostas e singularidade
 
-$$
-H_0
-$$
+Correlação elevada entre respostas não invalida, por si só, a MANOVA. As covariâncias entre respostas fazem parte da própria construção de $\mathbf E$.
 
-e, a partir dessa estrutura, as distribuições de referência dos critérios.
-
-Portanto, deve-se distinguir:
-
-- **formulação algébrica:** existe independentemente da normalidade;
-- **modelo probabilístico clássico:** introduz normalidade, independência entre unidades e covariância residual comum;
-- **inferência clássica:** utiliza a estrutura normal--Wishart para calibrar os critérios.
-
-Transformações aproximadas dos critérios, procedimentos robustos, métodos de reamostragem, testes por permutação e formulações heterocedásticas pertencem à etapa metodológica e não serão desenvolvidos neste capítulo.
-
-### Multicolinearidade e dependência exata entre respostas
-
-Correlação elevada entre respostas não invalida, por si só, a formulação multivariada.
-
-A própria MANOVA utiliza as covariâncias entre respostas para construir
-
-$$
-\mathbf E
-$$
-
-e determinar as direções características.
-
-O problema estrutural ocorre quando existe dependência linear exata suficiente para tornar a matriz residual singular.
-
-Nesse caso,
-
-$$
-\mathbf E^{-1}
-$$
-
-não existe e a formulação espectral clássica adotada neste capítulo deixa de estar disponível diretamente.
-
-Assim, deve-se distinguir forte associação entre respostas de singularidade da estrutura residual.
+O problema estrutural ocorre quando existe dependência linear exata suficiente para tornar $\mathbf E$ singular. Deve-se, portanto, distinguir associação forte entre respostas de singularidade da estrutura residual.
 
 ## Relações com outras técnicas
 
-A MANOVA compartilha objetos matemáticos com outras técnicas, mas seu objetivo é específico: testar hipóteses sobre parâmetros de um modelo linear com múltiplas respostas.
+A MANOVA compartilha estruturas com outros procedimentos inferenciais e multivariados. As relações abaixo mostram como a comparação entre hipótese e erro se especializa ou recebe outra interpretação conforme o problema estatístico.
 
 ### ANOVA
 
-Quando
+Quando existe uma única resposta,
 
 $$
 p=1,
 $$
 
-as matrizes
+as matrizes de hipótese e erro reduzem-se a escalares,
 
 $$
-\mathbf H
+\mathbf H=(H),
+\qquad
+\mathbf E=(E),
 $$
 
-e
+e existe no máximo uma raiz característica,
 
 $$
-\mathbf E
+\lambda
+=
+\frac{H}{E}.
 $$
 
-reduzem-se a escalares e existe no máximo uma raiz característica.
-
-Por @eq-relacao-f-raiz-manova,
+Se $\nu_H$ e $\nu_E$ são os graus de liberdade da hipótese e do erro, respectivamente, então
 
 $$
 F
 =
+\frac{
+H/\nu_H
+}{
+E/\nu_E
+}
+=
 \frac{\nu_E}{\nu_H}
 \lambda.
-$$
+$$ {#eq-relacao-f-raiz-manova}
 
-Assim, os quatro critérios multivariados tornam-se transformações monotônicas da mesma razão utilizada na ANOVA.
-
-A MANOVA preserva a lógica de comparação entre hipótese e erro, substituindo somas de quadrados escalares por matrizes de somas de quadrados e produtos cruzados.
+Os quatro critérios multivariados tornam-se, nesse caso, funções monotônicas da mesma razão utilizada pela ANOVA. A MANOVA preserva, portanto, a comparação entre hipótese e erro, substituindo somas de quadrados escalares por matrizes de somas de quadrados e produtos cruzados.
 
 ### $T^2$ de Hotelling
 
-Quando a hipótese de comparação entre dois grupos possui uma única direção independente,
+Na comparação clássica de duas populações,
 
 $$
-g=1,
+K=2,
 $$
 
-e existe no máximo uma raiz positiva.
+há apenas um contraste independente e, portanto,
 
-No caso clássico de duas amostras independentes, @eq-relacao-raiz-t2-manova estabelece
+$$
+g=1.
+$$
+
+Existe no máximo uma raiz característica positiva.
+
+Para duas amostras independentes de tamanhos $n_1$ e $n_2$, com matriz de covariâncias comum, a relação com a estatística definida em @def-t2-duas-amostras-independentes é
 
 $$
 \lambda_1
@@ -4027,19 +1656,15 @@ T^2
 }{
 n_1+n_2-2
 }.
-$$
+$$ {#eq-relacao-raiz-t2-manova}
 
-A MANOVA de dois grupos e o teste
+Assim, o teste $T^2$ para duas populações e a MANOVA de dois grupos utilizam a mesma razão multivariada entre diferença de médias e dispersão residual.
 
-$$
-T^2
-$$
-
-de Hotelling utilizam, portanto, a mesma estrutura de comparação multivariada.
+Com hipóteses de posto superior a $1$, várias raízes podem ser positivas e os critérios de Wilks, Pillai, Hotelling--Lawley e Roy passam a agregá-las de formas distintas.
 
 ### Regressão multivariada
 
-MANOVA e regressão multivariada são casos do mesmo modelo
+MANOVA e regressão multivariada utilizam o mesmo modelo
 
 $$
 \boldsymbol{\mathcal Y}
@@ -4049,19 +1674,7 @@ $$
 \boldsymbol{\mathcal E}.
 $$
 
-A distinção principal está na natureza dos termos representados em
-
-$$
-\mathbf Z
-$$
-
-e nas hipóteses formuladas sobre
-
-$$
-\mathbf B.
-$$
-
-Indicadores e contrastes podem representar grupos e fatores; variáveis quantitativas podem representar covariáveis ou preditores contínuos.
+A diferença está na estrutura representada em $\mathbf Z$ e nas hipóteses formuladas sobre $\mathbf B$. Indicadores e contrastes podem representar grupos ou fatores, enquanto variáveis quantitativas podem representar covariáveis ou preditores contínuos.
 
 Em ambos os casos, hipóteses estimáveis sobre
 
@@ -4069,81 +1682,54 @@ $$
 \mathbf C_1\mathbf B
 $$
 
-podem ser avaliadas pela mesma construção de matrizes de hipótese e erro.
-
-Portanto, a MANOVA não deve ser entendida como um modelo inteiramente separado da regressão multivariada. Ela utiliza a teoria do modelo linear multivariado para testar efeitos conjuntos sobre várias respostas.
+podem ser avaliadas pelas mesmas matrizes de hipótese e erro.
 
 ### Análise Discriminante
 
-No problema de grupos conhecidos, as matrizes que aparecem na MANOVA possuem correspondentes diretos na formulação geométrica da Análise Discriminante.
+MANOVA e Análise Discriminante compartilham a comparação entre estruturas associadas à separação dos grupos e à dispersão dentro dos grupos.
 
-A matriz de hipótese contém a estrutura associada às diferenças entre grupos, enquanto a matriz de erro contém a estrutura de dispersão dentro dos grupos.
-
-Por isso, o problema
+Na MANOVA, o problema
 
 $$
-\mathbf H
-\mathbf a
+\mathbf H\mathbf a
 =
 \lambda
-\mathbf E
-\mathbf a
+\mathbf E\mathbf a
 $$
 
-também aparecerá na formulação discriminante de Fisher.
+produz direções utilizadas para representar a magnitude de uma hipótese relativamente ao erro e sustentar testes inferenciais.
 
-A coincidência algébrica não implica coincidência de objetivos.
+Na @sec-discriminante, uma estrutura análoga de autovalores generalizados será utilizada com outro objetivo: construir combinações das variáveis que favoreçam a separação entre grupos previamente conhecidos.
 
-Na MANOVA, as matrizes de hipótese e erro são utilizadas para testar diferenças na função paramétrica multivariada especificada pela hipótese. Na Análise Discriminante, estruturas correspondentes de dispersão entre e dentro dos grupos serão utilizadas para construir combinações das variáveis que favoreçam separação, discriminação e classificação.
-
-Assim, as mesmas matrizes e o mesmo problema de autovalores generalizados podem receber interpretações estatísticas diferentes segundo o objetivo da técnica.
+A coincidência algébrica não implica coincidência estatística. Na MANOVA, o objetivo é testar efeitos sobre várias respostas; na Análise Discriminante, o objetivo passa a ser representar separação e construir regras de discriminação ou classificação.
 
 ## Síntese
 
-A MANOVA é formulada no modelo linear multivariado
+A MANOVA testa hipóteses sobre várias respostas conjuntamente no modelo linear multivariado
 
 $$
 \boldsymbol{\mathcal Y}
 =
 \mathbf Z\mathbf B
 +
-\boldsymbol{\mathcal E},
+\boldsymbol{\mathcal E}.
 $$
 
-e testa funções estimáveis dos parâmetros. Para a hipótese
-
-$$
-H_0:
-\mathbf C_1\mathbf B
-=
-\boldsymbol{\Theta}_0,
-$$
-
-a variação associada ao afastamento da hipótese é representada por
+Para uma hipótese estimável sobre os parâmetros, a matriz
 
 $$
 \mathbf H
-\succeq
-\mathbf0,
 $$
 
-enquanto a variação residual é representada por
+representa a variação multivariada associada ao afastamento observado da hipótese, enquanto
 
 $$
 \mathbf E
-\succeq
-\mathbf0.
 $$
 
-Quando
+representa a variação residual utilizada como referência.
 
-$$
-\mathbf E
-\succ
-\mathbf0,
-$$
-
-cada combinação linear das respostas definida por $\mathbf a\neq\mathbf0$ pode ser avaliada pelo quociente
+A comparação entre essas estruturas é formulada, para uma combinação linear das respostas determinada por $\mathbf a\neq\mathbf0$, pelo quociente
 
 $$
 \mathcal R_{\mathbf H,\mathbf E}
@@ -4160,7 +1746,15 @@ $$
 }.
 $$
 
-Os valores extremos desse quociente são obtidos pelo problema de autovalores generalizados
+Quando
+
+$$
+\mathbf E
+\succ
+\mathbf0,
+$$
+
+as direções extremas são determinadas pelo problema de autovalores generalizados
 
 $$
 \mathbf H\mathbf a
@@ -4169,78 +1763,36 @@ $$
 \mathbf E\mathbf a.
 $$
 
-Equivalentemente, a transformação
+A transformação
 
 $$
-\mathbf K_{\mathrm{HE}}
+\mathbf M_{\mathrm{HE}}
 =
 \mathbf E^{-1/2}
 \mathbf H
 \mathbf E^{-1/2}
 $$
 
-converte a comparação em um problema espectral simétrico na geometria em que a dispersão residual foi padronizada.
-
-Se
+converte esse problema em uma decomposição espectral simétrica na geometria em que a dispersão residual foi padronizada. As raízes características
 
 $$
-r_H
-=
-\operatorname{posto}
-\left(
-\mathbf H
-\right),
+\lambda_1
+\geq
+\cdots
+\geq
+\lambda_p
+\geq
+0
 $$
 
-existem exatamente $r_H$ raízes positivas, com
+quantificam a magnitude da hipótese relativamente ao erro nas respectivas direções características.
 
-$$
-r_H
-\leq
-\min(p,g).
-$$
+Os critérios de Wilks, Pillai, Hotelling--Lawley e Roy são funções dessa mesma coleção de raízes. Eles diferem pela forma de agregação: Wilks combina multiplicativamente todas as raízes; Pillai soma transformações limitadas; Hotelling--Lawley soma diretamente suas magnitudes; e Roy utiliza apenas a raiz dominante. A @tbl-criterios-manova reúne essas relações.
 
-Essas raízes quantificam a magnitude da hipótese relativamente ao erro nas direções características.
+A construção de $\mathbf H$, $\mathbf E$, das raízes e dos quatro critérios é algébrica. A inferência clássica acrescenta a hipótese de erros normais multivariados independentes com matriz de covariâncias residual comum. Sob essas condições, as SQPCs da hipótese e do erro possuem a estrutura normal--Wishart que sustenta as distribuições de referência dos critérios.
 
-Os quatro critérios clássicos agregam a mesma coleção de raízes de formas diferentes:
+A formulação exige distinguir condições com funções diferentes. A estimabilidade determina se a hipótese está identificada; a positividade definida de $\mathbf E$ permite a formulação espectral clássica; a independência entre unidades e a covariância residual comum pertencem ao modelo probabilístico; e a normalidade sustenta a calibração inferencial clássica. Correlação elevada entre respostas não constitui, por si só, singularidade.
 
-$$
-\Lambda_{\mathrm W}
-=
-\prod_{j=1}^{p}
-\frac1{1+\lambda_j},
-$$
+Quando $p=1$, a comparação reduz-se à estrutura da ANOVA. Na comparação de duas populações, existe no máximo uma raiz positiva e a formulação relaciona-se ao $T^2$ de Hotelling. Essas relações mostram que a MANOVA amplia a comparação entre hipótese e erro para situações com várias respostas conjuntamente.
 
-$$
-V
-=
-\sum_{j=1}^{p}
-\frac{\lambda_j}{1+\lambda_j},
-$$
-
-$$
-U
-=
-\sum_{j=1}^{p}
-\lambda_j
-$$
-
-e
-
-$$
-\Theta_{\mathrm R}
-=
-\lambda_1.
-$$
-
-Wilks utiliza uma agregação multiplicativa; Pillai soma raízes transformadas para uma escala limitada; Hotelling--Lawley soma diretamente as raízes; Roy utiliza apenas a direção dominante. Os quatro critérios descrevem, portanto, a mesma estrutura espectral por funções distintas.
-
-A construção das matrizes, das raízes e dos critérios é algébrica e não exige normalidade multivariada. Sob o modelo linear normal, a estrutura normal--Wishart fornece a base probabilística da inferência clássica e da relação entre a lambda de Wilks e a razão de verossimilhanças.
-
-A formulação exige ainda distinguir estimabilidade da hipótese, posto e não singularidade da estrutura residual, independência entre unidades, covariância residual comum e normalidade. Essas condições desempenham papéis diferentes: algumas garantem que os objetos algébricos estejam definidos e outras sustentam a interpretação probabilística dos testes.
-
-Quando $p=1$, a estrutura reduz-se à comparação univariada entre hipótese e erro. Em problemas com uma única direção independente, a MANOVA relaciona-se ao $T^2$ de Hotelling. MANOVA e regressão multivariada pertencem ao mesmo modelo linear e diferem principalmente pelos termos representados no delineamento e pelas hipóteses formuladas.
-
-A MANOVA integra modelo linear multivariado, funções estimáveis, formas quadráticas, produtos internos induzidos, autovalores generalizados, decomposição espectral, normal multivariada e distribuição Wishart para testar efeitos conjuntos sobre várias respostas.
-
-No próximo capítulo, os grupos permanecem conhecidos, mas o objetivo muda. A Análise Discriminante utilizará estruturas de dispersão entre e dentro dos grupos para construir direções de separação e, em sua formulação probabilística, regras para classificar novas observações.
+No próximo capítulo, os grupos continuam previamente conhecidos, mas o objetivo estatístico muda. A @sec-discriminante utilizará estruturas de dispersão entre e dentro dos grupos e um problema de autovalores generalizados para construir direções de separação e, sob modelos probabilísticos específicos, regras de classificação.
