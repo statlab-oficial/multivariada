@@ -1,0 +1,3566 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.23">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>17&nbsp; Formulação da Análise de Correspondência</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 1em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./mod_3_manova.html" rel="next">
+<link href="./mod_3_agrupamento.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-1fe81d0376b2c50856e68e651e390326.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-6f6599830d51be977da3b6af758f8eff.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-1fe81d0376b2c50856e68e651e390326.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-2641b481724464e61c86985d8c912b6f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-4c6d65c679321d81af7ec8b61b1d5a24.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-2641b481724464e61c86985d8c912b6f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Nenhum resultado",
+    "search-matching-documents-text": "documentos correspondentes",
+    "search-copy-link-title": "Copiar link para a busca",
+    "search-hide-matches-text": "Esconder correspondências adicionais",
+    "search-more-match-text": "mais correspondência neste documento",
+    "search-more-matches-text": "mais correspondências neste documento",
+    "search-clear-button-title": "Limpar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Procurar"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./mod_3_estruturas.html">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</a></li><li class="breadcrumb-item"><a href="./mod_3_correspondencia.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Formulação da Análise de Correspondência</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Procurar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
+      <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo escuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Procurar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Informações Legais e Declaração de Uso de Inteligência Artificial</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./prefacio_multivariada.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./identifica_multivariada.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Identificação da Disciplina</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo I — Fundamentos Matemáticos e Geométricos da Análise Multivariada</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_vetores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Vetores e representação dos dados multivariados</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_matrizes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Álgebra matricial aplicada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_espacos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Espaços vetoriais, bases e projeções</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_transformacoes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Transformações lineares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_autovetores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Autovalores, autovetores e decomposição espectral</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_svd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Decomposição em Valores Singulares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_calculo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Cálculo Diferencial, Integral e Matricial Aplicado à Estatística Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_exc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercícios de fixação do Módulo I</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo II — Fundamentos Probabilísticos e Inferenciais da Análise Multivariada</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_covariancias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Matrizes de covariâncias e correlações</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_normal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Distribuição Normal Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_amostrais.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Estatísticas Amostrais e Estimação</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_modelo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Modelo Linear Multivariado e Hipóteses Lineares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_inferencia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Inferência Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_exc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercícios de fixação do Módulo II</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_estruturas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Problemas e estruturas das técnicas multivariadas</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_cp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Formulação da Análise de Componentes Principais</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_fatorial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Formulação da Análise Fatorial</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_agrupamento.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Formulação da Análise de Agrupamentos</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_correspondencia.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Formulação da Análise de Correspondência</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_manova.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Formulação da MANOVA</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_discriminante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Formulação da Análise Discriminante</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referências</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Índice</h2>
+   
+  <ul>
+  <li><a href="#sec-ca-tabela-contingencia" id="toc-sec-ca-tabela-contingencia" class="nav-link active" data-scroll-target="#sec-ca-tabela-contingencia"><span class="header-section-number">17.1</span> O problema de associação em uma tabela de contingência</a></li>
+  <li><a href="#frequências-marginais-massas-e-perfis" id="toc-frequências-marginais-massas-e-perfis" class="nav-link" data-scroll-target="#frequências-marginais-massas-e-perfis"><span class="header-section-number">17.2</span> Frequências marginais, massas e perfis</a>
+  <ul class="collapse">
+  <li><a href="#distribuições-condicionais-observadas" id="toc-distribuições-condicionais-observadas" class="nav-link" data-scroll-target="#distribuições-condicionais-observadas"><span class="header-section-number">17.2.1</span> Distribuições condicionais observadas</a></li>
+  <li><a href="#independência-como-referência" id="toc-independência-como-referência" class="nav-link" data-scroll-target="#independência-como-referência"><span class="header-section-number">17.2.2</span> Independência como referência</a></li>
+  </ul></li>
+  <li><a href="#geometria-dos-perfis" id="toc-geometria-dos-perfis" class="nav-link" data-scroll-target="#geometria-dos-perfis"><span class="header-section-number">17.3</span> Geometria dos perfis</a></li>
+  <li><a href="#sec-ca-inercia" id="toc-sec-ca-inercia" class="nav-link" data-scroll-target="#sec-ca-inercia"><span class="header-section-number">17.4</span> Inércia e afastamento da independência</a></li>
+  <li><a href="#padronização-dos-desvios-da-independência" id="toc-padronização-dos-desvios-da-independência" class="nav-link" data-scroll-target="#padronização-dos-desvios-da-independência"><span class="header-section-number">17.5</span> Padronização dos desvios da independência</a>
+  <ul class="collapse">
+  <li><a href="#inércia-como-norma-matricial" id="toc-inércia-como-norma-matricial" class="nav-link" data-scroll-target="#inércia-como-norma-matricial"><span class="header-section-number">17.5.1</span> Inércia como norma matricial</a></li>
+  </ul></li>
+  <li><a href="#relação-algébrica-com-a-estatística-qui-quadrado" id="toc-relação-algébrica-com-a-estatística-qui-quadrado" class="nav-link" data-scroll-target="#relação-algébrica-com-a-estatística-qui-quadrado"><span class="header-section-number">17.6</span> Relação algébrica com a estatística qui-quadrado</a></li>
+  <li><a href="#sec-ca-svd" id="toc-sec-ca-svd" class="nav-link" data-scroll-target="#sec-ca-svd"><span class="header-section-number">17.7</span> Formulação pela decomposição em valores singulares</a>
+  <ul class="collapse">
+  <li><a href="#decomposição-da-inércia" id="toc-decomposição-da-inércia" class="nav-link" data-scroll-target="#decomposição-da-inércia"><span class="header-section-number">17.7.1</span> Decomposição da inércia</a></li>
+  <li><a href="#representação-em-dimensão-reduzida" id="toc-representação-em-dimensão-reduzida" class="nav-link" data-scroll-target="#representação-em-dimensão-reduzida"><span class="header-section-number">17.7.2</span> Representação em dimensão reduzida</a></li>
+  </ul></li>
+  <li><a href="#sec-ca-coordenadas" id="toc-sec-ca-coordenadas" class="nav-link" data-scroll-target="#sec-ca-coordenadas"><span class="header-section-number">17.8</span> Coordenadas da Análise de Correspondência</a>
+  <ul class="collapse">
+  <li><a href="#sistema-de-coordenadas-padrão" id="toc-sistema-de-coordenadas-padrão" class="nav-link" data-scroll-target="#sistema-de-coordenadas-padrão"><span class="header-section-number">17.8.1</span> Sistema de coordenadas padrão</a></li>
+  <li><a href="#sistema-de-coordenadas-principais" id="toc-sistema-de-coordenadas-principais" class="nav-link" data-scroll-target="#sistema-de-coordenadas-principais"><span class="header-section-number">17.8.2</span> Sistema de coordenadas principais</a></li>
+  <li><a href="#distâncias-entre-perfis-e-coordenadas-principais" id="toc-distâncias-entre-perfis-e-coordenadas-principais" class="nav-link" data-scroll-target="#distâncias-entre-perfis-e-coordenadas-principais"><span class="header-section-number">17.8.3</span> Distâncias entre perfis e coordenadas principais</a></li>
+  <li><a href="#relações-baricêntricas" id="toc-relações-baricêntricas" class="nav-link" data-scroll-target="#relações-baricêntricas"><span class="header-section-number">17.8.4</span> Relações baricêntricas</a></li>
+  <li><a href="#sec-ca-reconstrucao-desvios" id="toc-sec-ca-reconstrucao-desvios" class="nav-link" data-scroll-target="#sec-ca-reconstrucao-desvios"><span class="header-section-number">17.8.5</span> Aprofundamento: reconstrução dos desvios da independência</a></li>
+  </ul></li>
+  <li><a href="#representação-conjunta-de-linhas-e-colunas" id="toc-representação-conjunta-de-linhas-e-colunas" class="nav-link" data-scroll-target="#representação-conjunta-de-linhas-e-colunas"><span class="header-section-number">17.9</span> Representação conjunta de linhas e colunas</a>
+  <ul class="collapse">
+  <li><a href="#o-significado-das-proximidades" id="toc-o-significado-das-proximidades" class="nav-link" data-scroll-target="#o-significado-das-proximidades"><span class="header-section-number">17.9.1</span> O significado das proximidades</a></li>
+  <li><a href="#sec-ca-contribuicao-cos2" id="toc-sec-ca-contribuicao-cos2" class="nav-link" data-scroll-target="#sec-ca-contribuicao-cos2"><span class="header-section-number">17.9.2</span> Aprofundamento: contribuição e qualidade de representação</a></li>
+  </ul></li>
+  <li><a href="#sec-ca-descritiva-inferencial" id="toc-sec-ca-descritiva-inferencial" class="nav-link" data-scroll-target="#sec-ca-descritiva-inferencial"><span class="header-section-number">17.10</span> Formulação descritiva e inferencial</a>
+  <ul class="collapse">
+  <li><a href="#aprofundamento-formulação-probabilística-e-teste-de-independência" id="toc-aprofundamento-formulação-probabilística-e-teste-de-independência" class="nav-link" data-scroll-target="#aprofundamento-formulação-probabilística-e-teste-de-independência"><span class="header-section-number">17.10.1</span> Aprofundamento: formulação probabilística e teste de independência</a></li>
+  <li><a href="#teste-global-e-magnitude-geométrica" id="toc-teste-global-e-magnitude-geométrica" class="nav-link" data-scroll-target="#teste-global-e-magnitude-geométrica"><span class="header-section-number">17.10.2</span> Teste global e magnitude geométrica</a></li>
+  </ul></li>
+  <li><a href="#relação-com-a-análise-de-componentes-principais" id="toc-relação-com-a-análise-de-componentes-principais" class="nav-link" data-scroll-target="#relação-com-a-análise-de-componentes-principais"><span class="header-section-number">17.11</span> Relação com a Análise de Componentes Principais</a></li>
+  <li><a href="#sec-ca-categorias-suplementares" id="toc-sec-ca-categorias-suplementares" class="nav-link" data-scroll-target="#sec-ca-categorias-suplementares"><span class="header-section-number">17.12</span> Aprofundamento: categorias suplementares</a>
+  <ul class="collapse">
+  <li><a href="#linhas-suplementares" id="toc-linhas-suplementares" class="nav-link" data-scroll-target="#linhas-suplementares"><span class="header-section-number">17.12.1</span> Linhas suplementares</a></li>
+  <li><a href="#colunas-suplementares" id="toc-colunas-suplementares" class="nav-link" data-scroll-target="#colunas-suplementares"><span class="header-section-number">17.12.2</span> Colunas suplementares</a></li>
+  <li><a href="#qualidade-de-representação" id="toc-qualidade-de-representação" class="nav-link" data-scroll-target="#qualidade-de-representação"><span class="header-section-number">17.12.3</span> Qualidade de representação</a></li>
+  </ul></li>
+  <li><a href="#condições-e-limites-da-representação" id="toc-condições-e-limites-da-representação" class="nav-link" data-scroll-target="#condições-e-limites-da-representação"><span class="header-section-number">17.13</span> Condições e limites da representação</a>
+  <ul class="collapse">
+  <li><a href="#tabela-ativa-e-massas" id="toc-tabela-ativa-e-massas" class="nav-link" data-scroll-target="#tabela-ativa-e-massas"><span class="header-section-number">17.13.1</span> Tabela ativa e massas</a></li>
+  <li><a href="#dimensão-da-representação" id="toc-dimensão-da-representação" class="nav-link" data-scroll-target="#dimensão-da-representação"><span class="header-section-number">17.13.2</span> Dimensão da representação</a></li>
+  <li><a href="#sinais-multiplicidades-e-orientação" id="toc-sinais-multiplicidades-e-orientação" class="nav-link" data-scroll-target="#sinais-multiplicidades-e-orientação"><span class="header-section-number">17.13.3</span> Sinais, multiplicidades e orientação</a></li>
+  <li><a href="#proximidade-entre-linhas-e-colunas" id="toc-proximidade-entre-linhas-e-colunas" class="nav-link" data-scroll-target="#proximidade-entre-linhas-e-colunas"><span class="header-section-number">17.13.4</span> Proximidade entre linhas e colunas</a></li>
+  </ul></li>
+  <li><a href="#síntese" id="toc-síntese" class="nav-link" data-scroll-target="#síntese"><span class="header-section-number">17.14</span> Síntese</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./mod_3_estruturas.html">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</a></li><li class="breadcrumb-item"><a href="./mod_3_correspondencia.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Formulação da Análise de Correspondência</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-correspondencia" class="quarto-section-identifier"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Formulação da Análise de Correspondência</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A Análise de Correspondência representa geometricamente a associação entre as categorias de duas variáveis qualitativas a partir de uma tabela de contingência. A técnica compara os perfis observados com a estrutura correspondente à independência em uma geometria ponderada pelas frequências marginais <span class="citation" data-cites="greenacre2017ca">(<a href="#ref-greenacre2017ca" role="doc-biblioref">Greenacre, 2017</a>)</span>.</p>
+<p>Os desvios da independência são padronizados pelas massas e organizados em uma matriz cuja SVD fornece as dimensões da associação, suas inércias e as coordenadas das categorias de linhas e colunas.</p>
+<p>O capítulo desenvolve a formulação matemática e estatística da Análise de Correspondência simples. Critérios operacionais de escolha da dimensão, interpretação aplicada de mapas, implementação computacional e extensões serão tratados posteriormente. Categorias suplementares serão apresentadas ao final como aprofundamento da geometria desenvolvida para as categorias ativas.</p>
+<p>Os elementos da formulação são organizados na <a href="#tbl-estrutura-correspondencia" class="quarto-xref">Tabela&nbsp;<span class="quarto-unresolved-ref">tbl-estrutura-correspondencia</span></a>.</p>
+<div id="tbl-estrutura-correspondencia" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-estrutura-correspondencia-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;17.1: Elementos da formulação da Análise de Correspondência.
+</figcaption>
+<div aria-describedby="tbl-estrutura-correspondencia-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Elemento</th>
+<th>Objeto</th>
+<th>Papel na análise</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>dados observados</td>
+<td>tabela de contingência <span class="math inline">\(\mathbf N\)</span></td>
+<td>registra as frequências conjuntas</td>
+</tr>
+<tr class="even">
+<td>distribuição observada</td>
+<td>matriz <span class="math inline">\(\mathbf P\)</span></td>
+<td>expressa frequências relativas</td>
+</tr>
+<tr class="odd">
+<td>pesos marginais</td>
+<td>massas <span class="math inline">\(\mathbf r\)</span> e <span class="math inline">\(\mathbf c\)</span></td>
+<td>determinam a importância relativa das categorias</td>
+</tr>
+<tr class="even">
+<td>representação interna</td>
+<td>perfis de linhas e de colunas</td>
+<td>descreve distribuições condicionais observadas</td>
+</tr>
+<tr class="odd">
+<td>referência</td>
+<td>independência</td>
+<td>fornece a estrutura sem associação</td>
+</tr>
+<tr class="even">
+<td>geometria</td>
+<td>distância qui-quadrado</td>
+<td>compara perfis com ponderação pelas massas</td>
+</tr>
+<tr class="odd">
+<td>estrutura matricial</td>
+<td>desvios padronizados <span class="math inline">\(\mathbf Q_{\mathrm{CA}}\)</span></td>
+<td>reúne os desvios da independência</td>
+</tr>
+<tr class="even">
+<td>solução</td>
+<td>SVD de <span class="math inline">\(\mathbf Q_{\mathrm{CA}}\)</span></td>
+<td>produz inércias e coordenadas</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<section id="sec-ca-tabela-contingencia" class="level2" data-number="17.1">
+<h2 data-number="17.1" class="anchored" data-anchor-id="sec-ca-tabela-contingencia"><span class="header-section-number">17.1</span> O problema de associação em uma tabela de contingência</h2>
+<p>As duas variáveis analisadas são categóricas, conforme a distinção apresentada na <a href="#sec-natureza-variaveis" class="quarto-xref"><span class="quarto-unresolved-ref">sec-natureza-variaveis</span></a>. Suas categorias não são tratadas como coordenadas quantitativas em <span class="math inline">\(\mathbb R^p\)</span>. A informação utilizada pela Análise de Correspondência é organizada pelas frequências conjuntas das categorias em uma tabela de contingência.</p>
+<p>Considere duas variáveis qualitativas, uma com <span class="math inline">\(I\)</span> categorias e outra com <span class="math inline">\(J\)</span> categorias. As frequências observadas são organizadas na tabela</p>
+<p><span class="math display">\[
+\mathbf N
+=
+(n_{ij})
+\in
+\mathbb N_0^{I\times J},
+\]</span></p>
+<p>em que</p>
+<p><span class="math display">\[
+n_{ij}
+\in
+\mathbb N_0
+\]</span></p>
+<p>representa a frequência conjunta observada da categoria <span class="math inline">\(i\)</span> da variável das linhas com a categoria <span class="math inline">\(j\)</span> da variável das colunas.</p>
+<p>O total observado é</p>
+<p><span id="eq-total-correspondencia"><span class="math display">\[
+n
+=
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+n_{ij},
+\qquad
+n&gt;0.
+\tag{17.1}\]</span></span></p>
+<p>A condição <span class="math inline">\(n&gt;0\)</span> permite definir a matriz de frequências relativas observadas</p>
+<p><span id="eq-matriz-frequencias-relativas-ca"><span class="math display">\[
+\mathbf P
+=
+\frac{1}{n}\mathbf N
+=
+(p_{ij})
+\in
+\mathbb R^{I\times J}.
+\tag{17.2}\]</span></span></p>
+<p>Assim,</p>
+<p><span class="math display">\[
+p_{ij}
+=
+\frac{n_{ij}}{n}
+\geq
+0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+p_{ij}
+=
+1.
+\]</span></p>
+<p>A matriz <span class="math inline">\(\mathbf P\)</span> descreve a <strong>distribuição relativa observada</strong> na tabela. Neste desenvolvimento geométrico, <span class="math inline">\(\mathbf P\)</span> é construída diretamente a partir das frequências observadas. Uma distribuição conjunta populacional será introduzida somente quando o modelo probabilístico para a tabela for considerado na seção inferencial.</p>
+<p>A análise procura determinar como <span class="math inline">\(\mathbf P\)</span> se afasta da estrutura correspondente à independência e representar esse afastamento em poucas dimensões.</p>
+<p>A tabela possui duas leituras complementares. Comparando as linhas, investigam-se diferenças entre as distribuições das categorias das colunas condicionadas a cada linha. Comparando as colunas, investigam-se diferenças entre as distribuições das categorias das linhas condicionadas a cada coluna.</p>
+</section>
+<section id="frequências-marginais-massas-e-perfis" class="level2" data-number="17.2">
+<h2 data-number="17.2" class="anchored" data-anchor-id="frequências-marginais-massas-e-perfis"><span class="header-section-number">17.2</span> Frequências marginais, massas e perfis</h2>
+<p>As frequências marginais relativas determinam os pesos utilizados na geometria da Análise de Correspondência.</p>
+<div id="def-massas-correspondencia" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 17.1 (Massas de linhas e colunas)</strong></span> Considere uma matriz de frequências relativas</p>
+<p><span class="math display">\[
+\mathbf P
+=
+(p_{ij})
+\in
+\mathbb R^{I\times J},
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+p_{ij}\geq0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+p_{ij}
+=
+1.
+\]</span></p>
+<p>As <strong>massas das linhas</strong> são as frequências relativas marginais</p>
+<p><span class="math display">\[
+r_i
+=
+\sum_{j=1}^{J}
+p_{ij},
+\qquad
+i=1,\ldots,I,
+\]</span></p>
+<p>e as <strong>massas das colunas</strong> são</p>
+<p><span class="math display">\[
+c_j
+=
+\sum_{i=1}^{I}
+p_{ij},
+\qquad
+j=1,\ldots,J.
+\]</span></p>
+<p>Em forma vetorial,</p>
+<p><span class="math display">\[
+\mathbf r
+=
+\mathbf P\mathbf1_J
+\in
+\mathbb R^I
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf c
+=
+\mathbf P^\top\mathbf1_I
+\in
+\mathbb R^J.
+\]</span></p>
+<p>Como a soma dos elementos de <span class="math inline">\(\mathbf P\)</span> é igual a <span class="math inline">\(1\)</span>,</p>
+<p><span class="math display">\[
+\mathbf1_I^\top\mathbf r
+=
+\mathbf1_J^\top\mathbf c
+=
+1.
+\]</span></p>
+<p>As matrizes diagonais das massas são</p>
+<p><span class="math display">\[
+\mathbf D_r
+=
+\operatorname{diag}
+(r_1,\ldots,r_I)
+\in
+\mathbb R^{I\times I}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf D_c
+=
+\operatorname{diag}
+(c_1,\ldots,c_J)
+\in
+\mathbb R^{J\times J}.
+\]</span></p>
+</div>
+<p>A definição admite massas nulas. A geometria ativa da Análise de Correspondência, entretanto, utiliza inversas e raízes inversas dessas matrizes. No desenvolvimento do capítulo serão consideradas categorias ativas com</p>
+<p><span class="math display">\[
+r_i&gt;0,
+\qquad
+i=1,\ldots,I,
+\]</span></p>
+<p>e</p>
+<p><span id="eq-massas-positivas-ca"><span class="math display">\[
+c_j&gt;0,
+\qquad
+j=1,\ldots,J.
+\tag{17.3}\]</span></span></p>
+<p>Categorias de massa nula não possuem perfis definidos e não participam da geometria ativa. Essa situação será retomada nos limites da representação.</p>
+<section id="distribuições-condicionais-observadas" class="level3" data-number="17.2.1">
+<h3 data-number="17.2.1" class="anchored" data-anchor-id="distribuições-condicionais-observadas"><span class="header-section-number">17.2.1</span> Distribuições condicionais observadas</h3>
+<p>A Análise de Correspondência compara distribuições condicionais observadas, denominadas perfis.</p>
+<div id="def-perfis-correspondencia" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 17.2 (Perfis de linhas e de colunas)</strong></span> Considere</p>
+<p><span class="math display">\[
+\mathbf P
+=
+(p_{ij})
+\in
+\mathbb R^{I\times J}
+\]</span></p>
+<p>uma matriz de frequências relativas com massas de linhas e colunas dadas por <a href="#def-massas-correspondencia" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-massas-correspondencia</span></a>.</p>
+<p>Para uma linha <span class="math inline">\(i\)</span> com</p>
+<p><span class="math display">\[
+r_i&gt;0,
+\]</span></p>
+<p>o <strong>perfil da linha <span class="math inline">\(i\)</span></strong> é</p>
+<p><span id="eq-perfil-linha-ca"><span class="math display">\[
+\mathbf p_{i\mid\cdot}
+=
+\begin{pmatrix}
+\dfrac{p_{i1}}{r_i}\\
+\vdots\\
+\dfrac{p_{iJ}}{r_i}
+\end{pmatrix}
+\in
+\mathbb R^J.
+\tag{17.4}\]</span></span></p>
+<p>Para uma coluna <span class="math inline">\(j\)</span> com</p>
+<p><span class="math display">\[
+c_j&gt;0,
+\]</span></p>
+<p>o <strong>perfil da coluna <span class="math inline">\(j\)</span></strong> é</p>
+<p><span id="eq-perfil-coluna-ca"><span class="math display">\[
+\mathbf p_{\cdot\mid j}
+=
+\begin{pmatrix}
+\dfrac{p_{1j}}{c_j}\\
+\vdots\\
+\dfrac{p_{Ij}}{c_j}
+\end{pmatrix}
+\in
+\mathbb R^I.
+\tag{17.5}\]</span></span></p>
+</div>
+<p>Cada perfil possui soma unitária:</p>
+<p><span class="math display">\[
+\mathbf1_J^\top
+\mathbf p_{i\mid\cdot}
+=
+1
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf1_I^\top
+\mathbf p_{\cdot\mid j}
+=
+1.
+\]</span></p>
+<p>Sob <a href="#eq-massas-positivas-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-massas-positivas-ca</span></a>, os perfis de linhas podem ser reunidos na matriz</p>
+<p><span id="eq-matriz-perfis-linhas-ca"><span class="math display">\[
+\mathbf P^{(r)}
+=
+\mathbf D_r^{-1}
+\mathbf P
+\in
+\mathbb R^{I\times J},
+\tag{17.6}\]</span></span></p>
+<p>enquanto os perfis de colunas são organizados em</p>
+<p><span id="eq-matriz-perfis-colunas-ca"><span class="math display">\[
+\mathbf P^{(c)}
+=
+\mathbf D_c^{-1}
+\mathbf P^\top
+\in
+\mathbb R^{J\times I}.
+\tag{17.7}\]</span></span></p>
+<p>O perfil médio das linhas, ponderado pelas massas <span class="math inline">\(r_i\)</span>, é</p>
+<p><span id="eq-centro-perfis-linhas-ca"><span class="math display">\[
+\sum_{i=1}^{I}
+r_i
+\mathbf p_{i\mid\cdot}
+=
+\mathbf c,
+\tag{17.8}\]</span></span></p>
+<p>pois, para cada componente <span class="math inline">\(j\)</span>,</p>
+<p><span class="math display">\[
+\sum_{i=1}^{I}
+r_i
+\frac{p_{ij}}{r_i}
+=
+\sum_{i=1}^{I}
+p_{ij}
+=
+c_j.
+\]</span></p>
+<p>De forma dual,</p>
+<p><span id="eq-centro-perfis-colunas-ca"><span class="math display">\[
+\sum_{j=1}^{J}
+c_j
+\mathbf p_{\cdot\mid j}
+=
+\mathbf r.
+\tag{17.9}\]</span></span></p>
+<p>Assim, <span class="math inline">\(\mathbf c\)</span> é o centro ponderado da nuvem dos perfis de linhas e <span class="math inline">\(\mathbf r\)</span> é o centro ponderado da nuvem dos perfis de colunas.</p>
+</section>
+<section id="independência-como-referência" class="level3" data-number="17.2.2">
+<h3 data-number="17.2.2" class="anchored" data-anchor-id="independência-como-referência"><span class="header-section-number">17.2.2</span> Independência como referência</h3>
+<p>Para a distribuição relativa observada, a estrutura de independência associada às marginais <span class="math inline">\(\mathbf r\)</span> e <span class="math inline">\(\mathbf c\)</span> é</p>
+<p><span id="eq-independencia-celula-ca"><span class="math display">\[
+p_{ij}
+=
+r_ic_j,
+\tag{17.10}\]</span></span></p>
+<p>ou, em forma matricial,</p>
+<p><span id="eq-independencia-matricial-ca"><span class="math display">\[
+\mathbf P
+=
+\mathbf r\mathbf c^\top.
+\tag{17.11}\]</span></span></p>
+<p>Nesse caso, como as massas ativas são positivas,</p>
+<p><span class="math display">\[
+\frac{p_{ij}}{r_i}
+=
+c_j,
+\]</span></p>
+<p>de modo que</p>
+<p><span class="math display">\[
+\mathbf p_{i\mid\cdot}
+=
+\mathbf c
+\]</span></p>
+<p>para todas as linhas.</p>
+<p>Analogamente,</p>
+<p><span class="math display">\[
+\frac{p_{ij}}{c_j}
+=
+r_i,
+\]</span></p>
+<p>e todos os perfis de colunas coincidem com</p>
+<p><span class="math display">\[
+\mathbf r.
+\]</span></p>
+<p>A independência corresponde, portanto, ao colapso de cada nuvem de perfis em seu respectivo centro.</p>
+<p>Quando</p>
+<p><span class="math display">\[
+\mathbf P
+\neq
+\mathbf r\mathbf c^\top,
+\]</span></p>
+<p>as diferenças</p>
+<p><span class="math display">\[
+p_{ij}-r_ic_j
+\]</span></p>
+<p>representam os desvios observados em relação à estrutura de independência.</p>
+<p>Esses desvios ainda não levam em conta a importância relativa das marginais. A geometria da Análise de Correspondência surge ao ponderá-los pelas massas das categorias.</p>
+</section>
+</section>
+<section id="geometria-dos-perfis" class="level2" data-number="17.3">
+<h2 data-number="17.3" class="anchored" data-anchor-id="geometria-dos-perfis"><span class="header-section-number">17.3</span> Geometria dos perfis</h2>
+<p>A Análise de Correspondência compara os perfis utilizando uma geometria ponderada pelas massas marginais.</p>
+<p>No Módulo 1, o produto interno induzido e sua norma foram definidos em <a href="#def-produto-interno-induzido" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-produto-interno-induzido</span></a> e <a href="#def-norma-induzida" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-norma-induzida</span></a>. Sob <a href="#eq-massas-positivas-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-massas-positivas-ca</span></a>,</p>
+<p><span class="math display">\[
+\mathbf D_c^{-1}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf D_r^{-1}
+\]</span></p>
+<p>são matrizes diagonais positivas definidas e, portanto, definem produtos internos nos espaços de perfis de linhas e de colunas.</p>
+<p>Essa estrutura conduz à distância qui-quadrado.</p>
+<div id="def-distancia-qui-quadrado-ca" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 17.3 (Distância qui-quadrado entre perfis)</strong></span> Considere uma matriz</p>
+<p><span class="math display">\[
+\mathbf P
+\in
+\mathbb R^{I\times J}
+\]</span></p>
+<p>de frequências relativas cujas massas satisfazem</p>
+<p><span class="math display">\[
+r_i&gt;0,
+\qquad
+i=1,\ldots,I,
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+c_j&gt;0,
+\qquad
+j=1,\ldots,J.
+\]</span></p>
+<p>Se</p>
+<p><span class="math display">\[
+\mathbf p_{i\mid\cdot},
+\mathbf p_{i'\mid\cdot}
+\in
+\mathbb R^J
+\]</span></p>
+<p>são dois perfis de linhas, sua <strong>distância qui-quadrado</strong> é definida por</p>
+<p><span id="eq-distancia-qui-quadrado-linhas-ca"><span class="math display">\[
+d_{\chi^2}^2(i,i')
+=
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf p_{i'\mid\cdot}
+\right)^\top
+\mathbf D_c^{-1}
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf p_{i'\mid\cdot}
+\right).
+\tag{17.12}\]</span></span></p>
+<p>Equivalentemente,</p>
+<p><span class="math display">\[
+d_{\chi^2}^2(i,i')
+=
+\sum_{j=1}^{J}
+\frac{1}{c_j}
+\left(
+\frac{p_{ij}}{r_i}
+-
+\frac{p_{i'j}}{r_{i'}}
+\right)^2.
+\]</span></p>
+<p>Se</p>
+<p><span class="math display">\[
+\mathbf p_{\cdot\mid j},
+\mathbf p_{\cdot\mid j'}
+\in
+\mathbb R^I
+\]</span></p>
+<p>são dois perfis de colunas, sua distância qui-quadrado é</p>
+<p><span id="eq-distancia-qui-quadrado-colunas-ca"><span class="math display">\[
+d_{\chi^2}^2(j,j')
+=
+\left(
+\mathbf p_{\cdot\mid j}
+-
+\mathbf p_{\cdot\mid j'}
+\right)^\top
+\mathbf D_r^{-1}
+\left(
+\mathbf p_{\cdot\mid j}
+-
+\mathbf p_{\cdot\mid j'}
+\right).
+\tag{17.13}\]</span></span></p>
+<p>Equivalentemente,</p>
+<p><span class="math display">\[
+d_{\chi^2}^2(j,j')
+=
+\sum_{i=1}^{I}
+\frac{1}{r_i}
+\left(
+\frac{p_{ij}}{c_j}
+-
+\frac{p_{ij'}}{c_{j'}}
+\right)^2.
+\]</span></p>
+</div>
+<p>A distância qui-quadrado é, portanto, uma distância euclidiana em coordenadas reescaladas pelas massas. Para as linhas,</p>
+<p><span class="math display">\[
+d_{\chi^2}(i,i')
+=
+\left\|
+\mathbf D_c^{-1/2}
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf p_{i'\mid\cdot}
+\right)
+\right\|,
+\]</span></p>
+<p>e, para as colunas,</p>
+<p><span class="math display">\[
+d_{\chi^2}(j,j')
+=
+\left\|
+\mathbf D_r^{-1/2}
+\left(
+\mathbf p_{\cdot\mid j}
+-
+\mathbf p_{\cdot\mid j'}
+\right)
+\right\|.
+\]</span></p>
+<p>As ponderações</p>
+<p><span class="math display">\[
+\frac{1}{c_j}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\frac{1}{r_i}
+\]</span></p>
+<p>fazem com que uma mesma diferença absoluta entre perfis tenha peso maior quando ocorre em uma categoria de menor massa.</p>
+<p>A distância de uma linha ao centro da nuvem é</p>
+<p><span id="eq-distancia-perfil-centro-ca"><span class="math display">\[
+d_{\chi^2}^2(i,\mathbf c)
+=
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf c
+\right)^\top
+\mathbf D_c^{-1}
+\left(
+\mathbf p_{i\mid\cdot}
+-
+\mathbf c
+\right),
+\tag{17.14}\]</span></span></p>
+<p>ou, utilizando</p>
+<p><span class="math display">\[
+\frac{p_{ij}}{r_i}
+-
+c_j
+=
+\frac{
+p_{ij}-r_ic_j
+}{
+r_i
+},
+\]</span></p>
+<p>tem-se</p>
+<p><span id="eq-distancia-linha-independencia-ca"><span class="math display">\[
+d_{\chi^2}^2(i,\mathbf c)
+=
+\sum_{j=1}^{J}
+\frac{
+(p_{ij}-r_ic_j)^2
+}{
+r_i^2c_j
+}.
+\tag{17.15}\]</span></span></p>
+<p>De forma dual,</p>
+<p><span id="eq-distancia-coluna-independencia-ca"><span class="math display">\[
+d_{\chi^2}^2(j,\mathbf r)
+=
+\sum_{i=1}^{I}
+\frac{
+(p_{ij}-r_ic_j)^2
+}{
+c_j^2r_i
+}.
+\tag{17.16}\]</span></span></p>
+</section>
+<section id="sec-ca-inercia" class="level2" data-number="17.4">
+<h2 data-number="17.4" class="anchored" data-anchor-id="sec-ca-inercia"><span class="header-section-number">17.4</span> Inércia e afastamento da independência</h2>
+<div id="def-inercia-correspondencia" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 17.4 (Inércia total)</strong></span> Considere uma matriz de frequências relativas</p>
+<p><span class="math display">\[
+\mathbf P
+=
+(p_{ij})
+\in
+\mathbb R^{I\times J}
+\]</span></p>
+<p>com massas de linhas e colunas estritamente positivas.</p>
+<p>A <strong>inércia total</strong> da tabela é a dispersão qui-quadrado ponderada dos perfis de linhas em torno de seu centro <span class="math inline">\(\mathbf c\)</span>:</p>
+<p><span id="eq-inercia-linhas-ca"><span class="math display">\[
+\mathcal I
+=
+\sum_{i=1}^{I}
+r_i
+d_{\chi^2}^2(i,\mathbf c).
+\tag{17.17}\]</span></span></p>
+</div>
+<p>Utilizando <a href="#eq-distancia-linha-independencia-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-distancia-linha-independencia-ca</span></a>,</p>
+<p><span id="eq-inercia-celulas-ca"><span class="math display">\[
+\mathcal I
+=
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+\frac{
+(p_{ij}-r_ic_j)^2
+}{
+r_ic_j
+}.
+\tag{17.18}\]</span></span></p>
+<p>De forma dual,</p>
+<p><span id="eq-inercia-colunas-ca"><span class="math display">\[
+\mathcal I
+=
+\sum_{j=1}^{J}
+c_j
+d_{\chi^2}^2(j,\mathbf r).
+\tag{17.19}\]</span></span></p>
+<p>Como todos os termos em <a href="#eq-inercia-celulas-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-inercia-celulas-ca</span></a> são não negativos,</p>
+<p><span class="math display">\[
+\mathcal I=0
+\]</span></p>
+<p>se, e somente se,</p>
+<p><span class="math display">\[
+p_{ij}=r_ic_j
+\]</span></p>
+<p>para todas as células, ou equivalentemente,</p>
+<p><span class="math display">\[
+\mathbf P
+=
+\mathbf r\mathbf c^\top.
+\]</span></p>
+<p>A inércia quantifica, portanto, o afastamento global da distribuição relativa observada em relação à estrutura de independência na geometria qui-quadrado.</p>
+</section>
+<section id="padronização-dos-desvios-da-independência" class="level2" data-number="17.5">
+<h2 data-number="17.5" class="anchored" data-anchor-id="padronização-dos-desvios-da-independência"><span class="header-section-number">17.5</span> Padronização dos desvios da independência</h2>
+<p>A expressão de <a href="#eq-inercia-celulas-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-inercia-celulas-ca</span></a> sugere reunir os desvios</p>
+<p><span class="math display">\[
+p_{ij}-r_ic_j
+\]</span></p>
+<p>em uma única matriz, padronizando-os pelas massas correspondentes.</p>
+<div id="def-matriz-desvios-padronizados-ca" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 17.5 (Matriz de desvios padronizados)</strong></span> Considere</p>
+<p><span class="math display">\[
+\mathbf P
+=
+(p_{ij})
+\in
+\mathbb R^{I\times J}
+\]</span></p>
+<p>uma matriz de frequências relativas cujas massas</p>
+<p><span class="math display">\[
+r_i&gt;0,
+\qquad
+i=1,\ldots,I,
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+c_j&gt;0,
+\qquad
+j=1,\ldots,J,
+\]</span></p>
+<p>são estritamente positivas.</p>
+<p>A <strong>matriz de desvios padronizados da Análise de Correspondência</strong> é</p>
+<p><span id="eq-matriz-desvios-padronizados-ca"><span class="math display">\[
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf D_r^{-1/2}
+\left(
+\mathbf P
+-
+\mathbf r\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}
+\in
+\mathbb R^{I\times J}.
+\tag{17.20}\]</span></span></p>
+<p>Seu elemento <span class="math inline">\((i,j)\)</span> é</p>
+<p><span id="eq-elemento-desvio-padronizado-ca"><span class="math display">\[
+q_{ij}
+=
+\frac{
+p_{ij}-r_ic_j
+}{
+\sqrt{r_ic_j}
+}.
+\tag{17.21}\]</span></span></p>
+</div>
+<p>A matriz <span class="math inline">\(\mathbf Q_{\mathrm{CA}}\)</span> representa, em coordenadas ponderadas, os desvios da distribuição observada em relação à independência.</p>
+<p>Ela também possui restrições lineares decorrentes das próprias marginais. Como</p>
+<p><span class="math display">\[
+\mathbf P\mathbf1_J
+=
+\mathbf r
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf c^\top\mathbf1_J
+=
+1,
+\]</span></p>
+<p>segue que</p>
+<p><span id="eq-nucleo-colunas-qca"><span class="math display">\[
+\begin{aligned}
+\mathbf Q_{\mathrm{CA}}
+\mathbf D_c^{1/2}
+\mathbf1_J
+&amp;=
+\mathbf D_r^{-1/2}
+\left(
+\mathbf P
+-
+\mathbf r\mathbf c^\top
+\right)
+\mathbf1_J
+\\
+&amp;=
+\mathbf D_r^{-1/2}
+\left(
+\mathbf r-\mathbf r
+\right)
+\\
+&amp;=
+\mathbf0.
+\end{aligned}
+\tag{17.22}\]</span></span></p>
+<p>Analogamente,</p>
+<p><span id="eq-nucleo-linhas-qca"><span class="math display">\[
+\mathbf Q_{\mathrm{CA}}^\top
+\mathbf D_r^{1/2}
+\mathbf1_I
+=
+\mathbf0.
+\tag{17.23}\]</span></span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\mathbf D_c^{1/2}\mathbf1_J
+\neq
+\mathbf0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf D_r^{1/2}\mathbf1_I
+\neq
+\mathbf0
+\]</span></p>
+<p>sob massas positivas, <span class="math inline">\(\mathbf Q_{\mathrm{CA}}\)</span> possui um vetor não nulo em seu núcleo à direita e um vetor não nulo no núcleo de sua transposta. Portanto,</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf Q_{\mathrm{CA}}
+\right)
+\leq
+J-1
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf Q_{\mathrm{CA}}
+\right)
+\leq
+I-1.
+\]</span></p>
+<p>Consequentemente,</p>
+<p><span id="eq-posto-maximo-ca"><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf Q_{\mathrm{CA}}
+\right)
+\leq
+\min
+\left(
+I-1,
+J-1
+\right).
+\tag{17.24}\]</span></span></p>
+<p>Essa restrição explica por que a Análise de Correspondência possui, no máximo,</p>
+<p><span class="math display">\[
+\min
+\left(
+I-1,
+J-1
+\right)
+\]</span></p>
+<p>dimensões não nulas.</p>
+<section id="inércia-como-norma-matricial" class="level3" data-number="17.5.1">
+<h3 data-number="17.5.1" class="anchored" data-anchor-id="inércia-como-norma-matricial"><span class="header-section-number">17.5.1</span> Inércia como norma matricial</h3>
+<p>Pela definição de <span class="math inline">\(\mathbf Q_{\mathrm{CA}}\)</span> e pela norma de Frobenius de <a href="#def-norma-frobenius" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-norma-frobenius</span></a>,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\left\|
+\mathbf Q_{\mathrm{CA}}
+\right\|_F^2
+&amp;=
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+q_{ij}^2
+\\
+&amp;=
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+\frac{
+(p_{ij}-r_ic_j)^2
+}{
+r_ic_j
+}.
+\end{aligned}
+\]</span></p>
+<p>Por <a href="#eq-inercia-celulas-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-inercia-celulas-ca</span></a>,</p>
+<p><span id="eq-inercia-frobenius-ca"><span class="math display">\[
+\mathcal I
+=
+\left\|
+\mathbf Q_{\mathrm{CA}}
+\right\|_F^2.
+\tag{17.25}\]</span></span></p>
+<div id="prp-inercia-matriz-ca" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposição 17.1 (Formas equivalentes da inércia)</strong></span> Sob massas de linhas e colunas estritamente positivas,</p>
+<p><span class="math display">\[
+\mathcal I
+=
+\sum_{i=1}^{I}
+r_i
+d_{\chi^2}^2(i,\mathbf c)
+=
+\sum_{j=1}^{J}
+c_j
+d_{\chi^2}^2(j,\mathbf r)
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathcal I
+=
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+\frac{
+(p_{ij}-r_ic_j)^2
+}{
+r_ic_j
+}
+=
+\left\|
+\mathbf Q_{\mathrm{CA}}
+\right\|_F^2.
+\]</span></p>
+</div>
+<p>A mesma quantidade possui, assim, três interpretações compatíveis: dispersão da nuvem de linhas, dispersão da nuvem de colunas e magnitude matricial dos desvios padronizados da independência.</p>
+</section>
+</section>
+<section id="relação-algébrica-com-a-estatística-qui-quadrado" class="level2" data-number="17.6">
+<h2 data-number="17.6" class="anchored" data-anchor-id="relação-algébrica-com-a-estatística-qui-quadrado"><span class="header-section-number">17.6</span> Relação algébrica com a estatística qui-quadrado</h2>
+<p>Para a tabela observada, a estatística de Pearson calculada a partir das frequências marginais é</p>
+<p><span id="eq-qui-quadrado-pearson-ca"><span class="math display">\[
+\chi^2
+=
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+\frac{
+(n_{ij}-nr_ic_j)^2
+}{
+nr_ic_j
+}.
+\tag{17.26}\]</span></span></p>
+<p>Como</p>
+<p><span class="math display">\[
+n_{ij}
+=
+np_{ij},
+\]</span></p>
+<p>tem-se</p>
+<p><span class="math display">\[
+\begin{aligned}
+\chi^2
+&amp;=
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+\frac{
+n^2
+(p_{ij}-r_ic_j)^2
+}{
+nr_ic_j
+}
+\\
+&amp;=
+n
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+\frac{
+(p_{ij}-r_ic_j)^2
+}{
+r_ic_j
+}.
+\end{aligned}
+\]</span></p>
+<p>Por <a href="#eq-inercia-celulas-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-inercia-celulas-ca</span></a>,</p>
+<p><span id="eq-qui-quadrado-inercia-ca"><span class="math display">\[
+\chi^2
+=
+n\mathcal I.
+\tag{17.27}\]</span></span></p>
+<p>A identidade</p>
+<p><span class="math display">\[
+\chi^2=n\mathcal I
+\]</span></p>
+<p>é <strong>algébrica e exata para a tabela observada</strong>. Ela não depende de normalidade multivariada nem, por si só, de uma aproximação assintótica.</p>
+<p>Sua interpretação como estatística de teste exige um modelo probabilístico para a geração da tabela e será retomada na seção de formulação inferencial. A inércia e a identidade acima pertencem à estrutura descritiva e geométrica da Análise de Correspondência, enquanto a distribuição de referência de <span class="math inline">\(\chi^2\)</span> pertence à inferência.</p>
+</section>
+<section id="sec-ca-svd" class="level2" data-number="17.7">
+<h2 data-number="17.7" class="anchored" data-anchor-id="sec-ca-svd"><span class="header-section-number">17.7</span> Formulação pela decomposição em valores singulares</h2>
+<p>A matriz de desvios padronizados</p>
+<p><span class="math display">\[
+\mathbf Q_{\mathrm{CA}}
+\in
+\mathbb R^{I\times J}
+\]</span></p>
+<p>é, em geral, retangular. Sua decomposição utiliza diretamente a SVD desenvolvida no Módulo 1.</p>
+<p>Defina</p>
+<p><span class="math display">\[
+L
+=
+\operatorname{posto}
+\left(
+\mathbf Q_{\mathrm{CA}}
+\right).
+\]</span></p>
+<p>Por <a href="#eq-posto-maximo-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-posto-maximo-ca</span></a>,</p>
+<p><span class="math display">\[
+0
+\leq
+L
+\leq
+\min
+\left(
+I-1,
+J-1
+\right).
+\]</span></p>
+<p>Se</p>
+<p><span class="math display">\[
+L=0,
+\]</span></p>
+<p>então</p>
+<p><span class="math display">\[
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf0,
+\]</span></p>
+<p>e, por <a href="#prp-inercia-matriz-ca" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-inercia-matriz-ca</span></a>,</p>
+<p><span class="math display">\[
+\mathcal I=0.
+\]</span></p>
+<p>Nesse caso, a distribuição relativa observada coincide com a estrutura de independência,</p>
+<p><span class="math display">\[
+\mathbf P
+=
+\mathbf r\mathbf c^\top,
+\]</span></p>
+<p>e não existem dimensões não nulas de associação a decompor.</p>
+<p>Considere, portanto, no restante desta seção,</p>
+<p><span class="math display">\[
+L\geq1.
+\]</span></p>
+<p>Pela SVD compacta de <a href="#def-svd-compacta" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-svd-compacta</span></a>,</p>
+<p><span id="eq-svd-correspondencia"><span class="math display">\[
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf U
+\mathbf D
+\mathbf V^\top,
+\tag{17.28}\]</span></span></p>
+<p>com</p>
+<p><span class="math display">\[
+\mathbf U
+\in
+\mathbb R^{I\times L},
+\qquad
+\mathbf D
+\in
+\mathbb R^{L\times L},
+\qquad
+\mathbf V
+\in
+\mathbb R^{J\times L},
+\]</span></p>
+<p>satisfazendo</p>
+<p><span class="math display">\[
+\mathbf U^\top
+\mathbf U
+=
+\mathbf I_L,
+\]</span></p>
+<p><span class="math display">\[
+\mathbf V^\top
+\mathbf V
+=
+\mathbf I_L
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf D
+=
+\operatorname{diag}
+\left(
+d_1,\ldots,d_L
+\right),
+\]</span></p>
+<p>em que</p>
+<p><span class="math display">\[
+d_1
+\geq
+d_2
+\geq
+\cdots
+\geq
+d_L
+&gt;
+0.
+\]</span></p>
+<p>Os vetores singulares à esquerda descrevem direções no espaço ponderado das categorias das linhas, enquanto os vetores singulares à direita descrevem as direções correspondentes no espaço ponderado das categorias das colunas.</p>
+<p>A SVD acopla essas duas representações por meio dos mesmos valores singulares.</p>
+<section id="decomposição-da-inércia" class="level3" data-number="17.7.1">
+<h3 data-number="17.7.1" class="anchored" data-anchor-id="decomposição-da-inércia"><span class="header-section-number">17.7.1</span> Decomposição da inércia</h3>
+<div id="def-inercia-principal-ca" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 17.6 (Inércia principal)</strong></span> Considere a SVD compacta</p>
+<p><span class="math display">\[
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf U
+\mathbf D
+\mathbf V^\top
+\]</span></p>
+<p>de uma matriz de desvios padronizados com posto</p>
+<p><span class="math display">\[
+L\geq1,
+\]</span></p>
+<p>em que</p>
+<p><span class="math display">\[
+\mathbf D
+=
+\operatorname{diag}
+\left(
+d_1,\ldots,d_L
+\right)
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+d_\ell&gt;0,
+\qquad
+\ell=1,\ldots,L.
+\]</span></p>
+<p>A <strong>inércia principal da dimensão <span class="math inline">\(\ell\)</span></strong> é</p>
+<p><span id="eq-inercia-principal-ca"><span class="math display">\[
+\lambda_\ell
+=
+d_\ell^2,
+\qquad
+\ell=1,\ldots,L.
+\tag{17.29}\]</span></span></p>
+</div>
+<p>Pela relação entre a norma de Frobenius e os valores singulares estabelecida em <a href="#prp-normas-valores-singulares" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-normas-valores-singulares</span></a>,</p>
+<p><span class="math display">\[
+\left\|
+\mathbf Q_{\mathrm{CA}}
+\right\|_F^2
+=
+\sum_{\ell=1}^{L}
+d_\ell^2.
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\mathcal I
+=
+\left\|
+\mathbf Q_{\mathrm{CA}}
+\right\|_F^2
+\]</span></p>
+<p>por <a href="#eq-inercia-frobenius-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-inercia-frobenius-ca</span></a>, segue que</p>
+<p><span id="eq-decomposicao-inercia-ca"><span class="math display">\[
+\mathcal I
+=
+\sum_{\ell=1}^{L}
+\lambda_\ell.
+\tag{17.30}\]</span></span></p>
+<p>A SVD decompõe, portanto, a inércia total em parcelas não negativas associadas às diferentes dimensões da associação.</p>
+<p>Utilizando a identidade exata</p>
+<p><span class="math display">\[
+\chi^2
+=
+n\mathcal I
+\]</span></p>
+<p>de <a href="#eq-qui-quadrado-inercia-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-qui-quadrado-inercia-ca</span></a>,</p>
+<p><span id="eq-decomposicao-qui-quadrado-ca"><span class="math display">\[
+\chi^2
+=
+n
+\sum_{\ell=1}^{L}
+\lambda_\ell.
+\tag{17.31}\]</span></span></p>
+<p>Essa igualdade continua sendo uma decomposição algébrica da estatística observada. A distribuição inferencial de <span class="math inline">\(\chi^2\)</span> será considerada posteriormente e não é necessária para definir as inércias principais.</p>
+<p>Como</p>
+<p><span class="math display">\[
+\lambda_\ell&gt;0,
+\]</span></p>
+<p>a proporção da inércia associada à dimensão <span class="math inline">\(\ell\)</span> é</p>
+<p><span id="eq-proporcao-inercia-ca"><span class="math display">\[
+\frac{
+\lambda_\ell
+}{
+\displaystyle
+\sum_{h=1}^{L}
+\lambda_h
+}.
+\tag{17.32}\]</span></span></p>
+<p>Para</p>
+<p><span class="math display">\[
+1
+\leq
+k
+\leq
+L,
+\]</span></p>
+<p>a proporção acumulada da inércia representada pelas primeiras <span class="math inline">\(k\)</span> dimensões é</p>
+<p><span id="eq-inercia-acumulada-ca"><span class="math display">\[
+\frac{
+\displaystyle
+\sum_{\ell=1}^{k}
+\lambda_\ell
+}{
+\displaystyle
+\sum_{\ell=1}^{L}
+\lambda_\ell
+}.
+\tag{17.33}\]</span></span></p>
+<p>Essas proporções descrevem a decomposição da <strong>inércia qui-quadrado</strong>. Embora a expressão seja formalmente semelhante à proporção de variância explicada da ACP, o objeto decomposto é diferente: na Análise de Correspondência, decompõem-se os desvios padronizados da independência.</p>
+</section>
+<section id="representação-em-dimensão-reduzida" class="level3" data-number="17.7.2">
+<h3 data-number="17.7.2" class="anchored" data-anchor-id="representação-em-dimensão-reduzida"><span class="header-section-number">17.7.2</span> Representação em dimensão reduzida</h3>
+<p>Considere</p>
+<p><span class="math display">\[
+1
+\leq
+k
+&lt;
+L.
+\]</span></p>
+<p>Defina</p>
+<p><span class="math display">\[
+\mathbf U_k
+=
+\begin{pmatrix}
+\mathbf u_1 &amp;
+\cdots &amp;
+\mathbf u_k
+\end{pmatrix}
+\in
+\mathbb R^{I\times k},
+\]</span></p>
+<p><span class="math display">\[
+\mathbf V_k
+=
+\begin{pmatrix}
+\mathbf v_1 &amp;
+\cdots &amp;
+\mathbf v_k
+\end{pmatrix}
+\in
+\mathbb R^{J\times k}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf D_k
+=
+\operatorname{diag}
+\left(
+d_1,\ldots,d_k
+\right)
+\in
+\mathbb R^{k\times k}.
+\]</span></p>
+<p>A SVD truncada é</p>
+<p><span id="eq-svd-truncada-ca"><span class="math display">\[
+\mathbf Q_{\mathrm{CA},k}
+=
+\mathbf U_k
+\mathbf D_k
+\mathbf V_k^\top.
+\tag{17.34}\]</span></span></p>
+<p>Pelo Teorema de Eckart–Young–Mirsky em <a href="#thm-eckart-young-mirsky" class="quarto-xref">Teorema&nbsp;<span class="quarto-unresolved-ref">thm-eckart-young-mirsky</span></a>,</p>
+<p><span class="math display">\[
+\mathbf Q_{\mathrm{CA},k}
+\]</span></p>
+<p>é uma melhor aproximação de posto no máximo <span class="math inline">\(k\)</span> de</p>
+<p><span class="math display">\[
+\mathbf Q_{\mathrm{CA}}
+\]</span></p>
+<p>em norma de Frobenius.</p>
+<p>O erro quadrático de aproximação é</p>
+<p><span id="eq-inercia-nao-representada-ca"><span class="math display">\[
+\begin{aligned}
+\left\|
+\mathbf Q_{\mathrm{CA}}
+-
+\mathbf Q_{\mathrm{CA},k}
+\right\|_F^2
+&amp;=
+\sum_{\ell=k+1}^{L}
+d_\ell^2
+\\
+&amp;=
+\sum_{\ell=k+1}^{L}
+\lambda_\ell.
+\end{aligned}
+\tag{17.35}\]</span></span></p>
+<p>A quantidade</p>
+<p><span id="eq-inercia-representada-ca"><span class="math display">\[
+\mathcal I_k
+=
+\sum_{\ell=1}^{k}
+\lambda_\ell
+\tag{17.36}\]</span></span></p>
+<p>é a parcela da inércia total representada pelas primeiras <span class="math inline">\(k\)</span> dimensões.</p>
+<p>Consequentemente,</p>
+<p><span class="math display">\[
+\mathcal I
+=
+\mathcal I_k
++
+\sum_{\ell=k+1}^{L}
+\lambda_\ell.
+\]</span></p>
+<p>O resultado de posto reduzido deve ser interpretado em relação ao objeto efetivamente decomposto. Na Análise de Correspondência, a SVD truncada fornece uma aproximação ótima, em norma de Frobenius, da <strong>matriz ponderada de desvios da independência</strong>.</p>
+<p>Ela não corresponde à aproximação da tabela de frequências brutas segundo uma distância euclidiana ordinária.</p>
+</section>
+</section>
+<section id="sec-ca-coordenadas" class="level2" data-number="17.8">
+<h2 data-number="17.8" class="anchored" data-anchor-id="sec-ca-coordenadas"><span class="header-section-number">17.8</span> Coordenadas da Análise de Correspondência</h2>
+<p>A SVD é realizada sobre uma matriz em que os desvios da independência já foram ponderados pelas massas das categorias. As coordenadas da Análise de Correspondência transformam os vetores singulares novamente para os espaços dos perfis de linhas e de colunas.</p>
+<p>A representação utilizará duas escalas: coordenadas padrão e coordenadas principais.</p>
+<section id="sistema-de-coordenadas-padrão" class="level3" data-number="17.8.1">
+<h3 data-number="17.8.1" class="anchored" data-anchor-id="sistema-de-coordenadas-padrão"><span class="header-section-number">17.8.1</span> Sistema de coordenadas padrão</h3>
+<div id="def-coordenadas-padrao-ca" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 17.7 (Coordenadas padrão)</strong></span> Considere uma tabela de frequências relativas</p>
+<p><span class="math display">\[
+\mathbf P
+\in
+\mathbb R^{I\times J}
+\]</span></p>
+<p>com massas de linhas e colunas estritamente positivas e a SVD compacta</p>
+<p><span class="math display">\[
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf U
+\mathbf D
+\mathbf V^\top,
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+L
+=
+\operatorname{posto}
+\left(
+\mathbf Q_{\mathrm{CA}}
+\right)
+\geq1.
+\]</span></p>
+<p>As <strong>coordenadas padrão das linhas</strong> são as linhas de</p>
+<p><span id="eq-coordenadas-padrao-linhas-ca"><span class="math display">\[
+\mathbf A_r
+=
+\mathbf D_r^{-1/2}
+\mathbf U
+\in
+\mathbb R^{I\times L},
+\tag{17.37}\]</span></span></p>
+<p>e as <strong>coordenadas padrão das colunas</strong> são as linhas de</p>
+<p><span id="eq-coordenadas-padrao-colunas-ca"><span class="math display">\[
+\mathbf A_c
+=
+\mathbf D_c^{-1/2}
+\mathbf V
+\in
+\mathbb R^{J\times L}.
+\tag{17.38}\]</span></span></p>
+</div>
+<p>Como as colunas de <span class="math inline">\(\mathbf U\)</span> e <span class="math inline">\(\mathbf V\)</span> são ortonormais,</p>
+<p><span class="math display">\[
+\mathbf A_r^\top
+\mathbf D_r
+\mathbf A_r
+=
+\mathbf I_L
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf A_c^\top
+\mathbf D_c
+\mathbf A_c
+=
+\mathbf I_L.
+\]</span></p>
+<p>As coordenadas padrão são, portanto, ortonormais nas geometrias ponderadas pelas respectivas massas.</p>
+</section>
+<section id="sistema-de-coordenadas-principais" class="level3" data-number="17.8.2">
+<h3 data-number="17.8.2" class="anchored" data-anchor-id="sistema-de-coordenadas-principais"><span class="header-section-number">17.8.2</span> Sistema de coordenadas principais</h3>
+<div id="def-coordenadas-principais-ca" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 17.8 (Coordenadas principais)</strong></span> Sob as condições de <a href="#def-coordenadas-padrao-ca" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-coordenadas-padrao-ca</span></a>, as <strong>coordenadas principais das linhas</strong> são</p>
+<p><span id="eq-coordenadas-principais-linhas-ca"><span class="math display">\[
+\mathbf F_r
+=
+\mathbf A_r
+\mathbf D
+=
+\mathbf D_r^{-1/2}
+\mathbf U
+\mathbf D
+\in
+\mathbb R^{I\times L},
+\tag{17.39}\]</span></span></p>
+<p>e as <strong>coordenadas principais das colunas</strong> são</p>
+<p><span id="eq-coordenadas-principais-colunas-ca"><span class="math display">\[
+\mathbf F_c
+=
+\mathbf A_c
+\mathbf D
+=
+\mathbf D_c^{-1/2}
+\mathbf V
+\mathbf D
+\in
+\mathbb R^{J\times L}.
+\tag{17.40}\]</span></span></p>
+</div>
+<p>As coordenadas principais incorporam os valores singulares e, portanto, a magnitude da associação representada em cada dimensão. Como</p>
+<p><span class="math display">\[
+\mathbf A_r^\top
+\mathbf D_r
+\mathbf A_r
+=
+\mathbf I_L
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf A_c^\top
+\mathbf D_c
+\mathbf A_c
+=
+\mathbf I_L,
+\]</span></p>
+<p>segue que</p>
+<p><span class="math display">\[
+\mathbf F_r^\top
+\mathbf D_r
+\mathbf F_r
+=
+\mathbf D^2
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf F_c^\top
+\mathbf D_c
+\mathbf F_c
+=
+\mathbf D^2.
+\]</span></p>
+<p>Se <span class="math inline">\(f_{i\ell}^{(r)}\)</span> e <span class="math inline">\(f_{j\ell}^{(c)}\)</span> denotam as coordenadas principais da linha <span class="math inline">\(i\)</span> e da coluna <span class="math inline">\(j\)</span> na dimensão <span class="math inline">\(\ell\)</span>, respectivamente, então</p>
+<p><span id="eq-inercia-eixo-linhas-ca"><span class="math display">\[
+\lambda_\ell
+=
+\sum_{i=1}^{I}
+r_i
+\left(
+f_{i\ell}^{(r)}
+\right)^2
+=
+\sum_{j=1}^{J}
+c_j
+\left(
+f_{j\ell}^{(c)}
+\right)^2,
+\qquad
+\ell=1,\ldots,L.
+\tag{17.41}\]</span></span></p>
+<p>Cada inércia principal possui, assim, uma representação simultânea pela dispersão ponderada das coordenadas das linhas e das colunas.</p>
+<p>Essa dualidade não significa que as duas nuvens pertençam originalmente ao mesmo espaço de perfis. As linhas são perfis em <span class="math inline">\(\mathbb R^J\)</span> e as colunas são perfis em <span class="math inline">\(\mathbb R^I\)</span>; a SVD fornece dimensões acopladas para representar a mesma estrutura de associação.</p>
+</section>
+<section id="distâncias-entre-perfis-e-coordenadas-principais" class="level3" data-number="17.8.3">
+<h3 data-number="17.8.3" class="anchored" data-anchor-id="distâncias-entre-perfis-e-coordenadas-principais"><span class="header-section-number">17.8.3</span> Distâncias entre perfis e coordenadas principais</h3>
+<p>As coordenadas principais completas reproduzem a geometria qui-quadrado dos perfis.</p>
+<p>Para as linhas,</p>
+<p><span class="math display">\[
+\mathbf P^{(r)}
+=
+\mathbf D_r^{-1}\mathbf P.
+\]</span></p>
+<p>A partir de <a href="#eq-matriz-desvios-padronizados-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-matriz-desvios-padronizados-ca</span></a>,</p>
+<p><span class="math display">\[
+\left(
+\mathbf P^{(r)}
+-
+\mathbf1_I\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}
+=
+\mathbf D_r^{-1/2}
+\mathbf Q_{\mathrm{CA}}.
+\]</span></p>
+<p>Substituindo a SVD e utilizando <a href="#eq-coordenadas-principais-linhas-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-coordenadas-principais-linhas-ca</span></a>,</p>
+<p><span id="eq-perfis-coordenadas-principais-linhas"><span class="math display">\[
+\left(
+\mathbf P^{(r)}
+-
+\mathbf1_I\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}
+=
+\mathbf F_r
+\mathbf V^\top.
+\tag{17.42}\]</span></span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\mathbf V^\top\mathbf V
+=
+\mathbf I_L,
+\]</span></p>
+<p>a multiplicação por <span class="math inline">\(\mathbf V^\top\)</span> preserva a norma das diferenças entre as linhas de <span class="math inline">\(\mathbf F_r\)</span>.</p>
+<div id="prp-preservacao-distancias-ca" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposição 17.2 (Preservação das distâncias qui-quadrado)</strong></span> Mantidas todas as <span class="math inline">\(L\)</span> dimensões associadas aos valores singulares positivos, para quaisquer linhas <span class="math inline">\(i\)</span> e <span class="math inline">\(i'\)</span>,</p>
+<p><span class="math display">\[
+d_{\chi^2}^2
+\left(
+i,i'
+\right)
+=
+\left\|
+\mathbf f_i^{(r)}
+-
+\mathbf f_{i'}^{(r)}
+\right\|^2,
+\]</span></p>
+<p>e, de forma dual, para quaisquer colunas <span class="math inline">\(j\)</span> e <span class="math inline">\(j'\)</span>,</p>
+<p><span class="math display">\[
+d_{\chi^2}^2
+\left(
+j,j'
+\right)
+=
+\left\|
+\mathbf f_j^{(c)}
+-
+\mathbf f_{j'}^{(c)}
+\right\|^2.
+\]</span></p>
+</div>
+<p>Portanto, a ponderação pelas massas é incorporada antes da SVD, enquanto as coordenadas principais permitem representar a geometria resultante por distâncias euclidianas usuais.</p>
+<p>Se apenas as primeiras</p>
+<p><span class="math display">\[
+k&lt;L
+\]</span></p>
+<p>dimensões forem mantidas, a distância representada entre dois perfis não pode exceder a distância completa, pois as parcelas quadráticas associadas às dimensões descartadas são não negativas. A representação reduzida preserva apenas a parcela da geometria qui-quadrado contida no subespaço retido.</p>
+</section>
+<section id="relações-baricêntricas" class="level3" data-number="17.8.4">
+<h3 data-number="17.8.4" class="anchored" data-anchor-id="relações-baricêntricas"><span class="header-section-number">17.8.4</span> Relações baricêntricas</h3>
+<p>As duas nuvens de categorias são construídas a partir da mesma tabela e da mesma SVD. Essa estrutura produz relações diretas entre suas coordenadas.</p>
+<p>Das restrições marginais de <span class="math inline">\(\mathbf Q_{\mathrm{CA}}\)</span> e da SVD compacta decorre</p>
+<p><span class="math display">\[
+\mathbf r^\top
+\mathbf A_r
+=
+\mathbf0^\top,
+\qquad
+\mathbf c^\top
+\mathbf A_c
+=
+\mathbf0^\top.
+\]</span></p>
+<p>Partindo de</p>
+<p><span class="math display">\[
+\mathbf Q_{\mathrm{CA}}\mathbf V
+=
+\mathbf U\mathbf D
+\]</span></p>
+<p>e utilizando</p>
+<p><span class="math display">\[
+\mathbf A_c
+=
+\mathbf D_c^{-1/2}\mathbf V,
+\]</span></p>
+<p>obtém-se</p>
+<p><span class="math display">\[
+\mathbf D_r^{-1/2}
+\left(
+\mathbf P-\mathbf r\mathbf c^\top
+\right)
+\mathbf A_c
+=
+\mathbf U\mathbf D.
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\mathbf c^\top\mathbf A_c
+=
+\mathbf0^\top,
+\]</span></p>
+<p>segue que</p>
+<p><span id="eq-relacao-baricentrica-linhas-ca"><span class="math display">\[
+\mathbf F_r
+=
+\mathbf D_r^{-1}
+\mathbf P
+\mathbf A_c.
+\tag{17.43}\]</span></span></p>
+<p>De forma dual,</p>
+<p><span id="eq-relacao-baricentrica-colunas-ca"><span class="math display">\[
+\mathbf F_c
+=
+\mathbf D_c^{-1}
+\mathbf P^\top
+\mathbf A_r.
+\tag{17.44}\]</span></span></p>
+<p>Essas igualdades são as <strong>relações baricêntricas</strong> ou <strong>relações de transição</strong>.</p>
+<p>Para a linha <span class="math inline">\(i\)</span>,</p>
+<p><span id="eq-baricentro-linha-ca"><span class="math display">\[
+\mathbf f_i^{(r)}
+=
+\sum_{j=1}^{J}
+\frac{p_{ij}}{r_i}
+\mathbf a_j^{(c)}.
+\tag{17.45}\]</span></span></p>
+<p>Como os pesos <span class="math inline">\(p_{ij}/r_i\)</span> formam o perfil da linha <span class="math inline">\(i\)</span>, sua coordenada principal é o centro ponderado das coordenadas padrão das colunas.</p>
+<p>De forma dual,</p>
+<p><span id="eq-baricentro-coluna-ca"><span class="math display">\[
+\mathbf f_j^{(c)}
+=
+\sum_{i=1}^{I}
+\frac{p_{ij}}{c_j}
+\mathbf a_i^{(r)}.
+\tag{17.46}\]</span></span></p>
+<p>Assim, a posição de uma categoria é determinada pela distribuição condicional observada das categorias da outra margem.</p>
+<p>As relações são exatas nas <span class="math inline">\(L\)</span> dimensões não nulas. Quando apenas as primeiras <span class="math inline">\(k&lt;L\)</span> dimensões são apresentadas, elas continuam válidas coordenada a coordenada nas dimensões retidas, embora o mapa represente apenas parte da associação.</p>
+<p>A <a href="#fig-ca-relacao-baricentrica" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-ca-relacao-baricentrica</span></a> ilustra essa propriedade para uma tabela simples. As coordenadas principais de uma linha são apresentadas no mesmo sistema das coordenadas padrão das colunas que participam de seu baricentro.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-ca-relacao-baricentrica" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ca-relacao-baricentrica-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_correspondencia_files/figure-html/fig-ca-relacao-baricentrica-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="720">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ca-relacao-baricentrica-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;17.1: Relação baricêntrica entre uma linha e as coordenadas padrão das colunas. A posição da linha é a média ponderada das posições das colunas, com pesos dados pelo perfil da própria linha.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A figura representa uma relação de centro ponderado. Ela <strong>não</strong> afirma que a distância euclidiana entre um ponto de linha e um ponto de coluna seja uma distância qui-quadrado definida pela técnica.</p>
+</section>
+<section id="sec-ca-reconstrucao-desvios" class="level3" data-number="17.8.5">
+<h3 data-number="17.8.5" class="anchored" data-anchor-id="sec-ca-reconstrucao-desvios"><span class="header-section-number">17.8.5</span> Aprofundamento: reconstrução dos desvios da independência</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A SVD não apenas produz as dimensões utilizadas na representação geométrica. Ela também permite decompor e reconstruir, dimensão por dimensão, os desvios observados em relação à estrutura de independência.</p>
+</div>
+</div>
+<p>A SVD também permite reconstruir a matriz de frequências relativas observadas a partir da estrutura de independência e das dimensões da associação.</p>
+<p>De <a href="#eq-matriz-desvios-padronizados-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-matriz-desvios-padronizados-ca</span></a>,</p>
+<p><span class="math display">\[
+\mathbf P
+-
+\mathbf r\mathbf c^\top
+=
+\mathbf D_r^{1/2}
+\mathbf Q_{\mathrm{CA}}
+\mathbf D_c^{1/2}.
+\]</span></p>
+<p>Substituindo a SVD e utilizando</p>
+<p><span class="math display">\[
+\mathbf U
+=
+\mathbf D_r^{1/2}\mathbf A_r,
+\qquad
+\mathbf V
+=
+\mathbf D_c^{1/2}\mathbf A_c,
+\]</span></p>
+<p>obtém-se</p>
+<p><span id="eq-reconstrucao-desvios-ca"><span class="math display">\[
+\mathbf P
+-
+\mathbf r\mathbf c^\top
+=
+\mathbf D_r
+\mathbf A_r
+\mathbf D
+\mathbf A_c^\top
+\mathbf D_c.
+\tag{17.47}\]</span></span></p>
+<p>Consequentemente, para a célula <span class="math inline">\((i,j)\)</span>,</p>
+<p><span id="eq-reconstrucao-celula-ca"><span class="math display">\[
+p_{ij}
+-
+r_ic_j
+=
+r_ic_j
+\sum_{\ell=1}^{L}
+d_\ell
+a_{i\ell}^{(r)}
+a_{j\ell}^{(c)},
+\tag{17.48}\]</span></span></p>
+<p>e</p>
+<p><span id="eq-reconstrucao-frequencia-relativa-ca"><span class="math display">\[
+p_{ij}
+=
+r_ic_j
+\left[
+1+
+\sum_{\ell=1}^{L}
+d_\ell
+a_{i\ell}^{(r)}
+a_{j\ell}^{(c)}
+\right].
+\tag{17.49}\]</span></span></p>
+<p>A primeira parcela,</p>
+<p><span class="math display">\[
+r_ic_j,
+\]</span></p>
+<p>é a frequência relativa determinada pelas marginais sob independência. A soma acrescenta os desvios observados representados pelas dimensões da Correspondência.</p>
+<p>Cada dimensão contribui por meio de</p>
+<p><span class="math display">\[
+r_ic_j
+d_\ell
+a_{i\ell}^{(r)}
+a_{j\ell}^{(c)}.
+\]</span></p>
+<p>Seu sinal indica a direção do desvio reconstruído naquela dimensão, e sua magnitude depende das massas, do valor singular e das coordenadas padrão correspondentes.</p>
+<p>Com apenas as primeiras <span class="math inline">\(k&lt;L\)</span> dimensões,</p>
+<p><span id="eq-reconstrucao-reduzida-ca"><span class="math display">\[
+\widetilde p_{ij}^{(k)}
+=
+r_ic_j
+\left[
+1+
+\sum_{\ell=1}^{k}
+d_\ell
+a_{i\ell}^{(r)}
+a_{j\ell}^{(c)}
+\right].
+\tag{17.50}\]</span></span></p>
+<p>Essa expressão corresponde à aproximação de posto reduzido de <span class="math inline">\(\mathbf Q_{\mathrm{CA}}\)</span>. A reconstrução truncada é uma aproximação algébrica da associação observada e não garante, isoladamente,</p>
+<p><span class="math display">\[
+\widetilde p_{ij}^{(k)}
+\geq0
+\]</span></p>
+<p>para todas as células. Ela não deve, portanto, ser interpretada automaticamente como uma nova distribuição conjunta válida.</p>
+</section>
+</section>
+<section id="representação-conjunta-de-linhas-e-colunas" class="level2" data-number="17.9">
+<h2 data-number="17.9" class="anchored" data-anchor-id="representação-conjunta-de-linhas-e-colunas"><span class="header-section-number">17.9</span> Representação conjunta de linhas e colunas</h2>
+<p>A Análise de Correspondência fornece coordenadas para as duas margens da tabela. Para representar linhas e colunas simultaneamente, é necessário especificar quais sistemas de coordenadas serão utilizados para cada nuvem.</p>
+<p>A <a href="#tbl-escalas-representacao-ca" class="quarto-xref">Tabela&nbsp;<span class="quarto-unresolved-ref">tbl-escalas-representacao-ca</span></a> reúne três representações particularmente úteis para compreender essa geometria.</p>
+<div id="tbl-escalas-representacao-ca" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-escalas-representacao-ca-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;17.2: Sistemas de coordenadas para representar linhas e colunas na Análise de Correspondência.
+</figcaption>
+<div aria-describedby="tbl-escalas-representacao-ca-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Representação</th>
+<th>Linhas</th>
+<th>Colunas</th>
+<th>Propriedade principal</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>métrica das linhas</td>
+<td>principais <span class="math inline">\(\mathbf F_r\)</span></td>
+<td>padrão <span class="math inline">\(\mathbf A_c\)</span></td>
+<td>preserva a geometria das linhas e explicita sua relação baricêntrica com as colunas</td>
+</tr>
+<tr class="even">
+<td>métrica das colunas</td>
+<td>padrão <span class="math inline">\(\mathbf A_r\)</span></td>
+<td>principais <span class="math inline">\(\mathbf F_c\)</span></td>
+<td>preserva a geometria das colunas e explicita sua relação baricêntrica com as linhas</td>
+</tr>
+<tr class="odd">
+<td>simétrica</td>
+<td>principais <span class="math inline">\(\mathbf F_r\)</span></td>
+<td>principais <span class="math inline">\(\mathbf F_c\)</span></td>
+<td>representa ambas as nuvens em escalas associadas às inércias principais</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Na representação métrica das linhas, as distâncias euclidianas entre os pontos de linhas reproduzem exatamente suas distâncias qui-quadrado quando todas as dimensões não nulas são mantidas. As colunas aparecem em coordenadas padrão e participam diretamente das relações baricêntricas das linhas.</p>
+<p>Na representação métrica das colunas ocorre a relação dual.</p>
+<p>Na representação simétrica, linhas e colunas são expressas por coordenadas principais. Essa representação é útil para examinar simultaneamente as duas margens, mas não cria uma métrica qui-quadrado comum entre pontos pertencentes a margens diferentes.</p>
+<section id="o-significado-das-proximidades" class="level3" data-number="17.9.1">
+<h3 data-number="17.9.1" class="anchored" data-anchor-id="o-significado-das-proximidades"><span class="header-section-number">17.9.1</span> O significado das proximidades</h3>
+<p>Dentro da nuvem das linhas, proximidades representam semelhança entre perfis segundo a distância qui-quadrado; a interpretação dual vale para as colunas.</p>
+<p>A distância entre um ponto de linha e um ponto de coluna não corresponde, em geral, a uma distância qui-quadrado definida pela técnica. Por isso, proximidade gráfica entre categorias pertencentes a margens diferentes não constitui uma medida métrica direta de associação.</p>
+<p>A interpretação conjunta deve considerar os perfis, as relações baricêntricas e o sistema de coordenadas utilizado. Nas representações simétricas, a proximidade entre uma categoria de linha e uma categoria de coluna não deve ser interpretada, isoladamente, como uma medida direta de associação.</p>
+</section>
+<section id="sec-ca-contribuicao-cos2" class="level3" data-number="17.9.2">
+<h3 data-number="17.9.2" class="anchored" data-anchor-id="sec-ca-contribuicao-cos2"><span class="header-section-number">17.9.2</span> Aprofundamento: contribuição e qualidade de representação</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>As coordenadas principais fornecem a representação geométrica das categorias. Depois de construída essa representação, medidas adicionais podem ser utilizadas para identificar quais categorias participam mais intensamente da construção de cada dimensão e quanto da posição de cada categoria é representado pelas dimensões consideradas.</p>
+</div>
+</div>
+<p>A identidade de <a href="#eq-inercia-eixo-linhas-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-inercia-eixo-linhas-ca</span></a>,</p>
+<p><span class="math display">\[
+\lambda_\ell
+=
+\sum_{i=1}^{I}
+r_i
+\left(
+f_{i\ell}^{(r)}
+\right)^2
+=
+\sum_{j=1}^{J}
+c_j
+\left(
+f_{j\ell}^{(c)}
+\right)^2,
+\]</span></p>
+<p>permite decompor a inércia de cada dimensão entre as categorias.</p>
+<div id="def-contribuicao-ca" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 17.9 (Contribuição para uma dimensão)</strong></span> A <strong>contribuição da linha <span class="math inline">\(i\)</span> para a dimensão <span class="math inline">\(\ell\)</span></strong> é</p>
+<p><span id="eq-contribuicao-linha-ca"><span class="math display">\[
+\operatorname{ctr}_{i\ell}^{(r)}
+=
+\frac{
+r_i
+\left(
+f_{i\ell}^{(r)}
+\right)^2
+}{
+\lambda_\ell
+},
+\tag{17.51}\]</span></span></p>
+<p>e a <strong>contribuição da coluna <span class="math inline">\(j\)</span></strong> é</p>
+<p><span id="eq-contribuicao-coluna-ca"><span class="math display">\[
+\operatorname{ctr}_{j\ell}^{(c)}
+=
+\frac{
+c_j
+\left(
+f_{j\ell}^{(c)}
+\right)^2
+}{
+\lambda_\ell
+}.
+\tag{17.52}\]</span></span></p>
+</div>
+<p>Para cada dimensão,</p>
+<p><span class="math display">\[
+\sum_{i=1}^{I}
+\operatorname{ctr}_{i\ell}^{(r)}
+=
+1,
+\qquad
+\sum_{j=1}^{J}
+\operatorname{ctr}_{j\ell}^{(c)}
+=
+1.
+\]</span></p>
+<p>A contribuição mede a parcela da inércia de uma dimensão associada a determinada categoria. Ela depende conjuntamente da massa e da posição da categoria.</p>
+<p>Uma decomposição diferente avalia quanto da posição de uma categoria é representado por determinada dimensão. Como as coordenadas principais completas preservam a geometria qui-quadrado,</p>
+<p><span class="math display">\[
+d_{\chi^2}^2
+\left(
+i,\mathbf c
+\right)
+=
+\sum_{\ell=1}^{L}
+\left(
+f_{i\ell}^{(r)}
+\right)^2,
+\]</span></p>
+<p>e, de forma dual,</p>
+<p><span class="math display">\[
+d_{\chi^2}^2
+\left(
+j,\mathbf r
+\right)
+=
+\sum_{\ell=1}^{L}
+\left(
+f_{j\ell}^{(c)}
+\right)^2.
+\]</span></p>
+<div id="def-cos2-ca" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 17.10 (Qualidade de representação por dimensão)</strong></span> Para uma linha <span class="math inline">\(i\)</span> com distância positiva ao centro,</p>
+<p><span id="eq-cos2-linha-ca"><span class="math display">\[
+\cos^2_{i\ell}
+=
+\frac{
+\left(
+f_{i\ell}^{(r)}
+\right)^2
+}{
+d_{\chi^2}^2
+\left(
+i,\mathbf c
+\right)
+}.
+\tag{17.53}\]</span></span></p>
+<p>Para uma coluna <span class="math inline">\(j\)</span> com distância positiva ao centro,</p>
+<p><span id="eq-cos2-coluna-ca"><span class="math display">\[
+\cos^2_{j\ell}
+=
+\frac{
+\left(
+f_{j\ell}^{(c)}
+\right)^2
+}{
+d_{\chi^2}^2
+\left(
+j,\mathbf r
+\right)
+}.
+\tag{17.54}\]</span></span></p>
+</div>
+<p>Para uma categoria com distância positiva ao centro, a soma dos <span class="math inline">\(\cos^2\)</span> sobre todas as dimensões é igual a <span class="math inline">\(1\)</span>. Se a categoria coincide com o centro de sua nuvem, todos os escores principais são nulos e o <span class="math inline">\(\cos^2\)</span> não é definido.</p>
+<p>Para as primeiras <span class="math inline">\(k\leq L\)</span> dimensões,</p>
+<p><span class="math display">\[
+\sum_{\ell=1}^{k}
+\cos^2_{i\ell}
+\]</span></p>
+<p>representa a parcela da distância quadrática da linha <span class="math inline">\(i\)</span> ao centro contida na representação reduzida; a definição dual vale para as colunas.</p>
+<p>A <a href="#tbl-contribuicao-cos2-ca" class="quarto-xref">Tabela&nbsp;<span class="quarto-unresolved-ref">tbl-contribuicao-cos2-ca</span></a> distingue as duas decomposições.</p>
+<div id="tbl-contribuicao-cos2-ca" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-contribuicao-cos2-ca-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;17.3: Diferença entre contribuição e qualidade de representação na Análise de Correspondência.
+</figcaption>
+<div aria-describedby="tbl-contribuicao-cos2-ca-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Medida</th>
+<th>Quantidade de referência</th>
+<th>Interpretação</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>contribuição</td>
+<td>inércia da dimensão <span class="math inline">\(\lambda_\ell\)</span></td>
+<td>participação da categoria na construção da dimensão</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\cos^2\)</span></td>
+<td>distância quadrática da categoria ao centro</td>
+<td>parcela da posição da categoria representada pela dimensão</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A contribuição distribui a <strong>inércia de uma dimensão entre as categorias</strong>, enquanto o <span class="math inline">\(\cos^2\)</span> distribui a <strong>distância de uma categoria entre as dimensões</strong>. Uma categoria pode contribuir fortemente para um eixo sem ser bem representada apenas por ele, e pode ser bem representada por um eixo mesmo contribuindo pouco para sua inércia.</p>
+<p>Critérios operacionais de seleção de categorias, limiares de contribuição ou <span class="math inline">\(\cos^2\)</span> e regras de leitura de mapas pertencem à etapa aplicada.</p>
+</section>
+</section>
+<section id="sec-ca-descritiva-inferencial" class="level2" data-number="17.10">
+<h2 data-number="17.10" class="anchored" data-anchor-id="sec-ca-descritiva-inferencial"><span class="header-section-number">17.10</span> Formulação descritiva e inferencial</h2>
+<p>A identidade</p>
+<p><span class="math display">\[
+\chi^2
+=
+n\mathcal I
+\]</span></p>
+<p>estabelecida em <a href="#eq-qui-quadrado-inercia-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-qui-quadrado-inercia-ca</span></a> relaciona a estatística de Pearson calculada para a tabela observada com a inércia total da Análise de Correspondência. Essa igualdade é algébrica e não exige, por si só, um modelo probabilístico.</p>
+<p>Na formulação descritiva,</p>
+<p><span class="math display">\[
+p_{ij},
+\qquad
+r_i
+\qquad\text{e}\qquad
+c_j
+\]</span></p>
+<p>são quantidades calculadas a partir da tabela observada. A inércia</p>
+<p><span class="math display">\[
+\mathcal I
+\]</span></p>
+<p>mede e decompõe geometricamente o afastamento de</p>
+<p><span class="math display">\[
+\mathbf P
+=
+\mathbf r\mathbf c^\top.
+\]</span></p>
+<section id="aprofundamento-formulação-probabilística-e-teste-de-independência" class="level3" data-number="17.10.1">
+<h3 data-number="17.10.1" class="anchored" data-anchor-id="aprofundamento-formulação-probabilística-e-teste-de-independência"><span class="header-section-number">17.10.1</span> Aprofundamento: formulação probabilística e teste de independência</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A identidade <span class="math inline">\(\chi^2=n\mathcal I\)</span> é uma propriedade algébrica da tabela observada. Para utilizar a estatística de Pearson em um teste de independência populacional, é necessário acrescentar um modelo probabilístico para a geração das frequências e considerar sua distribuição amostral.</p>
+</div>
+</div>
+<p>Para uma interpretação inferencial, considere duas variáveis categóricas com probabilidades populacionais</p>
+<p><span class="math display">\[
+\pi_{ij}
+=
+P
+\left(
+\mathsf A=i,
+\mathsf B=j
+\right),
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\pi_{ij}\geq0,
+\qquad
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+\pi_{ij}
+=
+1.
+\]</span></p>
+<p>As probabilidades marginais são</p>
+<p><span class="math display">\[
+\pi_{i\cdot}
+=
+\sum_{j=1}^{J}
+\pi_{ij}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\pi_{\cdot j}
+=
+\sum_{i=1}^{I}
+\pi_{ij}.
+\]</span></p>
+<p>A hipótese populacional de independência é</p>
+<p><span id="eq-hipotese-independencia-ca"><span class="math display">\[
+H_0:
+\pi_{ij}
+=
+\pi_{i\cdot}
+\pi_{\cdot j},
+\qquad
+i=1,\ldots,I,
+\quad
+j=1,\ldots,J.
+\tag{17.55}\]</span></span></p>
+<p>Considere uma amostra de tamanho <span class="math inline">\(n\)</span> formada por observações independentes dessa distribuição conjunta. O vetor das frequências celulares possui distribuição multinomial com parâmetros <span class="math inline">\(n\)</span> e probabilidades <span class="math inline">\(\pi_{ij}\)</span>.</p>
+<div id="prp-qui-quadrado-assintotico-ca" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposição 17.3 (Distribuição assintótica da estatística de Pearson sob independência)</strong></span> Considere uma tabela de contingência <span class="math inline">\(I\times J\)</span>, com <span class="math inline">\(I\)</span> e <span class="math inline">\(J\)</span> fixos, obtida de uma amostra multinomial de tamanho <span class="math inline">\(n\)</span>.</p>
+<p>Sob</p>
+<p><span class="math display">\[
+H_0:
+\pi_{ij}
+=
+\pi_{i\cdot}\pi_{\cdot j},
+\]</span></p>
+<p>suponha</p>
+<p><span class="math display">\[
+\pi_{i\cdot}&gt;0,
+\qquad
+i=1,\ldots,I,
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\pi_{\cdot j}&gt;0,
+\qquad
+j=1,\ldots,J.
+\]</span></p>
+<p>Então, quando</p>
+<p><span class="math display">\[
+n\longrightarrow\infty,
+\]</span></p>
+<p>a estatística de Pearson satisfaz</p>
+<p><span id="eq-distribuicao-assintotica-qui-ca"><span class="math display">\[
+\chi^2
+\overset{d}{\longrightarrow}
+\chi^2_{(I-1)(J-1)}.
+\tag{17.56}\]</span></span></p>
+</div>
+<p>Esse resultado é <strong>assintótico</strong>, no sentido de <a href="#def-resultados-exatos-assintoticos" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-resultados-exatos-assintoticos</span></a>, e deve ser distinguido da identidade exata</p>
+<p><span class="math display">\[
+\chi^2
+=
+n\mathcal I.
+\]</span></p>
+</section>
+<section id="teste-global-e-magnitude-geométrica" class="level3" data-number="17.10.2">
+<h3 data-number="17.10.2" class="anchored" data-anchor-id="teste-global-e-magnitude-geométrica"><span class="header-section-number">17.10.2</span> Teste global e magnitude geométrica</h3>
+<p>O teste de Pearson avalia globalmente a hipótese de independência populacional. As dimensões obtidas pela SVD, por sua vez, decompõem descritivamente o afastamento observado da independência:</p>
+<p><span class="math display">\[
+\mathcal I
+=
+\sum_{\ell=1}^{L}
+\lambda_\ell.
+\]</span></p>
+<p>Uma dimensão da Correspondência não corresponde automaticamente a uma hipótese inferencial populacional separada. O teste e a decomposição geométrica respondem, portanto, a problemas distintos.</p>
+<p>A identidade</p>
+<p><span class="math display">\[
+\chi^2
+=
+n\mathcal I
+\]</span></p>
+<p>também separa magnitude geométrica e tamanho amostral. Se todas as contagens forem multiplicadas por um mesmo inteiro positivo <span class="math inline">\(a\)</span>, a matriz de frequências relativas <span class="math inline">\(\mathbf P\)</span>, as massas, a matriz <span class="math inline">\(\mathbf Q_{\mathrm{CA}}\)</span>, a inércia e as coordenadas permanecem inalteradas, enquanto</p>
+<p><span class="math display">\[
+\chi^{2*}
+=
+a\chi^2.
+\]</span></p>
+<p>Assim, significância estatística e magnitude geométrica da associação não são a mesma quantidade. A Correspondência pode ser utilizada descritivamente mesmo quando não se pretende realizar um teste formal de independência <span class="citation" data-cites="greenacre2017ca">(<a href="#ref-greenacre2017ca" role="doc-biblioref">Greenacre, 2017</a>)</span>.</p>
+</section>
+</section>
+<section id="relação-com-a-análise-de-componentes-principais" class="level2" data-number="17.11">
+<h2 data-number="17.11" class="anchored" data-anchor-id="relação-com-a-análise-de-componentes-principais"><span class="header-section-number">17.11</span> Relação com a Análise de Componentes Principais</h2>
+<p>A Análise de Correspondência e a ACP compartilham estruturas de decomposição e representação em baixa dimensão, mas partem de objetos estatísticos e geometrias diferentes.</p>
+<p>No <a href="#sec-acp" class="quarto-xref"><span class="quarto-unresolved-ref">sec-acp</span></a>, a ACP representa a variabilidade de dados quantitativos por meio de direções principais. Na Análise de Correspondência, a estrutura de entrada é uma tabela de contingência e a representação é construída a partir de perfis e da geometria qui-quadrado.</p>
+<p>Considere a matriz dos perfis de linhas,</p>
+<p><span class="math display">\[
+\mathbf P^{(r)}
+=
+\mathbf D_r^{-1}
+\mathbf P.
+\]</span></p>
+<p>Pela definição de <span class="math inline">\(\mathbf P^{(r)}\)</span> e por <a href="#eq-matriz-desvios-padronizados-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-matriz-desvios-padronizados-ca</span></a>,</p>
+<p><span id="eq-ca-matriz-perfis-ponderados"><span class="math display">\[
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf D_r^{1/2}
+\left(
+\mathbf P^{(r)}
+-
+\mathbf1_I\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}.
+\tag{17.57}\]</span></span></p>
+<p>Antes da SVD, portanto, os perfis de linhas são:</p>
+<ol type="1">
+<li>centralizados em torno de <span class="math inline">\(\mathbf c\)</span>;</li>
+<li>ponderados pelas massas das linhas;</li>
+<li>reescalonados pelas massas das colunas.</li>
+</ol>
+<p>Essa expressão permite interpretar a Análise de Correspondência como uma decomposição ponderada dos perfis centralizados. A semelhança com a ACP está no uso de uma estrutura centralizada, da SVD e de aproximações de posto reduzido. A diferença está no objeto analisado, nos pesos e na geometria: na Correspondência, as massas participam da construção e a métrica entre perfis é a métrica qui-quadrado.</p>
+<p>A <a href="#tbl-relacao-acp-ca" class="quarto-xref">Tabela&nbsp;<span class="quarto-unresolved-ref">tbl-relacao-acp-ca</span></a> resume essas diferenças.</p>
+<div id="tbl-relacao-acp-ca" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-relacao-acp-ca-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;17.4: Relação entre a ACP e a Análise de Correspondência.
+</figcaption>
+<div aria-describedby="tbl-relacao-acp-ca-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Aspecto</th>
+<th>ACP</th>
+<th>Análise de Correspondência</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>objeto inicial</td>
+<td>matriz de dados quantitativos ou matriz de covariâncias/correlações</td>
+<td>tabela de contingência</td>
+</tr>
+<tr class="even">
+<td>unidades representadas</td>
+<td>observações e/ou variáveis</td>
+<td>categorias de linhas e colunas</td>
+</tr>
+<tr class="odd">
+<td>centro</td>
+<td>vetor de médias</td>
+<td>perfis marginais <span class="math inline">\(\mathbf c\)</span> e <span class="math inline">\(\mathbf r\)</span></td>
+</tr>
+<tr class="even">
+<td>pesos</td>
+<td>usualmente iguais na formulação básica</td>
+<td>massas <span class="math inline">\(r_i\)</span> e <span class="math inline">\(c_j\)</span></td>
+</tr>
+<tr class="odd">
+<td>geometria</td>
+<td>euclidiana ou padronizada</td>
+<td>qui-quadrado</td>
+</tr>
+<tr class="even">
+<td>quantidade decomposta</td>
+<td>variância</td>
+<td>inércia</td>
+</tr>
+<tr class="odd">
+<td>ferramenta espectral</td>
+<td>autovalores ou SVD</td>
+<td>SVD dos desvios padronizados</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A presença de SVD e de aproximações de posto reduzido nas duas técnicas não as torna equivalentes. A ACP representa variabilidade de variáveis quantitativas; a Correspondência representa associações entre categorias por meio de perfis ponderados. Ela não deve, portanto, ser interpretada simplesmente como uma ACP aplicada a variáveis qualitativas <span class="citation" data-cites="greenacre2017ca">(<a href="#ref-greenacre2017ca" role="doc-biblioref">Greenacre, 2017</a>)</span>.</p>
+</section>
+<section id="sec-ca-categorias-suplementares" class="level2" data-number="17.12">
+<h2 data-number="17.12" class="anchored" data-anchor-id="sec-ca-categorias-suplementares"><span class="header-section-number">17.12</span> Aprofundamento: categorias suplementares</h2>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Categorias suplementares permitem acrescentar informações a uma solução já construída sem modificar os eixos, as inércias principais ou as coordenadas das categorias ativas. Sua posição é obtida projetando seus perfis na geometria determinada pelas categorias que participaram da análise.</p>
+</div>
+</div>
+<p>A formulação desenvolvida até aqui utiliza categorias <strong>ativas</strong>, que participam da construção da tabela de frequências relativas, das massas, dos perfis e da matriz de desvios padronizados. Consequentemente, essas categorias participam da SVD que determina as dimensões da associação.</p>
+<p>Uma categoria <strong>suplementar</strong> é relacionada posteriormente à solução obtida com as categorias ativas. Sua inclusão não modifica os valores singulares, as inércias principais nem as coordenadas das categorias que participaram da construção da análise. O objetivo é utilizar a geometria já determinada para posicionar informações adicionais e auxiliar sua interpretação <span class="citation" data-cites="greenacre2017ca">(<a href="#ref-greenacre2017ca" role="doc-biblioref">Greenacre, 2017</a>)</span>.</p>
+<section id="linhas-suplementares" class="level3" data-number="17.12.1">
+<h3 data-number="17.12.1" class="anchored" data-anchor-id="linhas-suplementares"><span class="header-section-number">17.12.1</span> Linhas suplementares</h3>
+<p>Considere uma categoria de linha suplementar cujo perfil em relação às <span class="math inline">\(J\)</span> colunas ativas seja</p>
+<p><span class="math display">\[
+\mathbf q_*
+=
+\begin{bmatrix}
+q_{*1} &amp;
+\cdots &amp;
+q_{*J}
+\end{bmatrix}^{\top}
+\in
+\mathbb R^J,
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+q_{*j}\geq0,
+\qquad
+\sum_{j=1}^{J}q_{*j}=1.
+\]</span></p>
+<p>A relação baricêntrica desenvolvida em <a href="#eq-baricentro-linha-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-baricentro-linha-ca</span></a> permite projetar essa categoria no espaço já construído. Se</p>
+<p><span class="math display">\[
+\mathbf a_j^{(c)}
+\in
+\mathbb R^L
+\]</span></p>
+<p>denota o vetor de coordenadas padrão da coluna ativa <span class="math inline">\(j\)</span>, então as coordenadas principais da linha suplementar são</p>
+<p><span id="eq-ca-linha-suplementar"><span class="math display">\[
+\mathbf f_*^{(r)}
+=
+\sum_{j=1}^{J}
+q_{*j}\,
+\mathbf a_j^{(c)}.
+\tag{17.58}\]</span></span></p>
+<p>A expressão mostra que a linha suplementar é posicionada pelo mesmo princípio baricêntrico utilizado para as linhas ativas. Seu perfil fornece os pesos utilizados para combinar as coordenadas padrão das colunas.</p>
+<p>A projeção utiliza uma solução já determinada. Por isso, a linha suplementar recebe coordenadas no espaço principal, mas não participa da determinação de</p>
+<p><span class="math display">\[
+\mathbf U,
+\qquad
+\mathbf D
+\qquad\text{ou}\qquad
+\mathbf V.
+\]</span></p>
+</section>
+<section id="colunas-suplementares" class="level3" data-number="17.12.2">
+<h3 data-number="17.12.2" class="anchored" data-anchor-id="colunas-suplementares"><span class="header-section-number">17.12.2</span> Colunas suplementares</h3>
+<p>A construção é dual para uma coluna suplementar. Considere seu perfil em relação às <span class="math inline">\(I\)</span> linhas ativas,</p>
+<p><span class="math display">\[
+\mathbf q_*
+=
+\begin{bmatrix}
+q_{1*} &amp;
+\cdots &amp;
+q_{I*}
+\end{bmatrix}^{\top}
+\in
+\mathbb R^I,
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+q_{i*}\geq0,
+\qquad
+\sum_{i=1}^{I}q_{i*}=1.
+\]</span></p>
+<p>Se</p>
+<p><span class="math display">\[
+\mathbf a_i^{(r)}
+\in
+\mathbb R^L
+\]</span></p>
+<p>denota o vetor de coordenadas padrão da linha ativa <span class="math inline">\(i\)</span>, então as coordenadas principais da coluna suplementar são</p>
+<p><span id="eq-ca-coluna-suplementar"><span class="math display">\[
+\mathbf f_*^{(c)}
+=
+\sum_{i=1}^{I}
+q_{i*}\,
+\mathbf a_i^{(r)}.
+\tag{17.59}\]</span></span></p>
+<p>A linha suplementar é, portanto, projetada a partir das coordenadas padrão das colunas ativas, enquanto a coluna suplementar é projetada a partir das coordenadas padrão das linhas ativas. Essa dualidade é a mesma que produz as relações baricêntricas das categorias ativas.</p>
+</section>
+<section id="qualidade-de-representação" class="level3" data-number="17.12.3">
+<h3 data-number="17.12.3" class="anchored" data-anchor-id="qualidade-de-representação"><span class="header-section-number">17.12.3</span> Qualidade de representação</h3>
+<p>A qualidade de representação de uma categoria suplementar pode ser avaliada pela mesma relação geométrica utilizada para as categorias ativas.</p>
+<p>Para uma linha suplementar, sua distância qui-quadrado ao perfil médio das colunas ativas é</p>
+<p><span class="math display">\[
+d_{\chi^2}^2
+\left(
+\mathbf q_*,
+\mathbf c
+\right)
+=
+\sum_{j=1}^{J}
+\frac{
+\left(
+q_{*j}-c_j
+\right)^2
+}{
+c_j
+}.
+\]</span></p>
+<p>Quando essa distância é positiva, o cosseno quadrado da linha suplementar na dimensão <span class="math inline">\(\ell\)</span> é</p>
+<p><span id="eq-ca-cos2-linha-suplementar"><span class="math display">\[
+\cos^2_{*\ell}
+=
+\frac{
+\left(
+f_{*\ell}^{(r)}
+\right)^2
+}{
+d_{\chi^2}^2
+\left(
+\mathbf q_*,
+\mathbf c
+\right)
+}.
+\tag{17.60}\]</span></span></p>
+<p>O valor mede a parcela da posição da categoria suplementar em relação ao perfil médio representada pela dimensão <span class="math inline">\(\ell\)</span>. A soma dos <span class="math inline">\(\cos^2\)</span> nas dimensões mantidas informa a qualidade de sua representação no subespaço exibido.</p>
+<p>A interpretação da contribuição exige outra distinção. As contribuições das categorias ativas decompõem a inércia de uma dimensão porque essas categorias participaram de sua construção. Uma categoria suplementar é projetada depois da determinação dos eixos e, portanto, não participa da decomposição</p>
+<p><span class="math display">\[
+\lambda_\ell
+=
+\sum_{i=1}^{I}
+r_i
+\left(
+f_{i\ell}^{(r)}
+\right)^2
+=
+\sum_{j=1}^{J}
+c_j
+\left(
+f_{j\ell}^{(c)}
+\right)^2.
+\]</span></p>
+<p>Assim, para uma categoria suplementar podem ser examinadas sua posição e sua qualidade de representação, mas ela não possui contribuição ativa para a inércia que determinou a dimensão.</p>
+<p>A distinção entre categorias ativas e suplementares separa duas etapas da análise. As categorias ativas determinam a geometria da associação; as categorias suplementares utilizam essa geometria para acrescentar informação interpretativa sem alterar a solução obtida.</p>
+</section>
+</section>
+<section id="condições-e-limites-da-representação" class="level2" data-number="17.13">
+<h2 data-number="17.13" class="anchored" data-anchor-id="condições-e-limites-da-representação"><span class="header-section-number">17.13</span> Condições e limites da representação</h2>
+<p>A formulação da Análise de Correspondência é predominantemente geométrica e descritiva. Por isso, convém distinguir as condições necessárias para definir sua geometria das hipóteses adicionais utilizadas quando se realiza inferência sobre independência.</p>
+<section id="tabela-ativa-e-massas" class="level3" data-number="17.13.1">
+<h3 data-number="17.13.1" class="anchored" data-anchor-id="tabela-ativa-e-massas"><span class="header-section-number">17.13.1</span> Tabela ativa e massas</h3>
+<p>A tabela de frequências observadas satisfaz</p>
+<p><span class="math display">\[
+\mathbf N
+\in
+\mathbb N_0^{I\times J}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+n&gt;0.
+\]</span></p>
+<p>A geometria ativa requer</p>
+<p><span class="math display">\[
+r_i&gt;0,
+\qquad
+i=1,\ldots,I,
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+c_j&gt;0,
+\qquad
+j=1,\ldots,J,
+\]</span></p>
+<p>para que os perfis e as inversas de <span class="math inline">\(\mathbf D_r\)</span> e <span class="math inline">\(\mathbf D_c\)</span> utilizados na técnica estejam definidos.</p>
+<p>Linhas ou colunas com massa nula não possuem perfis ativos e devem ser retiradas da geometria formulada neste capítulo.</p>
+<p>Massas positivas muito pequenas não impedem matematicamente a análise, mas podem exercer influência elevada porque a distância qui-quadrado utiliza os inversos das massas.</p>
+<p>Uma frequência celular nula,</p>
+<p><span class="math display">\[
+n_{ij}=0,
+\]</span></p>
+<p>também não impede a análise quando as massas marginais correspondentes permanecem positivas. Zeros estruturais, por outro lado, exigem interpretação de acordo com o mecanismo que produziu a tabela.</p>
+<p>Na formulação inferencial, frequências esperadas pequenas podem comprometer a qualidade da aproximação assintótica de Pearson. Essa questão pertence à avaliação aplicada do teste e não à definição geométrica da Correspondência.</p>
+</section>
+<section id="dimensão-da-representação" class="level3" data-number="17.13.2">
+<h3 data-number="17.13.2" class="anchored" data-anchor-id="dimensão-da-representação"><span class="header-section-number">17.13.2</span> Dimensão da representação</h3>
+<p>Por <a href="#eq-posto-maximo-ca" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-posto-maximo-ca</span></a>,</p>
+<p><span class="math display">\[
+L
+=
+\operatorname{posto}
+\left(
+\mathbf Q_{\mathrm{CA}}
+\right)
+\leq
+\min
+\left(
+I-1,
+J-1
+\right).
+\]</span></p>
+<p>Quando apenas</p>
+<p><span class="math display">\[
+1\leq k&lt;L
+\]</span></p>
+<p>dimensões são mantidas, a proporção da inércia representada é</p>
+<p><span class="math display">\[
+\frac{
+\displaystyle
+\sum_{\ell=1}^{k}
+\lambda_\ell
+}{
+\displaystyle
+\sum_{\ell=1}^{L}
+\lambda_\ell
+}.
+\]</span></p>
+<p>O mapa é, nesse caso, uma representação de posto reduzido. Uma representação bidimensional não implica que a associação observada seja intrinsecamente bidimensional.</p>
+</section>
+<section id="sinais-multiplicidades-e-orientação" class="level3" data-number="17.13.3">
+<h3 data-number="17.13.3" class="anchored" data-anchor-id="sinais-multiplicidades-e-orientação"><span class="header-section-number">17.13.3</span> Sinais, multiplicidades e orientação</h3>
+<p>A troca simultânea</p>
+<p><span class="math display">\[
+\mathbf u_\ell
+\longmapsto
+-
+\mathbf u_\ell,
+\qquad
+\mathbf v_\ell
+\longmapsto
+-
+\mathbf v_\ell
+\]</span></p>
+<p>não altera</p>
+<p><span class="math display">\[
+d_\ell
+\mathbf u_\ell
+\mathbf v_\ell^\top.
+\]</span></p>
+<p>O sinal absoluto de uma dimensão é, portanto, arbitrário.</p>
+<p>Quando um valor singular é repetido, os vetores singulares individuais associados não são únicos; o subespaço correspondente é o objeto geometricamente relevante. Se o truncamento ocorre dentro de uma multiplicidade, diferentes subespaços de mesma dimensão podem produzir representações igualmente admissíveis.</p>
+<p>A interpretação deve privilegiar estruturas invariantes, como inércias, distâncias dentro de cada nuvem, subespaços e relações entre perfis.</p>
+</section>
+<section id="proximidade-entre-linhas-e-colunas" class="level3" data-number="17.13.4">
+<h3 data-number="17.13.4" class="anchored" data-anchor-id="proximidade-entre-linhas-e-colunas"><span class="header-section-number">17.13.4</span> Proximidade entre linhas e colunas</h3>
+<p>As distâncias entre linhas em coordenadas principais completas reproduzem as distâncias qui-quadrado entre seus perfis; a interpretação dual vale para as colunas.</p>
+<p>A distância gráfica entre uma linha e uma coluna, entretanto, não possui, em geral, essa interpretação. A <a href="#fig-ca-mapa-conjunto" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-ca-mapa-conjunto</span></a> ilustra essa distinção na representação simultânea das duas nuvens.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-ca-mapa-conjunto" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ca-mapa-conjunto-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_correspondencia_files/figure-html/fig-ca-mapa-conjunto-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="720">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ca-mapa-conjunto-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;17.2: Representação conjunta das categorias de linhas e colunas. Distâncias dentro da mesma nuvem possuem interpretação geométrica própria; a distância entre uma linha e uma coluna não corresponde, em geral, a uma distância qui-quadrado.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>O mapa permite examinar simultaneamente as duas margens, mas sua leitura deve respeitar a geometria de cada nuvem. Relações entre linhas e colunas devem ser interpretadas a partir dos perfis, das relações baricêntricas e dos desvios padronizados da independência, e não pela distância gráfica direta entre símbolos de tipos diferentes.</p>
+<p>A Análise de Correspondência descreve associações entre categorias. Uma inércia positiva,</p>
+<p><span class="math display">\[
+\mathcal I&gt;0,
+\]</span></p>
+<p>indica que a tabela observada se afasta da estrutura</p>
+<p><span class="math display">\[
+\mathbf P
+=
+\mathbf r\mathbf c^\top.
+\]</span></p>
+<p>Mesmo quando o teste global fornece evidência de associação populacional, esse resultado não estabelece causalidade.</p>
+<p>Uma dimensão da Correspondência também não deve ser interpretada automaticamente como uma variável latente substantiva. Ela é uma direção singular que organiza parte dos desvios padronizados da independência. Sua interpretação deve considerar os perfis, as coordenadas das categorias, as relações baricêntricas e o contexto do problema.</p>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Correspondência com a implementação utilizada
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nas atividades computacionais, a Análise de Correspondência será realizada pelo módulo <a href="https://sebastien-le.github.io/medasite/"><code>MEDA</code></a> <span class="citation" data-cites="meda2026">(<a href="#ref-meda2026" role="doc-biblioref">Leblay et al., 2026</a>)</span> do <a href="https://www.jamovi.org/">jamovi</a> <span class="citation" data-cites="jamovi2026">(<a href="#ref-jamovi2026" role="doc-biblioref">The jamovi project, 2026</a>)</span>. O <code>MEDA</code> utiliza procedimentos implementados no pacote <code>FactoMineR</code> <span class="citation" data-cites="le2008factominer">(<a href="#ref-le2008factominer" role="doc-biblioref">Lê; Josse; Husson, 2008</a>)</span>.</p>
+<p>A entrada da análise é uma tabela de contingência, correspondente ao objeto desenvolvido na <a href="#sec-ca-tabela-contingencia" class="quarto-xref"><span class="quarto-unresolved-ref">sec-ca-tabela-contingencia</span></a>. Códigos eventualmente utilizados para representar categorias não constituem valores quantitativos; a análise utiliza as frequências conjuntas da tabela.</p>
+<p>As dimensões, inércias principais e coordenadas apresentadas pela implementação correspondem à decomposição por SVD e aos sistemas de coordenadas desenvolvidos nas <a href="#sec-ca-svd" class="quarto-xref"><span class="quarto-unresolved-ref">sec-ca-svd</span></a> e <a href="#sec-ca-coordenadas" class="quarto-xref"><span class="quarto-unresolved-ref">sec-ca-coordenadas</span></a>.</p>
+<p>Medidas adicionais de contribuição e qualidade de representação, o teste global de independência e a projeção de categorias suplementares devem ser interpretados segundo as respectivas formulações apresentadas neste capítulo.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="síntese" class="level2" data-number="17.14">
+<h2 data-number="17.14" class="anchored" data-anchor-id="síntese"><span class="header-section-number">17.14</span> Síntese</h2>
+<p>A Análise de Correspondência representa associações entre as categorias de duas variáveis a partir de uma tabela de contingência</p>
+<p><span class="math display">\[
+\mathbf N
+=
+(n_{ij})
+\in
+\mathbb N_0^{I\times J}.
+\]</span></p>
+<p>A matriz de frequências relativas</p>
+<p><span class="math display">\[
+\mathbf P
+=
+\frac1n\mathbf N
+\]</span></p>
+<p>determina as massas</p>
+<p><span class="math display">\[
+\mathbf r
+=
+\mathbf P\mathbf1_J
+\qquad\text{e}\qquad
+\mathbf c
+=
+\mathbf P^\top\mathbf1_I
+\]</span></p>
+<p>e os perfis condicionais das linhas e das colunas.</p>
+<p>Sob independência, a estrutura de referência é</p>
+<p><span class="math display">\[
+\mathbf P
+=
+\mathbf r\mathbf c^\top.
+\]</span></p>
+<p>A Correspondência analisa o afastamento dessa estrutura na geometria qui-quadrado. Os desvios padronizados da independência são reunidos na matriz</p>
+<p><span class="math display">\[
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf D_r^{-1/2}
+\left(
+\mathbf P-\mathbf r\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}.
+\]</span></p>
+<p>Sua norma de Frobenius determina a inércia total,</p>
+<p><span class="math display">\[
+\mathcal I
+=
+\left\|
+\mathbf Q_{\mathrm{CA}}
+\right\|_F^2.
+\]</span></p>
+<p>A decomposição em valores singulares</p>
+<p><span class="math display">\[
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf U\mathbf D\mathbf V^\top
+\]</span></p>
+<p>decompõe essa inércia em</p>
+<p><span class="math display">\[
+\mathcal I
+=
+\sum_{\ell=1}^{L}
+\lambda_\ell,
+\qquad
+\lambda_\ell
+=
+d_\ell^2.
+\]</span></p>
+<p>As inércias principais quantificam a parcela da associação representada em cada dimensão. Uma aproximação de posto reduzido preserva as dimensões que concentram maior parcela dessa estrutura.</p>
+<p>As coordenadas principais fornecem representações euclidianas da geometria qui-quadrado de cada margem. Quando todas as dimensões não nulas são mantidas, as distâncias euclidianas entre pontos de linhas reproduzem as distâncias qui-quadrado entre seus perfis, e a relação dual vale para as colunas. As relações baricêntricas conectam as duas nuvens, mas não estabelecem uma distância qui-quadrado direta entre uma categoria de linha e uma categoria de coluna.</p>
+<p>Para a tabela observada,</p>
+<p><span class="math display">\[
+\chi^2
+=
+n\mathcal I.
+\]</span></p>
+<p>Essa identidade relaciona a geometria da Correspondência à estatística de Pearson. A inércia descreve o afastamento observado da independência, enquanto a utilização de <span class="math inline">\(\chi^2\)</span> em um teste populacional requer um modelo probabilístico e condições inferenciais adicionais.</p>
+<p>A Correspondência e a ACP compartilham decomposições de baixa dimensão, mas operam sobre objetos e geometrias diferentes. A ACP representa variabilidade em dados quantitativos; a Correspondência representa associações entre perfis de uma tabela de contingência.</p>
+<p>No próximo capítulo, o problema estatístico passa da representação de associações entre categorias para a comparação conjunta de várias respostas quantitativas entre grupos ou condições previamente definidos. A <a href="#sec-manova" class="quarto-xref"><span class="quarto-unresolved-ref">sec-manova</span></a> utilizará o modelo linear multivariado, as matrizes de hipótese e erro e critérios baseados em sua estrutura espectral.</p>
+
+
+<div id="refs" class="references csl-bib-body" data-entry-spacing="1" role="list">
+<div id="ref-greenacre2017ca" class="csl-entry" role="listitem">
+GREENACRE, Michael. <strong><a href="https://www.routledge.com/Correspondence-Analysis-in-Practice/Greenacre/p/book/9781498731775">Correspondence Analysis in Practice</a></strong>. 3. ed. Boca Raton: CRC Press, 2017.
+</div>
+<div id="ref-le2008factominer" class="csl-entry" role="listitem">
+LÊ, Sébastien; JOSSE, Julie; HUSSON, François. <a href="https://doi.org/10.18637/jss.v025.i01"><span>FactoMineR</span>: A Package for Multivariate Analysis</a>. <strong>Journal of Statistical Software</strong>, v. 25, n. 1, p. 1–18, 2008.
+</div>
+<div id="ref-meda2026" class="csl-entry" role="listitem">
+LEBLAY, Thomas <em>et al.</em> <strong><span>MEDA</span>: Multivariate Exploratory Data Analysis with jamovi and FactoMineR</strong>. Disponível em: &lt;<a href="https://sebastien-le.github.io/medasite/">https://sebastien-le.github.io/medasite/</a>&gt;. Acesso em: 1 set. 2026.
+</div>
+<div id="ref-jamovi2026" class="csl-entry" role="listitem">
+THE JAMOVI PROJECT. <strong>jamovi (Version 2.7) [Computer Software]</strong>., 2026. Disponível em: &lt;<a href="https://www.jamovi.org">https://www.jamovi.org</a>&gt;. Acesso em: 1 set. 2026
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiada");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiada");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./mod_3_agrupamento.html" class="pagination-link" aria-label="Formulação da Análise de Agrupamentos">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Formulação da Análise de Agrupamentos</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./mod_3_manova.html" class="pagination-link" aria-label="Formulação da MANOVA">
+        <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Formulação da MANOVA</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -673,6 +673,209 @@ $$ {#eq-rayleigh-padronizado-manova}
 
 A transformação pela matriz de erro converte a geometria residual em uma geometria euclidiana. Nesse sistema, $\mathbf M_{\mathrm{HE}}$ representa a magnitude da hipótese relativamente à dispersão residual.
 
+A @fig-manova-branqueamento ilustra essa transformação no espaço das combinações lineares. Antes da padronização, o conjunto de direções que satisfaz
+
+$$
+\mathbf a^\top
+\mathbf E
+\mathbf a
+=
+1
+$$
+
+forma uma elipse determinada pela geometria residual. Sob a transformação
+
+$$
+\mathbf z
+=
+\mathbf E^{1/2}
+\mathbf a,
+$$
+
+esse mesmo conjunto passa a satisfazer
+
+$$
+\mathbf z^\top
+\mathbf z
+=
+1,
+$$
+
+tornando-se o círculo unitário. Nesse sistema padronizado, as direções características são os autovetores de $\mathbf M_{\mathrm{HE}}$.
+
+```{r}
+#| label: fig-manova-branqueamento
+#| fig-cap: "Branqueamento da geometria residual. À esquerda, o contorno representa as combinações lineares normalizadas por $\\mathbf a^\\top\\mathbf E\\mathbf a=1$. Após a transformação $\\mathbf z=\\mathbf E^{1/2}\\mathbf a$, a métrica residual torna-se euclidiana e o contorno transforma-se no círculo unitário. As linhas indicam as duas direções características do problema."
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-width: 8
+#| fig-height: 4.5
+#| fig-align: center
+
+library(ggplot2)
+
+E <- matrix(
+  c(
+    2.0, 0.8,
+    0.8, 1.2
+  ),
+  nrow = 2,
+  byrow = TRUE
+)
+
+H <- matrix(
+  c(
+    2.2, 1.4,
+    1.4, 1.2
+  ),
+  nrow = 2,
+  byrow = TRUE
+)
+
+decomp_E <- eigen(E, symmetric = TRUE)
+
+E_menos_meio <-
+  decomp_E$vectors %*%
+  diag(1 / sqrt(decomp_E$values)) %*%
+  t(decomp_E$vectors)
+
+M_HE <-
+  E_menos_meio %*%
+  H %*%
+  E_menos_meio
+
+decomp_M <- eigen(M_HE, symmetric = TRUE)
+
+V <- decomp_M$vectors
+
+orientacao <- ifelse(V[1, ] < 0, -1, 1)
+V <- sweep(V, 2, orientacao, "*")
+
+alpha <- E_menos_meio %*% V
+
+theta <- seq(0, 2 * pi, length.out = 400)
+
+circulo <- rbind(
+  cos(theta),
+  sin(theta)
+)
+
+elipse <- t(E_menos_meio %*% circulo)
+circulo_t <- t(circulo)
+
+contornos <- rbind(
+  data.frame(
+    x = elipse[, 1],
+    y = elipse[, 2],
+    painel = "Geometria residual original"
+  ),
+  data.frame(
+    x = circulo_t[, 1],
+    y = circulo_t[, 2],
+    painel = "Após o branqueamento"
+  )
+)
+
+direcoes <- rbind(
+  data.frame(
+    x = -alpha[1, ],
+    y = -alpha[2, ],
+    xend = alpha[1, ],
+    yend = alpha[2, ],
+    direcao = c("Direção 1", "Direção 2"),
+    painel = "Geometria residual original"
+  ),
+  data.frame(
+    x = -V[1, ],
+    y = -V[2, ],
+    xend = V[1, ],
+    yend = V[2, ],
+    direcao = c("Direção 1", "Direção 2"),
+    painel = "Após o branqueamento"
+  )
+)
+
+ggplot() +
+  geom_hline(
+    yintercept = 0,
+    linewidth = 0.3,
+    linetype = "dashed",
+    color = "grey70"
+  ) +
+  geom_vline(
+    xintercept = 0,
+    linewidth = 0.3,
+    linetype = "dashed",
+    color = "grey70"
+  ) +
+  geom_path(
+    data = contornos,
+    aes(x = x, y = y),
+    linewidth = 0.8,
+    color = "grey35"
+  ) +
+  geom_segment(
+    data = direcoes,
+    aes(
+      x = x,
+      y = y,
+      xend = xend,
+      yend = yend,
+      color = direcao
+    ),
+    linewidth = 1
+  ) +
+  geom_point(
+    aes(x = 0, y = 0),
+    size = 1.8,
+    color = "grey20"
+  ) +
+  facet_wrap(
+    ~painel,
+    nrow = 1
+  ) +
+  scale_color_manual(
+    values = c(
+      "Direção 1" = "#1f77b4",
+      "Direção 2" = "#2ca02c"
+    )
+  ) +
+  coord_equal(
+    xlim = c(-1.4, 1.4),
+    ylim = c(-1.4, 1.4),
+    expand = FALSE
+  ) +
+  labs(
+    x = "Coordenada 1",
+    y = "Coordenada 2",
+    color = NULL
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.minor = element_blank(),
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold")
+  )
+```
+
+A @fig-manova-branqueamento não representa observações, médias de grupos ou regiões de probabilidade. O contorno representa o conjunto de combinações lineares normalizadas pela forma quadrática residual. O branqueamento também não elimina a variabilidade residual dos dados; ele reexpressa sua métrica de modo que
+
+$$
+\mathbf a^\top
+\mathbf E
+\mathbf a
+$$
+
+se torne a norma euclidiana
+
+$$
+\mathbf z^\top
+\mathbf z.
+$$
+
+Nesse sistema, as direções características podem ser interpretadas diretamente como os eixos espectrais de $\mathbf M_{\mathrm{HE}}$.
+
 Se uma direção característica for normalizada por
 
 $$
@@ -984,19 +1187,17 @@ Os critérios podem, portanto, responder de forma diferente à distribuição do
 
 As transformações utilizadas para obter distribuições de referência ou valores críticos dependem de $p$, dos graus de liberdade da hipótese e do erro e do modelo probabilístico adotado. Essas calibrações pertencem à etapa inferencial aplicada e não serão desenvolvidas neste capítulo.
 
-## Base probabilística dos critérios
+### Aprofundamento: base probabilística dos critérios
 
-As matrizes observadas
+::: {.callout-note appearance="simple" icon=false}
+## Leitura de aprofundamento
 
-$$
-\mathbf H
-\qquad\text{e}\qquad
-\mathbf E
-$$
+As matrizes observadas $\mathbf H$ e $\mathbf E$, suas raízes características e os quatro critérios multivariados podem ser definidos algebricamente sem supor normalidade. A formulação normal acrescenta a estrutura probabilística utilizada na calibração clássica desses critérios.
 
-e os quatro critérios podem ser construídos algebricamente sempre que as condições matriciais da formulação forem satisfeitas. A normalidade multivariada não é necessária para definir essas quantidades.
+Os resultados sobre distribuição de Wishart e sobre as matrizes de hipótese e erro já foram desenvolvidos no Módulo 2. Esta seção apenas os especializa à formulação da MANOVA.
+:::
 
-A calibração inferencial clássica acrescenta um modelo probabilístico. Considere
+Considere
 
 $$
 \boldsymbol{\mathcal Y}
@@ -1123,11 +1324,11 @@ $$
 
 descreve a dispersão residual das respostas e sustenta a utilização de uma única matriz de erro como referência para a comparação com $\mathbf H$.
 
-Quando diferentes grupos possuem matrizes de covariâncias populacionais distintas, essa interpretação comum deixa de ser exata. As consequências dessa violação serão retomadas em `Pressupostos e limites`.
+Quando diferentes grupos possuem matrizes de covariâncias populacionais distintas, essa interpretação comum deixa de ser exata. As consequências dessa violação serão retomadas na @sec-manova-pressupostos.
 
-### Lambda de Wilks e razão de verossimilhanças
+#### Lambda de Wilks e razão de verossimilhanças
 
-A lambda de Wilks possui uma ligação direta com a razão de verossimilhanças do modelo linear normal multivariado.
+A lambda de Wilks possui uma ligação direta com a razão de verossimilhanças do modelo linear normal multivariado. Essa relação já foi desenvolvida no Módulo 2 e é retomada aqui para conectar a formulação por modelos encaixados à representação espectral da MANOVA.
 
 Para modelos encaixados, @prp-decomposicao-modelos-encaixados fornece
 
@@ -1200,13 +1401,15 @@ evidencia sua representação espectral [@wilks1932].
 
 Os critérios de Pillai, Hotelling--Lawley e Roy são construídos a partir da mesma estrutura aleatória $(\boldsymbol{\mathsf H},\boldsymbol{\mathsf E}_{\mathrm{res}})$, embora não correspondam diretamente à razão de verossimilhanças do modelo normal.
 
-A formulação distingue:
+A formulação distingue, portanto, três níveis:
 
 1. as matrizes observadas $\mathbf H$ e $\mathbf E$ e suas raízes características;
 2. os quatro critérios globais calculados a partir dessas raízes;
-3. a calibração inferencial clássica, que utiliza a estrutura probabilística normal--Wishart.
+3. a calibração inferencial clássica, que acrescenta a estrutura probabilística normal--Wishart.
 
-As condições de não singularidade, homogeneidade da covariância residual e validade da inferência clássica serão reunidas posteriormente em `Pressupostos e limites`.
+A definição dos critérios pertence aos dois primeiros níveis. A estrutura normal--Wishart fornece sua fundamentação probabilística clássica, mas não é necessária para definir algebricamente $\mathbf H$, $\mathbf E$ ou suas raízes características.
+
+As condições do modelo e os limites da inferência serão reunidos posteriormente na @sec-manova-pressupostos.
 
 ## Invariância a transformações lineares das respostas
 
@@ -1268,6 +1471,51 @@ $$
 \mathbf A.
 $$ {#eq-transformacao-e-manova}
 
+Se $\mathbf A$ é não singular, os pares
+
+$$
+(\mathbf H,\mathbf E)
+$$
+
+e
+
+$$
+(\mathbf H^{*},\mathbf E^{*})
+$$
+
+possuem as mesmas raízes características, incluindo suas multiplicidades. A demonstração formal desse resultado é apresentada na @prp-invariancia-raizes-manova.
+
+Como Wilks, Pillai, Hotelling--Lawley e Roy dependem somente das raízes características, os quatro critérios são invariantes a transformações lineares não singulares das respostas, desde que a hipótese seja expressa no sistema transformado correspondente.
+
+As direções características mudam de coordenadas. Se $\boldsymbol{\alpha}_j$ é uma direção característica normalizada no sistema original, pode-se tomar
+
+$$
+\boldsymbol{\alpha}_j^{*}
+=
+\mathbf A^{-1}
+\boldsymbol{\alpha}_j,
+$$
+
+de modo que
+
+$$
+\boldsymbol{\mathcal Y}^{*}
+\boldsymbol{\alpha}_j^{*}
+=
+\boldsymbol{\mathcal Y}
+\boldsymbol{\alpha}_j.
+$$
+
+Assim, os coeficientes numéricos das combinações lineares dependem da representação das respostas, enquanto as raízes e os quatro critérios permanecem invariantes sob mudanças invertíveis de coordenadas.
+
+### Aprofundamento: demonstração da invariância das raízes
+
+::: {.callout-note appearance="simple" icon=false}
+## Leitura de aprofundamento
+
+A invariância dos critérios decorre da preservação das raízes características do par $(\mathbf H,\mathbf E)$ sob transformações lineares não singulares das respostas. A demonstração utiliza a transformação por congruência de $\mathbf H$ e $\mathbf E$ e propriedades do determinante.
+:::
+
 ::: {#prp-invariancia-raizes-manova}
 ## Invariância das raízes características
 
@@ -1324,29 +1572,6 @@ $$
 
 as duas equações características possuem os mesmos zeros, com as mesmas multiplicidades.
 :::
-
-Como Wilks, Pillai, Hotelling--Lawley e Roy dependem somente das raízes características, os quatro critérios são invariantes a transformações lineares não singulares das respostas, desde que a hipótese seja expressa no sistema transformado correspondente.
-
-As direções características mudam de coordenadas. Se $\boldsymbol{\alpha}_j$ é uma direção característica normalizada no sistema original, pode-se tomar
-
-$$
-\boldsymbol{\alpha}_j^{*}
-=
-\mathbf A^{-1}
-\boldsymbol{\alpha}_j,
-$$
-
-de modo que
-
-$$
-\boldsymbol{\mathcal Y}^{*}
-\boldsymbol{\alpha}_j^{*}
-=
-\boldsymbol{\mathcal Y}
-\boldsymbol{\alpha}_j.
-$$
-
-Assim, os coeficientes numéricos das combinações lineares dependem da representação das respostas, enquanto as raízes e os quatro critérios permanecem invariantes sob mudanças invertíveis de coordenadas.
 
 ## Pressupostos e limites {#sec-manova-pressupostos}
 
@@ -1423,8 +1648,13 @@ No problema de comparação entre grupos, isso corresponde à utilização de um
 
 Essa estrutura justifica o uso de uma única matriz $\mathbf E$ como referência para a comparação com $\mathbf H$. Se as matrizes de covariâncias diferem entre grupos ou unidades, os critérios ainda podem ser calculados quando as operações matriciais necessárias existem, mas a calibração inferencial clássica normal--Wishart não corresponde exatamente a esse mecanismo.
 
+### Aprofundamento: teste $M$ de Box
+
 ::: {.callout-note appearance="simple" icon=false}
-## Aprofundamento: teste $M$ de Box
+## Leitura de aprofundamento
+
+A igualdade das matrizes de covariâncias constitui uma condição da formulação clássica de comparação entre grupos. O teste $M$ de Box fornece uma avaliação inferencial dessa hipótese, mas seu resultado não substitui a análise da estrutura residual nem constitui, isoladamente, uma decisão sobre a validade da MANOVA.
+:::
 
 No problema de comparação entre $K$ grupos, a hipótese de covariância residual comum pode ser expressa como
 
@@ -1444,7 +1674,6 @@ O teste $M$ de Box compara as matrizes de covariâncias estimadas nos grupos par
 A não rejeição de $H_0$ não demonstra que as matrizes populacionais sejam iguais. O resultado deve ser interpretado em conjunto com a estrutura dos dados e com as hipóteses utilizadas para obter a distribuição de referência do teste. Em particular, desvios da normalidade multivariada podem afetar seu comportamento.
 
 O teste constitui, portanto, uma avaliação inferencial da hipótese de covariância comum e não uma condição que, isoladamente, determine a validade da MANOVA.
-:::
 
 ### Não singularidade populacional e amostral
 
@@ -1499,7 +1728,7 @@ $$ {#eq-condicao-posto-e-manova}
 
 Essa condição não é suficiente em termos puramente algébricos, pois dependências lineares exatas entre os resíduos podem tornar $\mathbf E$ singular.
 
-Sob o modelo normal com
+Sob o modelo normal clássico, com
 
 $$
 \boldsymbol{\Sigma}
@@ -1513,15 +1742,7 @@ $$
 \nu_E\geq p,
 $$
 
-a distribuição Wishart em @eq-distribuicao-e-manova implica que
-
-$$
-\boldsymbol{\mathsf E}_{\mathrm{res}}
-\succ
-\mathbf0
-$$
-
-quase certamente.
+a matriz residual é positiva definida com probabilidade $1$ nas condições regulares dessa formulação. A justificativa probabilística desse resultado por meio da distribuição de Wishart é apresentada na leitura de aprofundamento sobre a base probabilística dos critérios.
 
 Quando $\mathbf E$ é singular, não existem diretamente
 
@@ -1535,7 +1756,7 @@ e a formulação espectral clássica adotada neste capítulo deixa de se aplicar
 
 ### Normalidade multivariada
 
-A normalidade não é necessária para construir
+A normalidade não é uma condição para a definição algébrica da MANOVA. As matrizes
 
 $$
 \mathbf H,
@@ -1543,9 +1764,9 @@ $$
 \mathbf E,
 $$
 
-as raízes características ou os quatro critérios, desde que as operações matriciais utilizadas estejam definidas.
+suas raízes características e os quatro critérios podem ser construídos sempre que as operações matriciais necessárias estejam definidas.
 
-Ela é necessária na formulação inferencial clássica desenvolvida aqui para obter as distribuições Wishart de $\boldsymbol{\mathsf H}$ e $\boldsymbol{\mathsf E}_{\mathrm{res}}$, sua independência sob $H_0$ e as distribuições de referência dos critérios.
+Sob a formulação normal clássica adotada neste capítulo, a normalidade dos erros acrescenta a estrutura probabilística que conduz às distribuições Wishart de $\boldsymbol{\mathsf H}$ e $\boldsymbol{\mathsf E}_{\mathrm{res}}$, à sua independência sob $H_0$ e à calibração inferencial clássica dos critérios.
 
 A hipótese de normalidade refere-se aos erros condicionais à estrutura de médias representada por $\mathbf Z$. Ela não equivale à exigência de que a distribuição marginal obtida ao reunir todas as respostas observadas seja uma única normal multivariada.
 
@@ -1616,11 +1837,21 @@ representam a mesma direção.
 
 Quando uma raiz possui multiplicidade maior que $1$, os autovetores individuais não são únicos; o subespaço característico correspondente é o objeto identificado.
 
-### Associação entre as respostas e singularidade
+### Associação entre as respostas, condicionamento e singularidade
 
-Correlação elevada entre respostas não invalida, por si só, a MANOVA. As covariâncias entre respostas fazem parte da própria construção de $\mathbf E$.
+Correlação elevada entre respostas não invalida, por si só, a MANOVA. A dependência entre as componentes do vetor resposta faz parte da própria construção de $\mathbf E$ e é uma das razões para utilizar uma análise conjunta.
 
-O problema estrutural ocorre quando existe dependência linear exata suficiente para tornar $\mathbf E$ singular. Deve-se, portanto, distinguir associação forte entre respostas de singularidade da estrutura residual.
+Entretanto, respostas muito próximas de uma relação linear exata podem produzir uma matriz $\mathbf E$ mal condicionada. Nesse caso, a matriz ainda pode ser invertível, mas pequenas perturbações nos dados podem produzir alterações relativamente grandes em $\mathbf E^{-1}$ e nas direções características.
+
+A singularidade constitui o caso limite: uma dependência linear exata suficiente reduz o posto de $\mathbf E$ e impede a utilização direta de
+
+$$
+\mathbf E^{-1}
+\qquad\text{e}\qquad
+\mathbf E^{-1/2}.
+$$
+
+Devem ser distinguidas, portanto, três situações: associação entre respostas, que é esperada na MANOVA; quase dependência linear, que pode gerar mau condicionamento; e dependência linear exata, que pode tornar a estrutura residual singular.
 
 ## Relações com outras técnicas
 
@@ -1675,7 +1906,7 @@ H_{jj}
 E_{jj}
 $$
 
-correspondem às somas de quadrados da hipótese e do erro associadas a essa variável. O teste univariado correspondente utiliza
+correspondem às somas de quadrados da hipótese e do erro associadas a essa variável, conduzindo à estatística
 
 $$
 F_j
@@ -1687,11 +1918,9 @@ E_{jj}/\nu_E
 }.
 $$ {#eq-f-univariado-pos-manova}
 
-Esses testes permitem examinar quais respostas apresentam evidência individual de efeito para a hipótese considerada. Sua interpretação é posterior à formulação multivariada e responde a uma pergunta diferente.
+Esses testes respondem a perguntas marginais sobre cada componente do vetor resposta e não reproduzem a MANOVA. Cada $F_j$ utiliza apenas elementos diagonais de $\mathbf H$ e $\mathbf E$, enquanto os critérios multivariados utilizam as matrizes completas e incorporam também os produtos cruzados entre as respostas.
 
-A coleção de testes univariados não reproduz a MANOVA. Cada estatística $F_j$ utiliza apenas os elementos diagonais correspondentes de $\mathbf H$ e $\mathbf E$, enquanto os critérios multivariados dependem das matrizes completas e incorporam os produtos cruzados entre as respostas. Assim, a análise conjunta pode fornecer informação que não aparece em cada resposta considerada isoladamente.
-
-Quando várias respostas são examinadas individualmente, também surge uma questão de multiplicidade inferencial. Os procedimentos utilizados para controlar essa multiplicidade e a condução de análises posteriores pertencem à etapa aplicada.
+Por isso, uma conclusão global da MANOVA não deve ser substituída por uma coleção de testes univariados. Procedimentos de acompanhamento, controle de multiplicidade e comparações posteriores pertencem à etapa aplicada.
 
 ### $T^2$ de Hotelling
 
@@ -1749,7 +1978,7 @@ podem ser avaliadas pelas mesmas matrizes de hipótese e erro.
 
 ### Análise Discriminante
 
-MANOVA e Análise Discriminante compartilham a comparação entre estruturas associadas à separação dos grupos e à dispersão dentro dos grupos.
+MANOVA e Análise Discriminante compartilham estruturas de dispersão associadas às diferenças entre grupos e à variabilidade dentro dos grupos.
 
 Na MANOVA, o problema
 
@@ -1760,26 +1989,22 @@ $$
 \mathbf E\mathbf a
 $$
 
-produz direções utilizadas para representar a magnitude de uma hipótese relativamente ao erro e sustentar testes inferenciais.
+procura direções em que a magnitude da hipótese seja elevada relativamente à dispersão residual. As raízes resultantes sustentam os critérios utilizados para testar a hipótese multivariada.
 
-No @sec-discriminante, uma estrutura análoga de autovalores generalizados será utilizada com outro objetivo: construir combinações das variáveis que favoreçam a separação entre grupos previamente conhecidos.
+No @sec-discriminante, uma estrutura espectral relacionada será utilizada com outro objetivo: construir combinações das variáveis que evidenciem a separação entre grupos previamente conhecidos e possam sustentar procedimentos de discriminação ou classificação.
 
-A coincidência algébrica não implica coincidência estatística. Na MANOVA, o objetivo é testar efeitos sobre várias respostas; na Análise Discriminante, o objetivo passa a ser representar separação e construir regras de discriminação ou classificação.
+A proximidade algébrica não implica equivalência estatística. Na MANOVA, os grupos ou efeitos fazem parte da estrutura explicativa e o objetivo principal é testar diferenças no vetor resposta. Na Análise Discriminante, a pertença aos grupos é conhecida na amostra de referência e o interesse passa à representação da separação e, em determinadas formulações, à classificação de novas observações.
 
 ::: {.callout-note appearance="simple" icon=false}
 ## Correspondência com a implementação utilizada
 
-Nas atividades computacionais, a MANOVA será realizada pela análise MANCOVA do núcleo do [jamovi](https://www.jamovi.org/) [@jamovi2026]. Quando o modelo não inclui covariáveis, a formulação corresponde ao caso MANOVA desenvolvido neste capítulo. A inclusão de covariáveis utiliza a mesma estrutura do modelo linear multivariado, com essas variáveis representadas na matriz de delineamento.
+Nas atividades computacionais, a MANOVA será realizada pela análise `MANCOVA` do núcleo do [jamovi](https://www.jamovi.org/) [@jamovi2026]. Sem covariáveis, essa análise corresponde à formulação MANOVA desenvolvida neste capítulo; a inclusão de covariáveis utiliza a mesma estrutura do modelo linear multivariado, ampliando a matriz de delineamento.
 
-As variáveis dependentes correspondem às respostas quantitativas reunidas em $\boldsymbol{\mathcal Y}$. Fatores fixos representam variáveis categóricas associadas a grupos ou tratamentos, enquanto covariáveis representam variáveis quantitativas incorporadas ao delineamento.
+As respostas quantitativas correspondem às colunas de $\boldsymbol{\mathcal Y}$, enquanto fatores e covariáveis determinam termos da matriz de delineamento. Os critérios de Wilks, Pillai, Hotelling--Lawley e Roy correspondem às funções das raízes características apresentadas na @sec-manova-criterios.
 
-A implementação disponibiliza os quatro critérios desenvolvidos na @sec-manova-criterios: lambda de Wilks, traço de Pillai, traço de Hotelling--Lawley e maior raiz de Roy. Todos são construídos a partir da comparação entre as matrizes de hipótese e erro e diferem pela forma como agregam as raízes características.
+O teste $M$ de Box está relacionado à hipótese de covariância residual comum discutida na @sec-manova-pressupostos. Os testes univariados apresentados para respostas individuais correspondem às comparações marginais discutidas na @sec-manova-anova-testes-univariados e não substituem o teste multivariado.
 
-O teste $M$ de Box apresentado entre as verificações associadas à análise avalia a compatibilidade das matrizes de covariâncias dos grupos com a hipótese de uma estrutura comum. Seu significado corresponde ao pressuposto discutido na @sec-manova-pressupostos. A rejeição fornece evidência contra a homogeneidade das matrizes de covariâncias, enquanto a não rejeição não demonstra sua igualdade.
-
-A implementação também pode apresentar testes univariados para cada resposta. Esses resultados correspondem ao exame desenvolvido na @sec-manova-anova-testes-univariados e não reproduzem a MANOVA. Os critérios multivariados utilizam as matrizes completas de hipótese e erro, incluindo os produtos cruzados entre as respostas.
-
-Os diagnósticos globais de normalidade multivariada disponibilizados pela implementação exigem interpretação cautelosa. A hipótese da MANOVA clássica refere-se à distribuição multivariada dos erros condicionais à estrutura sistemática do modelo. Um diagnóstico calculado diretamente sobre o conjunto das respostas observadas avalia uma propriedade diferente quando existem grupos com vetores de médias distintos. Por isso, essa saída não deve ser interpretada isoladamente como um teste exato do pressuposto de normalidade residual da MANOVA.
+Diagnósticos de normalidade devem ser interpretados em relação aos erros do modelo, e não automaticamente como propriedades da distribuição marginal de todas as respostas reunidas.
 :::
 
 ## Síntese
@@ -1868,10 +2093,10 @@ quantificam a magnitude da hipótese relativamente ao erro nas respectivas dire�
 
 Os critérios de Wilks, Pillai, Hotelling--Lawley e Roy são funções dessa mesma coleção de raízes. Eles diferem pela forma de agregação: Wilks combina multiplicativamente todas as raízes; Pillai soma transformações limitadas; Hotelling--Lawley soma diretamente suas magnitudes; e Roy utiliza apenas a raiz dominante. A @tbl-criterios-manova reúne essas relações.
 
-A construção de $\mathbf H$, $\mathbf E$, das raízes e dos quatro critérios é algébrica. A inferência clássica acrescenta a hipótese de erros normais multivariados independentes com matriz de covariâncias residual comum. Sob essas condições, as SQPCs da hipótese e do erro possuem a estrutura normal--Wishart que sustenta as distribuições de referência dos critérios.
+A construção de $\mathbf H$, $\mathbf E$, das raízes características e dos quatro critérios é algébrica. A formulação inferencial clássica acrescenta uma estrutura probabilística para os erros. Sob o modelo normal adotado neste capítulo, independência entre unidades, covariância residual comum e normalidade multivariada fornecem a base para a calibração dos critérios. A estrutura normal--Wishart que formaliza essa relação foi apresentada como leitura de aprofundamento e não é necessária para definir algebricamente os critérios da MANOVA.
 
-A formulação exige distinguir condições com funções diferentes. A estimabilidade determina se a hipótese está identificada; a positividade definida de $\mathbf E$ permite a formulação espectral clássica; a independência entre unidades e a covariância residual comum pertencem ao modelo probabilístico; e a normalidade sustenta a calibração inferencial clássica. Correlação elevada entre respostas não constitui, por si só, singularidade.
+A formulação exige distinguir condições com funções diferentes. A estimabilidade determina se a hipótese está identificada; a positividade definida de $\mathbf E$ permite a formulação espectral clássica; a covariância residual comum fornece uma referência compartilhada para a geometria do erro; e a independência entre unidades e a normalidade sustentam a calibração inferencial clássica adotada no capítulo. Associação elevada entre respostas não constitui, por si só, singularidade, embora relações lineares quase exatas possam produzir mau condicionamento da matriz residual.
 
 Quando $p=1$, a comparação reduz-se à estrutura da ANOVA. Na comparação de duas populações, existe no máximo uma raiz positiva e a formulação relaciona-se ao $T^2$ de Hotelling. Essas relações mostram que a MANOVA amplia a comparação entre hipótese e erro para situações com várias respostas conjuntamente.
 
-No próximo capítulo, os grupos continuam previamente conhecidos, mas o objetivo estatístico muda. O @sec-discriminante utilizará estruturas de dispersão entre e dentro dos grupos e um problema de autovalores generalizados para construir direções de separação e, sob modelos probabilísticos específicos, regras de classificação.
+No próximo capítulo, os grupos continuam previamente conhecidos na amostra utilizada para construir a análise, mas o objetivo estatístico muda. O @sec-discriminante utilizará estruturas de dispersão entre e dentro dos grupos e um problema espectral relacionado para construir direções de separação e, sob formulações probabilísticas específicas, regras de classificação de novas observações.

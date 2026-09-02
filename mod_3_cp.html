@@ -1,0 +1,4031 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.23">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>14&nbsp; Formulação da Análise de Componentes Principais</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 1em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./mod_3_fatorial.html" rel="next">
+<link href="./mod_3_estruturas.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-1fe81d0376b2c50856e68e651e390326.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-6f6599830d51be977da3b6af758f8eff.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-1fe81d0376b2c50856e68e651e390326.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-2641b481724464e61c86985d8c912b6f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-4c6d65c679321d81af7ec8b61b1d5a24.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-2641b481724464e61c86985d8c912b6f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Nenhum resultado",
+    "search-matching-documents-text": "documentos correspondentes",
+    "search-copy-link-title": "Copiar link para a busca",
+    "search-hide-matches-text": "Esconder correspondências adicionais",
+    "search-more-match-text": "mais correspondência neste documento",
+    "search-more-matches-text": "mais correspondências neste documento",
+    "search-clear-button-title": "Limpar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Procurar"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./mod_3_estruturas.html">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</a></li><li class="breadcrumb-item"><a href="./mod_3_cp.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Formulação da Análise de Componentes Principais</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Procurar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
+      <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo escuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Procurar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Informações Legais e Declaração de Uso de Inteligência Artificial</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./prefacio_multivariada.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./identifica_multivariada.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Identificação da Disciplina</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo I — Fundamentos Matemáticos e Geométricos da Análise Multivariada</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_vetores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Vetores e representação dos dados multivariados</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_matrizes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Álgebra matricial aplicada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_espacos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Espaços vetoriais, bases e projeções</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_transformacoes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Transformações lineares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_autovetores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Autovalores, autovetores e decomposição espectral</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_svd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Decomposição em Valores Singulares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_calculo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Cálculo Diferencial, Integral e Matricial Aplicado à Estatística Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_exc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercícios de fixação do Módulo I</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo II — Fundamentos Probabilísticos e Inferenciais da Análise Multivariada</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_covariancias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Matrizes de covariâncias e correlações</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_normal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Distribuição Normal Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_amostrais.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Estatísticas Amostrais e Estimação</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_modelo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Modelo Linear Multivariado e Hipóteses Lineares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_inferencia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Inferência Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_exc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercícios de fixação do Módulo II</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_estruturas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Problemas e estruturas das técnicas multivariadas</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_cp.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Formulação da Análise de Componentes Principais</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_fatorial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Formulação da Análise Fatorial</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_agrupamento.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Formulação da Análise de Agrupamentos</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_correspondencia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Formulação da Análise de Correspondência</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_manova.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Formulação da MANOVA</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_discriminante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Formulação da Análise Discriminante</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referências</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Índice</h2>
+   
+  <ul>
+  <li><a href="#o-problema-de-redução-de-dimensionalidade" id="toc-o-problema-de-redução-de-dimensionalidade" class="nav-link active" data-scroll-target="#o-problema-de-redução-de-dimensionalidade"><span class="header-section-number">14.1</span> O problema de redução de dimensionalidade</a></li>
+  <li><a href="#componentes-principais-como-combinações-lineares" id="toc-componentes-principais-como-combinações-lineares" class="nav-link" data-scroll-target="#componentes-principais-como-combinações-lineares"><span class="header-section-number">14.2</span> Componentes principais como combinações lineares</a></li>
+  <li><a href="#primeira-componente-principal" id="toc-primeira-componente-principal" class="nav-link" data-scroll-target="#primeira-componente-principal"><span class="header-section-number">14.3</span> Primeira componente principal</a></li>
+  <li><a href="#componentes-principais-sucessivas" id="toc-componentes-principais-sucessivas" class="nav-link" data-scroll-target="#componentes-principais-sucessivas"><span class="header-section-number">14.4</span> Componentes principais sucessivas</a></li>
+  <li><a href="#formulação-espectral" id="toc-formulação-espectral" class="nav-link" data-scroll-target="#formulação-espectral"><span class="header-section-number">14.5</span> Formulação espectral</a></li>
+  <li><a href="#variância-total-e-proporção-de-variância" id="toc-variância-total-e-proporção-de-variância" class="nav-link" data-scroll-target="#variância-total-e-proporção-de-variância"><span class="header-section-number">14.6</span> Variância total e proporção de variância</a>
+  <ul class="collapse">
+  <li><a href="#sec-acp-escolha-componentes" id="toc-sec-acp-escolha-componentes" class="nav-link" data-scroll-target="#sec-acp-escolha-componentes"><span class="header-section-number">14.6.1</span> Aprofundamento: escolha do número de componentes</a></li>
+  </ul></li>
+  <li><a href="#subespaço-principal-e-projeção" id="toc-subespaço-principal-e-projeção" class="nav-link" data-scroll-target="#subespaço-principal-e-projeção"><span class="header-section-number">14.7</span> Subespaço principal e projeção</a>
+  <ul class="collapse">
+  <li><a href="#aprofundamento-demonstração-da-variabilidade-máxima-do-subespaço-principal" id="toc-aprofundamento-demonstração-da-variabilidade-máxima-do-subespaço-principal" class="nav-link" data-scroll-target="#aprofundamento-demonstração-da-variabilidade-máxima-do-subespaço-principal"><span class="header-section-number">14.7.1</span> Aprofundamento: demonstração da variabilidade máxima do subespaço principal</a></li>
+  </ul></li>
+  <li><a href="#reconstrução-a-partir-das-componentes-principais" id="toc-reconstrução-a-partir-das-componentes-principais" class="nav-link" data-scroll-target="#reconstrução-a-partir-das-componentes-principais"><span class="header-section-number">14.8</span> Reconstrução a partir das componentes principais</a></li>
+  <li><a href="#formulação-amostral" id="toc-formulação-amostral" class="nav-link" data-scroll-target="#formulação-amostral"><span class="header-section-number">14.9</span> Formulação amostral</a></li>
+  <li><a href="#formulação-da-acp-pela-svd" id="toc-formulação-da-acp-pela-svd" class="nav-link" data-scroll-target="#formulação-da-acp-pela-svd"><span class="header-section-number">14.10</span> Formulação da ACP pela SVD</a>
+  <ul class="collapse">
+  <li><a href="#aprofundamento-aproximação-de-posto-reduzido" id="toc-aprofundamento-aproximação-de-posto-reduzido" class="nav-link" data-scroll-target="#aprofundamento-aproximação-de-posto-reduzido"><span class="header-section-number">14.10.1</span> Aprofundamento: aproximação de posto reduzido</a></li>
+  </ul></li>
+  <li><a href="#sec-acp-matriz-correlacoes" id="toc-sec-acp-matriz-correlacoes" class="nav-link" data-scroll-target="#sec-acp-matriz-correlacoes"><span class="header-section-number">14.11</span> ACP baseada na matriz de correlações</a></li>
+  <li><a href="#coeficientes-e-relação-das-variáveis-com-as-componentes" id="toc-coeficientes-e-relação-das-variáveis-com-as-componentes" class="nav-link" data-scroll-target="#coeficientes-e-relação-das-variáveis-com-as-componentes"><span class="header-section-number">14.12</span> Coeficientes e relação das variáveis com as componentes</a></li>
+  <li><a href="#sec-acp-representacao" id="toc-sec-acp-representacao" class="nav-link" data-scroll-target="#sec-acp-representacao"><span class="header-section-number">14.13</span> Representação das observações e das variáveis</a>
+  <ul class="collapse">
+  <li><a href="#aprofundamento-qualidade-de-representação-e-contribuição" id="toc-aprofundamento-qualidade-de-representação-e-contribuição" class="nav-link" data-scroll-target="#aprofundamento-qualidade-de-representação-e-contribuição"><span class="header-section-number">14.13.1</span> Aprofundamento: qualidade de representação e contribuição</a></li>
+  </ul></li>
+  <li><a href="#propriedades-da-solução" id="toc-propriedades-da-solução" class="nav-link" data-scroll-target="#propriedades-da-solução"><span class="header-section-number">14.14</span> Propriedades da solução</a>
+  <ul class="collapse">
+  <li><a href="#invariância-a-translações" id="toc-invariância-a-translações" class="nav-link" data-scroll-target="#invariância-a-translações"><span class="header-section-number">14.14.1</span> Invariância a translações</a></li>
+  <li><a href="#dependência-da-escala" id="toc-dependência-da-escala" class="nav-link" data-scroll-target="#dependência-da-escala"><span class="header-section-number">14.14.2</span> Dependência da escala</a></li>
+  <li><a href="#indeterminação-do-sinal" id="toc-indeterminação-do-sinal" class="nav-link" data-scroll-target="#indeterminação-do-sinal"><span class="header-section-number">14.14.3</span> Indeterminação do sinal</a></li>
+  <li><a href="#sec-acp-multiplicidade-singularidade" id="toc-sec-acp-multiplicidade-singularidade" class="nav-link" data-scroll-target="#sec-acp-multiplicidade-singularidade"><span class="header-section-number">14.14.4</span> Aprofundamento: unicidade, multiplicidade e dimensão efetiva</a></li>
+  </ul></li>
+  <li><a href="#formulação-descritiva-populacional-e-inferencial" id="toc-formulação-descritiva-populacional-e-inferencial" class="nav-link" data-scroll-target="#formulação-descritiva-populacional-e-inferencial"><span class="header-section-number">14.15</span> Formulação descritiva, populacional e inferencial</a></li>
+  <li><a href="#sec-acp-elementos-suplementares" id="toc-sec-acp-elementos-suplementares" class="nav-link" data-scroll-target="#sec-acp-elementos-suplementares"><span class="header-section-number">14.16</span> Aprofundamento: elementos ativos e suplementares na ACP</a>
+  <ul class="collapse">
+  <li><a href="#observações-suplementares" id="toc-observações-suplementares" class="nav-link" data-scroll-target="#observações-suplementares"><span class="header-section-number">14.16.1</span> Observações suplementares</a></li>
+  <li><a href="#variáveis-quantitativas-suplementares" id="toc-variáveis-quantitativas-suplementares" class="nav-link" data-scroll-target="#variáveis-quantitativas-suplementares"><span class="header-section-number">14.16.2</span> Variáveis quantitativas suplementares</a></li>
+  <li><a href="#variáveis-categóricas-suplementares" id="toc-variáveis-categóricas-suplementares" class="nav-link" data-scroll-target="#variáveis-categóricas-suplementares"><span class="header-section-number">14.16.3</span> Variáveis categóricas suplementares</a></li>
+  </ul></li>
+  <li><a href="#limites-da-representação-por-componentes-principais" id="toc-limites-da-representação-por-componentes-principais" class="nav-link" data-scroll-target="#limites-da-representação-por-componentes-principais"><span class="header-section-number">14.17</span> Limites da representação por componentes principais</a></li>
+  <li><a href="#síntese" id="toc-síntese" class="nav-link" data-scroll-target="#síntese"><span class="header-section-number">14.18</span> Síntese</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./mod_3_estruturas.html">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</a></li><li class="breadcrumb-item"><a href="./mod_3_cp.html"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Formulação da Análise de Componentes Principais</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-acp" class="quarto-section-identifier"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Formulação da Análise de Componentes Principais</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A Análise de Componentes Principais (ACP) representa a variabilidade de um conjunto de variáveis por meio de combinações lineares ordenadas segundo a variância que concentram <span class="citation" data-cites="jolliffe2002pca">(<a href="#ref-jolliffe2002pca" role="doc-biblioref">Jolliffe, 2002</a>)</span>. Seu objetivo é construir uma representação de menor dimensão que preserve, segundo esse critério, a maior parcela possível da variabilidade original.</p>
+<p>A formulação utiliza combinações lineares, quociente de Rayleigh, decomposição espectral, projeções ortogonais e SVD desenvolvidos nos módulos anteriores. O capítulo relaciona as formulações por maximização da variância, projeção em subespaços e aproximação de posto reduzido, distinguindo os níveis populacional e amostral e o uso das matrizes de covariâncias e correlações.</p>
+<section id="o-problema-de-redução-de-dimensionalidade" class="level2" data-number="14.1">
+<h2 data-number="14.1" class="anchored" data-anchor-id="o-problema-de-redução-de-dimensionalidade"><span class="header-section-number">14.1</span> O problema de redução de dimensionalidade</h2>
+<p>Considere o vetor aleatório</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+=
+(X_1,\ldots,X_p)^\top
+\in
+\mathbb R^p,
+\]</span></p>
+<p>com vetor de médias <span class="math inline">\(\boldsymbol{\mu}\)</span> e matriz de covariâncias populacional <span class="math inline">\(\boldsymbol{\Sigma}\)</span>, definida na <a href="#def-matriz-covariancias-populacional" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-matriz-covariancias-populacional</span></a>.</p>
+<p>Cada realização <span class="math inline">\(\mathbf x\in\mathbb R^p\)</span> representa uma unidade por meio de <span class="math inline">\(p\)</span> coordenadas. Quando várias dessas coordenadas apresentam associação linear, a variabilidade conjunta pode estar concentrada em um número menor de direções.</p>
+<p>Essa situação pode ser entendida geometricamente. Uma nuvem de pontos em <span class="math inline">\(\mathbb R^2\)</span> pode apresentar grande extensão em uma direção e pequena extensão na direção ortogonal, como será ilustrado na <a href="#fig-acp-direcoes-principais" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-acp-direcoes-principais</span></a>. Embora duas coordenadas sejam necessárias para representar exatamente cada ponto, uma única direção pode concentrar a maior parte da dispersão da nuvem. Em dimensão <span class="math inline">\(p\)</span>, o mesmo princípio conduz à procura de um subespaço de dimensão <span class="math inline">\(k&lt;p\)</span> que represente adequadamente a variabilidade dos dados.</p>
+<p>A ACP não seleciona diretamente <span class="math inline">\(k\)</span> variáveis dentre as <span class="math inline">\(p\)</span> variáveis originais. Ela constrói novas variáveis como combinações lineares das componentes de <span class="math inline">\(\boldsymbol{\mathsf X}\)</span>. Cada nova variável corresponde a uma direção no espaço das variáveis.</p>
+<p>O vetor aleatório centralizado,</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}_c
+=
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu},
+\]</span></p>
+<p>tem média nula e preserva a matriz de covariâncias de <span class="math inline">\(\boldsymbol{\mathsf X}\)</span>. A centralização separa a localização da distribuição de sua estrutura de dispersão. Por isso, a formulação populacional da ACP pode ser construída diretamente a partir de <span class="math inline">\(\boldsymbol{\mathsf X}_c\)</span> e de <span class="math inline">\(\boldsymbol{\Sigma}\)</span>.</p>
+<p>Uma direção unitária</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}
+\in
+\mathbb R^p,
+\qquad
+\boldsymbol{\alpha}^\top\boldsymbol{\alpha}=1,
+\]</span></p>
+<p>produz a combinação linear</p>
+<p><span class="math display">\[
+Y
+=
+\boldsymbol{\alpha}^\top
+\boldsymbol{\mathsf X}_c.
+\]</span></p>
+<p>Como <span class="math inline">\(\boldsymbol{\alpha}\)</span> possui norma unitária, <span class="math inline">\(Y\)</span> representa a coordenada de <span class="math inline">\(\boldsymbol{\mathsf X}_c\)</span> na direção definida por <span class="math inline">\(\boldsymbol{\alpha}\)</span>.</p>
+<p>Pelo resultado sobre momentos de combinações lineares apresentado na <a href="#prp-momentos-combinacoes-lineares" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-momentos-combinacoes-lineares</span></a>,</p>
+<p><span class="math display">\[
+E(Y)=0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\operatorname{Var}(Y)
+=
+\boldsymbol{\alpha}^\top
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}.
+\]</span></p>
+<p>A variância da combinação linear depende, portanto, da direção <span class="math inline">\(\boldsymbol{\alpha}\)</span>. Algumas direções podem apresentar grande dispersão, enquanto outras apresentam pequena dispersão.</p>
+<p>A ACP utiliza essa diferença para ordenar as direções. O primeiro objetivo consiste em encontrar a direção unitária de maior variabilidade. Depois são procuradas novas direções, ortogonais às anteriores, que preservem sucessivamente a maior variabilidade restante.</p>
+<p>A <a href="#fig-acp-direcoes-principais" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-acp-direcoes-principais</span></a> representa uma nuvem bidimensional com variabilidade distinta segundo diferentes direções. A primeira direção principal acompanha a maior extensão da nuvem, enquanto a segunda é ortogonal à primeira e representa a variabilidade remanescente.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-acp-direcoes-principais" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-acp-direcoes-principais-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_cp_files/figure-html/fig-acp-direcoes-principais-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-acp-direcoes-principais-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;14.1: As direções principais acompanham os eixos de maior e menor variabilidade da nuvem de observações.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A maior dispersão ocorre na direção da primeira componente. A segunda componente representa a maior variabilidade possível entre as direções ortogonais à primeira. A figura transforma a ideia de maximização da variância em uma propriedade geométrica da nuvem.</p>
+<p>A redução de dimensionalidade ocorre quando apenas as primeiras <span class="math inline">\(k&lt;p\)</span> direções são mantidas. A qualidade dessa representação depende da concentração da variabilidade nessas direções. Quando grande parte da variância total se concentra nas primeiras componentes, poucas direções podem representar adequadamente os dados. Quando a variabilidade se distribui de forma mais uniforme entre as componentes, a redução de dimensão implica perda proporcionalmente maior de informação.</p>
+</section>
+<section id="componentes-principais-como-combinações-lineares" class="level2" data-number="14.2">
+<h2 data-number="14.2" class="anchored" data-anchor-id="componentes-principais-como-combinações-lineares"><span class="header-section-number">14.2</span> Componentes principais como combinações lineares</h2>
+<p>A <span class="math inline">\(j\)</span>-ésima componente principal populacional tem a forma</p>
+<p><span class="math display">\[
+Y_j
+=
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\mathsf X}_c
+=
+\boldsymbol{\alpha}_j^\top
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}
+\right),
+\]</span></p>
+<p>em que</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j
+\in
+\mathbb R^p
+\]</span></p>
+<p>é o vetor de coeficientes da componente.</p>
+<p>A formulação distingue os seguintes objetos:</p>
+<ul>
+<li><span class="math inline">\(\boldsymbol{\alpha}_j\)</span> define uma direção no espaço das variáveis;</li>
+<li><span class="math inline">\(Y_j\)</span> é uma variável aleatória obtida pela projeção de <span class="math inline">\(\boldsymbol{\mathsf X}_c\)</span> nessa direção;</li>
+<li>a variância de <span class="math inline">\(Y_j\)</span> quantifica a dispersão populacional representada pela direção;</li>
+<li>posteriormente, a versão amostral de <span class="math inline">\(\boldsymbol{\alpha}_j\)</span> permitirá calcular os escores das observações.</li>
+</ul>
+<p>Para duas combinações lineares,</p>
+<p><span class="math display">\[
+Y_j
+=
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\mathsf X}_c
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+Y_\ell
+=
+\boldsymbol{\alpha}_\ell^\top
+\boldsymbol{\mathsf X}_c,
+\]</span></p>
+<p>tem-se</p>
+<p><span class="math display">\[
+\operatorname{Cov}(Y_j,Y_\ell)
+=
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_\ell.
+\]</span></p>
+<p>Assim, a matriz <span class="math inline">\(\boldsymbol{\Sigma}\)</span> determina simultaneamente a variabilidade de cada direção e a covariância entre diferentes combinações lineares.</p>
+<p>A restrição de norma unitária é necessária porque a variância depende da escala do vetor de coeficientes. Para qualquer constante <span class="math inline">\(c\)</span>,</p>
+<p><span class="math display">\[
+\operatorname{Var}
+\left(
+c\boldsymbol{\alpha}^\top
+\boldsymbol{\mathsf X}_c
+\right)
+=
+c^2
+\boldsymbol{\alpha}^\top
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}.
+\]</span></p>
+<p>Sem controlar a norma de <span class="math inline">\(\boldsymbol{\alpha}\)</span>, a variância poderia ser aumentada apenas multiplicando os coeficientes por uma constante. A condição</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}^\top\boldsymbol{\alpha}=1
+\]</span></p>
+<p>remove esse efeito de escala e transforma o problema em uma escolha de direção.</p>
+</section>
+<section id="primeira-componente-principal" class="level2" data-number="14.3">
+<h2 data-number="14.3" class="anchored" data-anchor-id="primeira-componente-principal"><span class="header-section-number">14.3</span> Primeira componente principal</h2>
+<p>A primeira componente principal é definida pela direção unitária que apresenta a maior variância.</p>
+<p>O problema é</p>
+<p><span class="math display">\[
+\max_{\boldsymbol{\alpha}_1\in\mathbb R^p}
+\boldsymbol{\alpha}_1^\top
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_1,
+\]</span></p>
+<p>sujeito a</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_1^\top
+\boldsymbol{\alpha}_1
+=
+1.
+\]</span></p>
+<p>Esse problema já possui a forma estudada no Módulo 1. O quociente de Rayleigh foi definido na <a href="#def-quociente-rayleigh" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-quociente-rayleigh</span></a> e seus extremos foram caracterizados no <a href="#thm-extremos-quociente-rayleigh" class="quarto-xref">Teorema&nbsp;<span class="quarto-unresolved-ref">thm-extremos-quociente-rayleigh</span></a>. Aplicando esse resultado à matriz simétrica e semidefinida positiva <span class="math inline">\(\boldsymbol{\Sigma}\)</span>, o máximo é igual ao maior autovalor da matriz de covariâncias.</p>
+<p>A variação do quociente de Rayleigh segundo a direção foi ilustrada na <a href="#fig-quociente-rayleigh" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-quociente-rayleigh</span></a>. Na ACP, a matriz utilizada naquele problema passa a ser <span class="math inline">\(\boldsymbol{\Sigma}\)</span>, e o máximo do quociente corresponde à maior variância possível de uma combinação linear com coeficientes de norma unitária.</p>
+<p>Se os autovalores de <span class="math inline">\(\boldsymbol{\Sigma}\)</span> forem ordenados como</p>
+<p><span class="math display">\[
+\lambda_1
+\geq
+\lambda_2
+\geq
+\cdots
+\geq
+\lambda_p
+\geq
+0,
+\]</span></p>
+<p>e <span class="math inline">\(\boldsymbol{\alpha}_1\)</span> for um autovetor unitário associado a <span class="math inline">\(\lambda_1\)</span>, então</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_1
+=
+\lambda_1
+\boldsymbol{\alpha}_1.
+\]</span></p>
+<p>A primeira componente principal é</p>
+<p><span class="math display">\[
+Y_1
+=
+\boldsymbol{\alpha}_1^\top
+\boldsymbol{\mathsf X}_c,
+\]</span></p>
+<p>e sua variância é</p>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{Var}(Y_1)
+&amp;=
+\boldsymbol{\alpha}_1^\top
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_1\\
+&amp;=
+\boldsymbol{\alpha}_1^\top
+\lambda_1
+\boldsymbol{\alpha}_1\\
+&amp;=
+\lambda_1.
+\end{aligned}
+\]</span></p>
+<p>Portanto,</p>
+<p><span class="math display">\[
+\operatorname{Var}(Y_1)
+=
+\lambda_1.
+\]</span></p>
+<p>O maior autovalor possui uma interpretação estatística direta: ele é a maior variância que pode ser obtida por uma combinação linear das variáveis com vetor de coeficientes de norma unitária.</p>
+<p>O autovetor correspondente fornece a direção em que essa variância é alcançada. A primeira componente principal transforma esse resultado geométrico em uma nova variável.</p>
+<p>A derivação por multiplicadores de Lagrange não precisa ser reconstruída aqui. A relação entre critérios de otimização e soluções espectrais foi retomada na <a href="#sec-estruturas-otimizacao" class="quarto-xref"><span class="quarto-unresolved-ref">sec-estruturas-otimizacao</span></a>. O resultado específico que relaciona a otimização de uma forma quadrática sob restrição de norma aos autovetores foi demonstrado no <a href="#thm-autovalores-otimizacao-restrita" class="quarto-xref">Teorema&nbsp;<span class="quarto-unresolved-ref">thm-autovalores-otimizacao-restrita</span></a>, a partir da condição geral de Lagrange apresentada no <a href="#thm-multiplicadores-lagrange" class="quarto-xref">Teorema&nbsp;<span class="quarto-unresolved-ref">thm-multiplicadores-lagrange</span></a>.</p>
+</section>
+<section id="componentes-principais-sucessivas" class="level2" data-number="14.4">
+<h2 data-number="14.4" class="anchored" data-anchor-id="componentes-principais-sucessivas"><span class="header-section-number">14.4</span> Componentes principais sucessivas</h2>
+<p>A primeira direção concentra a maior variabilidade possível em uma única coordenada. As componentes seguintes devem acrescentar novas direções sem repetir a informação linear já representada.</p>
+<p>A segunda componente principal é definida como a combinação linear de maior variância entre as direções unitárias ortogonais à primeira:</p>
+<p><span class="math display">\[
+\max_{\boldsymbol{\alpha}_2\in\mathbb R^p}
+\boldsymbol{\alpha}_2^\top
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_2,
+\]</span></p>
+<p>sujeito a</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_2^\top
+\boldsymbol{\alpha}_2
+=
+1
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_2^\top
+\boldsymbol{\alpha}_1
+=
+0.
+\]</span></p>
+<p>O mesmo princípio é aplicado sucessivamente. Para <span class="math inline">\(j=1,\ldots,p\)</span>, a <span class="math inline">\(j\)</span>-ésima direção principal resolve</p>
+<p><span class="math display">\[
+\max_{\boldsymbol{\alpha}_j\in\mathbb R^p}
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_j,
+\]</span></p>
+<p>sujeito a</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\alpha}_j
+=
+1
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\alpha}_\ell
+=
+0,
+\qquad
+\ell=1,\ldots,j-1.
+\]</span></p>
+<p>A caracterização variacional de direções sucessivas já foi estabelecida no <a href="#thm-caracterizacao-variacional-sucessiva" class="quarto-xref">Teorema&nbsp;<span class="quarto-unresolved-ref">thm-caracterizacao-variacional-sucessiva</span></a>. Aplicando esse resultado a <span class="math inline">\(\boldsymbol{\Sigma}\)</span>, obtém-se</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_j
+=
+\lambda_j
+\boldsymbol{\alpha}_j,
+\qquad
+j=1,\ldots,p.
+\]</span></p>
+<p>Assim, pode-se escolher uma base ortonormal de autovetores da matriz de covariâncias, ordenada de acordo com os autovalores decrescentes, para definir as direções principais. Quando um autovalor possui multiplicidade maior que um, os autovetores individuais dentro do autoespaço correspondente não são únicos; essa questão será retomada ao discutir as propriedades da solução.</p>
+<p>A <span class="math inline">\(j\)</span>-ésima componente principal é</p>
+<p><span class="math display">\[
+Y_j
+=
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\mathsf X}_c
+\]</span></p>
+<p>e possui variância</p>
+<p><span class="math display">\[
+\operatorname{Var}(Y_j)
+=
+\lambda_j.
+\]</span></p>
+<p>Para <span class="math inline">\(j\neq\ell\)</span>,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{Cov}(Y_j,Y_\ell)
+&amp;=
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_\ell\\
+&amp;=
+\lambda_\ell
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\alpha}_\ell\\
+&amp;=
+0.
+\end{aligned}
+\]</span></p>
+<p>Logo, as componentes principais são não correlacionadas:</p>
+<p><span class="math display">\[
+\operatorname{Cov}(Y_j,Y_\ell)
+=
+0,
+\qquad
+j\neq\ell.
+\]</span></p>
+<p>Duas propriedades diferentes aparecem nessa construção. Os vetores de coeficientes são ortogonais,</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\alpha}_\ell
+=
+0,
+\]</span></p>
+<p>enquanto as componentes principais são não correlacionadas,</p>
+<p><span class="math display">\[
+\operatorname{Cov}(Y_j,Y_\ell)
+=
+0.
+\]</span></p>
+<p>A primeira propriedade pertence à geometria dos vetores de coeficientes. A segunda pertence à estrutura probabilística das variáveis construídas. Na ACP, a equação de autovetores</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}\boldsymbol{\alpha}_\ell
+=
+\lambda_\ell\boldsymbol{\alpha}_\ell
+\]</span></p>
+<p>faz a ligação entre essas duas propriedades.</p>
+<p>A ausência de correlação não implica independência em uma distribuição geral. Se <span class="math inline">\(\boldsymbol{\mathsf X}\)</span> possui distribuição normal multivariada, qualquer transformação linear também é normal, conforme <a href="#prp-transformacao-afim-normal" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-transformacao-afim-normal</span></a>. Nesse caso, o vetor das componentes principais é normal multivariado e possui matriz de covariâncias diagonal. Pelo resultado de independência para blocos normais de <a href="#prp-independencia-blocos-normais" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-independencia-blocos-normais</span></a>, as componentes principais são independentes.</p>
+<p>A normalidade, portanto, acrescenta uma propriedade probabilística às componentes, mas não participa da definição da ACP.</p>
+</section>
+<section id="formulação-espectral" class="level2" data-number="14.5">
+<h2 data-number="14.5" class="anchored" data-anchor-id="formulação-espectral"><span class="header-section-number">14.5</span> Formulação espectral</h2>
+<p>Reunindo os vetores de coeficientes em</p>
+<p><span class="math display">\[
+\mathbf A
+=
+\begin{pmatrix}
+\boldsymbol{\alpha}_1 &amp;
+\boldsymbol{\alpha}_2 &amp;
+\cdots &amp;
+\boldsymbol{\alpha}_p
+\end{pmatrix},
+\]</span></p>
+<p>tem-se</p>
+<p><span class="math display">\[
+\mathbf A^\top
+\mathbf A
+=
+\mathbf I_p.
+\]</span></p>
+<p>A matriz <span class="math inline">\(\mathbf A\)</span> é ortogonal. Pelo Teorema Espectral de <a href="#thm-teorema-espectral" class="quarto-xref">Teorema&nbsp;<span class="quarto-unresolved-ref">thm-teorema-espectral</span></a>,</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+=
+\mathbf A
+\boldsymbol{\Lambda}
+\mathbf A^\top,
+\]</span></p>
+<p>em que</p>
+<p><span class="math display">\[
+\boldsymbol{\Lambda}
+=
+\operatorname{diag}
+(
+\lambda_1,\ldots,\lambda_p
+).
+\]</span></p>
+<p>As componentes podem ser reunidas no vetor aleatório</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf Y}
+=
+\begin{pmatrix}
+Y_1\\
+\vdots\\
+Y_p
+\end{pmatrix}
+=
+\mathbf A^\top
+\boldsymbol{\mathsf X}_c.
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+E(\boldsymbol{\mathsf X}_c)
+=
+\mathbf0,
+\]</span></p>
+<p>tem-se</p>
+<p><span class="math display">\[
+E(\boldsymbol{\mathsf Y})
+=
+\mathbf0.
+\]</span></p>
+<p>Pela regra de transformação da matriz de covariâncias estabelecida na <a href="#eq-covariancia-transformacao-afim" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-covariancia-transformacao-afim</span></a>,</p>
+<p><span class="math display">\[
+\operatorname{Cov}
+(
+\mathbf A^\top
+\boldsymbol{\mathsf X}_c
+)
+=
+\mathbf A^\top
+\boldsymbol{\Sigma}
+\mathbf A.
+\]</span></p>
+<p>Substituindo a decomposição espectral,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{Cov}
+(
+\boldsymbol{\mathsf Y}
+)
+&amp;=
+\mathbf A^\top
+\mathbf A
+\boldsymbol{\Lambda}
+\mathbf A^\top
+\mathbf A\\
+&amp;=
+\boldsymbol{\Lambda}.
+\end{aligned}
+\]</span></p>
+<p>Portanto,</p>
+<p><span class="math display">\[
+\operatorname{Cov}
+(
+\boldsymbol{\mathsf Y}
+)
+=
+\begin{pmatrix}
+\lambda_1 &amp; 0 &amp; \cdots &amp; 0\\
+0 &amp; \lambda_2 &amp; \cdots &amp; 0\\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots\\
+0 &amp; 0 &amp; \cdots &amp; \lambda_p
+\end{pmatrix}.
+\]</span></p>
+<p>A transformação para componentes principais diagonaliza a estrutura de covariâncias. As variáveis originais podem apresentar covariâncias diferentes de zero; no novo sistema de coordenadas, toda a variabilidade aparece distribuída ao longo de eixos não correlacionados.</p>
+<p>A transformação completa</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}_c
+\longmapsto
+\boldsymbol{\mathsf Y}
+=
+\mathbf A^\top
+\boldsymbol{\mathsf X}_c
+\]</span></p>
+<p>não reduz a dimensão. Ela representa o mesmo vetor em uma base ortonormal diferente. Pela propriedade de preservação geométrica das transformações ortogonais estabelecida na <a href="#prp-preservacao-geometria-transformacao-ortogonal" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-preservacao-geometria-transformacao-ortogonal</span></a>, produtos internos, normas e distâncias são preservados quando todas as <span class="math inline">\(p\)</span> componentes são mantidas.</p>
+<p>A redução ocorre somente quando a transformação é seguida pela retenção das primeiras <span class="math inline">\(k&lt;p\)</span> coordenadas.</p>
+</section>
+<section id="variância-total-e-proporção-de-variância" class="level2" data-number="14.6">
+<h2 data-number="14.6" class="anchored" data-anchor-id="variância-total-e-proporção-de-variância"><span class="header-section-number">14.6</span> Variância total e proporção de variância</h2>
+<p>A variância total foi definida na <a href="#def-variancia-total" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-variancia-total</span></a> por</p>
+<p><span class="math display">\[
+V_T
+=
+\operatorname{tr}
+(
+\boldsymbol{\Sigma}
+).
+\]</span></p>
+<p>Pela relação entre traço e autovalores estabelecida na <a href="#prp-consequencias-espectrais-basicas" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-consequencias-espectrais-basicas</span></a>,</p>
+<p><span class="math display">\[
+\operatorname{tr}
+(
+\boldsymbol{\Sigma}
+)
+=
+\sum_{j=1}^p
+\lambda_j.
+\]</span></p>
+<p>Por outro lado,</p>
+<p><span class="math display">\[
+\operatorname{Cov}
+(
+\boldsymbol{\mathsf Y}
+)
+=
+\boldsymbol{\Lambda},
+\]</span></p>
+<p>de modo que</p>
+<p><span class="math display">\[
+\operatorname{tr}
+\left[
+\operatorname{Cov}
+(
+\boldsymbol{\mathsf Y}
+)
+\right]
+=
+\sum_{j=1}^p
+\lambda_j.
+\]</span></p>
+<p>Assim,</p>
+<p><span class="math display">\[
+\sum_{j=1}^p
+\operatorname{Var}(Y_j)
+=
+\operatorname{tr}
+(
+\boldsymbol{\Sigma}
+).
+\]</span></p>
+<p>A ACP completa redistribui, entre novas coordenadas, a mesma variabilidade total presente nas variáveis originais. A ordenação dos autovalores concentra as maiores parcelas nas primeiras componentes.</p>
+<p>Se</p>
+<p><span class="math display">\[
+\operatorname{tr}
+(
+\boldsymbol{\Sigma}
+)
+&gt;0,
+\]</span></p>
+<p>a proporção da variância total associada à componente <span class="math inline">\(j\)</span> é</p>
+<p><span class="math display">\[
+\pi_j
+=
+\frac{
+\lambda_j
+}{
+\sum_{\ell=1}^p
+\lambda_\ell
+}.
+\]</span></p>
+<p>Para as primeiras <span class="math inline">\(k\)</span> componentes, a proporção acumulada é</p>
+<p><span class="math display">\[
+\Pi_k
+=
+\frac{
+\sum_{j=1}^k
+\lambda_j
+}{
+\sum_{\ell=1}^p
+\lambda_\ell
+}.
+\]</span></p>
+<p>A variabilidade representada pelas primeiras <span class="math inline">\(k\)</span> direções é</p>
+<p><span class="math display">\[
+\sum_{j=1}^k
+\lambda_j,
+\]</span></p>
+<p>enquanto a variabilidade associada às direções descartadas é</p>
+<p><span class="math display">\[
+\sum_{j=k+1}^p
+\lambda_j.
+\]</span></p>
+<p>A decomposição pode ser resumida pela <a href="#tbl-acp-variancia-autovalores" class="quarto-xref">Tabela&nbsp;<span class="quarto-unresolved-ref">tbl-acp-variancia-autovalores</span></a>.</p>
+<div id="tbl-acp-variancia-autovalores" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-acp-variancia-autovalores-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;14.1: Relação entre componentes principais, direções, autovalores e variância representada, quando a variância total é positiva.
+</figcaption>
+<div aria-describedby="tbl-acp-variancia-autovalores-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 21%">
+<col style="width: 21%">
+<col style="width: 28%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Componente</th>
+<th>Direção</th>
+<th style="text-align: right;">Variância</th>
+<th style="text-align: right;">Proporção da variância total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(Y_1\)</span></td>
+<td><span class="math inline">\(\boldsymbol{\alpha}_1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(\lambda_1\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(\lambda_1/\sum_{\ell=1}^p\lambda_\ell\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(Y_2\)</span></td>
+<td><span class="math inline">\(\boldsymbol{\alpha}_2\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(\lambda_2\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(\lambda_2/\sum_{\ell=1}^p\lambda_\ell\)</span></td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\vdots\)</span></td>
+<td><span class="math inline">\(\vdots\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(\vdots\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(\vdots\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(Y_p\)</span></td>
+<td><span class="math inline">\(\boldsymbol{\alpha}_p\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(\lambda_p\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(\lambda_p/\sum_{\ell=1}^p\lambda_\ell\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div id="exm-acp-duas-variaveis" class="theorem example">
+<p><span class="theorem-title"><strong>Exemplo 14.1 (Componentes principais de duas variáveis)</strong></span> Considere um vetor aleatório</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+=
+\begin{pmatrix}
+X_1\\
+X_2
+\end{pmatrix}
+\]</span></p>
+<p>com matriz de covariâncias</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+=
+\begin{pmatrix}
+4 &amp; 2\\
+2 &amp; 4
+\end{pmatrix}.
+\]</span></p>
+<p>A decomposição espectral fornece os autovalores</p>
+<p><span class="math display">\[
+\lambda_1=6
+\qquad
+\text{e}
+\qquad
+\lambda_2=2,
+\]</span></p>
+<p>com autovetores unitários</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_1
+=
+\frac{1}{\sqrt{2}}
+\begin{pmatrix}
+1\\
+1
+\end{pmatrix}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_2
+=
+\frac{1}{\sqrt{2}}
+\begin{pmatrix}
+1\\
+-1
+\end{pmatrix}.
+\]</span></p>
+<p>A primeira componente principal é</p>
+<p><span class="math display">\[
+Y_1
+=
+\frac{
+(X_1-\mu_1)
++
+(X_2-\mu_2)
+}{
+\sqrt{2}
+},
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\operatorname{Var}(Y_1)=6.
+\]</span></p>
+<p>A segunda componente é</p>
+<p><span class="math display">\[
+Y_2
+=
+\frac{
+(X_1-\mu_1)
+-
+(X_2-\mu_2)
+}{
+\sqrt{2}
+},
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\operatorname{Var}(Y_2)=2.
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_2
+=
+\lambda_2
+\boldsymbol{\alpha}_2
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_1^\top
+\boldsymbol{\alpha}_2
+=
+0,
+\]</span></p>
+<p>tem-se</p>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{Cov}(Y_1,Y_2)
+&amp;=
+\boldsymbol{\alpha}_1^\top
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_2\\
+&amp;=
+\lambda_2
+\boldsymbol{\alpha}_1^\top
+\boldsymbol{\alpha}_2\\
+&amp;=
+0.
+\end{aligned}
+\]</span></p>
+<p>Portanto, as duas componentes são não correlacionadas.</p>
+<p>A variância total é</p>
+<p><span class="math display">\[
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}
+\right)
+=
+4+4
+=
+8,
+\]</span></p>
+<p>que coincide com</p>
+<p><span class="math display">\[
+\lambda_1+\lambda_2
+=
+6+2
+=
+8.
+\]</span></p>
+<p>A primeira componente representa</p>
+<p><span class="math display">\[
+\frac{6}{8}
+=
+75\%
+\]</span></p>
+<p>da variabilidade total, enquanto a segunda representa</p>
+<p><span class="math display">\[
+\frac{2}{8}
+=
+25\%.
+\]</span></p>
+<p>Se a representação for reduzida de duas para uma dimensão, a direção</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_1
+\]</span></p>
+<p>preserva <span class="math inline">\(75\%\)</span> da variabilidade e descarta <span class="math inline">\(25\%\)</span>. Nesse exemplo, a redução de dimensão possui interpretação direta: a maior parte da dispersão ocorre na direção em que as duas variáveis se deslocam conjuntamente.</p>
+</div>
+<p>A <a href="#fig-acp-variancia-explicada" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-acp-variancia-explicada</span></a> mostra, em um exemplo didático, duas leituras complementares dos autovalores. O primeiro painel apresenta a variância associada individualmente a cada componente. O segundo apresenta a proporção acumulada da variância representada pelas primeiras componentes.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-acp-variancia-explicada" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-acp-variancia-explicada-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_cp_files/figure-html/fig-acp-variancia-explicada-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-acp-variancia-explicada-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;14.2: Os autovalores quantificam a variância de cada componente, e sua soma acumulada determina a proporção da variabilidade representada pelas primeiras dimensões.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A concentração dos primeiros autovalores determina a capacidade de redução linear de dimensão. Quando <span class="math inline">\(\Pi_k\)</span> é elevada para um valor pequeno de <span class="math inline">\(k\)</span>, o subespaço principal representa grande parcela da variabilidade total. A proporção acumulada descreve a decomposição da variância, mas não estabelece um limite para a escolha do número de componentes.</p>
+<section id="sec-acp-escolha-componentes" class="level3" data-number="14.6.1">
+<h3 data-number="14.6.1" class="anchored" data-anchor-id="sec-acp-escolha-componentes"><span class="header-section-number">14.6.1</span> Aprofundamento: escolha do número de componentes</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A formulação da ACP determina e ordena as componentes principais, mas não estabelece, por si só, quantas devem ser mantidas em uma representação reduzida. Esta seção apresenta critérios utilizados para auxiliar essa escolha e discute seus diferentes significados.</p>
+</div>
+</div>
+<p>A decomposição espectral produz até <span class="math inline">\(p\)</span> componentes, mas a redução de dimensionalidade exige escolher quantas delas serão mantidas. Essa escolha não é determinada unicamente pela solução matemática da ACP: ela depende do objetivo da representação e do compromisso entre redução de dimensão e preservação da estrutura dos dados <span class="citation" data-cites="jolliffe2002pca">(<a href="#ref-jolliffe2002pca" role="doc-biblioref">Jolliffe, 2002</a>)</span>.</p>
+<p>A proporção acumulada</p>
+<p><span class="math display">\[
+\Pi_k
+=
+\frac{
+\sum_{j=1}^k\lambda_j
+}{
+\sum_{\ell=1}^p\lambda_\ell
+}
+\]</span></p>
+<p>quantifica a parcela da variabilidade total preservada pelas primeiras <span class="math inline">\(k\)</span> componentes. Valores elevados de <span class="math inline">\(\Pi_k\)</span> indicam que poucas dimensões concentram grande parte da variabilidade, mas não existe uma proporção mínima universal que determine, por si só, quantas componentes devem ser retidas.</p>
+<p>Outra informação é fornecida pelo gráfico dos autovalores, usualmente denominado <strong>gráfico de declive</strong> (<em>scree plot</em>). Os autovalores são apresentados em ordem decrescente e procura-se identificar uma mudança no padrão de queda. Quando existe um declínio inicial acentuado seguido por uma sequência relativamente mais estável de valores pequenos, essa mudança pode indicar uma dimensão a partir da qual componentes adicionais acrescentam parcelas progressivamente menores da variabilidade.</p>
+<p>A <a href="#fig-acp-scree" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-acp-scree</span></a> ilustra esse comportamento. A linha horizontal também permite comparar, no mesmo exemplo, o gráfico de declive com a referência <span class="math inline">\(\lambda=1\)</span> utilizada na ACP baseada em correlações.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-acp-scree" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-acp-scree-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_cp_files/figure-html/fig-acp-scree-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-acp-scree-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;14.3: Gráfico de declive dos autovalores. A linha tracejada indica a referência λ = 1 para uma ACP baseada em correlações.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>No exemplo, os cinco autovalores somam <span class="math inline">\(5\)</span>, como ocorre para uma matriz de correlações de ordem <span class="math inline">\(5\)</span>. A queda é mais acentuada nas primeiras componentes e se torna progressivamente menor a partir das seguintes. A linha tracejada representa outro critério: apenas os dois primeiros autovalores excedem <span class="math inline">\(1\)</span>. A mudança de inclinação e a comparação com <span class="math inline">\(1\)</span> fornecem, portanto, informações distintas.</p>
+<p>Na ACP baseada na matriz de correlações, há ainda uma referência específica decorrente da padronização. Como</p>
+<p><span class="math display">\[
+\operatorname{tr}
+(
+\mathbf R
+)
+=
+p,
+\]</span></p>
+<p>a média dos <span class="math inline">\(p\)</span> autovalores é igual a <span class="math inline">\(1\)</span>. Nesse contexto, o critério de reter componentes com</p>
+<p><span class="math display">\[
+\widehat{\lambda}_{Rj}&gt;1
+\]</span></p>
+<p>pode ser interpretado como a retenção de componentes cuja variância excede a variância de uma variável original padronizada. Esse critério é uma regra heurística e sua justificativa não se transfere diretamente para a ACP baseada em uma matriz de covariâncias, cujas variâncias dependem das escalas das variáveis.</p>
+<p>Assim, a escolha de <span class="math inline">\(k\)</span> deve considerar conjuntamente a concentração dos autovalores, a proporção acumulada de variância, o padrão observado no gráfico de declive e a interpretabilidade da representação obtida. Diferentes critérios podem sugerir dimensões distintas, e a decisão deve permanecer vinculada ao objetivo da análise.</p>
+<p>Nesta formulação, a ACP transforma o problema estatístico de preservar variabilidade em poucas direções em um problema espectral já resolvido matematicamente no Módulo 1. O passo seguinte consiste em mostrar que as primeiras <span class="math inline">\(k\)</span> direções também definem um subespaço que maximiza a variabilidade projetada e minimiza o erro quadrático de reconstrução.</p>
+</section>
+</section>
+<section id="subespaço-principal-e-projeção" class="level2" data-number="14.7">
+<h2 data-number="14.7" class="anchored" data-anchor-id="subespaço-principal-e-projeção"><span class="header-section-number">14.7</span> Subespaço principal e projeção</h2>
+<p>As primeiras <span class="math inline">\(k&lt;p\)</span> componentes principais definem um subespaço de dimensão <span class="math inline">\(k\)</span> no qual a variabilidade de <span class="math inline">\(\boldsymbol{\mathsf X}\)</span> será representada.</p>
+<p>Considere uma base ortonormal de autovetores de <span class="math inline">\(\boldsymbol{\Sigma}\)</span>,</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_1,\ldots,\boldsymbol{\alpha}_p,
+\]</span></p>
+<p>ordenada de modo que</p>
+<p><span class="math display">\[
+\lambda_1
+\geq
+\cdots
+\geq
+\lambda_p.
+\]</span></p>
+<p>Defina</p>
+<p><span class="math display">\[
+\mathbf A_k
+=
+\begin{pmatrix}
+\boldsymbol{\alpha}_1 &amp;
+\cdots &amp;
+\boldsymbol{\alpha}_k
+\end{pmatrix}
+\in
+\mathbb R^{p\times k}.
+\]</span></p>
+<p>Como esses vetores são ortonormais,</p>
+<p><span class="math display">\[
+\mathbf A_k^\top
+\mathbf A_k
+=
+\mathbf I_k.
+\]</span></p>
+<p>Suas colunas geram um subespaço que maximiza a variabilidade projetada em dimensão <span class="math inline">\(k\)</span>.</p>
+<div id="def-subespaco-principal-acp" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 14.1 (Subespaço principal)</strong></span> Seja</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\in
+\mathbb R^{p\times p}
+\]</span></p>
+<p>uma matriz de covariâncias, com autovalores ordenados como</p>
+<p><span class="math display">\[
+\lambda_1
+\geq
+\cdots
+\geq
+\lambda_p
+\geq
+0,
+\]</span></p>
+<p>e seja</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_1,\ldots,\boldsymbol{\alpha}_p
+\]</span></p>
+<p>uma base ortonormal de autovetores correspondente a essa ordenação.</p>
+<p>Para <span class="math inline">\(1\leq k\leq p\)</span>, um <strong>subespaço principal de dimensão <span class="math inline">\(k\)</span></strong> é</p>
+<p><span class="math display">\[
+\mathcal S_k
+=
+\operatorname{span}
+\left\{
+\boldsymbol{\alpha}_1,\ldots,\boldsymbol{\alpha}_k
+\right\}.
+\]</span></p>
+<p>Se <span class="math inline">\(k&lt;p\)</span> e</p>
+<p><span class="math display">\[
+\lambda_k&gt;\lambda_{k+1},
+\]</span></p>
+<p>o subespaço principal de dimensão <span class="math inline">\(k\)</span> é único. Se</p>
+<p><span class="math display">\[
+\lambda_k=\lambda_{k+1},
+\]</span></p>
+<p>podem existir diferentes subespaços principais de dimensão <span class="math inline">\(k\)</span> que preservam a mesma variabilidade máxima.</p>
+</div>
+<p>A matriz de projeção ortogonal sobre um subespaço principal <span class="math inline">\(\mathcal S_k\)</span> é</p>
+<p><span class="math display">\[
+\mathbf P_k
+=
+\mathbf A_k
+\mathbf A_k^\top.
+\]</span></p>
+<p>Essa expressão é uma aplicação direta da projeção sobre um subespaço com base ortonormal desenvolvida na <a href="#prp-projecao-base-ortonormal" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-projecao-base-ortonormal</span></a>.</p>
+<p>As coordenadas de <span class="math inline">\(\boldsymbol{\mathsf X}_c\)</span> nesse subespaço são</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf Y}_k
+=
+\mathbf A_k^\top
+\boldsymbol{\mathsf X}_c
+=
+\begin{pmatrix}
+Y_1\\
+\vdots\\
+Y_k
+\end{pmatrix}.
+\]</span></p>
+<p>Sua matriz de covariâncias é</p>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf Y}_k
+\right)
+&amp;=
+\mathbf A_k^\top
+\boldsymbol{\Sigma}
+\mathbf A_k\\
+&amp;=
+\operatorname{diag}
+\left(
+\lambda_1,\ldots,\lambda_k
+\right).
+\end{aligned}
+\]</span></p>
+<p>Portanto, a variância total das coordenadas mantidas é</p>
+<p><span class="math display">\[
+\operatorname{tr}
+\left[
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf Y}_k
+\right)
+\right]
+=
+\sum_{j=1}^k
+\lambda_j.
+\]</span></p>
+<p>Esse resultado fornece uma interpretação conjunta das primeiras <span class="math inline">\(k\)</span> componentes. A ACP não procura somente a melhor primeira direção e depois as seguintes de forma isolada. O conjunto das primeiras <span class="math inline">\(k\)</span> direções determina um subespaço que concentra a maior variabilidade possível entre os subespaços lineares de mesma dimensão.</p>
+<p>Considere qualquer matriz</p>
+<p><span class="math display">\[
+\mathbf Q
+=
+\begin{pmatrix}
+\mathbf q_1 &amp;
+\cdots &amp;
+\mathbf q_k
+\end{pmatrix}
+\in
+\mathbb R^{p\times k},
+\]</span></p>
+<p>com colunas ortonormais,</p>
+<p><span class="math display">\[
+\mathbf Q^\top
+\mathbf Q
+=
+\mathbf I_k.
+\]</span></p>
+<p>A projeção de <span class="math inline">\(\boldsymbol{\mathsf X}_c\)</span> sobre o subespaço gerado por <span class="math inline">\(\mathbf Q\)</span> possui coordenadas</p>
+<p><span class="math display">\[
+\mathbf Q^\top
+\boldsymbol{\mathsf X}_c
+\]</span></p>
+<p>e variância total</p>
+<p><span class="math display">\[
+\operatorname{tr}
+\left(
+\mathbf Q^\top
+\boldsymbol{\Sigma}
+\mathbf Q
+\right)
+=
+\sum_{j=1}^k
+\mathbf q_j^\top
+\boldsymbol{\Sigma}
+\mathbf q_j.
+\]</span></p>
+<p>O resultado para uma única direção se estende ao conjunto das primeiras <span class="math inline">\(k\)</span> direções.</p>
+<div id="prp-subespaco-principal-variancia" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposição 14.1 (Variabilidade máxima do subespaço principal)</strong></span> Seja</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\in
+\mathbb R^{p\times p}
+\]</span></p>
+<p>uma matriz de covariâncias com autovalores</p>
+<p><span class="math display">\[
+\lambda_1
+\geq
+\cdots
+\geq
+\lambda_p
+\geq
+0.
+\]</span></p>
+<p>Para <span class="math inline">\(1\leq k\leq p\)</span> e qualquer matriz</p>
+<p><span class="math display">\[
+\mathbf Q
+\in
+\mathbb R^{p\times k}
+\]</span></p>
+<p>com colunas ortonormais,</p>
+<p><span class="math display">\[
+\mathbf Q^\top
+\mathbf Q
+=
+\mathbf I_k,
+\]</span></p>
+<p>tem-se</p>
+<p><span class="math display">\[
+\operatorname{tr}
+\left(
+\mathbf Q^\top
+\boldsymbol{\Sigma}
+\mathbf Q
+\right)
+\leq
+\sum_{j=1}^k
+\lambda_j.
+\]</span></p>
+<p>Portanto, a maior variância total que pode ser preservada por uma projeção ortogonal em um subespaço de dimensão <span class="math inline">\(k\)</span> é</p>
+<p><span class="math display">\[
+\sum_{j=1}^k
+\lambda_j.
+\]</span></p>
+<p>Esse máximo é atingido por qualquer subespaço principal <span class="math inline">\(\mathcal S_k\)</span> de <a href="#def-subespaco-principal-acp" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-subespaco-principal-acp</span></a>.</p>
+<p>Se <span class="math inline">\(k&lt;p\)</span> e</p>
+<p><span class="math display">\[
+\lambda_k&gt;\lambda_{k+1},
+\]</span></p>
+<p>o subespaço que maximiza a variância é único. Se</p>
+<p><span class="math display">\[
+\lambda_k=\lambda_{k+1},
+\]</span></p>
+<p>o subespaço maximizador pode não ser único.</p>
+</div>
+<section id="aprofundamento-demonstração-da-variabilidade-máxima-do-subespaço-principal" class="level3" data-number="14.7.1">
+<h3 data-number="14.7.1" class="anchored" data-anchor-id="aprofundamento-demonstração-da-variabilidade-máxima-do-subespaço-principal"><span class="header-section-number">14.7.1</span> Aprofundamento: demonstração da variabilidade máxima do subespaço principal</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A proposição anterior é suficiente para a formulação da ACP. A demonstração a seguir explicita como a ordenação dos autovalores determina o subespaço de dimensão <span class="math inline">\(k\)</span> que preserva a maior variabilidade total.</p>
+</div>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Comprovação</em>. </span>Pelo Teorema Espectral de <a href="#thm-teorema-espectral" class="quarto-xref">Teorema&nbsp;<span class="quarto-unresolved-ref">thm-teorema-espectral</span></a>,</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+=
+\mathbf A
+\boldsymbol{\Lambda}
+\mathbf A^\top.
+\]</span></p>
+<p>Defina</p>
+<p><span class="math display">\[
+\mathbf B
+=
+\mathbf A^\top
+\mathbf Q.
+\]</span></p>
+<p>Como <span class="math inline">\(\mathbf A\)</span> é ortogonal e</p>
+<p><span class="math display">\[
+\mathbf Q^\top
+\mathbf Q
+=
+\mathbf I_k,
+\]</span></p>
+<p>tem-se</p>
+<p><span class="math display">\[
+\mathbf B^\top
+\mathbf B
+=
+\mathbf I_k.
+\]</span></p>
+<p>Se <span class="math inline">\(b_{i\ell}\)</span> denota o elemento da linha <span class="math inline">\(i\)</span> e da coluna <span class="math inline">\(\ell\)</span> de <span class="math inline">\(\mathbf B\)</span>, defina</p>
+<p><span class="math display">\[
+w_i
+=
+\sum_{\ell=1}^k
+b_{i\ell}^{\,2}.
+\]</span></p>
+<p>Então,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{tr}
+\left(
+\mathbf Q^\top
+\boldsymbol{\Sigma}
+\mathbf Q
+\right)
+&amp;=
+\operatorname{tr}
+\left(
+\mathbf B^\top
+\boldsymbol{\Lambda}
+\mathbf B
+\right)\\
+&amp;=
+\sum_{i=1}^p
+\lambda_i w_i.
+\end{aligned}
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\mathbf B
+\mathbf B^\top
+\]</span></p>
+<p>é um projetor ortogonal, seus elementos diagonais satisfazem</p>
+<p><span class="math display">\[
+0
+\leq
+w_i
+\leq
+1.
+\]</span></p>
+<p>Além disso,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\sum_{i=1}^p
+w_i
+&amp;=
+\operatorname{tr}
+\left(
+\mathbf B
+\mathbf B^\top
+\right)\\
+&amp;=
+\operatorname{tr}
+\left(
+\mathbf B^\top
+\mathbf B
+\right)\\
+&amp;=
+k.
+\end{aligned}
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\lambda_1
+\geq
+\cdots
+\geq
+\lambda_p,
+\]</span></p>
+<p>a soma</p>
+<p><span class="math display">\[
+\sum_{i=1}^p
+\lambda_i w_i
+\]</span></p>
+<p>é maximizada atribuindo peso total aos <span class="math inline">\(k\)</span> maiores autovalores. Portanto,</p>
+<p><span class="math display">\[
+\operatorname{tr}
+\left(
+\mathbf Q^\top
+\boldsymbol{\Sigma}
+\mathbf Q
+\right)
+\leq
+\sum_{j=1}^k
+\lambda_j.
+\]</span></p>
+<p>A igualdade é atingida quando o subespaço é gerado pelos autovetores associados aos <span class="math inline">\(k\)</span> maiores autovalores. Se</p>
+<p><span class="math display">\[
+\lambda_k
+&gt;
+\lambda_{k+1},
+\]</span></p>
+<p>esse subespaço é único. Quando</p>
+<p><span class="math display">\[
+\lambda_k
+=
+\lambda_{k+1},
+\]</span></p>
+<p>podem existir diferentes subespaços de dimensão <span class="math inline">\(k\)</span> que atingem o mesmo máximo.</p>
+</div>
+<p>) + theme_minimal( base_size = 13 ) + theme( panel.grid.minor = element_blank() ) ```</p>
+<p>No exemplo, os cinco autovalores somam <span class="math inline">\(5\)</span>, como ocorre para uma matriz de correlações de ordem <span class="math inline">\(5\)</span>. A queda é mais acentuada nas primeiras componentes e se torna progressivamente menor a partir das seguintes. A linha tracejada representa outro critério: apenas os dois primeiros autovalores excedem <span class="math inline">\(1\)</span>. A mudança de inclinação e a comparação com <span class="math inline">\(1\)</span> fornecem, portanto, informações distintas.</p>
+<p>Na ACP baseada na matriz de correlações, há ainda uma referência específica decorrente da padronização.</p>
+</section>
+</section>
+<section id="reconstrução-a-partir-das-componentes-principais" class="level2" data-number="14.8">
+<h2 data-number="14.8" class="anchored" data-anchor-id="reconstrução-a-partir-das-componentes-principais"><span class="header-section-number">14.8</span> Reconstrução a partir das componentes principais</h2>
+<p>As primeiras <span class="math inline">\(k\)</span> componentes fornecem as coordenadas de <span class="math inline">\(\boldsymbol{\mathsf X}_c\)</span> no subespaço principal. A projeção no espaço original é obtida por</p>
+<p><span class="math display">\[
+\widetilde{\boldsymbol{\mathsf X}}_{c,k}
+=
+\mathbf A_k
+\boldsymbol{\mathsf Y}_k.
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf Y}_k
+=
+\mathbf A_k^\top
+\boldsymbol{\mathsf X}_c,
+\]</span></p>
+<p>segue que</p>
+<p><span class="math display">\[
+\widetilde{\boldsymbol{\mathsf X}}_{c,k}
+=
+\mathbf A_k
+\mathbf A_k^\top
+\boldsymbol{\mathsf X}_c
+=
+\mathbf P_k
+\boldsymbol{\mathsf X}_c.
+\]</span></p>
+<p>O vetor <span class="math inline">\(\widetilde{\boldsymbol{\mathsf X}}_{c,k}\)</span> é a representação de <span class="math inline">\(\boldsymbol{\mathsf X}_c\)</span> obtida utilizando apenas as primeiras <span class="math inline">\(k\)</span> direções principais.</p>
+<p>A parcela não representada é</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf E}_k
+=
+\boldsymbol{\mathsf X}_c
+-
+\widetilde{\boldsymbol{\mathsf X}}_{c,k}
+=
+\left(
+\mathbf I_p-\mathbf P_k
+\right)
+\boldsymbol{\mathsf X}_c.
+\]</span></p>
+<p>A matriz de projeção residual foi definida na <a href="#def-matriz-projecao-residual" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-matriz-projecao-residual</span></a>, e a ortogonalidade entre a projeção e o resíduo decorre de <a href="#prp-propriedades-projecao-residual" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-propriedades-projecao-residual</span></a>. Portanto,</p>
+<p><span class="math display">\[
+\left\|
+\boldsymbol{\mathsf X}_c
+\right\|^2
+=
+\left\|
+\widetilde{\boldsymbol{\mathsf X}}_{c,k}
+\right\|^2
++
+\left\|
+\boldsymbol{\mathsf E}_k
+\right\|^2.
+\]</span></p>
+<p>Tomando esperanças, a variabilidade total também se decompõe em parcela representada e parcela não representada:</p>
+<p><span class="math display">\[
+E
+\left(
+\left\|
+\boldsymbol{\mathsf X}_c
+\right\|^2
+\right)
+=
+E
+\left(
+\left\|
+\widetilde{\boldsymbol{\mathsf X}}_{c,k}
+\right\|^2
+\right)
++
+E
+\left(
+\left\|
+\boldsymbol{\mathsf E}_k
+\right\|^2
+\right).
+\]</span></p>
+<p>A primeira parcela é</p>
+<p><span class="math display">\[
+E
+\left(
+\left\|
+\widetilde{\boldsymbol{\mathsf X}}_{c,k}
+\right\|^2
+\right)
+=
+\sum_{j=1}^k
+\lambda_j,
+\]</span></p>
+<p>enquanto, pela definição de variância total na <a href="#def-variancia-total" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-variancia-total</span></a>,</p>
+<p><span class="math display">\[
+E
+\left(
+\left\|
+\boldsymbol{\mathsf X}_c
+\right\|^2
+\right)
+=
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}
+\right)
+=
+\sum_{j=1}^p
+\lambda_j.
+\]</span></p>
+<p>Consequentemente,</p>
+<p><span class="math display">\[
+E
+\left(
+\left\|
+\boldsymbol{\mathsf E}_k
+\right\|^2
+\right)
+=
+\sum_{j=k+1}^p
+\lambda_j.
+\]</span></p>
+<p>A variabilidade descartada pela redução de dimensão corresponde exatamente à soma dos autovalores associados às direções excluídas.</p>
+<div id="prp-acp-variancia-reconstrucao" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposição 14.2 (Variância preservada e erro de reconstrução)</strong></span> Seja</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+\in
+\mathbb R^p
+\]</span></p>
+<p>um vetor aleatório com segundos momentos finitos, vetor de médias <span class="math inline">\(\boldsymbol{\mu}\)</span> e matriz de covariâncias <span class="math inline">\(\boldsymbol{\Sigma}\)</span>. Defina</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}_c
+=
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}.
+\]</span></p>
+<p>Para <span class="math inline">\(1\leq k\leq p\)</span>, considere uma matriz</p>
+<p><span class="math display">\[
+\mathbf Q
+\in
+\mathbb R^{p\times k}
+\]</span></p>
+<p>com colunas ortonormais,</p>
+<p><span class="math display">\[
+\mathbf Q^\top\mathbf Q
+=
+\mathbf I_k,
+\]</span></p>
+<p>e a projeção ortogonal</p>
+<p><span class="math display">\[
+\widetilde{\boldsymbol{\mathsf X}}_{c,\mathbf Q}
+=
+\mathbf Q
+\mathbf Q^\top
+\boldsymbol{\mathsf X}_c.
+\]</span></p>
+<p>O erro quadrático médio de reconstrução é</p>
+<p><span class="math display">\[
+E
+\left[
+\left\|
+\boldsymbol{\mathsf X}_c
+-
+\widetilde{\boldsymbol{\mathsf X}}_{c,\mathbf Q}
+\right\|^2
+\right]
+=
+\operatorname{tr}
+(
+\boldsymbol{\Sigma}
+)
+-
+\operatorname{tr}
+\left(
+\mathbf Q^\top
+\boldsymbol{\Sigma}
+\mathbf Q
+\right).
+\]</span></p>
+<p>Consequentemente, maximizar a variância preservada,</p>
+<p><span class="math display">\[
+\operatorname{tr}
+\left(
+\mathbf Q^\top
+\boldsymbol{\Sigma}
+\mathbf Q
+\right),
+\]</span></p>
+<p>equivale a minimizar o erro quadrático médio de reconstrução.</p>
+<p>Para um subespaço principal de dimensão <span class="math inline">\(k\)</span>,</p>
+<p><span class="math display">\[
+\text{variância preservada}
+=
+\sum_{j=1}^k
+\lambda_j
+\]</span></p>
+<p>e o erro mínimo é</p>
+<p><span class="math display">\[
+\min_{\mathbf Q^\top\mathbf Q=\mathbf I_k}
+E
+\left[
+\left\|
+\boldsymbol{\mathsf X}_c
+-
+\mathbf Q\mathbf Q^\top
+\boldsymbol{\mathsf X}_c
+\right\|^2
+\right]
+=
+\sum_{j=k+1}^p
+\lambda_j.
+\]</span></p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Comprovação</em>. </span>Como <span class="math inline">\(\mathbf Q\mathbf Q^\top\)</span> é um projetor ortogonal,</p>
+<p><span class="math display">\[
+\begin{aligned}
+E
+\left[
+\left\|
+\boldsymbol{\mathsf X}_c
+-
+\mathbf Q\mathbf Q^\top
+\boldsymbol{\mathsf X}_c
+\right\|^2
+\right]
+&amp;=
+\operatorname{tr}
+\left[
+\left(
+\mathbf I_p-\mathbf Q\mathbf Q^\top
+\right)
+\boldsymbol{\Sigma}
+\right]\\
+&amp;=
+\operatorname{tr}
+(
+\boldsymbol{\Sigma}
+)
+-
+\operatorname{tr}
+\left(
+\mathbf Q^\top
+\boldsymbol{\Sigma}
+\mathbf Q
+\right).
+\end{aligned}
+\]</span></p>
+<p>O primeiro termo é constante em relação a <span class="math inline">\(\mathbf Q\)</span>. Portanto, minimizar o erro equivale a maximizar a variância preservada. Pela <a href="#prp-subespaco-principal-variancia" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-subespaco-principal-variancia</span></a>, o máximo é <span class="math inline">\(\sum_{j=1}^k\lambda_j\)</span> e, como <span class="math inline">\(\operatorname{tr}(\boldsymbol{\Sigma})=\sum_{j=1}^p\lambda_j\)</span>, o erro mínimo é</p>
+<p><span class="math display">\[
+\sum_{j=k+1}^p\lambda_j.
+\]</span></p>
+</div>
+<p>A decomposição de um vetor em projeção e resíduo ortogonal foi apresentada na <a href="#fig-projecao-ortogonal" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-projecao-ortogonal</span></a>. Na ACP, o mesmo princípio é aplicado simultaneamente à nuvem de observações, utilizando como subespaço uma direção ou um subespaço principal.</p>
+<p>A <a href="#fig-acp-projecao-reconstrucao" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-acp-projecao-reconstrucao</span></a> representa a redução de duas para uma dimensão. Cada observação é projetada sobre a primeira direção principal. Os segmentos vermelhos representam os resíduos de reconstrução.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-acp-projecao-reconstrucao" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-acp-projecao-reconstrucao-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_cp_files/figure-html/fig-acp-projecao-reconstrucao-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-acp-projecao-reconstrucao-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;14.4: A redução para uma componente substitui cada observação por sua projeção sobre a primeira direção principal; os segmentos ortogonais representam o erro de reconstrução.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Os pontos azuis são as observações centralizadas, os pontos verdes são suas representações utilizando somente a primeira componente e os segmentos vermelhos correspondem à parcela descartada. A ACP escolhe um subespaço principal que minimiza conjuntamente esses resíduos quadráticos entre todos os subespaços de mesma dimensão.</p>
+<p>Essa equivalência conecta duas interpretações da técnica. A ACP pode ser formulada como busca das direções que preservam maior variabilidade ou como busca do subespaço que produz menor perda quadrática na reconstrução.</p>
+</section>
+<section id="formulação-amostral" class="level2" data-number="14.9">
+<h2 data-number="14.9" class="anchored" data-anchor-id="formulação-amostral"><span class="header-section-number">14.9</span> Formulação amostral</h2>
+<p>A formulação populacional define as componentes em termos de <span class="math inline">\(\boldsymbol{\Sigma}\)</span>, que geralmente é desconhecida. A aplicação da técnica utiliza uma amostra para estimar suas direções e variâncias.</p>
+<p>Considere uma realização amostral com <span class="math inline">\(n\geq2\)</span> observações, organizada na matriz</p>
+<p><span class="math display">\[
+\mathbf X
+\in
+\mathbb R^{n\times p},
+\]</span></p>
+<p>com média observada <span class="math inline">\(\bar{\mathbf x}\)</span> e matriz centralizada</p>
+<p><span class="math display">\[
+\mathbf X_c
+=
+\mathbf X
+-
+\mathbf 1_n
+\bar{\mathbf x}^\top.
+\]</span></p>
+<p>A matriz de covariâncias observada foi definida na <a href="#def-matriz-covariancias-observada" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-matriz-covariancias-observada</span></a> como</p>
+<p><span class="math display">\[
+\mathbf S
+=
+\frac{1}{n-1}
+\mathbf X_c^\top
+\mathbf X_c.
+\]</span></p>
+<p>A versão amostral da ACP substitui a matriz populacional <span class="math inline">\(\boldsymbol{\Sigma}\)</span> por <span class="math inline">\(\mathbf S\)</span>.</p>
+<p>Considere a decomposição espectral</p>
+<p><span class="math display">\[
+\mathbf S
+=
+\widehat{\mathbf A}
+\widehat{\boldsymbol{\Lambda}}
+\widehat{\mathbf A}^\top,
+\]</span></p>
+<p>em que</p>
+<p><span class="math display">\[
+\widehat{\boldsymbol{\Lambda}}
+=
+\operatorname{diag}
+\left(
+\widehat{\lambda}_1,\ldots,
+\widehat{\lambda}_p
+\right),
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\widehat{\lambda}_1
+\geq
+\cdots
+\geq
+\widehat{\lambda}_p
+\geq
+0,
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\widehat{\mathbf A}
+=
+\begin{pmatrix}
+\widehat{\boldsymbol{\alpha}}_1 &amp;
+\cdots &amp;
+\widehat{\boldsymbol{\alpha}}_p
+\end{pmatrix}.
+\]</span></p>
+<p>A <a href="#tbl-acp-populacao-amostra" class="quarto-xref">Tabela&nbsp;<span class="quarto-unresolved-ref">tbl-acp-populacao-amostra</span></a> sintetiza a distinção entre os principais objetos populacionais e amostrais da ACP.</p>
+<div id="tbl-acp-populacao-amostra" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-acp-populacao-amostra-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;14.2: Correspondência entre objetos populacionais e amostrais na ACP.
+</figcaption>
+<div aria-describedby="tbl-acp-populacao-amostra-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Objeto</th>
+<th>População</th>
+<th>Amostra observada</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Matriz de covariâncias</td>
+<td><span class="math inline">\(\boldsymbol{\Sigma}\)</span></td>
+<td><span class="math inline">\(\mathbf S\)</span></td>
+</tr>
+<tr class="even">
+<td>Direção principal <span class="math inline">\(j\)</span></td>
+<td><span class="math inline">\(\boldsymbol{\alpha}_j\)</span></td>
+<td><span class="math inline">\(\widehat{\boldsymbol{\alpha}}_j\)</span></td>
+</tr>
+<tr class="odd">
+<td>Variância da componente <span class="math inline">\(j\)</span></td>
+<td><span class="math inline">\(\lambda_j\)</span></td>
+<td><span class="math inline">\(\widehat{\lambda}_j\)</span></td>
+</tr>
+<tr class="even">
+<td>Componente principal</td>
+<td><span class="math inline">\(Y_j=\boldsymbol{\alpha}_j^\top(\boldsymbol{\mathsf X}-\boldsymbol{\mu})\)</span></td>
+<td>definida a partir da direção estimada <span class="math inline">\(\widehat{\boldsymbol{\alpha}}_j\)</span></td>
+</tr>
+<tr class="odd">
+<td>Coordenada de uma observação</td>
+<td>realização de <span class="math inline">\(Y_j\)</span></td>
+<td>escore <span class="math inline">\(t_{ij}\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A direção <span class="math inline">\(\widehat{\boldsymbol{\alpha}}_j\)</span> é obtida a partir da amostra. Quando a direção populacional correspondente é identificável, ela pode ser interpretada como estimativa dessa direção; a relação entre a solução amostral e a populacional será retomada na seção sobre formulação populacional e inferência.</p>
+<p>Para a observação <span class="math inline">\(i\)</span>, o escore na componente <span class="math inline">\(j\)</span> é</p>
+<p><span class="math display">\[
+t_{ij}
+=
+\widehat{\boldsymbol{\alpha}}_j^\top
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right).
+\]</span></p>
+<div id="def-escore-componente-principal" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 14.2 (Escore de uma componente principal)</strong></span> Considere a observação</p>
+<p><span class="math display">\[
+\mathbf x_i
+\in
+\mathbb R^p,
+\]</span></p>
+<p>sua versão centralizada</p>
+<p><span class="math display">\[
+\mathbf x_i-\bar{\mathbf x},
+\]</span></p>
+<p>e uma direção principal amostral unitária</p>
+<p><span class="math display">\[
+\widehat{\boldsymbol{\alpha}}_j
+\in
+\mathbb R^p.
+\]</span></p>
+<p>O <strong>escore da observação <span class="math inline">\(i\)</span> na componente principal <span class="math inline">\(j\)</span></strong> é sua coordenada nessa direção:</p>
+<p><span class="math display">\[
+t_{ij}
+=
+\widehat{\boldsymbol{\alpha}}_j^\top
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right).
+\]</span></p>
+</div>
+<p>Os escores de todas as observações nas <span class="math inline">\(k\)</span> primeiras componentes são reunidos em</p>
+<p><span class="math display">\[
+\mathbf T_k
+=
+\mathbf X_c
+\widehat{\mathbf A}_k,
+\]</span></p>
+<p>em que</p>
+<p><span class="math display">\[
+\widehat{\mathbf A}_k
+=
+\begin{pmatrix}
+\widehat{\boldsymbol{\alpha}}_1 &amp;
+\cdots &amp;
+\widehat{\boldsymbol{\alpha}}_k
+\end{pmatrix}.
+\]</span></p>
+<p>A matriz</p>
+<p><span class="math display">\[
+\mathbf T_k
+\in
+\mathbb R^{n\times k}
+\]</span></p>
+<p>fornece a representação das <span class="math inline">\(n\)</span> observações no espaço principal de dimensão <span class="math inline">\(k\)</span>.</p>
+<p>Os elementos de <span class="math inline">\(\widehat{\boldsymbol{\alpha}}_j\)</span> são os <strong>coeficientes da componente principal</strong>. Os elementos da coluna correspondente de <span class="math inline">\(\mathbf T_k\)</span> são os <strong>escores</strong>. Esses objetos desempenham funções diferentes: os coeficientes definem a direção e os escores localizam as observações nessa direção.</p>
+<p>A matriz centralizada reconstruída a partir das primeiras <span class="math inline">\(k\)</span> componentes é</p>
+<p><span class="math display">\[
+\widetilde{\mathbf X}_{c,k}
+=
+\mathbf T_k
+\widehat{\mathbf A}_k^\top.
+\]</span></p>
+<p>Substituindo a definição dos escores,</p>
+<p><span class="math display">\[
+\widetilde{\mathbf X}_{c,k}
+=
+\mathbf X_c
+\widehat{\mathbf A}_k
+\widehat{\mathbf A}_k^\top.
+\]</span></p>
+<p>Assim, a reconstrução amostral também é uma projeção ortogonal sobre o subespaço principal estimado.</p>
+<p>Para retornar às unidades e à localização originais, adiciona-se novamente o vetor de médias:</p>
+<p><span class="math display">\[
+\widetilde{\mathbf X}_k
+=
+\widetilde{\mathbf X}_{c,k}
++
+\mathbf 1_n
+\bar{\mathbf x}^\top.
+\]</span></p>
+<p>A centralização remove a localização antes da determinação das direções principais; a reconstrução final restitui essa localização.</p>
+</section>
+<section id="formulação-da-acp-pela-svd" class="level2" data-number="14.10">
+<h2 data-number="14.10" class="anchored" data-anchor-id="formulação-da-acp-pela-svd"><span class="header-section-number">14.10</span> Formulação da ACP pela SVD</h2>
+<p>A formulação amostral pode ser obtida diretamente da matriz centralizada sem formar previamente <span class="math inline">\(\mathbf S\)</span>.</p>
+<p>Se</p>
+<p><span class="math display">\[
+r
+=
+\operatorname{posto}
+\left(
+\mathbf X_c
+\right)
+&gt;0,
+\]</span></p>
+<p>considere a SVD compacta definida na <a href="#def-svd-compacta" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-svd-compacta</span></a>:</p>
+<p><span class="math display">\[
+\mathbf X_c
+=
+\mathbf U_r
+\mathbf D_r
+\mathbf V_r^\top,
+\]</span></p>
+<p>em que</p>
+<p><span class="math display">\[
+\mathbf U_r
+\in
+\mathbb R^{n\times r},
+\qquad
+\mathbf D_r
+\in
+\mathbb R^{r\times r},
+\qquad
+\mathbf V_r
+\in
+\mathbb R^{p\times r}.
+\]</span></p>
+<p>Os valores singulares são ordenados como</p>
+<p><span class="math display">\[
+d_1
+\geq
+d_2
+\geq
+\cdots
+\geq
+d_r
+&gt;
+0.
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\mathbf S
+=
+\frac{1}{n-1}
+\mathbf X_c^\top
+\mathbf X_c,
+\]</span></p>
+<p>a relação entre a SVD da matriz centralizada e a decomposição espectral da covariância, estabelecida na <a href="#prp-svd-covariancia-amostral" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-svd-covariancia-amostral</span></a>, fornece</p>
+<p><span class="math display">\[
+\mathbf S
+=
+\mathbf V_r
+\frac{\mathbf D_r^2}{n-1}
+\mathbf V_r^\top.
+\]</span></p>
+<p>Portanto, para as componentes associadas a autovalores positivos, a direção principal amostral pode ser escolhida como um autovetor <span class="math inline">\(\mathbf v_j\)</span> associado a <span class="math inline">\(\widehat{\lambda}_j\)</span>:</p>
+<p><span class="math display">\[
+\widehat{\boldsymbol{\alpha}}_j
+=
+\mathbf v_j.
+\]</span></p>
+<p>Como todo autovetor, <span class="math inline">\(\mathbf v_j\)</span> pode ser substituído por <span class="math inline">\(-\mathbf v_j\)</span> sem alterar a componente principal como direção.</p>
+<p>Assim,</p>
+<p><span class="math display">\[
+\widehat{\lambda}_j
+=
+\frac{d_j^2}{n-1},
+\qquad
+j=1,\ldots,r.
+\]</span></p>
+<p>Os vetores singulares à direita da matriz centralizada são as direções principais amostrais associadas à variabilidade positiva. O quadrado de cada valor singular, dividido por <span class="math inline">\(n-1\)</span>, é a variância observada da componente correspondente.</p>
+<p>Se</p>
+<p><span class="math display">\[
+r&lt;p,
+\]</span></p>
+<p>as <span class="math inline">\(p-r\)</span> componentes restantes possuem autovalor zero. A SVD compacta não precisa fornecer uma base para esse complemento nulo, pois essas direções não acrescentam variabilidade à representação.</p>
+<p>A interpretação geométrica da SVD foi apresentada na <a href="#fig-geometria-svd" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-geometria-svd</span></a>. Na ACP amostral, a matriz decomposta passa a ser <span class="math inline">\(\mathbf X_c\)</span>. Os vetores singulares à direita fornecem as direções no espaço das variáveis, enquanto os produtos dos vetores singulares à esquerda pelos valores singulares fornecem as coordenadas das observações nessas direções.</p>
+<p>Essa relação mostra que a decomposição espectral de <span class="math inline">\(\mathbf S\)</span> e a SVD de <span class="math inline">\(\mathbf X_c\)</span> não constituem duas técnicas diferentes. Para as componentes de variância positiva, elas fornecem duas formas de obter a mesma solução amostral da ACP.</p>
+<p>Os escores também são obtidos diretamente pela SVD:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\mathbf T_r
+&amp;=
+\mathbf X_c
+\mathbf V_r\\
+&amp;=
+\mathbf U_r
+\mathbf D_r.
+\end{aligned}
+\]</span></p>
+<p>Assim, a SVD separa naturalmente os elementos da representação:</p>
+<ul>
+<li><span class="math inline">\(\mathbf V_r\)</span> contém as direções principais associadas à variabilidade positiva no espaço das variáveis;</li>
+<li><span class="math inline">\(\mathbf U_r\mathbf D_r\)</span> contém os escores das observações;</li>
+<li><span class="math inline">\(\mathbf D_r\)</span> determina a magnitude da variabilidade em cada direção.</li>
+</ul>
+<p>A centralização também limita o número de componentes com variância positiva. Pelo resultado de posto da matriz de covariâncias observada estabelecido na <a href="#eq-posto-covariancia-observada" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-posto-covariancia-observada</span></a>,</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf S
+\right)
+=
+\operatorname{posto}
+\left(
+\mathbf X_c
+\right)
+\leq
+\min(p,n-1).
+\]</span></p>
+<p>Portanto, existem no máximo</p>
+<p><span class="math display">\[
+\min(p,n-1)
+\]</span></p>
+<p>componentes principais com variância amostral positiva.</p>
+<p>Em particular, quando <span class="math inline">\(p\geq n\)</span>, a matriz <span class="math inline">\(\mathbf S\)</span> é necessariamente singular. Essa singularidade amostral não implica que a matriz populacional <span class="math inline">\(\boldsymbol{\Sigma}\)</span> seja singular; ela pode decorrer apenas do número de direções disponíveis na amostra após a centralização.</p>
+<section id="aprofundamento-aproximação-de-posto-reduzido" class="level3" data-number="14.10.1">
+<h3 data-number="14.10.1" class="anchored" data-anchor-id="aprofundamento-aproximação-de-posto-reduzido"><span class="header-section-number">14.10.1</span> Aprofundamento: aproximação de posto reduzido</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Esta seção relaciona a redução de dimensionalidade da ACP ao problema matricial de melhor aproximação de posto reduzido. O desenvolvimento retoma a SVD truncada e o Teorema de Eckart–Young–Mirsky estudados no Módulo 1 e mostra como a projeção principal, a reconstrução e a aproximação matricial descrevem o mesmo objeto.</p>
+</div>
+</div>
+<p>A SVD permite conectar diretamente a redução de dimensionalidade ao problema de aproximação matricial.</p>
+<p>Para</p>
+<p><span class="math display">\[
+1\leq k&lt;r,
+\]</span></p>
+<p>mantendo apenas os <span class="math inline">\(k\)</span> primeiros termos da SVD,</p>
+<p><span class="math display">\[
+\mathbf X_{c,k}
+=
+\mathbf U_k
+\mathbf D_k
+\mathbf V_k^\top.
+\]</span></p>
+<p>Pelo Teorema de Eckart–Young–Mirsky de <a href="#thm-eckart-young-mirsky" class="quarto-xref">Teorema&nbsp;<span class="quarto-unresolved-ref">thm-eckart-young-mirsky</span></a>, <span class="math inline">\(\mathbf X_{c,k}\)</span> é uma melhor aproximação de <span class="math inline">\(\mathbf X_c\)</span> entre todas as matrizes de posto não superior a <span class="math inline">\(k\)</span>, segundo a norma de Frobenius.</p>
+<p>Se</p>
+<p><span class="math display">\[
+d_k&gt;d_{k+1},
+\]</span></p>
+<p>essa melhor aproximação é única. Quando</p>
+<p><span class="math display">\[
+d_k=d_{k+1},
+\]</span></p>
+<p>podem existir diferentes aproximações de posto não superior a <span class="math inline">\(k\)</span> que atingem o mesmo erro mínimo.</p>
+<p>Além disso, pela relação entre projeção e SVD estabelecida na <a href="#prp-aproximacao-dados-projecao-svd" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-aproximacao-dados-projecao-svd</span></a>,</p>
+<p><span class="math display">\[
+\mathbf X_{c,k}
+=
+\mathbf X_c
+\mathbf V_k
+\mathbf V_k^\top.
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\mathbf T_k
+=
+\mathbf X_c
+\mathbf V_k,
+\]</span></p>
+<p>também se obtém</p>
+<p><span class="math display">\[
+\mathbf X_{c,k}
+=
+\mathbf T_k
+\mathbf V_k^\top.
+\]</span></p>
+<p>Essas três expressões representam o mesmo objeto:</p>
+<p><span class="math display">\[
+\mathbf U_k
+\mathbf D_k
+\mathbf V_k^\top
+=
+\mathbf X_c
+\mathbf V_k
+\mathbf V_k^\top
+=
+\mathbf T_k
+\mathbf V_k^\top.
+\]</span></p>
+<p>A primeira expressão mostra a aproximação de posto reduzido; a segunda mostra a projeção sobre um subespaço principal; a terceira mostra a reconstrução a partir dos escores e das direções principais.</p>
+<p>O erro quadrático total da aproximação é</p>
+<p><span class="math display">\[
+\left\|
+\mathbf X_c
+-
+\mathbf X_{c,k}
+\right\|_F^2
+=
+\sum_{j=k+1}^{r}
+d_j^2.
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+d_j^2
+=
+(n-1)
+\widehat{\lambda}_j,
+\]</span></p>
+<p>segue que</p>
+<p><span class="math display">\[
+\left\|
+\mathbf X_c
+-
+\mathbf X_{c,k}
+\right\|_F^2
+=
+(n-1)
+\sum_{j=k+1}^{r}
+\widehat{\lambda}_j.
+\]</span></p>
+<p>A parcela da soma de quadrados preservada pela aproximação é</p>
+<p><span class="math display">\[
+\frac{
+\sum_{j=1}^k
+d_j^2
+}{
+\sum_{j=1}^r
+d_j^2
+}
+=
+\frac{
+\sum_{j=1}^k
+\widehat{\lambda}_j
+}{
+\sum_{j=1}^r
+\widehat{\lambda}_j
+}.
+\]</span></p>
+<p>Essa expressão coincide com a proporção de variância observada representada pelas primeiras <span class="math inline">\(k\)</span> componentes.</p>
+<p>A equivalência entre as formulações pode ser resumida pela <a href="#tbl-formulacoes-acp" class="quarto-xref">Tabela&nbsp;<span class="quarto-unresolved-ref">tbl-formulacoes-acp</span></a>.</p>
+<div id="tbl-formulacoes-acp" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-formulacoes-acp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;14.3: Formulações relacionadas da Análise de Componentes Principais.
+</figcaption>
+<div aria-describedby="tbl-formulacoes-acp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Formulação</th>
+<th>Objeto otimizado ou decomposto</th>
+<th>Solução</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Variância</td>
+<td><span class="math inline">\(\boldsymbol{\alpha}^\top\boldsymbol{\Sigma}\boldsymbol{\alpha}\)</span> ou <span class="math inline">\(\boldsymbol{\alpha}^\top\mathbf S\boldsymbol{\alpha}\)</span></td>
+<td>Autovetores associados aos maiores autovalores</td>
+</tr>
+<tr class="even">
+<td>Subespaço</td>
+<td>Variância total da projeção em dimensão <span class="math inline">\(k\)</span></td>
+<td>Subespaço gerado pelas primeiras <span class="math inline">\(k\)</span> direções</td>
+</tr>
+<tr class="odd">
+<td>Reconstrução</td>
+<td>Erro quadrático da representação</td>
+<td>Projeção sobre um subespaço principal</td>
+</tr>
+<tr class="even">
+<td>SVD</td>
+<td>Matriz de dados centralizada <span class="math inline">\(\mathbf X_c\)</span></td>
+<td>Vetores singulares à direita associados à variabilidade positiva</td>
+</tr>
+<tr class="odd">
+<td>Aproximação matricial</td>
+<td><span class="math inline">\(\|\mathbf X_c-\mathbf B\|_F\)</span> com <span class="math inline">\(\operatorname{posto}(\mathbf B)\leq k\)</span></td>
+<td><span class="math inline">\(\mathbf U_k\mathbf D_k\mathbf V_k^\top\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A ACP pode, portanto, ser compreendida simultaneamente como um problema estatístico de preservação da variabilidade, um problema geométrico de projeção e um problema matricial de aproximação de posto reduzido. Os resultados dos Módulos 1 e 2 mostram por que essas três perspectivas conduzem à mesma solução.</p>
+</section>
+</section>
+<section id="sec-acp-matriz-correlacoes" class="level2" data-number="14.11">
+<h2 data-number="14.11" class="anchored" data-anchor-id="sec-acp-matriz-correlacoes"><span class="header-section-number">14.11</span> ACP baseada na matriz de correlações</h2>
+<p>A formulação anterior utiliza a matriz de covariâncias. Quando as variáveis possuem escalas ou unidades de medida diferentes, pode ser definido outro problema: realizar a ACP após padronizar cada variável para variância unitária.</p>
+<p>A matriz de correlações populacional <span class="math inline">\(\boldsymbol{\mathcal R}\)</span> foi definida na <a href="#def-matriz-correlacoes-populacional" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-matriz-correlacoes-populacional</span></a>, sob a condição de que todas as variâncias marginais populacionais sejam positivas, e sua correspondente observada <span class="math inline">\(\mathbf R\)</span> foi definida na <a href="#def-matriz-correlacoes-observada" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-matriz-correlacoes-observada</span></a>, sob a condição de que</p>
+<p><span class="math display">\[
+s_{jj}&gt;0,
+\qquad
+j=1,\ldots,p.
+\]</span></p>
+<p>No nível observado, defina</p>
+<p><span class="math display">\[
+\mathbf D_S
+=
+\operatorname{diag}
+\left(
+s_{11},\ldots,s_{pp}
+\right).
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+s_{jj}&gt;0,
+\qquad
+j=1,\ldots,p,
+\]</span></p>
+<p>a matriz <span class="math inline">\(\mathbf D_S\)</span> é positiva definida e <span class="math inline">\(\mathbf D_S^{-1/2}\)</span> existe. Assim,</p>
+<p><span class="math display">\[
+\mathbf R
+=
+\mathbf D_S^{-1/2}
+\mathbf S
+\mathbf D_S^{-1/2}.
+\]</span></p>
+<p>O Módulo 2 estabeleceu na <a href="#eq-correlacao-produto-dados-padronizados" class="quarto-xref">Equação&nbsp;<span class="quarto-unresolved-ref">eq-correlacao-produto-dados-padronizados</span></a> a relação entre a matriz de correlações e as colunas centralizadas e padronizadas. Para manter essa notação distinta da matriz de delineamento <span class="math inline">\(\mathbf Z\)</span> utilizada na <a href="#def-modelo-linear-multivariado" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-modelo-linear-multivariado</span></a>, neste capítulo denotaremos a matriz padronizada por</p>
+<p><span class="math display">\[
+\mathbf X_{\mathrm{pad}}
+=
+\mathbf X_c
+\mathbf D_S^{-1/2}.
+\]</span></p>
+<p>Assim,</p>
+<p><span class="math display">\[
+\mathbf R
+=
+\frac{1}{n-1}
+\mathbf X_{\mathrm{pad}}^\top
+\mathbf X_{\mathrm{pad}}.
+\]</span></p>
+<p>Realizar a ACP de <span class="math inline">\(\mathbf R\)</span> equivale, portanto, a realizar a ACP sobre as colunas centralizadas e padronizadas de <span class="math inline">\(\mathbf X\)</span>.</p>
+<p>Se</p>
+<p><span class="math display">\[
+\mathbf R
+=
+\mathbf A_R
+\boldsymbol{\Lambda}_R
+\mathbf A_R^\top,
+\]</span></p>
+<p>as direções principais são obtidas no espaço das variáveis padronizadas. Os autovalores</p>
+<p><span class="math display">\[
+\lambda_{R1},
+\ldots,
+\lambda_{Rp}
+\]</span></p>
+<p>representam as variâncias das componentes construídas a partir dessas variáveis.</p>
+<p>Como a diagonal de <span class="math inline">\(\mathbf R\)</span> é formada por valores iguais a <span class="math inline">\(1\)</span>,</p>
+<p><span class="math display">\[
+\operatorname{tr}
+\left(
+\mathbf R
+\right)
+=
+p.
+\]</span></p>
+<p>Logo,</p>
+<p><span class="math display">\[
+\sum_{j=1}^p
+\lambda_{Rj}
+=
+p.
+\]</span></p>
+<p>A proporção da variância padronizada representada pela componente <span class="math inline">\(j\)</span> é</p>
+<p><span class="math display">\[
+\frac{\lambda_{Rj}}{p},
+\]</span></p>
+<p>e a proporção acumulada nas primeiras <span class="math inline">\(k\)</span> componentes é</p>
+<p><span class="math display">\[
+\frac{
+\sum_{j=1}^k
+\lambda_{Rj}
+}{
+p
+}.
+\]</span></p>
+<p>A utilização de <span class="math inline">\(\mathbf S\)</span> ou <span class="math inline">\(\mathbf R\)</span> corresponde a <strong>duas formulações diferentes da ACP</strong>.</p>
+<p>Na ACP baseada em <span class="math inline">\(\mathbf S\)</span>, as variáveis preservam suas escalas e variâncias originais. Uma variável com maior variabilidade pode exercer maior influência sobre as primeiras componentes.</p>
+<p>Na ACP baseada em <span class="math inline">\(\mathbf R\)</span>, todas as variáveis entram na análise com variância unitária. As diferenças de escala marginal são removidas antes da decomposição.</p>
+<p>A <a href="#tbl-acp-covariancia-correlacao" class="quarto-xref">Tabela&nbsp;<span class="quarto-unresolved-ref">tbl-acp-covariancia-correlacao</span></a> resume essa distinção.</p>
+<div id="tbl-acp-covariancia-correlacao" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-acp-covariancia-correlacao-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;14.4: Diferenças entre a ACP baseada em covariâncias e em correlações.
+</figcaption>
+<div aria-describedby="tbl-acp-covariancia-correlacao-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Aspecto</th>
+<th>ACP por covariâncias</th>
+<th>ACP por correlações</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Matriz de entrada</td>
+<td><span class="math inline">\(\mathbf S\)</span></td>
+<td><span class="math inline">\(\mathbf R\)</span></td>
+</tr>
+<tr class="even">
+<td>Dados equivalentes</td>
+<td>Centralizados</td>
+<td>Centralizados e padronizados</td>
+</tr>
+<tr class="odd">
+<td>Variâncias marginais</td>
+<td>Mantidas nas unidades originais</td>
+<td>Iguais a <span class="math inline">\(1\)</span></td>
+</tr>
+<tr class="even">
+<td>Variância total</td>
+<td><span class="math inline">\(\operatorname{tr}(\mathbf S)\)</span></td>
+<td><span class="math inline">\(p\)</span></td>
+</tr>
+<tr class="odd">
+<td>Influência da escala</td>
+<td>Preservada</td>
+<td>Removida pela padronização</td>
+</tr>
+<tr class="even">
+<td>Problema resolvido</td>
+<td>Representar a variabilidade nas escalas originais</td>
+<td>Representar a variabilidade após igualar as escalas marginais</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A <a href="#fig-acp-covariancia-correlacao" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-acp-covariancia-correlacao</span></a> ilustra o efeito da padronização. Os dois painéis representam as mesmas observações, antes e depois da padronização marginal. A mudança das escalas altera a geometria e, consequentemente, as direções principais.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-acp-covariancia-correlacao" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-acp-covariancia-correlacao-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_cp_files/figure-html/fig-acp-covariancia-correlacao-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-acp-covariancia-correlacao-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;14.5: A ACP baseada em covariâncias preserva as escalas originais, enquanto a ACP baseada em correlações utiliza a geometria das variáveis padronizadas.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A seta vermelha representa a primeira direção principal em cada geometria. A padronização remove as diferenças de escala marginal entre as variáveis e, nesse exemplo, modifica a direção que maximiza a variância.</p>
+<p>A escolha entre as duas matrizes faz parte da definição do problema estatístico. Ela não deve ser tratada como uma decisão puramente computacional.</p>
+<p>A padronização modifica a geometria da nuvem de dados por meio de um escalonamento diferente em cada eixo. Consequentemente, os autovetores, os autovalores, os escores e o subespaço principal podem mudar.</p>
+<p>Essa distinção será importante também no próximo capítulo. A Análise Fatorial pode ser formulada sobre uma matriz de covariâncias ou de correlações, mas seu objetivo será diferente: em vez de decompor a variabilidade total em direções principais, será especificado um modelo para a estrutura de covariação entre as variáveis.</p>
+<p>A decomposição espectral também fornece a interpretação geométrica completa da ACP. As colunas de</p>
+<p><span class="math display">\[
+\mathbf A
+=
+\begin{pmatrix}
+\boldsymbol{\alpha}_1 &amp;
+\cdots &amp;
+\boldsymbol{\alpha}_p
+\end{pmatrix}
+\]</span></p>
+<p>formam uma base ortonormal alinhada aos eixos principais da dispersão. Quando todas as componentes são mantidas, a transformação</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf Y}
+=
+\mathbf A^\top
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}
+\right)
+\]</span></p>
+<p>corresponde a uma mudança ortogonal de coordenadas e</p>
+<p><span class="math display">\[
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf Y}
+\right)
+=
+\boldsymbol{\Lambda}.
+\]</span></p>
+<p>Assim, os autovetores determinam as direções principais e os autovalores determinam as variâncias nessas direções. Quando apenas as primeiras <span class="math inline">\(k\)</span> componentes são mantidas, a mudança completa de coordenadas é substituída pela projeção sobre o subespaço principal <span class="math inline">\(\mathcal S_k\)</span>, formalizada na <a href="#prp-acp-variancia-reconstrucao" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-acp-variancia-reconstrucao</span></a>.</p>
+</section>
+<section id="coeficientes-e-relação-das-variáveis-com-as-componentes" class="level2" data-number="14.12">
+<h2 data-number="14.12" class="anchored" data-anchor-id="coeficientes-e-relação-das-variáveis-com-as-componentes"><span class="header-section-number">14.12</span> Coeficientes e relação das variáveis com as componentes</h2>
+<p>Os elementos do vetor</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j
+=
+\begin{pmatrix}
+a_{1j}\\
+\vdots\\
+a_{pj}
+\end{pmatrix}
+\]</span></p>
+<p>são os <strong>coeficientes da <span class="math inline">\(j\)</span>-ésima componente principal</strong>. Eles definem a combinação linear</p>
+<p><span class="math display">\[
+Y_j
+=
+\sum_{i=1}^p
+a_{ij}
+\left(
+X_i-\mu_i
+\right).
+\]</span></p>
+<p>Esses coeficientes determinam a direção da componente no espaço das variáveis. Eles não devem ser confundidos com as correlações entre as variáveis originais e a componente.</p>
+<p>A relação entre esses dois objetos pode ser obtida diretamente a partir da matriz de covariâncias.</p>
+<p>Para a variável <span class="math inline">\(X_i\)</span>,</p>
+<p><span class="math display">\[
+\begin{aligned}
+\operatorname{Cov}
+\left(
+X_i,Y_j
+\right)
+&amp;=
+\operatorname{Cov}
+\left[
+X_i,
+\boldsymbol{\alpha}_j^\top
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}
+\right)
+\right]\\
+&amp;=
+\sum_{\ell=1}^{p}
+a_{\ell j}
+\operatorname{Cov}
+\left(
+X_i,X_\ell
+\right)\\
+&amp;=
+\left(
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_j
+\right)_i.
+\end{aligned}
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_j
+=
+\lambda_j
+\boldsymbol{\alpha}_j,
+\]</span></p>
+<p>segue que</p>
+<p><span class="math display">\[
+\operatorname{Cov}
+\left(
+X_i,Y_j
+\right)
+=
+\lambda_j
+a_{ij}.
+\]</span></p>
+<p>Além disso,</p>
+<p><span class="math display">\[
+\operatorname{Var}(Y_j)
+=
+\lambda_j
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\operatorname{Var}(X_i)
+=
+\sigma_{ii}.
+\]</span></p>
+<p>Se</p>
+<p><span class="math display">\[
+\sigma_{ii}&gt;0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\lambda_j&gt;0,
+\]</span></p>
+<p>então a correlação está definida e</p>
+<p><span class="math display">\[
+\operatorname{Corr}
+\left(
+X_i,Y_j
+\right)
+=
+\frac{
+\sqrt{\lambda_j}\,a_{ij}
+}{
+\sqrt{\sigma_{ii}}
+}.
+\]</span></p>
+<div id="prp-correlacao-variavel-componente" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposição 14.3 (Correlação entre uma variável e uma componente principal)</strong></span> Considere a ACP populacional baseada na matriz de covariâncias <span class="math inline">\(\boldsymbol{\Sigma}\)</span>. Para uma variável <span class="math inline">\(X_i\)</span> com</p>
+<p><span class="math display">\[
+\sigma_{ii}&gt;0
+\]</span></p>
+<p>e uma componente principal</p>
+<p><span class="math display">\[
+Y_j
+=
+\boldsymbol{\alpha}_j^\top
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}
+\right)
+\]</span></p>
+<p>associada a um autovalor</p>
+<p><span class="math display">\[
+\lambda_j&gt;0,
+\]</span></p>
+<p>tem-se</p>
+<p><span class="math display">\[
+\operatorname{Corr}
+\left(
+X_i,Y_j
+\right)
+=
+\frac{
+\sqrt{\lambda_j}\,a_{ij}
+}{
+\sqrt{\sigma_{ii}}
+}.
+\]</span></p>
+<p>Na ACP populacional baseada na matriz de correlações <span class="math inline">\(\boldsymbol{\mathcal R}\)</span>, suponha que as variâncias marginais sejam positivas, como exigido na <a href="#def-matriz-correlacoes-populacional" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-matriz-correlacoes-populacional</span></a>. Considere a variável padronizada <span class="math inline">\(X_{i,\mathrm{pad}}\)</span> e uma componente</p>
+<p><span class="math display">\[
+Y_{Rj}
+\]</span></p>
+<p>construída a partir do autovetor <span class="math inline">\(\boldsymbol{\alpha}_{Rj}\)</span> associado a</p>
+<p><span class="math display">\[
+\lambda_{Rj}&gt;0.
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\operatorname{Var}
+\left(
+X_{i,\mathrm{pad}}
+\right)
+=
+1,
+\]</span></p>
+<p>tem-se</p>
+<p><span class="math display">\[
+\operatorname{Corr}
+\left(
+X_{i,\mathrm{pad}},
+Y_{Rj}
+\right)
+=
+\sqrt{\lambda_{Rj}}\,
+a_{R,ij}.
+\]</span></p>
+</div>
+<p>A exigência de autovalor positivo decorre da própria definição de correlação. Se</p>
+<p><span class="math display">\[
+\lambda_j=0,
+\]</span></p>
+<p>então</p>
+<p><span class="math display">\[
+\operatorname{Var}(Y_j)=0,
+\]</span></p>
+<p>e a correlação entre <span class="math inline">\(Y_j\)</span> e qualquer variável não está definida.</p>
+<p>A expressão mostra que o coeficiente <span class="math inline">\(a_{ij}\)</span> e a correlação entre <span class="math inline">\(X_i\)</span> e <span class="math inline">\(Y_j\)</span> representam objetos diferentes.</p>
+<p>A diferença entre os coeficientes da componente e as correlações com as variáveis pode ser visualizada na <a href="#fig-acp-coeficientes-correlacoes" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-acp-coeficientes-correlacoes</span></a>. O exemplo utiliza uma matriz de covariâncias com variâncias marginais diferentes.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-acp-coeficientes-correlacoes" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-acp-coeficientes-correlacoes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_cp_files/figure-html/fig-acp-coeficientes-correlacoes-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-acp-coeficientes-correlacoes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;14.6: Os coeficientes definem a direção da componente, enquanto as correlações medem a associação de cada variável com a componente.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Os coeficientes pertencem ao vetor unitário que define a direção principal. As correlações dependem também da variância da componente e da variância de cada variável. Por isso, as duas medidas não são intercambiáveis.</p>
+<p>O coeficiente indica a participação da variável na definição da direção. A correlação indica a intensidade da associação linear da variável com a componente construída.</p>
+<p>Essa distinção será importante no capítulo seguinte. Na Análise Fatorial, as cargas fatoriais pertencem ao próprio modelo de covariâncias e terão interpretação diferente dos coeficientes de uma componente principal.</p>
+<p>Na formulação amostral baseada em <span class="math inline">\(\mathbf S\)</span>, se</p>
+<p><span class="math display">\[
+s_{ii}&gt;0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\widehat{\lambda}_j&gt;0,
+\]</span></p>
+<p>então</p>
+<p><span class="math display">\[
+\widehat{\operatorname{Corr}}
+\left(
+X_i,Y_j
+\right)
+=
+\frac{
+\sqrt{\widehat{\lambda}_j}
+\,\widehat a_{ij}
+}{
+\sqrt{s_{ii}}
+}.
+\]</span></p>
+<p>Quando a ACP é realizada sobre <span class="math inline">\(\mathbf R\)</span>, cada variável padronizada possui variância observada igual a <span class="math inline">\(1\)</span>. Para uma componente com</p>
+<p><span class="math display">\[
+\widehat{\lambda}_{Rj}&gt;0,
+\]</span></p>
+<p>denotando por <span class="math inline">\(X_{i,\mathrm{pad}}\)</span> a variável padronizada e por <span class="math inline">\(Y_{Rj}\)</span> a componente correspondente,</p>
+<p><span class="math display">\[
+\widehat{\operatorname{Corr}}
+\left(
+X_{i,\mathrm{pad}},
+Y_{Rj}
+\right)
+=
+\sqrt{\widehat{\lambda}_{Rj}}
+\,\widehat a_{R,ij}.
+\]</span></p>
+<p>A interpretação substantiva das componentes pode utilizar conjuntamente os coeficientes e as associações das variáveis com as componentes. A formulação matemática deve preservar a distinção entre os dois objetos.</p>
+</section>
+<section id="sec-acp-representacao" class="level2" data-number="14.13">
+<h2 data-number="14.13" class="anchored" data-anchor-id="sec-acp-representacao"><span class="header-section-number">14.13</span> Representação das observações e das variáveis</h2>
+<p>As observações são representadas nas componentes por seus escores, enquanto as variáveis podem ser relacionadas às componentes pelas correlações desenvolvidas na seção anterior. Esses dois objetos são suficientes para estabelecer suas posições na representação reduzida.</p>
+<section id="aprofundamento-qualidade-de-representação-e-contribuição" class="level3" data-number="14.13.1">
+<h3 data-number="14.13.1" class="anchored" data-anchor-id="aprofundamento-qualidade-de-representação-e-contribuição"><span class="header-section-number">14.13.1</span> Aprofundamento: qualidade de representação e contribuição</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Além das coordenadas, a interpretação de uma ACP pode utilizar medidas que avaliam a qualidade da representação e a participação de observações ou variáveis em cada dimensão. Esta seção desenvolve o cosseno quadrado (<span class="math inline">\(\cos^2\)</span>) e a contribuição, mantendo distintos os significados dessas duas medidas.</p>
+</div>
+</div>
+<section id="observações-coordenadas-qualidade-de-representação-e-contribuição" class="level4" data-number="14.13.1.1">
+<h4 data-number="14.13.1.1" class="anchored" data-anchor-id="observações-coordenadas-qualidade-de-representação-e-contribuição"><span class="header-section-number">14.13.1.1</span> Observações: coordenadas, qualidade de representação e contribuição</h4>
+<p>Para a observação <span class="math inline">\(i\)</span>, a coordenada na componente <span class="math inline">\(j\)</span> é o próprio escore</p>
+<p><span class="math display">\[
+t_{ij}
+=
+\widehat{\boldsymbol{\alpha}}_j^\top
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right).
+\]</span></p>
+<p>Assim, em uma representação pelas duas primeiras componentes, a observação <span class="math inline">\(i\)</span> é localizada pelo ponto</p>
+<p><span class="math display">\[
+\left(
+t_{i1},
+t_{i2}
+\right).
+\]</span></p>
+<p>A magnitude de uma coordenada informa a posição da observação em uma determinada direção, mas não informa, isoladamente, se essa dimensão representa bem sua posição no espaço original. Para avaliar essa representação, considere a soma dos quadrados das coordenadas da observação em todas as componentes,</p>
+<p><span class="math display">\[
+d_i^2
+=
+\sum_{\ell=1}^{p}
+t_{i\ell}^2.
+\]</span></p>
+<p>Na ACP baseada em covariâncias,</p>
+<p><span class="math display">\[
+d_i^2
+=
+\left\|
+\mathbf x_i-\bar{\mathbf x}
+\right\|^2,
+\]</span></p>
+<p>pois a transformação completa para as componentes é ortogonal. Na ACP baseada em correlações, a mesma interpretação se aplica no espaço das variáveis centralizadas e padronizadas.</p>
+<p>Quando <span class="math inline">\(d_i^2&gt;0\)</span>, o <strong>cosseno quadrado</strong> da observação <span class="math inline">\(i\)</span> em relação à componente <span class="math inline">\(j\)</span> é</p>
+<p><span id="eq-acp-cos2-observacao"><span class="math display">\[
+\cos^2_{ij}
+=
+\frac{
+t_{ij}^2
+}{
+\sum_{\ell=1}^{p}t_{i\ell}^2
+}.
+\tag{14.1}\]</span></span></p>
+<p>Essa quantidade mede a parcela da distância quadrática da observação ao centro representada pela componente <span class="math inline">\(j\)</span>. Para um subespaço formado pelas primeiras <span class="math inline">\(k\)</span> componentes, a qualidade de representação é</p>
+<p><span id="eq-acp-cos2-observacao-subespaco"><span class="math display">\[
+\cos^2_{i,(1:k)}
+=
+\sum_{j=1}^{k}
+\cos^2_{ij}.
+\tag{14.2}\]</span></span></p>
+<p>Valores próximos de <span class="math inline">\(1\)</span> indicam que a posição da observação em relação ao centro é bem representada pelo subespaço retido. Valores pequenos indicam que parcela importante de sua posição permanece em dimensões não representadas.</p>
+<p>A <strong>contribuição</strong> responde a outra pergunta. Para uma componente <span class="math inline">\(j\)</span> com variância positiva, define-se</p>
+<p><span id="eq-acp-contribuicao-observacao"><span class="math display">\[
+\operatorname{ctr}_{ij}
+=
+\frac{
+t_{ij}^2
+}{
+\sum_{h=1}^{n}t_{hj}^2
+}.
+\tag{14.3}\]</span></span></p>
+<p>Portanto,</p>
+<p><span class="math display">\[
+\sum_{i=1}^{n}
+\operatorname{ctr}_{ij}
+=
+1.
+\]</span></p>
+<p>Na convenção amostral utilizada neste capítulo,</p>
+<p><span class="math display">\[
+\sum_{h=1}^{n}
+t_{hj}^2
+=
+(n-1)\widehat{\lambda}_j,
+\]</span></p>
+<p>de modo que</p>
+<p><span class="math display">\[
+\operatorname{ctr}_{ij}
+=
+\frac{
+t_{ij}^2
+}{
+(n-1)\widehat{\lambda}_j
+}.
+\]</span></p>
+<p>Uma contribuição elevada indica que a observação responde por parcela relativamente elevada da soma de quadrados associada à componente. Essa medida não deve ser confundida com qualidade de representação.</p>
+<p>Assim,</p>
+<p><span class="math display">\[
+\cos^2
+\quad\text{e}\quad
+\text{contribuição}
+\]</span></p>
+<p>possuem orientações complementares. O <span class="math inline">\(\cos^2\)</span> avalia quanto uma componente representa uma determinada observação; a contribuição avalia quanto uma determinada observação participa da variabilidade representada por uma componente.</p>
+</section>
+<section id="variáveis-coordenadas-qualidade-de-representação-e-contribuição" class="level4" data-number="14.13.1.2">
+<h4 data-number="14.13.1.2" class="anchored" data-anchor-id="variáveis-coordenadas-qualidade-de-representação-e-contribuição"><span class="header-section-number">14.13.1.2</span> Variáveis: coordenadas, qualidade de representação e contribuição</h4>
+<p>A seção anterior mostrou que as correlações entre as variáveis e as componentes são distintas dos coeficientes que definem as direções principais. Essas correlações também fornecem uma representação das variáveis no espaço das componentes.</p>
+<p>Na ACP amostral, denote por</p>
+<p><span class="math display">\[
+r_{ij}
+=
+\widehat{\operatorname{Corr}}
+\left(
+X_i,Y_j
+\right)
+\]</span></p>
+<p>a correlação entre a variável <span class="math inline">\(i\)</span> e a componente <span class="math inline">\(j\)</span>. Em uma representação pelas duas primeiras componentes, a variável pode ser localizada pelas coordenadas</p>
+<p><span class="math display">\[
+\left(
+r_{i1},
+r_{i2}
+\right).
+\]</span></p>
+<p>Na ACP baseada na matriz de correlações, essas coordenadas satisfazem</p>
+<p><span class="math display">\[
+r_{ij}
+=
+\sqrt{\widehat{\lambda}_{Rj}}\,
+\widehat a_{R,ij},
+\]</span></p>
+<p>para componentes com autovalor positivo. Como cada variável padronizada possui variância igual a <span class="math inline">\(1\)</span>, o quadrado da correlação</p>
+<p><span id="eq-acp-cos2-variavel"><span class="math display">\[
+\cos^2_{ij}
+=
+r_{ij}^2
+\tag{14.4}\]</span></span></p>
+<p>mede a qualidade de representação da variável <span class="math inline">\(i\)</span> pela componente <span class="math inline">\(j\)</span>. Para as primeiras <span class="math inline">\(k\)</span> componentes,</p>
+<p><span class="math display">\[
+\cos^2_{i,(1:k)}
+=
+\sum_{j=1}^{k}
+r_{ij}^2.
+\]</span></p>
+<p>Quanto mais próximo esse valor estiver de <span class="math inline">\(1\)</span>, maior é a parcela da variabilidade da variável representada pelo subespaço considerado.</p>
+<p>Na ACP baseada em correlações, a contribuição da variável <span class="math inline">\(i\)</span> para a componente <span class="math inline">\(j\)</span> pode ser expressa por</p>
+<p><span id="eq-acp-contribuicao-variavel"><span class="math display">\[
+\operatorname{ctr}_{ij}^{(\mathrm{var})}
+=
+\frac{
+r_{ij}^2
+}{
+\widehat{\lambda}_{Rj}
+},
+\tag{14.5}\]</span></span></p>
+<p>e, utilizando a relação entre correlações e coeficientes,</p>
+<p><span class="math display">\[
+\operatorname{ctr}_{ij}^{(\mathrm{var})}
+=
+\widehat a_{R,ij}^{\,2}.
+\]</span></p>
+<p>Como os autovetores são unitários,</p>
+<p><span class="math display">\[
+\sum_{i=1}^{p}
+\operatorname{ctr}_{ij}^{(\mathrm{var})}
+=
+1.
+\]</span></p>
+<p>A contribuição identifica quais variáveis participam mais intensamente da construção de uma determinada direção na geometria padronizada, enquanto o <span class="math inline">\(\cos^2\)</span> informa quão bem cada variável é representada por essa direção ou pelo subespaço considerado.</p>
+</section>
+<section id="duas-representações-complementares" class="level4" data-number="14.13.1.3">
+<h4 data-number="14.13.1.3" class="anchored" data-anchor-id="duas-representações-complementares"><span class="header-section-number">14.13.1.3</span> Duas representações complementares</h4>
+<p>A ACP permite, portanto, examinar dois espaços relacionados, mas conceitualmente distintos.</p>
+<p>No <strong>mapa das observações</strong>, os pontos são posicionados pelos escores. A proximidade entre pontos descreve proximidade na representação reduzida, e a qualidade dessa representação pode ser avaliada pelos respectivos <span class="math inline">\(\cos^2\)</span>.</p>
+<p>No <strong>mapa das variáveis</strong>, as coordenadas podem ser construídas a partir das associações entre as variáveis e as componentes. Na ACP baseada em correlações, as coordenadas</p>
+<p><span class="math display">\[
+\left(
+r_{i1},
+r_{i2}
+\right)
+\]</span></p>
+<p>estão contidas no círculo unitário, pois</p>
+<p><span class="math display">\[
+r_{i1}^2+r_{i2}^2
+\leq
+1.
+\]</span></p>
+<p>Essa representação permite identificar quais variáveis estão mais associadas a cada dimensão e quais são bem representadas pelo plano considerado.</p>
+<p>Coordenada, qualidade de representação e contribuição devem permanecer conceitualmente separadas:</p>
+<ul>
+<li>a <strong>coordenada</strong> informa onde a observação ou variável se encontra na representação;</li>
+<li>o <strong><span class="math inline">\(\cos^2\)</span></strong> informa quão bem ela é representada pela dimensão ou pelo subespaço;</li>
+<li>a <strong>contribuição</strong> informa quanto ela participa da construção da variabilidade representada por uma dimensão.</li>
+</ul>
+<p>Essas medidas complementam a interpretação dos autovalores. Enquanto os autovalores descrevem a importância global das componentes, coordenadas, <span class="math inline">\(\cos^2\)</span> e contribuições permitem examinar quais observações e variáveis caracterizam a representação obtida.</p>
+</section>
+</section>
+</section>
+<section id="propriedades-da-solução" class="level2" data-number="14.14">
+<h2 data-number="14.14" class="anchored" data-anchor-id="propriedades-da-solução"><span class="header-section-number">14.14</span> Propriedades da solução</h2>
+<p>A ACP herda propriedades da matriz de covariâncias e da decomposição espectral. Algumas delas possuem consequências diretas para a interpretação das componentes.</p>
+<section id="invariância-a-translações" class="level3" data-number="14.14.1">
+<h3 data-number="14.14.1" class="anchored" data-anchor-id="invariância-a-translações"><span class="header-section-number">14.14.1</span> Invariância a translações</h3>
+<p>Para qualquer vetor constante <span class="math inline">\(\mathbf c\in\mathbb R^p\)</span>,</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}^{*}
+=
+\boldsymbol{\mathsf X}
++
+\mathbf c
+\]</span></p>
+<p>possui a mesma matriz de covariâncias de <span class="math inline">\(\boldsymbol{\mathsf X}\)</span>:</p>
+<p><span class="math display">\[
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}^{*}
+\right)
+=
+\boldsymbol{\Sigma}.
+\]</span></p>
+<p>Consequentemente, os autovalores e as direções principais não se alteram. A ACP baseada em covariâncias é, portanto, invariante a translações. A centralização modifica a origem da representação, mas não sua estrutura de dispersão.</p>
+</section>
+<section id="dependência-da-escala" class="level3" data-number="14.14.2">
+<h3 data-number="14.14.2" class="anchored" data-anchor-id="dependência-da-escala"><span class="header-section-number">14.14.2</span> Dependência da escala</h3>
+<p>A ACP baseada em covariâncias não é, em geral, invariante a mudanças individuais de escala. Se</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}^{*}
+=
+\mathbf D
+\boldsymbol{\mathsf X},
+\]</span></p>
+<p>com <span class="math inline">\(\mathbf D\)</span> diagonal e positiva, então</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}^{*}
+=
+\mathbf D
+\boldsymbol{\Sigma}
+\mathbf D.
+\]</span></p>
+<p>Os autovalores e autovetores de <span class="math inline">\(\boldsymbol{\Sigma}^{*}\)</span> podem diferir dos de <span class="math inline">\(\boldsymbol{\Sigma}\)</span>. Portanto, mudanças de unidade podem alterar a solução da ACP por covariâncias. Essa propriedade explica a distinção desenvolvida anteriormente entre a ACP baseada em covariâncias e a ACP baseada em correlações.</p>
+</section>
+<section id="indeterminação-do-sinal" class="level3" data-number="14.14.3">
+<h3 data-number="14.14.3" class="anchored" data-anchor-id="indeterminação-do-sinal"><span class="header-section-number">14.14.3</span> Indeterminação do sinal</h3>
+<p>Se</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_j
+=
+\lambda_j
+\boldsymbol{\alpha}_j,
+\]</span></p>
+<p>então</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+(-\boldsymbol{\alpha}_j)
+=
+\lambda_j
+(-\boldsymbol{\alpha}_j).
+\]</span></p>
+<p>Portanto, <span class="math inline">\(\boldsymbol{\alpha}_j\)</span> e <span class="math inline">\(-\boldsymbol{\alpha}_j\)</span> representam a mesma direção principal.</p>
+<p>Se o sinal do vetor de coeficientes for invertido,</p>
+<p><span class="math display">\[
+Y_j
+=
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\mathsf X}_c
+\]</span></p>
+<p>passa a ser</p>
+<p><span class="math display">\[
+Y_j^{*}
+=
+-Y_j.
+\]</span></p>
+<p>Os escores também mudam de sinal, mas a variância, o subespaço gerado e a qualidade da representação permanecem inalterados.</p>
+<p>A orientação positiva ou negativa de um eixo principal é, portanto, arbitrária.</p>
+<p>Essa propriedade é especialmente importante na comparação de resultados produzidos por diferentes programas ou diferentes decomposições numéricas. Duas soluções podem apresentar sinais opostos e ainda representar exatamente a mesma componente.</p>
+<p>A mudança de sinal não é a única situação em que as direções podem deixar de ser únicas. Quando há autovalores repetidos, a ACP identifica o autoespaço correspondente, mas não uma base única dentro dele. Além disso, quando a matriz analisada é singular, a variabilidade está restrita a um subespaço de dimensão inferior a <span class="math inline">\(p\)</span>. Essas situações são desenvolvidas a seguir como aprofundamento.</p>
+</section>
+<section id="sec-acp-multiplicidade-singularidade" class="level3" data-number="14.14.4">
+<h3 data-number="14.14.4" class="anchored" data-anchor-id="sec-acp-multiplicidade-singularidade"><span class="header-section-number">14.14.4</span> Aprofundamento: unicidade, multiplicidade e dimensão efetiva</h3>
+<p>Quando todos os autovalores são simples, cada direção principal é determinada até mudança de sinal. Autovalores repetidos e matrizes singulares exigem distinguir a unicidade das direções, a unicidade dos subespaços e a dimensão efetivamente ocupada pela variabilidade.</p>
+<section id="multiplicidade-de-autovalores" class="level4" data-number="14.14.4.1">
+<h4 data-number="14.14.4.1" class="anchored" data-anchor-id="multiplicidade-de-autovalores"><span class="header-section-number">14.14.4.1</span> Multiplicidade de autovalores</h4>
+<p>Os conceitos de multiplicidade algébrica e geométrica foram definidos na <a href="#def-multiplicidades-autovalor" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-multiplicidades-autovalor</span></a>. Como <span class="math inline">\(\boldsymbol{\Sigma}\)</span> é simétrica, o Teorema Espectral garante uma base ortonormal em cada autoespaço.</p>
+<p>Considere</p>
+<p><span class="math display">\[
+\lambda_j
+=
+\lambda_{j+1}.
+\]</span></p>
+<p>Qualquer base ortonormal do autoespaço associado pode ser utilizada. Assim, os vetores</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j
+\qquad\text{e}\qquad
+\boldsymbol{\alpha}_{j+1}
+\]</span></p>
+<p>não são individualmente determinados de forma única. O objeto determinado é o autoespaço associado ao autovalor repetido.</p>
+<p>Quando um autovalor é simples, sua direção principal é determinada até mudança de sinal. Quando há multiplicidade, diferentes rotações ortogonais dentro do autoespaço produzem conjuntos diferentes de autovetores igualmente válidos. A ACP identifica, nesse caso, o subespaço de variabilidade correspondente, e não eixos individuais únicos.</p>
+<p>A não unicidade das bases de um autoespaço com multiplicidade foi ilustrada na <a href="#fig-multiplicidades" class="quarto-xref">Figura&nbsp;<span class="quarto-unresolved-ref">fig-multiplicidades</span></a>. Na ACP, a mesma propriedade explica a condição de unicidade apresentada na <a href="#def-subespaco-principal-acp" class="quarto-xref">Definição&nbsp;<span class="quarto-unresolved-ref">def-subespaco-principal-acp</span></a> e na <a href="#prp-subespaco-principal-variancia" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-subespaco-principal-variancia</span></a>.</p>
+<p>Se</p>
+<p><span class="math display">\[
+\lambda_k
+&gt;
+\lambda_{k+1},
+\]</span></p>
+<p>o subespaço principal de dimensão <span class="math inline">\(k\)</span> é único. Se</p>
+<p><span class="math display">\[
+\lambda_k
+=
+\lambda_{k+1},
+\]</span></p>
+<p>o corte ocorre dentro de um autoespaço associado a um autovalor repetido. Nesse caso, diferentes subespaços de dimensão <span class="math inline">\(k\)</span> podem preservar a mesma variabilidade máxima.</p>
+<p>Mesmo sem igualdade exata, autovalores muito próximos podem tornar os autovetores individuais mais sensíveis a pequenas perturbações da matriz analisada. Nessa situação, a interpretação conjunta do subespaço pode ser mais estável do que a interpretação de cada direção isoladamente.</p>
+</section>
+<section id="singularidade-e-dimensão-efetiva" class="level4" data-number="14.14.4.2">
+<h4 data-number="14.14.4.2" class="anchored" data-anchor-id="singularidade-e-dimensão-efetiva"><span class="header-section-number">14.14.4.2</span> Singularidade e dimensão efetiva</h4>
+<p>A matriz de covariâncias pode ser singular. O Módulo 2 relacionou essa situação à existência de combinações lineares com variância zero na <a href="#prp-singularidade-matriz-covariancias" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-singularidade-matriz-covariancias</span></a>.</p>
+<p>Se</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\boldsymbol{\Sigma}
+\right)
+=
+r
+&lt;
+p,
+\]</span></p>
+<p>então exatamente <span class="math inline">\(r\)</span> autovalores são positivos:</p>
+<p><span class="math display">\[
+\lambda_1
+\geq
+\cdots
+\geq
+\lambda_r
+&gt;
+0,
+\]</span></p>
+<p>enquanto</p>
+<p><span class="math display">\[
+\lambda_{r+1}
+=
+\cdots
+=
+\lambda_p
+=
+0.
+\]</span></p>
+<p>A variabilidade populacional está inteiramente contida em um subespaço de dimensão <span class="math inline">\(r\)</span>. As componentes associadas aos autovalores nulos possuem variância zero e não acrescentam novas direções de variabilidade. Assim, a passagem de <span class="math inline">\(p\)</span> para <span class="math inline">\(r\)</span> dimensões pode ser realizada sem perda de variância.</p>
+<p>No nível amostral, a centralização implica</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf X_c
+\right)
+\leq
+n-1
+\]</span></p>
+<p>e, consequentemente,</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf S
+\right)
+\leq
+\min(p,n-1).
+\]</span></p>
+<p>Quando</p>
+<p><span class="math display">\[
+p
+\geq
+n,
+\]</span></p>
+<p>a matriz de covariâncias amostral é necessariamente singular, ainda que a matriz populacional não seja. A SVD representa diretamente o subespaço de variabilidade observado e continua aplicável sem exigir a inversão de <span class="math inline">\(\mathbf S\)</span>.</p>
+</section>
+</section>
+</section>
+<section id="formulação-descritiva-populacional-e-inferencial" class="level2" data-number="14.15">
+<h2 data-number="14.15" class="anchored" data-anchor-id="formulação-descritiva-populacional-e-inferencial"><span class="header-section-number">14.15</span> Formulação descritiva, populacional e inferencial</h2>
+<p>A ACP pode ser formulada sem hipótese de normalidade. No nível populacional, basta que <span class="math inline">\(\boldsymbol{\mathsf X}\)</span> possua momentos de segunda ordem finitos para que a matriz de covariâncias <span class="math inline">\(\boldsymbol{\Sigma}\)</span> e suas componentes principais estejam definidas.</p>
+<p>Na formulação <strong>descritiva</strong>, a matriz de dados observada é o objeto de interesse, e autovalores, direções e escores descrevem sua estrutura de variabilidade.</p>
+<p>Na formulação <strong>populacional</strong>, os autovalores</p>
+<p><span class="math display">\[
+\lambda_j
+\]</span></p>
+<p>e os autovetores unitários</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j
+\]</span></p>
+<p>são características da matriz populacional <span class="math inline">\(\boldsymbol{\Sigma}\)</span>. Quando uma amostra é utilizada para estudar essa estrutura, a matriz observada <span class="math inline">\(\mathbf S\)</span> fornece os correspondentes</p>
+<p><span class="math display">\[
+\widehat{\lambda}_j
+\qquad\text{e}\qquad
+\widehat{\boldsymbol{\alpha}}_j.
+\]</span></p>
+<p>Sob as condições de consistência da matriz de covariâncias amostral estabelecidas na <a href="#prp-consistencia-covariancia-amostral" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-consistencia-covariancia-amostral</span></a>, a solução amostral pode ser interpretada como estimativa da estrutura espectral populacional. A identificação de uma direção individual requer separação do autovalor correspondente; quando há multiplicidade, o objeto identificado é o autoespaço, como discutido na <a href="#sec-acp-multiplicidade-singularidade" class="quarto-xref"><span class="quarto-unresolved-ref">sec-acp-multiplicidade-singularidade</span></a>.</p>
+<p>A normalidade multivariada não é necessária para a formulação da ACP. Quando</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+\sim
+N_p
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right),
+\]</span></p>
+<p>a transformação ortogonal para as componentes produz</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf Y}
+=
+\mathbf A^\top
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}
+\right)
+\sim
+N_p
+\left(
+\mathbf0,
+\boldsymbol{\Lambda}
+\right).
+\]</span></p>
+<p>Nesse caso, as componentes são independentes. Sem normalidade conjunta, a ACP garante que componentes distintas sejam não correlacionadas, mas não necessariamente independentes.</p>
+<p>A inferência sobre autovalores, autovetores e subespaços requer hipóteses adicionais e teoria distribucional ou assintótica específica <span class="citation" data-cites="anderson2003">(<a href="#ref-anderson2003" role="doc-biblioref">Anderson, 2003</a>)</span>. Esses resultados não são necessários para a formulação da técnica desenvolvida neste capítulo.</p>
+</section>
+<section id="sec-acp-elementos-suplementares" class="level2" data-number="14.16">
+<h2 data-number="14.16" class="anchored" data-anchor-id="sec-acp-elementos-suplementares"><span class="header-section-number">14.16</span> Aprofundamento: elementos ativos e suplementares na ACP</h2>
+<p>A formulação desenvolvida até aqui utilizou todas as variáveis selecionadas para construir a matriz de covariâncias ou de correlações e, a partir dela, determinar autovalores, autovetores e componentes principais. Esses elementos podem ser denominados <strong>ativos</strong>, pois participam diretamente da determinação da solução.</p>
+<p>Uma vez construído o espaço principal, outros elementos podem ser relacionados a essa representação sem participar da determinação das direções principais. Esses elementos são denominados <strong>suplementares</strong>.</p>
+<p>A distinção entre elementos ativos e suplementares está, portanto, no papel que desempenham na análise: os elementos ativos participam da construção da solução, enquanto os elementos suplementares são projetados ou relacionados à solução já construída.</p>
+<section id="observações-suplementares" class="level3" data-number="14.16.1">
+<h3 data-number="14.16.1" class="anchored" data-anchor-id="observações-suplementares"><span class="header-section-number">14.16.1</span> Observações suplementares</h3>
+<p>Considere uma nova observação</p>
+<p><span class="math display">\[
+\mathbf x_*
+\in
+\mathbb R^p
+\]</span></p>
+<p>que não tenha participado do cálculo da matriz de covariâncias e das direções principais. Mantendo a solução obtida a partir das observações ativas, sua coordenada na componente <span class="math inline">\(j\)</span> pode ser calculada por</p>
+<p><span id="eq-acp-observacao-suplementar"><span class="math display">\[
+t_{*j}
+=
+\widehat{\boldsymbol{\alpha}}_j^\top
+\left(
+\mathbf x_*-\bar{\mathbf x}
+\right).
+\tag{14.6}\]</span></span></p>
+<p>A observação é, portanto, projetada sobre direções já determinadas. Ela recebe coordenadas no espaço principal, mas não modifica</p>
+<p><span class="math display">\[
+\widehat{\lambda}_j
+\qquad\text{nem}\qquad
+\widehat{\boldsymbol{\alpha}}_j.
+\]</span></p>
+<p>Quando a ACP é realizada sobre variáveis padronizadas, a observação suplementar deve ser centralizada e padronizada utilizando as médias e os desvios-padrão empregados na construção da solução, e não parâmetros recalculados a partir da nova observação.</p>
+<p>Essa projeção utiliza diretamente a teoria de projeções em subespaços desenvolvida anteriormente: uma vez definida a base do espaço principal, outros vetores podem ser representados nessa base sem que ela precise ser novamente estimada.</p>
+</section>
+<section id="variáveis-quantitativas-suplementares" class="level3" data-number="14.16.2">
+<h3 data-number="14.16.2" class="anchored" data-anchor-id="variáveis-quantitativas-suplementares"><span class="header-section-number">14.16.2</span> Variáveis quantitativas suplementares</h3>
+<p>Uma variável quantitativa suplementar não participa da matriz utilizada para determinar as componentes principais. Depois que os escores das observações ativas são obtidos, a variável suplementar pode ser relacionada às componentes, por exemplo, por meio de suas correlações com os escores.</p>
+<p>Assim, uma associação elevada entre uma variável suplementar e determinada componente auxilia a interpretação dessa dimensão, mas não significa que a variável tenha participado da construção do eixo.</p>
+<p>Essa distinção é especialmente importante porque duas variáveis podem apresentar relações semelhantes com uma componente mesmo quando apenas uma delas foi utilizada para construir a solução.</p>
+</section>
+<section id="variáveis-categóricas-suplementares" class="level3" data-number="14.16.3">
+<h3 data-number="14.16.3" class="anchored" data-anchor-id="variáveis-categóricas-suplementares"><span class="header-section-number">14.16.3</span> Variáveis categóricas suplementares</h3>
+<p>Uma variável categórica não integra diretamente a matriz de covariâncias ou de correlações da ACP clássica desenvolvida neste capítulo. Ela pode, entretanto, ser utilizada posteriormente para interpretar a distribuição das observações no espaço principal.</p>
+<p>As categorias podem identificar subconjuntos de observações e permitir examinar se determinados grupos ocupam regiões distintas da representação. Como a variável é suplementar, essa informação é utilizada para interpretar a configuração obtida, sem alterar as componentes principais.</p>
+<p>A utilização de elementos suplementares preserva a separação entre a construção das dimensões, determinada pelos elementos ativos, e a projeção posterior de informações adicionais para interpretação. Desse modo, informações auxiliares podem ser incorporadas sem modificar o critério de máxima variabilidade que definiu as componentes.</p>
+</section>
+</section>
+<section id="limites-da-representação-por-componentes-principais" class="level2" data-number="14.17">
+<h2 data-number="14.17" class="anchored" data-anchor-id="limites-da-representação-por-componentes-principais"><span class="header-section-number">14.17</span> Limites da representação por componentes principais</h2>
+<p>A ACP resolve um problema definido de forma precisa: encontrar combinações lineares e subespaços que preservem variabilidade segundo uma matriz de covariâncias ou correlações. Os limites da técnica decorrem diretamente dessa formulação e são sintetizados na <a href="#tbl-limites-acp" class="quarto-xref">Tabela&nbsp;<span class="quarto-unresolved-ref">tbl-limites-acp</span></a>.</p>
+<div id="tbl-limites-acp" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-limites-acp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;14.5: Limites decorrentes da formulação clássica da Análise de Componentes Principais.
+</figcaption>
+<div aria-describedby="tbl-limites-acp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Aspecto</th>
+<th>Consequência para a ACP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Critério de importância</td>
+<td>As componentes são ordenadas pela variância. Uma direção de pequena variabilidade pode ser relevante para outro objetivo estatístico.</td>
+</tr>
+<tr class="even">
+<td>Estrutura representada</td>
+<td>As componentes são combinações lineares e utilizam covariâncias ou correlações. Estruturas essencialmente não lineares podem não ser concentradas em poucas componentes.</td>
+</tr>
+<tr class="odd">
+<td>Conjunto de variáveis</td>
+<td>Inclusão, exclusão, transformação ou mudança de escala altera a matriz analisada e pode modificar toda a solução.</td>
+</tr>
+<tr class="even">
+<td>Sensibilidade da matriz de entrada</td>
+<td>Valores extremos podem alterar variâncias, covariâncias, correlações e, consequentemente, autovalores e autovetores.</td>
+</tr>
+<tr class="odd">
+<td>Redução de dimensão</td>
+<td>Quando são descartadas direções com autovalores positivos, parte da variabilidade original deixa de ser representada.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Quando são retidas menos dimensões do que o posto efetivo da matriz analisada, parte da variabilidade é necessariamente descartada. Pela <a href="#prp-acp-variancia-reconstrucao" class="quarto-xref">Proposição&nbsp;<span class="quarto-unresolved-ref">prp-acp-variancia-reconstrucao</span></a>, essa perda corresponde à soma dos autovalores associados às direções excluídas. Toda a variabilidade é preservada apenas quando as dimensões descartadas possuem autovalores nulos.</p>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Correspondência com a implementação utilizada
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nas atividades computacionais, a ACP será realizada pelo módulo <a href="https://sebastien-le.github.io/medasite/"><code>MEDA</code></a> <span class="citation" data-cites="meda2026">(<a href="#ref-meda2026" role="doc-biblioref">Leblay et al., 2026</a>)</span> do <a href="https://www.jamovi.org/">jamovi</a> <span class="citation" data-cites="jamovi2026">(<a href="#ref-jamovi2026" role="doc-biblioref">The jamovi project, 2026</a>)</span>. O <code>MEDA</code> fornece uma interface para procedimentos de análise multivariada implementados no pacote <code>FactoMineR</code> <span class="citation" data-cites="le2008factominer">(<a href="#ref-le2008factominer" role="doc-biblioref">Lê; Josse; Husson, 2008</a>)</span>. A opção <em>Scale to unit variance</em> controla a padronização das variáveis quantitativas ativas antes da construção das componentes.</p>
+<p>Quando essa opção é utilizada, cada variável ativa é colocada em escala de variância unitária, e a solução corresponde à formulação da ACP baseada em correlações desenvolvida na <a href="#sec-acp-matriz-correlacoes" class="quarto-xref"><span class="quarto-unresolved-ref">sec-acp-matriz-correlacoes</span></a>. Quando a padronização não é utilizada, as diferenças de escala entre as variáveis são preservadas, correspondendo conceitualmente à formulação baseada em covariâncias.</p>
+<p>As saídas de coordenadas, contribuições e <span class="math inline">\(\cos^2\)</span> correspondem aos objetos definidos na <a href="#sec-acp-representacao" class="quarto-xref"><span class="quarto-unresolved-ref">sec-acp-representacao</span></a>. As coordenadas indicam a posição das observações ou variáveis nas dimensões principais, as contribuições quantificam sua participação na construção de uma dimensão e os <span class="math inline">\(\cos^2\)</span> descrevem a qualidade de representação em relação às dimensões consideradas.</p>
+<p>O <code>MEDA</code> também permite distinguir variáveis quantitativas ativas de variáveis quantitativas ou categóricas suplementares. As variáveis ativas participam da determinação das componentes; as suplementares são relacionadas posteriormente à solução, conforme discutido na <a href="#sec-acp-elementos-suplementares" class="quarto-xref"><span class="quarto-unresolved-ref">sec-acp-elementos-suplementares</span></a>.</p>
+<p>Na implementação adotada, a padronização para variância unitária é a configuração inicial. A decisão de mantê-la ou removê-la deve decorrer do significado das escalas das variáveis e do objetivo da análise, e não apenas da configuração padrão do programa.</p>
+</div>
+</div>
+</section>
+<section id="síntese" class="level2" data-number="14.18">
+<h2 data-number="14.18" class="anchored" data-anchor-id="síntese"><span class="header-section-number">14.18</span> Síntese</h2>
+<p>A Análise de Componentes Principais representa a variabilidade multivariada por meio de combinações lineares construídas em direções ortonormais. Para o vetor centralizado <span class="math inline">\(\boldsymbol{\mathsf X}_c\)</span>, as componentes populacionais são</p>
+<p><span class="math display">\[
+Y_j
+=
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\mathsf X}_c,
+\]</span></p>
+<p>em que <span class="math inline">\(\boldsymbol{\alpha}_j\)</span> é um autovetor unitário de <span class="math inline">\(\boldsymbol{\Sigma}\)</span> associado ao autovalor <span class="math inline">\(\lambda_j\)</span>. As componentes são não correlacionadas e satisfazem</p>
+<p><span class="math display">\[
+\operatorname{Var}(Y_j)
+=
+\lambda_j.
+\]</span></p>
+<p>Os autovetores associados aos <span class="math inline">\(k\)</span> maiores autovalores formam</p>
+<p><span class="math display">\[
+\mathbf A_k
+=
+\begin{pmatrix}
+\boldsymbol{\alpha}_1&amp;
+\cdots&amp;
+\boldsymbol{\alpha}_k
+\end{pmatrix},
+\]</span></p>
+<p>cujas colunas geram o subespaço principal. A projeção sobre esse subespaço preserva a maior variabilidade possível entre todos os subespaços de mesma dimensão e, de forma equivalente, minimiza o erro quadrático de reconstrução.</p>
+<p>No nível amostral, a construção é aplicada à matriz de covariâncias <span class="math inline">\(\mathbf S\)</span> ou à matriz de correlações <span class="math inline">\(\mathbf R\)</span>. A SVD da matriz de dados centralizada fornece uma formulação equivalente, relacionando valores singulares, direções principais, autovalores e escores. A escolha entre covariâncias e correlações determina se as diferenças de escala entre as variáveis participam diretamente da geometria da solução.</p>
+<p>A definição da ACP exige momentos de segunda ordem finitos, mas não normalidade multivariada. A normalidade torna-se relevante quando se deseja desenvolver resultados inferenciais específicos sobre a estrutura populacional.</p>
+<p>No próximo capítulo, o problema deixa de ser a representação da variabilidade total e passa a ser a modelagem da estrutura comum entre as variáveis. A Análise Fatorial introduz fatores latentes e separa a variância comum da variância específica.</p>
+
+
+<div id="refs" class="references csl-bib-body" data-entry-spacing="1" role="list">
+<div id="ref-anderson2003" class="csl-entry" role="listitem">
+ANDERSON, Theodore W. <strong><a href="https://www.wiley.com/en-us/An+Introduction+to+Multivariate+Statistical+Analysis%2C+3rd+Edition-p-9780471360919">An Introduction to Multivariate Statistical Analysis</a></strong>. 3. ed. Hoboken, NJ: John Wiley &amp; Sons, 2003. p. 752
+</div>
+<div id="ref-jolliffe2002pca" class="csl-entry" role="listitem">
+JOLLIFFE, Ian T. <strong><a href="https://doi.org/10.1007/b98835">Principal Component Analysis</a></strong>. 2. ed. New York: Springer, 2002. p. 488
+</div>
+<div id="ref-le2008factominer" class="csl-entry" role="listitem">
+LÊ, Sébastien; JOSSE, Julie; HUSSON, François. <a href="https://doi.org/10.18637/jss.v025.i01"><span>FactoMineR</span>: A Package for Multivariate Analysis</a>. <strong>Journal of Statistical Software</strong>, v. 25, n. 1, p. 1–18, 2008.
+</div>
+<div id="ref-meda2026" class="csl-entry" role="listitem">
+LEBLAY, Thomas <em>et al.</em> <strong><span>MEDA</span>: Multivariate Exploratory Data Analysis with jamovi and FactoMineR</strong>. Disponível em: &lt;<a href="https://sebastien-le.github.io/medasite/">https://sebastien-le.github.io/medasite/</a>&gt;. Acesso em: 1 set. 2026.
+</div>
+<div id="ref-jamovi2026" class="csl-entry" role="listitem">
+THE JAMOVI PROJECT. <strong>jamovi (Version 2.7) [Computer Software]</strong>., 2026. Disponível em: &lt;<a href="https://www.jamovi.org">https://www.jamovi.org</a>&gt;. Acesso em: 1 set. 2026
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiada");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiada");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./mod_3_estruturas.html" class="pagination-link" aria-label="Problemas e estruturas das técnicas multivariadas">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Problemas e estruturas das técnicas multivariadas</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./mod_3_fatorial.html" class="pagination-link" aria-label="Formulação da Análise Fatorial">
+        <span class="nav-page-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Formulação da Análise Fatorial</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
