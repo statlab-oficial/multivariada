@@ -1,0 +1,3972 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.23">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>19&nbsp; Formulação da Análise Discriminante</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 1em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="next">
+<link href="./mod_3_manova.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-1fe81d0376b2c50856e68e651e390326.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-6f6599830d51be977da3b6af758f8eff.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-1fe81d0376b2c50856e68e651e390326.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-2641b481724464e61c86985d8c912b6f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-4c6d65c679321d81af7ec8b61b1d5a24.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-2641b481724464e61c86985d8c912b6f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Nenhum resultado",
+    "search-matching-documents-text": "documentos correspondentes",
+    "search-copy-link-title": "Copiar link para a busca",
+    "search-hide-matches-text": "Esconder correspondências adicionais",
+    "search-more-match-text": "mais correspondência neste documento",
+    "search-more-matches-text": "mais correspondências neste documento",
+    "search-clear-button-title": "Limpar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Procurar"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./mod_3_estruturas.html">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</a></li><li class="breadcrumb-item"><a href="./mod_3_discriminante.html"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Formulação da Análise Discriminante</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Procurar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
+      <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo escuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Procurar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Informações Legais e Declaração de Uso de Inteligência Artificial</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./prefacio_multivariada.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./identifica_multivariada.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Identificação da Disciplina</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo I — Fundamentos Matemáticos e Geométricos da Análise Multivariada</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_vetores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Vetores e representação dos dados multivariados</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_matrizes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Álgebra matricial aplicada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_espacos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Espaços vetoriais, bases e projeções</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_transformacoes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Transformações lineares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_autovetores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Autovalores, autovetores e decomposição espectral</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_svd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Decomposição em Valores Singulares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_calculo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Cálculo Diferencial, Integral e Matricial Aplicado à Estatística Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_exc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercícios de fixação do Módulo I</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo II — Fundamentos Probabilísticos e Inferenciais da Análise Multivariada</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_covariancias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Matrizes de covariâncias e correlações</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_normal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Distribuição Normal Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_amostrais.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Estatísticas Amostrais e Estimação</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_modelo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Modelo Linear Multivariado e Hipóteses Lineares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_inferencia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Inferência Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_exc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercícios de fixação do Módulo II</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_estruturas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Problemas e estruturas das técnicas multivariadas</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_cp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Formulação da Análise de Componentes Principais</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_fatorial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Formulação da Análise Fatorial</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_agrupamento.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Formulação da Análise de Agrupamentos</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_correspondencia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Formulação da Análise de Correspondência</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_manova.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Formulação da MANOVA</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_discriminante.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Formulação da Análise Discriminante</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referências</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Índice</h2>
+   
+  <ul>
+  <li><a href="#o-problema-de-discriminação-e-classificação" id="toc-o-problema-de-discriminação-e-classificação" class="nav-link active" data-scroll-target="#o-problema-de-discriminação-e-classificação"><span class="header-section-number">19.1</span> O problema de discriminação e classificação</a></li>
+  <li><a href="#classificação-como-problema-de-decisão" id="toc-classificação-como-problema-de-decisão" class="nav-link" data-scroll-target="#classificação-como-problema-de-decisão"><span class="header-section-number">19.2</span> Classificação como problema de decisão</a>
+  <ul class="collapse">
+  <li><a href="#probabilidades-a-priori-e-posteriores" id="toc-probabilidades-a-priori-e-posteriores" class="nav-link" data-scroll-target="#probabilidades-a-priori-e-posteriores"><span class="header-section-number">19.2.1</span> Probabilidades a priori e posteriores</a></li>
+  <li><a href="#regra-de-bayes-sob-perda-zeroum" id="toc-regra-de-bayes-sob-perda-zeroum" class="nav-link" data-scroll-target="#regra-de-bayes-sob-perda-zeroum"><span class="header-section-number">19.2.2</span> Regra de Bayes sob perda zero–um</a></li>
+  <li><a href="#aprofundamento-perdas-e-risco-de-classificação" id="toc-aprofundamento-perdas-e-risco-de-classificação" class="nav-link" data-scroll-target="#aprofundamento-perdas-e-risco-de-classificação"><span class="header-section-number">19.2.3</span> Aprofundamento: perdas e risco de classificação</a></li>
+  </ul></li>
+  <li><a href="#sec-discriminante-lda" id="toc-sec-discriminante-lda" class="nav-link" data-scroll-target="#sec-discriminante-lda"><span class="header-section-number">19.3</span> Discriminação linear sob normalidade</a>
+  <ul class="collapse">
+  <li><a href="#fronteiras-e-distância-de-mahalanobis" id="toc-fronteiras-e-distância-de-mahalanobis" class="nav-link" data-scroll-target="#fronteiras-e-distância-de-mahalanobis"><span class="header-section-number">19.3.1</span> Fronteiras e distância de Mahalanobis</a></li>
+  </ul></li>
+  <li><a href="#sec-discriminante-qda" id="toc-sec-discriminante-qda" class="nav-link" data-scroll-target="#sec-discriminante-qda"><span class="header-section-number">19.4</span> Discriminação quadrática</a>
+  <ul class="collapse">
+  <li><a href="#fronteiras-e-comparação-com-a-lda" id="toc-fronteiras-e-comparação-com-a-lda" class="nav-link" data-scroll-target="#fronteiras-e-comparação-com-a-lda"><span class="header-section-number">19.4.1</span> Fronteiras e comparação com a LDA</a></li>
+  <li><a href="#aprofundamento-forma-explícita-da-fronteira-quadrática" id="toc-aprofundamento-forma-explícita-da-fronteira-quadrática" class="nav-link" data-scroll-target="#aprofundamento-forma-explícita-da-fronteira-quadrática"><span class="header-section-number">19.4.2</span> Aprofundamento: forma explícita da fronteira quadrática</a></li>
+  </ul></li>
+  <li><a href="#sec-discriminante-regra-estimada" id="toc-sec-discriminante-regra-estimada" class="nav-link" data-scroll-target="#sec-discriminante-regra-estimada"><span class="header-section-number">19.5</span> Da regra populacional à regra estimada</a>
+  <ul class="collapse">
+  <li><a href="#covariância-comum-na-lda" id="toc-covariância-comum-na-lda" class="nav-link" data-scroll-target="#covariância-comum-na-lda"><span class="header-section-number">19.5.1</span> Covariância comum na LDA</a></li>
+  <li><a href="#probabilidades-a-priori" id="toc-probabilidades-a-priori" class="nav-link" data-scroll-target="#probabilidades-a-priori"><span class="header-section-number">19.5.2</span> Probabilidades <em>a priori</em></a></li>
+  <li><a href="#regra-estimada-da-lda" id="toc-regra-estimada-da-lda" class="nav-link" data-scroll-target="#regra-estimada-da-lda"><span class="header-section-number">19.5.3</span> Regra estimada da LDA</a></li>
+  <li><a href="#regra-estimada-da-qda" id="toc-regra-estimada-da-qda" class="nav-link" data-scroll-target="#regra-estimada-da-qda"><span class="header-section-number">19.5.4</span> Regra estimada da QDA</a></li>
+  <li><a href="#aprofundamento-erro-aparente-e-erro-em-novas-observações" id="toc-aprofundamento-erro-aparente-e-erro-em-novas-observações" class="nav-link" data-scroll-target="#aprofundamento-erro-aparente-e-erro-em-novas-observações"><span class="header-section-number">19.5.5</span> Aprofundamento: erro aparente e erro em novas observações</a></li>
+  </ul></li>
+  <li><a href="#sec-discriminante-fisher" id="toc-sec-discriminante-fisher" class="nav-link" data-scroll-target="#sec-discriminante-fisher"><span class="header-section-number">19.6</span> Formulação geométrica de Fisher</a>
+  <ul class="collapse">
+  <li><a href="#dispersões-populacionais-dentro-e-entre-grupos" id="toc-dispersões-populacionais-dentro-e-entre-grupos" class="nav-link" data-scroll-target="#dispersões-populacionais-dentro-e-entre-grupos"><span class="header-section-number">19.6.1</span> Dispersões populacionais dentro e entre grupos</a></li>
+  <li><a href="#sec-discriminante-decomposicao-covariancia" id="toc-sec-discriminante-decomposicao-covariancia" class="nav-link" data-scroll-target="#sec-discriminante-decomposicao-covariancia"><span class="header-section-number">19.6.2</span> Aprofundamento: decomposição da covariância por grupos</a></li>
+  <li><a href="#dispersões-projetadas" id="toc-dispersões-projetadas" class="nav-link" data-scroll-target="#dispersões-projetadas"><span class="header-section-number">19.6.3</span> Dispersões projetadas</a></li>
+  </ul></li>
+  <li><a href="#formulação-amostral-de-fisher" id="toc-formulação-amostral-de-fisher" class="nav-link" data-scroll-target="#formulação-amostral-de-fisher"><span class="header-section-number">19.7</span> Formulação amostral de Fisher</a></li>
+  <li><a href="#direções-discriminantes-e-autovalores-generalizados" id="toc-direções-discriminantes-e-autovalores-generalizados" class="nav-link" data-scroll-target="#direções-discriminantes-e-autovalores-generalizados"><span class="header-section-number">19.8</span> Direções discriminantes e autovalores generalizados</a>
+  <ul class="collapse">
+  <li><a href="#geometria-pela-dispersão-intragrupos" id="toc-geometria-pela-dispersão-intragrupos" class="nav-link" data-scroll-target="#geometria-pela-dispersão-intragrupos"><span class="header-section-number">19.8.1</span> Geometria pela dispersão intragrupos</a></li>
+  <li><a href="#número-de-direções-discriminantes" id="toc-número-de-direções-discriminantes" class="nav-link" data-scroll-target="#número-de-direções-discriminantes"><span class="header-section-number">19.8.2</span> Número de direções discriminantes</a></li>
+  </ul></li>
+  <li><a href="#sec-discriminante-representacao" id="toc-sec-discriminante-representacao" class="nav-link" data-scroll-target="#sec-discriminante-representacao"><span class="header-section-number">19.9</span> Representação no subespaço discriminante</a>
+  <ul class="collapse">
+  <li><a href="#aprofundamento-coeficientes-das-funções-discriminantes" id="toc-aprofundamento-coeficientes-das-funções-discriminantes" class="nav-link" data-scroll-target="#aprofundamento-coeficientes-das-funções-discriminantes"><span class="header-section-number">19.9.1</span> Aprofundamento: coeficientes das funções discriminantes</a></li>
+  </ul></li>
+  <li><a href="#relação-espectral-com-a-manova" id="toc-relação-espectral-com-a-manova" class="nav-link" data-scroll-target="#relação-espectral-com-a-manova"><span class="header-section-number">19.10</span> Relação espectral com a MANOVA</a></li>
+  <li><a href="#dois-grupos-e-relação-entre-fisher-e-lda" id="toc-dois-grupos-e-relação-entre-fisher-e-lda" class="nav-link" data-scroll-target="#dois-grupos-e-relação-entre-fisher-e-lda"><span class="header-section-number">19.11</span> Dois grupos e relação entre Fisher e LDA</a>
+  <ul class="collapse">
+  <li><a href="#formulação-populacional-para-dois-grupos" id="toc-formulação-populacional-para-dois-grupos" class="nav-link" data-scroll-target="#formulação-populacional-para-dois-grupos"><span class="header-section-number">19.11.1</span> Formulação populacional para dois grupos</a></li>
+  <li><a href="#relação-com-a-discriminação-linear-normal" id="toc-relação-com-a-discriminação-linear-normal" class="nav-link" data-scroll-target="#relação-com-a-discriminação-linear-normal"><span class="header-section-number">19.11.2</span> Relação com a discriminação linear normal</a></li>
+  <li><a href="#aprofundamento-relação-amostral-entre-fisher-e-lda" id="toc-aprofundamento-relação-amostral-entre-fisher-e-lda" class="nav-link" data-scroll-target="#aprofundamento-relação-amostral-entre-fisher-e-lda"><span class="header-section-number">19.11.3</span> Aprofundamento: relação amostral entre Fisher e LDA</a></li>
+  <li><a href="#mais-de-dois-grupos" id="toc-mais-de-dois-grupos" class="nav-link" data-scroll-target="#mais-de-dois-grupos"><span class="header-section-number">19.11.4</span> Mais de dois grupos</a></li>
+  </ul></li>
+  <li><a href="#sec-discriminante-pressupostos" id="toc-sec-discriminante-pressupostos" class="nav-link" data-scroll-target="#sec-discriminante-pressupostos"><span class="header-section-number">19.12</span> Pressupostos e limites</a>
+  <ul class="collapse">
+  <li><a href="#grupos-previamente-definidos" id="toc-grupos-previamente-definidos" class="nav-link" data-scroll-target="#grupos-previamente-definidos"><span class="header-section-number">19.12.1</span> Grupos previamente definidos</a></li>
+  <li><a href="#normalidade-e-estrutura-das-covariâncias" id="toc-normalidade-e-estrutura-das-covariâncias" class="nav-link" data-scroll-target="#normalidade-e-estrutura-das-covariâncias"><span class="header-section-number">19.12.2</span> Normalidade e estrutura das covariâncias</a></li>
+  <li><a href="#não-singularidade-e-dimensão" id="toc-não-singularidade-e-dimensão" class="nav-link" data-scroll-target="#não-singularidade-e-dimensão"><span class="header-section-number">19.12.3</span> Não singularidade e dimensão</a></li>
+  <li><a href="#independência-das-unidades-de-treinamento" id="toc-independência-das-unidades-de-treinamento" class="nav-link" data-scroll-target="#independência-das-unidades-de-treinamento"><span class="header-section-number">19.12.4</span> Independência das unidades de treinamento</a></li>
+  <li><a href="#probabilidades-a-priori-e-perdas" id="toc-probabilidades-a-priori-e-perdas" class="nav-link" data-scroll-target="#probabilidades-a-priori-e-perdas"><span class="header-section-number">19.12.5</span> Probabilidades <em>a priori</em> e perdas</a></li>
+  <li><a href="#identificação-das-direções-discriminantes" id="toc-identificação-das-direções-discriminantes" class="nav-link" data-scroll-target="#identificação-das-direções-discriminantes"><span class="header-section-number">19.12.6</span> Identificação das direções discriminantes</a></li>
+  <li><a href="#sobreposição-entre-as-classes" id="toc-sobreposição-entre-as-classes" class="nav-link" data-scroll-target="#sobreposição-entre-as-classes"><span class="header-section-number">19.12.7</span> Sobreposição entre as classes</a></li>
+  </ul></li>
+  <li><a href="#relações-com-outras-técnicas" id="toc-relações-com-outras-técnicas" class="nav-link" data-scroll-target="#relações-com-outras-técnicas"><span class="header-section-number">19.13</span> Relações com outras técnicas</a>
+  <ul class="collapse">
+  <li><a href="#análise-de-componentes-principais" id="toc-análise-de-componentes-principais" class="nav-link" data-scroll-target="#análise-de-componentes-principais"><span class="header-section-number">19.13.1</span> Análise de Componentes Principais</a></li>
+  <li><a href="#análise-de-agrupamentos" id="toc-análise-de-agrupamentos" class="nav-link" data-scroll-target="#análise-de-agrupamentos"><span class="header-section-number">19.13.2</span> Análise de Agrupamentos</a></li>
+  </ul></li>
+  <li><a href="#síntese" id="toc-síntese" class="nav-link" data-scroll-target="#síntese"><span class="header-section-number">19.14</span> Síntese</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./mod_3_estruturas.html">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</a></li><li class="breadcrumb-item"><a href="./mod_3_discriminante.html"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Formulação da Análise Discriminante</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-discriminante" class="quarto-section-identifier"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Formulação da Análise Discriminante</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A Análise Discriminante utiliza grupos previamente conhecidos para resolver dois problemas relacionados: representar a separação entre os grupos e construir regras para classificar novas observações.</p>
+<p>Duas formulações serão desenvolvidas. Na formulação probabilística, as classes são descritas por distribuições condicionais e a classificação é tratada como um problema de decisão envolvendo probabilidades <em>a priori</em>, perdas e probabilidades posteriores. Na formulação geométrica de Fisher, procuram-se combinações lineares que maximizem a separação entre grupos relativamente à dispersão intragrupos <span class="citation" data-cites="rencher2012">(<a href="references.html#ref-rencher2012" role="doc-biblioref">Rencher; Christensen, 2012</a>)</span>.</p>
+<p>As duas formulações possuem objetivos distintos. A primeira produz regras de classificação; a segunda constrói direções que representam a separação entre grupos conhecidos. Sob condições específicas, suas soluções podem estar relacionadas.</p>
+<p>Parâmetros populacionais, quantidades amostrais e regras estimadas serão distinguidos ao longo do capítulo. Algoritmos, regularização, seleção de variáveis e avaliação preditiva pertencem à etapa metodológica posterior.</p>
+<p>A <a href="#tbl-estrutura-discriminante" class="quarto-xref">Tabela&nbsp;<span>19.1</span></a> resume as formulações utilizadas.</p>
+<div id="tbl-estrutura-discriminante" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-estrutura-discriminante-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;19.1: Formulações complementares da Análise Discriminante.
+</figcaption>
+<div aria-describedby="tbl-estrutura-discriminante-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Formulação</th>
+<th>Objeto de partida</th>
+<th>Problema</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>decisão estatística</td>
+<td>densidades condicionais, probabilidades <em>a priori</em> e perdas</td>
+<td>escolher uma ação para uma nova observação</td>
+<td>regra de Bayes</td>
+</tr>
+<tr class="even">
+<td>normal com covariância comum</td>
+<td><span class="math inline">\(\boldsymbol{\mu}_k\)</span>, <span class="math inline">\(\boldsymbol{\Sigma}\)</span> e <span class="math inline">\(\pi_k\)</span></td>
+<td>minimizar risco sob perda zero–um</td>
+<td>regra discriminante linear</td>
+</tr>
+<tr class="odd">
+<td>normal com covariâncias distintas</td>
+<td><span class="math inline">\(\boldsymbol{\mu}_k\)</span>, <span class="math inline">\(\boldsymbol{\Sigma}_k\)</span> e <span class="math inline">\(\pi_k\)</span></td>
+<td>minimizar risco sob perda zero–um</td>
+<td>regra discriminante quadrática</td>
+</tr>
+<tr class="even">
+<td>geométrica de Fisher</td>
+<td>dispersões intragrupos e entre grupos</td>
+<td>maximizar separação relativa</td>
+<td>direções e coordenadas discriminantes</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<section id="o-problema-de-discriminação-e-classificação" class="level2" data-number="19.1">
+<h2 data-number="19.1" class="anchored" data-anchor-id="o-problema-de-discriminação-e-classificação"><span class="header-section-number">19.1</span> O problema de discriminação e classificação</h2>
+<p>Considere uma variável aleatória de classe</p>
+<p><span class="math display">\[
+\mathsf C
+\in
+\{1,\ldots,K\},
+\qquad
+K\geq2.
+\]</span></p>
+<p>A variável <span class="math inline">\(\mathsf C\)</span> é categórica, conforme a distinção apresentada na <a href="mod_1_vetores.html#sec-natureza-variaveis" class="quarto-xref"><span>Seção 1.2</span></a>. Os valores <span class="math inline">\(1,\ldots,K\)</span> funcionam como rótulos das classes e não como medidas quantitativas. Sua ordem ou suas diferenças numéricas não participam da definição da Análise Discriminante.</p>
+<p>Considere também um vetor aleatório de características quantitativas</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+=
+\begin{pmatrix}
+\mathsf X_1\\
+\vdots\\
+\mathsf X_p
+\end{pmatrix}
+\in
+\mathbb R^p.
+\]</span></p>
+<p>Para cada classe</p>
+<p><span class="math display">\[
+k\in\{1,\ldots,K\},
+\]</span></p>
+<p>existe uma distribuição condicional de</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+\mid
+\mathsf C=k.
+\]</span></p>
+<p>Uma realização</p>
+<p><span class="math display">\[
+\mathbf x
+\in
+\mathbb R^p
+\]</span></p>
+<p>representa os valores observados das características de uma unidade.</p>
+<p>Durante a construção da técnica, os rótulos das unidades utilizadas para caracterizar os grupos são conhecidos. A Análise Discriminante é, portanto, uma técnica supervisionada.</p>
+<p>Na <strong>discriminação</strong>, procura-se construir funções ou direções que representem a separação entre os grupos. Na <strong>classificação</strong>, procura-se uma regra</p>
+<p><span class="math display">\[
+\psi:
+\mathbb R^p
+\longrightarrow
+\{1,\ldots,K\}
+\]</span></p>
+<p>que associe uma nova observação <span class="math inline">\(\mathbf x\)</span> a uma das classes.</p>
+<p>A qualidade preditiva de uma regra estimada constitui um problema adicional. Taxas de erro, matrizes de confusão, validação cruzada e outros procedimentos de avaliação pertencem à etapa metodológica e não serão utilizados para definir a regra neste capítulo.</p>
+</section>
+<section id="classificação-como-problema-de-decisão" class="level2" data-number="19.2">
+<h2 data-number="19.2" class="anchored" data-anchor-id="classificação-como-problema-de-decisão"><span class="header-section-number">19.2</span> Classificação como problema de decisão</h2>
+<p>A classificação pode ser formulada como um problema de decisão. Para uma observação</p>
+<p><span class="math display">\[
+\mathbf x
+\in
+\mathbb R^p,
+\]</span></p>
+<p>deve-se escolher uma ação</p>
+<p><span class="math display">\[
+a
+\in
+\mathcal A,
+\qquad
+\mathcal A
+=
+\{1,\ldots,K\}.
+\]</span></p>
+<p>A ação <span class="math inline">\(a\)</span> significa atribuir a observação à classe <span class="math inline">\(a\)</span>. A decisão depende das probabilidades <em>a priori</em>, das distribuições condicionais das características e das perdas associadas às possíveis classificações.</p>
+<section id="probabilidades-a-priori-e-posteriores" class="level3" data-number="19.2.1">
+<h3 data-number="19.2.1" class="anchored" data-anchor-id="probabilidades-a-priori-e-posteriores"><span class="header-section-number">19.2.1</span> Probabilidades a priori e posteriores</h3>
+<div id="def-probabilidades-priori-discriminante" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.1 (Probabilidades a priori das classes)</strong></span> Seja</p>
+<p><span class="math display">\[
+\mathsf C
+\in
+\{1,\ldots,K\}
+\]</span></p>
+<p>uma variável aleatória de classe.</p>
+<p>As <strong>probabilidades a priori</strong> são</p>
+<p><span class="math display">\[
+\pi_k
+=
+P
+\left(
+\mathsf C=k
+\right),
+\qquad
+k=1,\ldots,K,
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\pi_k&gt;0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\sum_{k=1}^{K}
+\pi_k
+=
+1.
+\]</span></p>
+</div>
+<p>As probabilidades <em>a priori</em> descrevem a distribuição das classes antes da observação das características da nova unidade. Elas são parâmetros do problema de decisão e não devem ser identificadas automaticamente com as proporções das classes em uma amostra de treinamento.</p>
+<p>Suponha que, para cada classe <span class="math inline">\(k\)</span>,</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+\mid
+\mathsf C=k
+\]</span></p>
+<p>possua densidade condicional</p>
+<p><span class="math display">\[
+f_k(\mathbf x)
+=
+f
+\left(
+\mathbf x
+\mid
+\mathsf C=k
+\right).
+\]</span></p>
+<p>Para uma observação <span class="math inline">\(\mathbf x\)</span> tal que</p>
+<p><span class="math display">\[
+\sum_{\ell=1}^{K}
+\pi_\ell
+f_\ell(\mathbf x)
+&gt;
+0,
+\]</span></p>
+<p>o teorema de Bayes fornece</p>
+<p><span id="eq-posterior-classe-discriminante"><span class="math display">\[
+P
+\left(
+\mathsf C=k
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right)
+=
+\frac{
+\pi_k f_k(\mathbf x)
+}{
+\displaystyle
+\sum_{\ell=1}^{K}
+\pi_\ell f_\ell(\mathbf x)
+}.
+\tag{19.1}\]</span></span></p>
+<p>A probabilidade posterior combina a probabilidade inicial da classe, representada por <span class="math inline">\(\pi_k\)</span>, com a compatibilidade da observação com sua distribuição condicional, representada por <span class="math inline">\(f_k(\mathbf x)\)</span>.</p>
+</section>
+<section id="regra-de-bayes-sob-perda-zeroum" class="level3" data-number="19.2.2">
+<h3 data-number="19.2.2" class="anchored" data-anchor-id="regra-de-bayes-sob-perda-zeroum"><span class="header-section-number">19.2.2</span> Regra de Bayes sob perda zero–um</h3>
+<p>No caso mais simples, atribui-se perda zero a uma classificação correta e a mesma perda unitária a qualquer classificação incorreta:</p>
+<p><span id="eq-perda-zero-um-discriminante"><span class="math display">\[
+L(a,k)
+=
+\begin{cases}
+0,
+&amp;
+a=k,
+\\[4pt]
+1,
+&amp;
+a\neq k.
+\end{cases}
+\tag{19.2}\]</span></span></p>
+<p>Se a observação <span class="math inline">\(\mathbf x\)</span> for atribuída à classe <span class="math inline">\(a\)</span>, a perda esperada posterior é</p>
+<p><span class="math display">\[
+1
+-
+P
+\left(
+\mathsf C=a
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right).
+\]</span></p>
+<p>Minimizá-la equivale a maximizar a probabilidade posterior. Assim, a regra de Bayes sob perda zero–um atribui <span class="math inline">\(\mathbf x\)</span> a uma classe que satisfaça</p>
+<p><span class="math display">\[
+\psi_{\mathrm B}(\mathbf x)
+\in
+\underset{
+k\in\{1,\ldots,K\}
+}{
+\operatorname{arg\,max}
+}
+\;
+P
+\left(
+\mathsf C=k
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right).
+\]</span></p>
+<p>Por <a href="#eq-posterior-classe-discriminante" class="quarto-xref">Equação&nbsp;<span>19.1</span></a>, o denominador é comum a todas as classes. Portanto,</p>
+<p><span id="eq-regra-bayes-classificacao-discriminante"><span class="math display">\[
+\psi_{\mathrm B}(\mathbf x)
+\in
+\underset{
+k\in\{1,\ldots,K\}
+}{
+\operatorname{arg\,max}
+}
+\;
+\pi_k f_k(\mathbf x).
+\tag{19.3}\]</span></span></p>
+<p>Quando</p>
+<p><span class="math display">\[
+f_k(\mathbf x)&gt;0
+\]</span></p>
+<p>para todas as classes, a mesma comparação pode ser realizada pelo escore</p>
+<p><span id="eq-escore-log-bayes-discriminante"><span class="math display">\[
+\log\pi_k
++
+\log f_k(\mathbf x).
+\tag{19.4}\]</span></span></p>
+<p>Essa é a forma da regra de classificação que será especializada adiante para populações normais. Ela combina a frequência populacional esperada das classes, representada pelas probabilidades <em>a priori</em>, com a compatibilidade da observação com cada distribuição condicional <span class="citation" data-cites="anderson2003 johnson2007">(<a href="references.html#ref-anderson2003" role="doc-biblioref">Anderson, 2003</a>; <a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>)</span>.</p>
+<p>Quando diferentes erros de classificação possuem consequências distintas, a maior probabilidade posterior deixa de determinar, isoladamente, a decisão ótima. A formulação geral incorpora essas consequências por meio de uma função de perda.</p>
+</section>
+<section id="aprofundamento-perdas-e-risco-de-classificação" class="level3" data-number="19.2.3">
+<h3 data-number="19.2.3" class="anchored" data-anchor-id="aprofundamento-perdas-e-risco-de-classificação"><span class="header-section-number">19.2.3</span> Aprofundamento: perdas e risco de classificação</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A regra de máxima probabilidade posterior pressupõe que todas as classificações incorretas tenham a mesma consequência. Em problemas nos quais diferentes erros possuem custos distintos, a decisão pode ser formulada pela minimização da perda esperada posterior. Essa formulação é mais geral, mas não é necessária para desenvolver a LDA e a QDA sob perda zero–um.</p>
+</div>
+</div>
+<div id="def-perda-classificacao-discriminante" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.2 (Perda de classificação)</strong></span> Considere o conjunto de ações</p>
+<p><span class="math display">\[
+\mathcal A
+=
+\{1,\ldots,K\}.
+\]</span></p>
+<p>Uma <strong>função de perda de classificação</strong> é uma função</p>
+<p><span class="math display">\[
+L:
+\mathcal A
+\times
+\{1,\ldots,K\}
+\longrightarrow
+[0,\infty)
+\]</span></p>
+<p>tal que</p>
+<p><span class="math display">\[
+L(a,k)
+\]</span></p>
+<p>quantifica a consequência de escolher a ação <span class="math inline">\(a\)</span> quando a classe verdadeira é <span class="math inline">\(k\)</span>.</p>
+</div>
+<p>Os valores</p>
+<p><span class="math display">\[
+L(k,k)
+\]</span></p>
+<p>correspondem às classificações corretas, enquanto</p>
+<p><span class="math display">\[
+L(a,k),
+\qquad
+a\neq k,
+\]</span></p>
+<p>correspondem aos diferentes tipos de erro. A formulação permite atribuir consequências distintas a diferentes classificações incorretas.</p>
+<div id="def-risco-condicional-classificacao-discriminante" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.3 (Risco condicional de classificação)</strong></span> Para uma observação <span class="math inline">\(\mathbf x\)</span> na qual as probabilidades posteriores estão definidas, o <strong>risco condicional</strong> de escolher a ação</p>
+<p><span class="math display">\[
+a\in\mathcal A
+\]</span></p>
+<p>é</p>
+<p><span id="eq-risco-condicional-classificacao-discriminante"><span class="math display">\[
+R
+\left(
+a\mid\mathbf x
+\right)
+=
+\sum_{k=1}^{K}
+L(a,k)
+P
+\left(
+\mathsf C=k
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right).
+\tag{19.5}\]</span></span></p>
+</div>
+<p>O risco condicional é a perda esperada associada a uma ação depois de observadas as características <span class="math inline">\(\mathbf x\)</span>. Cada consequência possível é ponderada pela probabilidade posterior da respectiva classe verdadeira.</p>
+<div id="def-regra-bayes-classificacao-discriminante" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.4 (Regra de Bayes para classificação)</strong></span> Para cada observação <span class="math inline">\(\mathbf x\)</span>, defina o conjunto de ações que minimizam o risco condicional por</p>
+<p><span id="eq-regra-bayes-risco-discriminante"><span class="math display">\[
+\mathcal A_{\mathrm B}
+(\mathbf x)
+=
+\underset{
+a\in\mathcal A
+}{
+\operatorname{arg\,min}
+}
+\;
+R
+\left(
+a\mid\mathbf x
+\right).
+\tag{19.6}\]</span></span></p>
+<p>Uma <strong>regra de Bayes</strong> é qualquer função</p>
+<p><span class="math display">\[
+\psi_{\mathrm B}:
+\mathbb R^p
+\longrightarrow
+\mathcal A
+\]</span></p>
+<p>tal que</p>
+<p><span class="math display">\[
+\psi_{\mathrm B}(\mathbf x)
+\in
+\mathcal A_{\mathrm B}(\mathbf x)
+\]</span></p>
+<p>sempre que os riscos condicionais estejam definidos.</p>
+</div>
+<p>Quando mais de uma ação minimiza o risco, uma regra de desempate pode ser especificada para produzir uma classificação única.</p>
+<p>A regra de Bayes depende conjuntamente das distribuições condicionais, das probabilidades <em>a priori</em> e da função de perda. Sob a perda zero–um, essa formulação geral reduz-se à regra de máxima probabilidade posterior em <a href="#eq-regra-bayes-classificacao-discriminante" class="quarto-xref">Equação&nbsp;<span>19.3</span></a>. Com perdas assimétricas, a classe de maior probabilidade posterior não precisa ser a ação que minimiza o risco <span class="citation" data-cites="anderson2003 johnson2007">(<a href="references.html#ref-anderson2003" role="doc-biblioref">Anderson, 2003</a>; <a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>)</span>.</p>
+<p>A formulação probabilística será agora especializada para populações normais multivariadas. A estrutura da matriz de covariâncias determinará se as fronteiras de classificação são lineares ou quadráticas.</p>
+</section>
+</section>
+<section id="sec-discriminante-lda" class="level2" data-number="19.3">
+<h2 data-number="19.3" class="anchored" data-anchor-id="sec-discriminante-lda"><span class="header-section-number">19.3</span> Discriminação linear sob normalidade</h2>
+<p>Considere a especialização probabilística</p>
+<p><span id="eq-modelo-normal-lda"><span class="math display">\[
+\boldsymbol{\mathsf X}
+\mid
+\mathsf C=k
+\sim
+N_p
+\left(
+\boldsymbol{\mu}_k,
+\boldsymbol{\Sigma}
+\right),
+\qquad
+k=1,\ldots,K,
+\tag{19.7}\]</span></span></p>
+<p>em que</p>
+<p><span class="math display">\[
+\boldsymbol{\mu}_k
+\in
+\mathbb R^p
+\]</span></p>
+<p>e todas as classes compartilham a matriz de covariâncias</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\in
+\mathbb R^{p\times p},
+\qquad
+\boldsymbol{\Sigma}
+\succ
+\mathbf0.
+\]</span></p>
+<p>Considere também probabilidades <em>a priori</em></p>
+<p><span class="math display">\[
+\pi_k&gt;0,
+\qquad
+\sum_{k=1}^{K}\pi_k=1.
+\]</span></p>
+<p>A normalidade não é necessária para definir a regra de Bayes. Ela é utilizada aqui para especificar as distribuições condicionais das características.</p>
+<p>Sob perda zero–um, <a href="#eq-regra-bayes-classificacao-discriminante" class="quarto-xref">Equação&nbsp;<span>19.3</span></a> mostra que a classificação pode ser obtida comparando</p>
+<p><span class="math display">\[
+\log\pi_k
++
+\log f_k(\mathbf x).
+\]</span></p>
+<p>A comparação entre log-densidades normais com matriz de covariâncias comum foi estabelecida em <a href="mod_2_normal.html#eq-log-razao-normal-covariancia-comum" class="quarto-xref">Equação&nbsp;<span>9.49</span></a>. Os termos quadráticos em <span class="math inline">\(\mathbf x\)</span> e os termos que não dependem da classe cancelam-se, restando uma função afim das características.</p>
+<div id="def-funcao-discriminante-linear" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.5 (Função discriminante linear)</strong></span> Sob o modelo em <a href="#eq-modelo-normal-lda" class="quarto-xref">Equação&nbsp;<span>19.7</span></a> e perda zero–um, a <strong>função discriminante linear</strong> da classe <span class="math inline">\(k\)</span> é</p>
+<p><span id="eq-funcao-discriminante-linear"><span class="math display">\[
+\delta_k(\mathbf x)
+=
+\mathbf x^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_k
+-
+\frac12
+\boldsymbol{\mu}_k^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_k
++
+\log\pi_k.
+\tag{19.8}\]</span></span></p>
+</div>
+<p>A regra discriminante linear é</p>
+<p><span id="eq-regra-classificacao-lda"><span class="math display">\[
+\psi_{\mathrm{LDA}}(\mathbf x)
+\in
+\underset{
+k\in\{1,\ldots,K\}
+}{
+\operatorname{arg\,max}
+}
+\;
+\delta_k(\mathbf x).
+\tag{19.9}\]</span></span></p>
+<p>A função <span class="math inline">\(\delta_k(\mathbf x)\)</span> é afim em <span class="math inline">\(\mathbf x\)</span>. A denominação <em>Linear Discriminant Analysis</em> refere-se à forma das fronteiras de decisão entre as classes.</p>
+<section id="fronteiras-e-distância-de-mahalanobis" class="level3" data-number="19.3.1">
+<h3 data-number="19.3.1" class="anchored" data-anchor-id="fronteiras-e-distância-de-mahalanobis"><span class="header-section-number">19.3.1</span> Fronteiras e distância de Mahalanobis</h3>
+<p>Considere duas classes distintas,</p>
+<p><span class="math display">\[
+k\neq h.
+\]</span></p>
+<p>A fronteira entre elas é determinada por</p>
+<p><span class="math display">\[
+\delta_k(\mathbf x)
+=
+\delta_h(\mathbf x),
+\]</span></p>
+<p>ou, equivalentemente,</p>
+<p><span id="eq-fronteira-linear-discriminante"><span class="math display">\[
+\begin{aligned}
+0
+&amp;=
+\mathbf x^\top
+\boldsymbol{\Sigma}^{-1}
+\left(
+\boldsymbol{\mu}_k
+-
+\boldsymbol{\mu}_h
+\right)
+\\
+&amp;\quad
+-
+\frac12
+\left(
+\boldsymbol{\mu}_k^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_k
+-
+\boldsymbol{\mu}_h^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_h
+\right)
++
+\log
+\frac{\pi_k}{\pi_h}.
+\end{aligned}
+\tag{19.10}\]</span></span></p>
+<p>Quando</p>
+<p><span class="math display">\[
+\boldsymbol{\mu}_k
+\neq
+\boldsymbol{\mu}_h,
+\]</span></p>
+<p>essa equação define um hiperplano cujo vetor normal é</p>
+<p><span id="eq-normal-fronteira-lda"><span class="math display">\[
+\boldsymbol{\Sigma}^{-1}
+\left(
+\boldsymbol{\mu}_k
+-
+\boldsymbol{\mu}_h
+\right).
+\tag{19.11}\]</span></span></p>
+<p>A orientação da fronteira depende, portanto, da diferença entre os vetores de médias e da estrutura de covariâncias. Mantidos esses objetos, alterar as probabilidades <em>a priori</em> modifica o termo constante e desloca a fronteira, mas não altera seu vetor normal.</p>
+<p>Se</p>
+<p><span class="math display">\[
+\boldsymbol{\mu}_k
+=
+\boldsymbol{\mu}_h,
+\]</span></p>
+<p>as duas classes possuem a mesma densidade condicional sob o modelo de covariância comum. A comparação entre elas depende apenas das probabilidades <em>a priori</em>.</p>
+<p>A distância de Mahalanobis definida em <a href="mod_2_covariancias.html#def-distancia-mahalanobis" class="quarto-xref">Definição&nbsp;<span>8.9</span></a> permite escrever a mesma regra em forma geométrica. Para a classe <span class="math inline">\(k\)</span>,</p>
+<p><span class="math display">\[
+d_M^2
+\left(
+\mathbf x,
+\boldsymbol{\mu}_k;
+\boldsymbol{\Sigma}
+\right)
+=
+(\mathbf x-\boldsymbol{\mu}_k)^\top
+\boldsymbol{\Sigma}^{-1}
+(\mathbf x-\boldsymbol{\mu}_k).
+\]</span></p>
+<p>Sob perda zero–um,</p>
+<p><span id="eq-regra-lda-mahalanobis"><span class="math display">\[
+\psi_{\mathrm{LDA}}(\mathbf x)
+\in
+\underset{
+k\in\{1,\ldots,K\}
+}{
+\operatorname{arg\,min}
+}
+\left\{
+d_M^2
+\left(
+\mathbf x,
+\boldsymbol{\mu}_k;
+\boldsymbol{\Sigma}
+\right)
+-
+2\log\pi_k
+\right\}.
+\tag{19.12}\]</span></span></p>
+<p>Se as probabilidades <em>a priori</em> são iguais,</p>
+<p><span class="math display">\[
+\pi_1
+=
+\cdots
+=
+\pi_K
+=
+\frac1K,
+\]</span></p>
+<p>o termo associado às probabilidades é comum a todas as classes e</p>
+<p><span id="eq-lda-centroide-mahalanobis"><span class="math display">\[
+\psi_{\mathrm{LDA}}(\mathbf x)
+\in
+\underset{
+k\in\{1,\ldots,K\}
+}{
+\operatorname{arg\,min}
+}
+\;
+d_M^2
+\left(
+\mathbf x,
+\boldsymbol{\mu}_k;
+\boldsymbol{\Sigma}
+\right).
+\tag{19.13}\]</span></span></p>
+<p>Assim, sob normalidade, covariância comum, probabilidades <em>a priori</em> iguais e perda zero–um, a regra de Bayes classifica pela menor distância de Mahalanobis ao centro populacional da classe.</p>
+<p>A formulação mostra como uma estrutura geométrica já estabelecida adquire função decisória: a matriz <span class="math inline">\(\boldsymbol{\Sigma}\)</span> determina simultaneamente a dispersão das populações normais e a geometria utilizada para comparar uma nova observação com seus centros.</p>
+<p>A LDA desenvolvida nesta seção é populacional, pois utiliza</p>
+<p><span class="math display">\[
+\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_K,
+\qquad
+\boldsymbol{\Sigma},
+\qquad
+\pi_1,\ldots,\pi_K.
+\]</span></p>
+<p>A passagem desses parâmetros para uma regra estimada será tratada depois da formulação quadrática.</p>
+</section>
+</section>
+<section id="sec-discriminante-qda" class="level2" data-number="19.4">
+<h2 data-number="19.4" class="anchored" data-anchor-id="sec-discriminante-qda"><span class="header-section-number">19.4</span> Discriminação quadrática</h2>
+<p>A linearidade da LDA decorre da utilização de uma matriz de covariâncias comum. Considere agora</p>
+<p><span id="eq-modelo-normal-qda"><span class="math display">\[
+\boldsymbol{\mathsf X}
+\mid
+\mathsf C=k
+\sim
+N_p
+\left(
+\boldsymbol{\mu}_k,
+\boldsymbol{\Sigma}_k
+\right),
+\qquad
+k=1,\ldots,K,
+\tag{19.14}\]</span></span></p>
+<p>em que</p>
+<p><span class="math display">\[
+\boldsymbol{\mu}_k
+\in
+\mathbb R^p
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_k
+\in
+\mathbb R^{p\times p},
+\qquad
+\boldsymbol{\Sigma}_k
+\succ
+\mathbf0.
+\]</span></p>
+<p>Considere também</p>
+<p><span class="math display">\[
+\pi_k&gt;0,
+\qquad
+\sum_{k=1}^{K}\pi_k=1.
+\]</span></p>
+<p>Sob perda zero–um, a regra de Bayes continua comparando</p>
+<p><span class="math display">\[
+\log\pi_k+\log f_k(\mathbf x).
+\]</span></p>
+<p>A diferença está na estrutura das distribuições condicionais. Como as matrizes de covariâncias dependem da classe, os termos quadráticos não se cancelam entre as comparações. Essa propriedade foi estabelecida em <a href="mod_2_normal.html#eq-log-razao-normal-covariancias-distintas" class="quarto-xref">Equação&nbsp;<span>9.50</span></a>.</p>
+<div id="def-funcao-discriminante-quadratica" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.6 (Função discriminante quadrática)</strong></span> Sob o modelo em <a href="#eq-modelo-normal-qda" class="quarto-xref">Equação&nbsp;<span>19.14</span></a> e perda zero–um, a <strong>função discriminante quadrática</strong> da classe <span class="math inline">\(k\)</span> é</p>
+<p><span id="eq-funcao-discriminante-quadratica"><span class="math display">\[
+\delta_k^{Q}(\mathbf x)
+=
+-\frac12
+\log
+\left|
+\boldsymbol{\Sigma}_k
+\right|
+-
+\frac12
+(\mathbf x-\boldsymbol{\mu}_k)^\top
+\boldsymbol{\Sigma}_k^{-1}
+(\mathbf x-\boldsymbol{\mu}_k)
++
+\log\pi_k.
+\tag{19.15}\]</span></span></p>
+</div>
+<p>A regra discriminante quadrática é</p>
+<p><span id="eq-regra-classificacao-qda"><span class="math display">\[
+\psi_{\mathrm{QDA}}(\mathbf x)
+\in
+\underset{
+k\in\{1,\ldots,K\}
+}{
+\operatorname{arg\,max}
+}
+\;
+\delta_k^{Q}(\mathbf x).
+\tag{19.16}\]</span></span></p>
+<p>A função possui dois componentes dependentes da dispersão da classe. A forma quadrática</p>
+<p><span class="math display">\[
+(\mathbf x-\boldsymbol{\mu}_k)^\top
+\boldsymbol{\Sigma}_k^{-1}
+(\mathbf x-\boldsymbol{\mu}_k)
+\]</span></p>
+<p>é a distância quadrática de Mahalanobis à média da classe segundo sua própria matriz de covariâncias. O termo</p>
+<p><span class="math display">\[
+\log
+\left|
+\boldsymbol{\Sigma}_k
+\right|
+\]</span></p>
+<p>participa da normalização da densidade e incorpora a dispersão multivariada da população.</p>
+<p>Diferentemente da LDA, não existe uma única geometria de Mahalanobis compartilhada pelas classes.</p>
+<section id="fronteiras-e-comparação-com-a-lda" class="level3" data-number="19.4.1">
+<h3 data-number="19.4.1" class="anchored" data-anchor-id="fronteiras-e-comparação-com-a-lda"><span class="header-section-number">19.4.1</span> Fronteiras e comparação com a LDA</h3>
+<p>Considere duas classes distintas,</p>
+<p><span class="math display">\[
+k\neq h.
+\]</span></p>
+<p>A fronteira é determinada por</p>
+<p><span class="math display">\[
+\delta_k^Q(\mathbf x)
+=
+\delta_h^Q(\mathbf x).
+\]</span></p>
+<p>Após reunir os termos quadráticos, lineares e constantes, obtém-se</p>
+<p><span id="eq-fronteira-quadratica-discriminante"><span class="math display">\[
+\mathbf x^\top
+\mathbf A_{kh}
+\mathbf x
++
+\mathbf b_{kh}^\top
+\mathbf x
++
+c_{kh}
+=
+0,
+\tag{19.17}\]</span></span></p>
+<p>em que <span class="math inline">\(\mathbf A_{kh}\)</span>, <span class="math inline">\(\mathbf b_{kh}\)</span> e <span class="math inline">\(c_{kh}\)</span> dependem das médias, das matrizes de covariâncias e das probabilidades <em>a priori</em> das duas classes.</p>
+<p>Quando</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_k
+\neq
+\boldsymbol{\Sigma}_h,
+\]</span></p>
+<p>em geral,</p>
+<p><span class="math display">\[
+\mathbf A_{kh}
+\neq
+\mathbf0,
+\]</span></p>
+<p>e permanecem termos quadráticos em <span class="math inline">\(\mathbf x\)</span>. A fronteira entre as classes não precisa, portanto, ser um hiperplano.</p>
+<p>Quando todas as classes compartilham</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_1
+=
+\cdots
+=
+\boldsymbol{\Sigma}_K
+=
+\boldsymbol{\Sigma},
+\]</span></p>
+<p>o termo quadrático desaparece e os log-determinantes comuns cancelam-se. A função discriminante quadrática reduz-se, nesse caso, à LDA de <a href="#eq-funcao-discriminante-linear" class="quarto-xref">Equação&nbsp;<span>19.8</span></a>.</p>
+<p>A diferença entre LDA e QDA decorre, portanto, da estrutura probabilística atribuída às covariâncias condicionais. A LDA utiliza uma única geometria residual e produz fronteiras lineares; a QDA utiliza uma geometria específica para cada classe e pode produzir fronteiras quadráticas.</p>
+<p>A <a href="#fig-fronteiras-lda-qda" class="quarto-xref">Figura&nbsp;<span>19.1</span></a> ilustra essa diferença para duas populações normais.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-fronteiras-lda-qda" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-fronteiras-lda-qda-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_discriminante_files/figure-html/fig-fronteiras-lda-qda-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-fronteiras-lda-qda-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;19.1: Fronteiras de decisão para duas populações normais. As elipses delimitam regiões de concentração de 75%. Com covariância comum, a LDA produz uma fronteira linear; com covariâncias distintas, a QDA pode produzir uma fronteira quadrática.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A diferença visual entre as fronteiras é uma consequência das hipóteses probabilísticas. Na LDA, os termos quadráticos comuns cancelam-se. Na QDA, esse cancelamento não ocorre quando as matrizes de covariâncias diferem.</p>
+</section>
+<section id="aprofundamento-forma-explícita-da-fronteira-quadrática" class="level3" data-number="19.4.2">
+<h3 data-number="19.4.2" class="anchored" data-anchor-id="aprofundamento-forma-explícita-da-fronteira-quadrática"><span class="header-section-number">19.4.2</span> Aprofundamento: forma explícita da fronteira quadrática</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A forma quadrática da fronteira é suficiente para distinguir conceitualmente QDA e LDA. A expansão a seguir explicita como médias, covariâncias e probabilidades <em>a priori</em> determinam seus termos quadráticos, lineares e constantes.</p>
+</div>
+</div>
+<p>Na <a href="#eq-fronteira-quadratica-discriminante" class="quarto-xref">Equação&nbsp;<span>19.17</span></a>,</p>
+<p><span class="math display">\[
+\mathbf A_{kh}
+=
+\frac12
+\left(
+\boldsymbol{\Sigma}_h^{-1}
+-
+\boldsymbol{\Sigma}_k^{-1}
+\right),
+\]</span></p>
+<p><span class="math display">\[
+\mathbf b_{kh}
+=
+\boldsymbol{\Sigma}_k^{-1}
+\boldsymbol{\mu}_k
+-
+\boldsymbol{\Sigma}_h^{-1}
+\boldsymbol{\mu}_h
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\begin{aligned}
+c_{kh}
+&amp;=
+-\frac12
+\boldsymbol{\mu}_k^\top
+\boldsymbol{\Sigma}_k^{-1}
+\boldsymbol{\mu}_k
++
+\frac12
+\boldsymbol{\mu}_h^\top
+\boldsymbol{\Sigma}_h^{-1}
+\boldsymbol{\mu}_h
+\\
+&amp;\quad
+-
+\frac12
+\log
+\left|
+\boldsymbol{\Sigma}_k
+\right|
++
+\frac12
+\log
+\left|
+\boldsymbol{\Sigma}_h
+\right|
++
+\log
+\frac{\pi_k}{\pi_h}.
+\end{aligned}
+\]</span></p>
+<p>Assim, diferenças entre as inversas das matrizes de covariâncias determinam o termo quadrático, diferenças entre as médias ponderadas pelas respectivas precisões determinam o termo linear, e médias, determinantes e probabilidades <em>a priori</em> participam do termo constante.</p>
+<p>Se</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_k
+=
+\boldsymbol{\Sigma}_h,
+\]</span></p>
+<p>então</p>
+<p><span class="math display">\[
+\mathbf A_{kh}
+=
+\mathbf0,
+\]</span></p>
+<p>recuperando-se uma fronteira linear.</p>
+</section>
+</section>
+<section id="sec-discriminante-regra-estimada" class="level2" data-number="19.5">
+<h2 data-number="19.5" class="anchored" data-anchor-id="sec-discriminante-regra-estimada"><span class="header-section-number">19.5</span> Da regra populacional à regra estimada</h2>
+<p>As regras formuladas nas seções anteriores dependem de parâmetros populacionais.</p>
+<p>Na LDA, são necessários</p>
+<p><span class="math display">\[
+\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_K,
+\qquad
+\boldsymbol{\Sigma},
+\qquad
+\pi_1,\ldots,\pi_K.
+\]</span></p>
+<p>Na QDA, são necessários</p>
+<p><span class="math display">\[
+\boldsymbol{\mu}_1,\ldots,\boldsymbol{\mu}_K,
+\qquad
+\boldsymbol{\Sigma}_1,\ldots,\boldsymbol{\Sigma}_K,
+\qquad
+\pi_1,\ldots,\pi_K.
+\]</span></p>
+<p>Em uma aplicação, esses parâmetros são geralmente desconhecidos e devem ser estimados a partir de uma amostra de treinamento com classes conhecidas. A distinção entre estimador e estimativa estabelecida em <a href="mod_2_amostrais.html#def-estimador-estimativa" class="quarto-xref">Definição&nbsp;<span>10.4</span></a> será mantida: antes da observação da amostra, as estatísticas utilizadas são aleatórias; depois da observação, seus valores são estimativas.</p>
+<p>Considere</p>
+<p><span class="math display">\[
+n
+=
+\sum_{k=1}^{K}
+n_k,
+\]</span></p>
+<p>em que <span class="math inline">\(n_k\)</span> é o número de unidades observadas da classe <span class="math inline">\(k\)</span>.</p>
+<p>Para cada classe, a média amostral aleatória é obtida aplicando <a href="mod_2_amostrais.html#eq-media-amostral-aleatoria" class="quarto-xref">Equação&nbsp;<span>10.8</span></a> às observações do grupo, e sua realização observada será denotada por</p>
+<p><span class="math display">\[
+\overline{\mathbf x}_k
+\in
+\mathbb R^p.
+\]</span></p>
+<p>Quando</p>
+<p><span class="math display">\[
+n_k\geq2,
+\]</span></p>
+<p>a matriz de covariâncias amostral definida em <a href="mod_2_amostrais.html#def-matriz-covariancias-amostral-aleatoria" class="quarto-xref">Definição&nbsp;<span>10.14</span></a> fornece o estimador da covariância da classe, cuja realização será denotada por</p>
+<p><span class="math display">\[
+\mathbf S_k
+\in
+\mathbb R^{p\times p}.
+\]</span></p>
+<p>Essas estatísticas não exigem normalidade para serem definidas. Nas formulações LDA e QDA, elas são utilizadas como estimadores dos parâmetros dos respectivos modelos normais.</p>
+<section id="covariância-comum-na-lda" class="level3" data-number="19.5.1">
+<h3 data-number="19.5.1" class="anchored" data-anchor-id="covariância-comum-na-lda"><span class="header-section-number">19.5.1</span> Covariância comum na LDA</h3>
+<p>Sob a hipótese populacional</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_1
+=
+\cdots
+=
+\boldsymbol{\Sigma}_K
+=
+\boldsymbol{\Sigma},
+\]</span></p>
+<p>a dispersão das classes é reunida em uma única estimativa.</p>
+<p>Pela correspondência entre a SQPC residual e a dispersão intragrupos estabelecida em <a href="mod_2_modelo.html#eq-correspondencia-sscp-residual-intragrupos" class="quarto-xref">Equação&nbsp;<span>11.107</span></a>, para</p>
+<p><span class="math display">\[
+n&gt;K,
+\]</span></p>
+<p>a matriz de covariâncias agrupada observada é</p>
+<p><span id="eq-estimativa-covariancia-agrupada-discriminante"><span class="math display">\[
+\mathbf S_p
+=
+\frac{1}{n-K}
+\mathbf T_{\mathrm{intra}}.
+\tag{19.18}\]</span></span></p>
+<p>Equivalentemente, quando todas as matrizes <span class="math inline">\(\mathbf S_k\)</span> estão definidas,</p>
+<p><span class="math display">\[
+\mathbf S_p
+=
+\frac{
+\displaystyle
+\sum_{k=1}^{K}
+(n_k-1)\mathbf S_k
+}{
+n-K
+}.
+\]</span></p>
+<p>A mesma estrutura de dispersão intragrupos utilizada posteriormente na formulação de Fisher fornece, portanto, a estimativa da covariância comum utilizada pela LDA.</p>
+</section>
+<section id="probabilidades-a-priori" class="level3" data-number="19.5.2">
+<h3 data-number="19.5.2" class="anchored" data-anchor-id="probabilidades-a-priori"><span class="header-section-number">19.5.2</span> Probabilidades <em>a priori</em></h3>
+<p>As probabilidades</p>
+<p><span class="math display">\[
+\pi_1,\ldots,\pi_K
+\]</span></p>
+<p>também devem ser conhecidas, especificadas ou estimadas.</p>
+<p>Quando a amostra de treinamento representa a mistura populacional das classes, pode-se utilizar</p>
+<p><span id="eq-estimador-priori-empirico-discriminante"><span class="math display">\[
+\widehat{\pi}_k
+=
+\frac{n_k}{n}.
+\tag{19.19}\]</span></span></p>
+<p>Essa escolha não é automática. Se os tamanhos das classes foram fixados pelo delineamento ou se o mecanismo amostral altera suas proporções, <span class="math inline">\(n_k/n\)</span> não representa necessariamente</p>
+<p><span class="math display">\[
+P(\mathsf C=k).
+\]</span></p>
+<p>Nessas situações, as probabilidades <em>a priori</em> devem ser especificadas a partir do problema ou de informação populacional externa.</p>
+</section>
+<section id="regra-estimada-da-lda" class="level3" data-number="19.5.3">
+<h3 data-number="19.5.3" class="anchored" data-anchor-id="regra-estimada-da-lda"><span class="header-section-number">19.5.3</span> Regra estimada da LDA</h3>
+<p>Substituindo os parâmetros populacionais da LDA por estimativas, obtém-se a regra <em>plug-in</em>.</p>
+<div id="def-funcao-discriminante-linear-estimada" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.7 (Função discriminante linear estimada)</strong></span> Considere médias observadas</p>
+<p><span class="math display">\[
+\overline{\mathbf x}_1,\ldots,\overline{\mathbf x}_K,
+\]</span></p>
+<p>uma matriz</p>
+<p><span class="math display">\[
+\mathbf S_p
+\succ
+\mathbf0
+\]</span></p>
+<p>e probabilidades estimadas ou especificadas</p>
+<p><span class="math display">\[
+\widehat{\pi}_k&gt;0,
+\qquad
+\sum_{k=1}^{K}
+\widehat{\pi}_k
+=
+1.
+\]</span></p>
+<p>A <strong>função discriminante linear estimada</strong> da classe <span class="math inline">\(k\)</span> é</p>
+<p><span id="eq-funcao-discriminante-linear-estimada"><span class="math display">\[
+\widehat{\delta}_k(\mathbf x)
+=
+\mathbf x^\top
+\mathbf S_p^{-1}
+\overline{\mathbf x}_k
+-
+\frac12
+\overline{\mathbf x}_k^\top
+\mathbf S_p^{-1}
+\overline{\mathbf x}_k
++
+\log
+\widehat{\pi}_k.
+\tag{19.20}\]</span></span></p>
+</div>
+<p>A regra estimada é</p>
+<p><span id="eq-regra-estimada-lda"><span class="math display">\[
+\widehat{\psi}_{\mathrm{LDA}}(\mathbf x)
+\in
+\underset{
+k\in\{1,\ldots,K\}
+}{
+\operatorname{arg\,max}
+}
+\;
+\widehat{\delta}_k(\mathbf x).
+\tag{19.21}\]</span></span></p>
+<p>A forma algébrica coincide com a regra populacional, mas os objetos possuem naturezas estatísticas diferentes:</p>
+<p><span class="math display">\[
+\boldsymbol{\mu}_k
+\longrightarrow
+\overline{\mathbf x}_k,
+\qquad
+\boldsymbol{\Sigma}
+\longrightarrow
+\mathbf S_p,
+\qquad
+\pi_k
+\longrightarrow
+\widehat{\pi}_k.
+\]</span></p>
+<p>A regra estimada depende da amostra de treinamento e, portanto, varia entre amostras.</p>
+</section>
+<section id="regra-estimada-da-qda" class="level3" data-number="19.5.4">
+<h3 data-number="19.5.4" class="anchored" data-anchor-id="regra-estimada-da-qda"><span class="header-section-number">19.5.4</span> Regra estimada da QDA</h3>
+<p>Na QDA, cada classe possui sua própria matriz de covariâncias.</p>
+<div id="def-funcao-discriminante-quadratica-estimada" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.8 (Função discriminante quadrática estimada)</strong></span> Considere</p>
+<p><span class="math display">\[
+\mathbf S_k
+\succ
+\mathbf0,
+\qquad
+k=1,\ldots,K.
+\]</span></p>
+<p>A <strong>função discriminante quadrática estimada</strong> da classe <span class="math inline">\(k\)</span> é</p>
+<p><span id="eq-funcao-discriminante-quadratica-estimada"><span class="math display">\[
+\widehat{\delta}_k^{Q}(\mathbf x)
+=
+-\frac12
+\log
+\left|
+\mathbf S_k
+\right|
+-
+\frac12
+(\mathbf x-\overline{\mathbf x}_k)^\top
+\mathbf S_k^{-1}
+(\mathbf x-\overline{\mathbf x}_k)
++
+\log
+\widehat{\pi}_k.
+\tag{19.22}\]</span></span></p>
+</div>
+<p>A regra correspondente é</p>
+<p><span id="eq-regra-estimada-qda"><span class="math display">\[
+\widehat{\psi}_{\mathrm{QDA}}(\mathbf x)
+\in
+\underset{
+k\in\{1,\ldots,K\}
+}{
+\operatorname{arg\,max}
+}
+\;
+\widehat{\delta}_k^{Q}(\mathbf x).
+\tag{19.23}\]</span></span></p>
+<p>A LDA utiliza uma única estimativa de covariância, <span class="math inline">\(\mathbf S_p\)</span>, enquanto a QDA utiliza</p>
+<p><span class="math display">\[
+\mathbf S_1,\ldots,\mathbf S_K.
+\]</span></p>
+<p>A QDA exige, portanto, informação suficiente para estimar e inverter uma matriz de covariâncias em cada classe. As condições de posto correspondentes serão reunidas posteriormente na <a href="#sec-discriminante-pressupostos" class="quarto-xref"><span>Seção 19.12</span></a>.</p>
+<p>A <a href="#tbl-lda-qda" class="quarto-xref">Tabela&nbsp;<span>19.2</span></a> sintetiza a diferença entre as duas formulações.</p>
+<div id="tbl-lda-qda" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-lda-qda-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;19.2: Comparação entre LDA e QDA.
+</figcaption>
+<div aria-describedby="tbl-lda-qda-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Aspecto</th>
+<th>LDA</th>
+<th>QDA</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>modelo condicional</td>
+<td><span class="math inline">\(N_p(\boldsymbol{\mu}_k,\boldsymbol{\Sigma})\)</span></td>
+<td><span class="math inline">\(N_p(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)\)</span></td>
+</tr>
+<tr class="even">
+<td>covariância populacional</td>
+<td>comum</td>
+<td>específica por classe</td>
+</tr>
+<tr class="odd">
+<td>estimativa de covariância</td>
+<td><span class="math inline">\(\mathbf S_p\)</span></td>
+<td><span class="math inline">\(\mathbf S_k\)</span></td>
+</tr>
+<tr class="even">
+<td>função discriminante</td>
+<td>afim em <span class="math inline">\(\mathbf x\)</span></td>
+<td>quadrática em <span class="math inline">\(\mathbf x\)</span></td>
+</tr>
+<tr class="odd">
+<td>fronteira entre duas classes</td>
+<td>hiperplano</td>
+<td>superfície quadrática em geral</td>
+</tr>
+<tr class="even">
+<td>geometria</td>
+<td>uma métrica de Mahalanobis comum</td>
+<td>uma métrica de Mahalanobis por classe</td>
+</tr>
+<tr class="odd">
+<td>probabilidades <em>a priori</em></td>
+<td>entram por <span class="math inline">\(\log\pi_k\)</span></td>
+<td>entram por <span class="math inline">\(\log\pi_k\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>A substituição dos parâmetros por estimativas transforma a regra populacional em uma regra construída a partir da amostra de treinamento. A regra estimada depende, portanto, da amostra utilizada para estimar médias, covariâncias e probabilidades <em>a priori</em>.</p>
+</section>
+<section id="aprofundamento-erro-aparente-e-erro-em-novas-observações" class="level3" data-number="19.5.5">
+<h3 data-number="19.5.5" class="anchored" data-anchor-id="aprofundamento-erro-aparente-e-erro-em-novas-observações"><span class="header-section-number">19.5.5</span> Aprofundamento: erro aparente e erro em novas observações</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A formulação da LDA e da QDA determina como construir uma regra de classificação. Avaliar o desempenho dessa regra constitui um problema adicional. Em particular, o erro observado nas mesmas unidades utilizadas para estimar a regra deve ser distinguido do erro obtido em observações que não participaram da estimação.</p>
+</div>
+</div>
+<p>Considere uma amostra de treinamento formada por pares</p>
+<p><span class="math display">\[
+(\mathbf x_i,c_i),
+\qquad
+i=1,\ldots,n,
+\]</span></p>
+<p>utilizados para construir uma regra <span class="math inline">\(\widehat{\psi}\)</span>. A proporção de classificações incorretas calculada nas próprias observações utilizadas no ajuste é o <strong>erro aparente</strong>,</p>
+<p><span id="eq-erro-aparente-discriminante"><span class="math display">\[
+\widehat R_{\mathrm{aparente}}
+=
+\frac1n
+\sum_{i=1}^{n}
+\mathbb 1
+\left\{
+\widehat{\psi}(\mathbf x_i)
+\neq
+c_i
+\right\},
+\tag{19.24}\]</span></span></p>
+<p>em que <span class="math inline">\(\mathbb 1\{\cdot\}\)</span> é a função indicadora.</p>
+<p>Esse erro descreve o desempenho da regra nas unidades que também contribuíram para estimar seus parâmetros. Ele não mede diretamente o comportamento da regra diante de novas observações.</p>
+<p>Considere agora uma amostra de teste formada por <span class="math inline">\(m\)</span> pares</p>
+<p><span class="math display">\[
+(\mathbf x_i^*,c_i^*),
+\qquad
+i=1,\ldots,m,
+\]</span></p>
+<p>que não participaram da estimação da regra. A proporção de classificações incorretas nesse conjunto é</p>
+<p><span id="eq-erro-teste-discriminante"><span class="math display">\[
+\widehat R_{\mathrm{teste}}
+=
+\frac1m
+\sum_{i=1}^{m}
+\mathbb 1
+\left\{
+\widehat{\psi}(\mathbf x_i^*)
+\neq
+c_i^*
+\right\}.
+\tag{19.25}\]</span></span></p>
+<p>O erro aparente descreve o comportamento da regra nas observações utilizadas em sua construção, enquanto o erro de teste descreve seu comportamento em observações externas à estimação. Procedimentos para formar amostras de treinamento e teste, validação cruzada e outros métodos de avaliação preditiva pertencem à etapa metodológica posterior.</p>
+<p>As formulações LDA e QDA resolvem um problema de decisão no espaço original das características. A formulação de Fisher parte de outro objetivo: utilizar os rótulos conhecidos para construir combinações lineares que representem a separação entre os grupos relativamente à dispersão intragrupos.</p>
+</section>
+</section>
+<section id="sec-discriminante-fisher" class="level2" data-number="19.6">
+<h2 data-number="19.6" class="anchored" data-anchor-id="sec-discriminante-fisher"><span class="header-section-number">19.6</span> Formulação geométrica de Fisher</h2>
+<p>A formulação probabilística anterior produz regras para classificar novas observações. A formulação de Fisher utiliza os grupos conhecidos com outro objetivo: construir combinações lineares das características que representem sua separação relativamente à dispersão existente dentro dos grupos.</p>
+<p>O problema admite uma formulação populacional e uma formulação amostral. A primeira identifica as estruturas de dispersão que definem o critério; a segunda utiliza as matrizes calculadas a partir das observações com rótulos conhecidos.</p>
+<p>A formulação de Fisher não exige normalidade multivariada para ser definida.</p>
+<section id="dispersões-populacionais-dentro-e-entre-grupos" class="level3" data-number="19.6.1">
+<h3 data-number="19.6.1" class="anchored" data-anchor-id="dispersões-populacionais-dentro-e-entre-grupos"><span class="header-section-number">19.6.1</span> Dispersões populacionais dentro e entre grupos</h3>
+<p>Considere</p>
+<p><span class="math display">\[
+\mathsf C
+\in
+\{1,\ldots,K\},
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+P(\mathsf C=k)
+=
+\pi_k,
+\qquad
+\pi_k&gt;0,
+\qquad
+\sum_{k=1}^{K}\pi_k=1,
+\]</span></p>
+<p>e um vetor aleatório</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+\in
+\mathbb R^p
+\]</span></p>
+<p>com segundos momentos finitos.</p>
+<p>Para cada classe, sejam</p>
+<p><span class="math display">\[
+\boldsymbol{\mu}_k
+=
+E
+\left(
+\boldsymbol{\mathsf X}
+\mid
+\mathsf C=k
+\right)
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_k
+=
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}
+\mid
+\mathsf C=k
+\right).
+\]</span></p>
+<p>A média marginal é</p>
+<p><span id="eq-media-populacional-fisher"><span class="math display">\[
+\boldsymbol{\mu}
+=
+E
+\left(
+\boldsymbol{\mathsf X}
+\right)
+=
+\sum_{k=1}^{K}
+\pi_k
+\boldsymbol{\mu}_k.
+\tag{19.26}\]</span></span></p>
+<div id="def-dispersoes-populacionais-fisher" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.9 (Dispersões populacionais de Fisher)</strong></span> A <strong>dispersão populacional intragrupos</strong> é</p>
+<p><span id="eq-dispersao-populacional-intra-fisher"><span class="math display">\[
+\boldsymbol{\Sigma}_W
+=
+\sum_{k=1}^{K}
+\pi_k
+\boldsymbol{\Sigma}_k
+\in
+\mathbb R^{p\times p},
+\tag{19.27}\]</span></span></p>
+<p>e a <strong>dispersão populacional entre grupos</strong> é</p>
+<p><span id="eq-dispersao-populacional-entre-fisher"><span class="math display">\[
+\boldsymbol{\Sigma}_B
+=
+\sum_{k=1}^{K}
+\pi_k
+\left(
+\boldsymbol{\mu}_k-\boldsymbol{\mu}
+\right)
+\left(
+\boldsymbol{\mu}_k-\boldsymbol{\mu}
+\right)^\top
+\in
+\mathbb R^{p\times p}.
+\tag{19.28}\]</span></span></p>
+</div>
+<p>As duas matrizes são simétricas e semidefinidas positivas. A matriz <span class="math inline">\(\boldsymbol{\Sigma}_W\)</span> representa a dispersão média existente dentro das classes, enquanto <span class="math inline">\(\boldsymbol{\Sigma}_B\)</span> representa a dispersão dos vetores de médias das classes em torno da média marginal.</p>
+<div id="prp-decomposicao-covariancia-fisher" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposição 19.1 (Decomposição populacional da covariância por grupos)</strong></span> Sob as condições de <a href="#def-dispersoes-populacionais-fisher" class="quarto-xref">Definição&nbsp;<span>19.9</span></a>,</p>
+<p><span id="eq-decomposicao-covariancia-fisher"><span class="math display">\[
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}
+\right)
+=
+\boldsymbol{\Sigma}_W
++
+\boldsymbol{\Sigma}_B.
+\tag{19.29}\]</span></span></p>
+</div>
+<p>A demonstração dessa decomposição, obtida pela aplicação da decomposição da covariância à variável de classe <span class="math inline">\(\mathsf C\)</span>, é apresentada na <a href="#sec-discriminante-decomposicao-covariancia" class="quarto-xref"><span>Seção 19.6.2</span></a>.</p>
+<p>Essa decomposição é a contraparte populacional de</p>
+<p><span class="math display">\[
+\mathbf T
+=
+\mathbf T_{\mathrm{intra}}
++
+\mathbf T_{\mathrm{entre}},
+\]</span></p>
+<p>estabelecida em <a href="mod_2_covariancias.html#prp-decomposicao-dispersao-grupos" class="quarto-xref">Proposição&nbsp;<span>8.10</span></a>. Os objetos possuem naturezas distintas: <span class="math inline">\(\boldsymbol{\Sigma}_W\)</span> e <span class="math inline">\(\boldsymbol{\Sigma}_B\)</span> são parâmetros populacionais, enquanto <span class="math inline">\(\mathbf T_{\mathrm{intra}}\)</span> e <span class="math inline">\(\mathbf T_{\mathrm{entre}}\)</span> são matrizes calculadas a partir das observações.</p>
+</section>
+<section id="sec-discriminante-decomposicao-covariancia" class="level3" data-number="19.6.2">
+<h3 data-number="19.6.2" class="anchored" data-anchor-id="sec-discriminante-decomposicao-covariancia"><span class="header-section-number">19.6.2</span> Aprofundamento: decomposição da covariância por grupos</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A identidade <span class="math inline">\(\operatorname{Cov}(\boldsymbol{\mathsf X})=\boldsymbol{\Sigma}_W+\boldsymbol{\Sigma}_B\)</span> é uma aplicação da decomposição da covariância condicionada à variável de classe. Sua demonstração explicita por que a variabilidade marginal pode ser separada em uma parcela média dentro das classes e outra associada às diferenças entre seus vetores de médias.</p>
+</div>
+</div>
+<p>Escreva</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}
+=
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_{\mathsf C}
+\right)
++
+\left(
+\boldsymbol{\mu}_{\mathsf C}
+-
+\boldsymbol{\mu}
+\right),
+\]</span></p>
+<p>em que</p>
+<p><span class="math display">\[
+\boldsymbol{\mu}_{\mathsf C}
+=
+E
+\left(
+\boldsymbol{\mathsf X}
+\mid
+\mathsf C
+\right).
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+E
+\left[
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}_{\mathsf C}
+\mid
+\mathsf C
+\right]
+=
+\mathbf0,
+\]</span></p>
+<p>os termos cruzados possuem esperança nula. Assim,</p>
+<p><span class="math display">\[
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}
+\right)
+=
+E
+\left[
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}
+\mid
+\mathsf C
+\right)
+\right]
++
+\operatorname{Cov}
+\left[
+E
+\left(
+\boldsymbol{\mathsf X}
+\mid
+\mathsf C
+\right)
+\right],
+\]</span></p>
+<p>o que fornece</p>
+<p><span class="math display">\[
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf X}
+\right)
+=
+\boldsymbol{\Sigma}_W
++
+\boldsymbol{\Sigma}_B.
+\]</span></p>
+</section>
+<section id="dispersões-projetadas" class="level3" data-number="19.6.3">
+<h3 data-number="19.6.3" class="anchored" data-anchor-id="dispersões-projetadas"><span class="header-section-number">19.6.3</span> Dispersões projetadas</h3>
+<p>Considere uma direção</p>
+<p><span class="math display">\[
+\mathbf a
+\in
+\mathbb R^p,
+\qquad
+\mathbf a\neq\mathbf0,
+\]</span></p>
+<p>e a combinação linear</p>
+<p><span class="math display">\[
+\mathsf Z
+=
+\mathbf a^\top
+\boldsymbol{\mathsf X}.
+\]</span></p>
+<p>A dispersão média de <span class="math inline">\(\mathsf Z\)</span> dentro das classes é</p>
+<p><span id="eq-dispersao-populacional-intra-projetada-fisher"><span class="math display">\[
+\sum_{k=1}^{K}
+\pi_k
+\operatorname{Var}
+\left(
+\mathsf Z
+\mid
+\mathsf C=k
+\right)
+=
+\mathbf a^\top
+\boldsymbol{\Sigma}_W
+\mathbf a,
+\tag{19.30}\]</span></span></p>
+<p>enquanto a dispersão das médias condicionais projetadas é</p>
+<p><span id="eq-dispersao-populacional-entre-projetada-fisher"><span class="math display">\[
+\sum_{k=1}^{K}
+\pi_k
+\left[
+\mathbf a^\top
+\left(
+\boldsymbol{\mu}_k-\boldsymbol{\mu}
+\right)
+\right]^2
+=
+\mathbf a^\top
+\boldsymbol{\Sigma}_B
+\mathbf a.
+\tag{19.31}\]</span></span></p>
+<div id="def-criterio-fisher-populacional-discriminante" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.10 (Critério populacional de Fisher)</strong></span> Se</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_B
+\succeq
+\mathbf0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_W
+\succ
+\mathbf0,
+\]</span></p>
+<p>o <strong>critério populacional de Fisher</strong> é</p>
+<p><span id="eq-criterio-fisher-populacional-discriminante"><span class="math display">\[
+J_F^{(P)}
+(\mathbf a)
+=
+\frac{
+\mathbf a^\top
+\boldsymbol{\Sigma}_B
+\mathbf a
+}{
+\mathbf a^\top
+\boldsymbol{\Sigma}_W
+\mathbf a
+},
+\qquad
+\mathbf a\neq\mathbf0.
+\tag{19.32}\]</span></span></p>
+</div>
+<p>O numerador mede a separação entre os vetores de médias das classes depois da projeção. O denominador mede a dispersão média que permanece dentro das classes na mesma direção. O critério procura, portanto, separação elevada relativamente à variabilidade intragrupos.</p>
+<p>Essa formulação exige segundos momentos finitos e, na forma clássica adotada aqui,</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_W
+\succ
+\mathbf0.
+\]</span></p>
+<p>A normalidade multivariada e a igualdade</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_1
+=
+\cdots
+=
+\boldsymbol{\Sigma}_K
+\]</span></p>
+<p>não são necessárias para definir o critério.</p>
+<p>Quando as covariâncias condicionais são comuns,</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_k
+=
+\boldsymbol{\Sigma},
+\qquad
+k=1,\ldots,K,
+\]</span></p>
+<p>tem-se</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_W
+=
+\boldsymbol{\Sigma}.
+\]</span></p>
+<p>Essa condição estabelecerá posteriormente a relação entre a direção de Fisher e a discriminação linear normal.</p>
+</section>
+</section>
+<section id="formulação-amostral-de-fisher" class="level2" data-number="19.7">
+<h2 data-number="19.7" class="anchored" data-anchor-id="formulação-amostral-de-fisher"><span class="header-section-number">19.7</span> Formulação amostral de Fisher</h2>
+<p>Considere uma amostra com grupos conhecidos, com <span class="math inline">\(n_k\)</span> observações no grupo <span class="math inline">\(k\)</span> e</p>
+<p><span class="math display">\[
+n
+=
+\sum_{k=1}^{K}
+n_k
+\]</span></p>
+<p>observações no total.</p>
+<p>As matrizes de dispersão intragrupos e entre grupos já foram definidas em <a href="mod_2_covariancias.html#def-sscp-intragrupos" class="quarto-xref">Definição&nbsp;<span>8.14</span></a> e <a href="mod_2_covariancias.html#def-sscp-entre-grupos" class="quarto-xref">Definição&nbsp;<span>8.15</span></a>. Elas serão denotadas, respectivamente, por</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{intra}}
+\qquad\text{e}\qquad
+\mathbf T_{\mathrm{entre}}.
+\]</span></p>
+<p>Pela decomposição estabelecida em <a href="mod_2_covariancias.html#prp-decomposicao-dispersao-grupos" class="quarto-xref">Proposição&nbsp;<span>8.10</span></a>,</p>
+<p><span class="math display">\[
+\mathbf T
+=
+\mathbf T_{\mathrm{intra}}
++
+\mathbf T_{\mathrm{entre}}.
+\]</span></p>
+<p>Na formulação amostral de Fisher, essas matrizes desempenham funções distintas: <span class="math inline">\(\mathbf T_{\mathrm{intra}}\)</span> representa a dispersão das observações em torno dos centroides de seus grupos, enquanto <span class="math inline">\(\mathbf T_{\mathrm{entre}}\)</span> representa a dispersão dos centroides em torno da média global.</p>
+<p>As matrizes</p>
+<p><span class="math display">\[
+\frac1n
+\mathbf T_{\mathrm{intra}}
+\qquad\text{e}\qquad
+\frac1n
+\mathbf T_{\mathrm{entre}}
+\]</span></p>
+<p>correspondem às versões empíricas das dispersões populacionais quando as classes recebem pesos <span class="math inline">\(n_k/n\)</span>. Como a multiplicação do numerador e do denominador por um mesmo escalar positivo não altera o quociente de Fisher, o critério pode ser formulado diretamente com as SQPCs.</p>
+<p>Os pesos <span class="math inline">\(n_k\)</span> presentes em <span class="math inline">\(\mathbf T_{\mathrm{entre}}\)</span> pertencem à decomposição da amostra observada. Eles não devem ser identificados automaticamente com as probabilidades <em>a priori</em> <span class="math inline">\(\pi_k\)</span> utilizadas na classificação probabilística.</p>
+<p>Considere agora uma direção</p>
+<p><span class="math display">\[
+\mathbf a
+\in
+\mathbb R^p,
+\qquad
+\mathbf a\neq\mathbf0.
+\]</span></p>
+<p>Para uma observação</p>
+<p><span class="math display">\[
+\mathbf x
+\in
+\mathbb R^p,
+\]</span></p>
+<p>sua coordenada projetada é</p>
+<p><span class="math display">\[
+z
+=
+\mathbf a^\top
+\mathbf x.
+\]</span></p>
+<p>Depois da projeção, a dispersão intragrupos é</p>
+<p><span class="math display">\[
+\mathbf a^\top
+\mathbf T_{\mathrm{intra}}
+\mathbf a,
+\]</span></p>
+<p>enquanto a dispersão entre os centroides é</p>
+<p><span class="math display">\[
+\mathbf a^\top
+\mathbf T_{\mathrm{entre}}
+\mathbf a.
+\]</span></p>
+<div id="def-criterio-fisher-discriminante" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.11 (Critério amostral de Fisher)</strong></span> Sejam</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{entre}},
+\mathbf T_{\mathrm{intra}}
+\in
+\mathbb R^{p\times p}
+\]</span></p>
+<p>matrizes simétricas tais que</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{entre}}
+\succeq
+\mathbf0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{intra}}
+\succ
+\mathbf0.
+\]</span></p>
+<p>Para</p>
+<p><span class="math display">\[
+\mathbf a
+\in
+\mathbb R^p,
+\qquad
+\mathbf a\neq\mathbf0,
+\]</span></p>
+<p>o <strong>critério amostral de Fisher</strong> é</p>
+<p><span id="eq-criterio-fisher-discriminante"><span class="math display">\[
+J_F(\mathbf a)
+=
+\frac{
+\mathbf a^\top
+\mathbf T_{\mathrm{entre}}
+\mathbf a
+}{
+\mathbf a^\top
+\mathbf T_{\mathrm{intra}}
+\mathbf a
+}.
+\tag{19.33}\]</span></span></p>
+</div>
+<p>O numerador mede a separação dos centroides depois da projeção, enquanto o denominador mede a dispersão que permanece dentro dos grupos na mesma direção.</p>
+<p>Como</p>
+<p><span class="math display">\[
+J_F(c\mathbf a)
+=
+J_F(\mathbf a),
+\qquad
+c\neq0,
+\]</span></p>
+<p>o critério identifica direções, e não vetores com comprimento determinado.</p>
+<p>Maximizar <span class="math inline">\(J_F(\mathbf a)\)</span> corresponde a procurar uma combinação das características na qual a separação entre grupos seja elevada relativamente à dispersão intragrupos. A construção é supervisionada porque os rótulos dos grupos determinam diretamente <span class="math inline">\(\mathbf T_{\mathrm{intra}}\)</span> e <span class="math inline">\(\mathbf T_{\mathrm{entre}}\)</span>.</p>
+<p>A <a href="#fig-projecoes-fisher" class="quarto-xref">Figura&nbsp;<span>19.2</span></a> compara duas projeções das mesmas observações. A primeira utiliza a direção que une os centroides; a segunda utiliza a direção determinada pelo critério de Fisher. Os escores são padronizados pelo desvio padrão intragrupos para tornar comparáveis as duas projeções.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-projecoes-fisher" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-projecoes-fisher-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_discriminante_files/figure-html/fig-projecoes-fisher-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-projecoes-fisher-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;19.2: Projeção das mesmas duas classes na direção que une os centroides e na direção de Fisher. A direção discriminante aumenta a separação entre os grupos relativamente à dispersão intragrupos.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A figura ilustra o papel do denominador de <a href="#eq-criterio-fisher-discriminante" class="quarto-xref">Equação&nbsp;<span>19.33</span></a>: uma diferença entre centroides é mais informativa quando ocorre em uma direção na qual a dispersão intragrupos é relativamente pequena.</p>
+</section>
+<section id="direções-discriminantes-e-autovalores-generalizados" class="level2" data-number="19.8">
+<h2 data-number="19.8" class="anchored" data-anchor-id="direções-discriminantes-e-autovalores-generalizados"><span class="header-section-number">19.8</span> Direções discriminantes e autovalores generalizados</h2>
+<p>O critério em <a href="#eq-criterio-fisher-discriminante" class="quarto-xref">Equação&nbsp;<span>19.33</span></a> é o quociente de Rayleigh generalizado definido em <a href="mod_1_autovetores.html#def-quociente-rayleigh-generalizado" class="quarto-xref">Definição&nbsp;<span>5.12</span></a>, aplicado ao par</p>
+<p><span class="math display">\[
+\left(
+\mathbf T_{\mathrm{entre}},
+\mathbf T_{\mathrm{intra}}
+\right).
+\]</span></p>
+<p>Pelo resultado de <a href="mod_1_autovetores.html#thm-extremos-rayleigh-generalizado" class="quarto-xref">Teorema&nbsp;<span>5.8</span></a>, os extremos de</p>
+<p><span class="math display">\[
+J_F(\mathbf a)
+\]</span></p>
+<p>são determinados pelo problema</p>
+<p><span id="eq-autovalor-generalizado-fisher"><span class="math display">\[
+\mathbf T_{\mathrm{entre}}
+\mathbf a
+=
+\lambda
+\mathbf T_{\mathrm{intra}}
+\mathbf a.
+\tag{19.34}\]</span></span></p>
+<p>Nessa expressão, <span class="math inline">\(\mathbf a\)</span> representa uma direção genérica. As soluções normalizadas serão denotadas por <span class="math inline">\(\boldsymbol{\alpha}_j\)</span>.</p>
+<section id="geometria-pela-dispersão-intragrupos" class="level3" data-number="19.8.1">
+<h3 data-number="19.8.1" class="anchored" data-anchor-id="geometria-pela-dispersão-intragrupos"><span class="header-section-number">19.8.1</span> Geometria pela dispersão intragrupos</h3>
+<p>Como</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{intra}}
+\succ
+\mathbf0,
+\]</span></p>
+<p>sua raiz quadrada principal e sua inversa existem por <a href="mod_1_autovetores.html#def-raiz-quadrada-principal" class="quarto-xref">Definição&nbsp;<span>5.9</span></a>.</p>
+<p>Defina</p>
+<p><span class="math display">\[
+\mathbf u
+=
+\mathbf T_{\mathrm{intra}}^{1/2}
+\mathbf a.
+\]</span></p>
+<p>Então,</p>
+<p><span class="math display">\[
+\mathbf a
+=
+\mathbf T_{\mathrm{intra}}^{-1/2}
+\mathbf u,
+\]</span></p>
+<p>e <a href="#eq-autovalor-generalizado-fisher" class="quarto-xref">Equação&nbsp;<span>19.34</span></a> torna-se</p>
+<p><span class="math display">\[
+\mathbf M_F
+\mathbf u
+=
+\lambda
+\mathbf u,
+\]</span></p>
+<p>em que</p>
+<p><span id="eq-matriz-fisher-branqueada"><span class="math display">\[
+\mathbf M_F
+=
+\mathbf T_{\mathrm{intra}}^{-1/2}
+\mathbf T_{\mathrm{entre}}
+\mathbf T_{\mathrm{intra}}^{-1/2}
+\in
+\mathbb R^{p\times p}.
+\tag{19.35}\]</span></span></p>
+<p>A matriz <span class="math inline">\(\mathbf M_F\)</span> é simétrica e semidefinida positiva. Como <span class="math inline">\(\mathbf T_{\mathrm{intra}}^{-1/2}\)</span> é invertível,</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf M_F
+\right)
+=
+\operatorname{posto}
+\left(
+\mathbf T_{\mathrm{entre}}
+\right).
+\]</span></p>
+<p>Defina</p>
+<p><span class="math display">\[
+r_F
+=
+\operatorname{posto}
+\left(
+\mathbf T_{\mathrm{entre}}
+\right).
+\]</span></p>
+<p>A matriz <span class="math inline">\(\mathbf M_F\)</span> possui exatamente <span class="math inline">\(r_F\)</span> autovalores positivos, que coincidem com as raízes positivas do problema generalizado de Fisher.</p>
+<div id="def-direcoes-discriminantes-fisher" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.12 (Direções discriminantes de Fisher)</strong></span> Sejam</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{entre}},
+\mathbf T_{\mathrm{intra}}
+\in
+\mathbb R^{p\times p},
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{entre}}
+\succeq
+\mathbf0
+\qquad\text{e}\qquad
+\mathbf T_{\mathrm{intra}}
+\succ
+\mathbf0.
+\]</span></p>
+<p>Defina</p>
+<p><span class="math display">\[
+r_F
+=
+\operatorname{posto}
+\left(
+\mathbf T_{\mathrm{entre}}
+\right).
+\]</span></p>
+<p>Se <span class="math inline">\(r_F\geq1\)</span>, as <strong>direções discriminantes de Fisher</strong> são autovetores generalizados</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_1,
+\ldots,
+\boldsymbol{\alpha}_{r_F}
+\in
+\mathbb R^p
+\]</span></p>
+<p>associados às raízes positivas</p>
+<p><span class="math display">\[
+\lambda_1
+\geq
+\lambda_2
+\geq
+\cdots
+\geq
+\lambda_{r_F}
+&gt;
+0
+\]</span></p>
+<p>e escolhidos com a normalização</p>
+<p><span id="eq-ortogonalidade-fisher"><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\mathbf T_{\mathrm{intra}}
+\boldsymbol{\alpha}_\ell
+=
+\delta_{j\ell}.
+\tag{19.36}\]</span></span></p>
+<p>Com essa convenção,</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{entre}}
+\boldsymbol{\alpha}_j
+=
+\lambda_j
+\mathbf T_{\mathrm{intra}}
+\boldsymbol{\alpha}_j.
+\]</span></p>
+</div>
+<p>Se</p>
+<p><span class="math display">\[
+r_F=0,
+\]</span></p>
+<p>então</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{entre}}
+=
+\mathbf0,
+\]</span></p>
+<p>e não existe direção com separação amostral positiva entre os centroides.</p>
+<p>Para a primeira direção,</p>
+<p><span class="math display">\[
+J_F
+\left(
+\boldsymbol{\alpha}_1
+\right)
+=
+\lambda_1
+=
+\max_{\mathbf a\neq\mathbf0}
+J_F(\mathbf a).
+\]</span></p>
+<p>A normalização em <a href="#eq-ortogonalidade-fisher" class="quarto-xref">Equação&nbsp;<span>19.36</span></a> implica, para cada <span class="math inline">\(j\)</span>,</p>
+<p><span id="eq-normalizacao-fisher"><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\mathbf T_{\mathrm{intra}}
+\boldsymbol{\alpha}_j
+=
+1.
+\tag{19.37}\]</span></span></p>
+<p>Consequentemente,</p>
+<p><span id="eq-raiz-separacao-fisher"><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\mathbf T_{\mathrm{entre}}
+\boldsymbol{\alpha}_j
+=
+\lambda_j.
+\tag{19.38}\]</span></span></p>
+<p>Cada raiz <span class="math inline">\(\lambda_j\)</span> mede, portanto, a separação entre os grupos na direção <span class="math inline">\(\boldsymbol{\alpha}_j\)</span> depois que a dispersão intragrupos nessa direção foi normalizada para <span class="math inline">\(1\)</span>.</p>
+<p>Quando <span class="math inline">\(r_F\geq1\)</span>, a participação relativa de cada raiz na soma das raízes discriminantes positivas pode ser expressa por</p>
+<p><span id="eq-proporcao-raiz-discriminante"><span class="math display">\[
+\rho_j
+=
+\frac{
+\lambda_j
+}{
+\displaystyle
+\sum_{\ell=1}^{r_F}
+\lambda_\ell
+},
+\qquad
+j=1,\ldots,r_F.
+\tag{19.39}\]</span></span></p>
+<p>Consequentemente,</p>
+<p><span class="math display">\[
+\sum_{j=1}^{r_F}
+\rho_j
+=
+1.
+\]</span></p>
+<p>A quantidade <span class="math inline">\(\rho_j\)</span> descreve a participação relativa da direção <span class="math inline">\(j\)</span> na soma das raízes discriminantes positivas. Ela não representa uma proporção da variância total das características, como ocorre na ACP. As raízes de Fisher quantificam separação entre grupos relativamente à dispersão intragrupos, de modo que sua interpretação permanece vinculada ao critério discriminante.</p>
+<p>A ortogonalidade em <a href="#eq-ortogonalidade-fisher" class="quarto-xref">Equação&nbsp;<span>19.36</span></a> é definida pela geometria induzida por <span class="math inline">\(\mathbf T_{\mathrm{intra}}\)</span>. Em geral,</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\boldsymbol{\alpha}_\ell
+\]</span></p>
+<p>não precisa ser zero para</p>
+<p><span class="math display">\[
+j\neq\ell.
+\]</span></p>
+</section>
+<section id="número-de-direções-discriminantes" class="level3" data-number="19.8.2">
+<h3 data-number="19.8.2" class="anchored" data-anchor-id="número-de-direções-discriminantes"><span class="header-section-number">19.8.2</span> Número de direções discriminantes</h3>
+<p>Pelo limite de posto estabelecido em <a href="mod_2_covariancias.html#eq-posto-sscp-entre-grupos" class="quarto-xref">Equação&nbsp;<span>8.101</span></a>,</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf T_{\mathrm{entre}}
+\right)
+\leq
+\min
+\left(
+p,K-1
+\right).
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+r_F
+=
+\operatorname{posto}
+\left(
+\mathbf T_{\mathrm{entre}}
+\right),
+\]</span></p>
+<p>segue que</p>
+<p><span id="eq-numero-direcoes-discriminantes"><span class="math display">\[
+r_F
+\leq
+\min
+\left(
+p,K-1
+\right).
+\tag{19.40}\]</span></span></p>
+<p>O limite decorre de duas restrições. A separação ocorre em um espaço de dimensão <span class="math inline">\(p\)</span>, e os <span class="math inline">\(K\)</span> centroides centralizados em torno da média global podem gerar no máximo <span class="math inline">\(K-1\)</span> direções linearmente independentes.</p>
+<p>Assim, dois grupos produzem no máximo uma direção discriminante, e <span class="math inline">\(K\)</span> grupos produzem no máximo <span class="math inline">\(K-1\)</span>, sem ultrapassar a dimensão original <span class="math inline">\(p\)</span>.</p>
+<p>O subespaço gerado por</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_1,
+\ldots,
+\boldsymbol{\alpha}_{r_F}
+\]</span></p>
+<p>é o subespaço discriminante de Fisher. A próxima seção utiliza essas direções para construir coordenadas supervisionadas das observações e dos centroides.</p>
+</section>
+</section>
+<section id="sec-discriminante-representacao" class="level2" data-number="19.9">
+<h2 data-number="19.9" class="anchored" data-anchor-id="sec-discriminante-representacao"><span class="header-section-number">19.9</span> Representação no subespaço discriminante</h2>
+<p>As direções</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_1,
+\ldots,
+\boldsymbol{\alpha}_{r_F}
+\]</span></p>
+<p>definidas em <a href="#def-direcoes-discriminantes-fisher" class="quarto-xref">Definição&nbsp;<span>19.12</span></a> determinam um subespaço supervisionado de dimensão</p>
+<p><span class="math display">\[
+r_F
+\leq
+\min
+\left(
+p,K-1
+\right).
+\]</span></p>
+<p>A projeção nesse subespaço produz coordenadas construídas especificamente para representar a separação entre os grupos relativamente à dispersão intragrupos.</p>
+<div id="def-coordenadas-discriminantes" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 19.13 (Coordenadas discriminantes)</strong></span> Considere as direções discriminantes normalizadas</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_1,
+\ldots,
+\boldsymbol{\alpha}_{r_F}
+\in
+\mathbb R^p
+\]</span></p>
+<p>e a média global amostral</p>
+<p><span class="math display">\[
+\overline{\mathbf x}
+\in
+\mathbb R^p.
+\]</span></p>
+<p>A <strong>coordenada discriminante <span class="math inline">\(j\)</span></strong> de uma observação</p>
+<p><span class="math display">\[
+\mathbf x
+\in
+\mathbb R^p
+\]</span></p>
+<p>é</p>
+<p><span id="eq-coordenada-discriminante"><span class="math display">\[
+z_j(\mathbf x)
+=
+\boldsymbol{\alpha}_j^\top
+\left(
+\mathbf x-\overline{\mathbf x}
+\right),
+\qquad
+j=1,\ldots,r_F.
+\tag{19.41}\]</span></span></p>
+<p>O vetor de coordenadas discriminantes é</p>
+<p><span id="eq-vetor-coordenadas-discriminantes"><span class="math display">\[
+\mathbf z(\mathbf x)
+=
+\begin{pmatrix}
+z_1(\mathbf x)\\
+\vdots\\
+z_{r_F}(\mathbf x)
+\end{pmatrix}
+\in
+\mathbb R^{r_F}.
+\tag{19.42}\]</span></span></p>
+</div>
+<p>A centralização coloca a média global na origem da representação. Utilizar</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j^\top\mathbf x
+\]</span></p>
+<p>sem centralização preservaria as diferenças entre observações e centroides, modificando apenas a origem das coordenadas.</p>
+<p>O centroide do grupo <span class="math inline">\(k\)</span> na dimensão discriminante <span class="math inline">\(j\)</span> é</p>
+<p><span id="eq-centroide-discriminante"><span class="math display">\[
+\overline z_{kj}
+=
+\boldsymbol{\alpha}_j^\top
+\left(
+\overline{\mathbf x}_k
+-
+\overline{\mathbf x}
+\right).
+\tag{19.43}\]</span></span></p>
+<p>A representação é supervisionada porque</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_1,
+\ldots,
+\boldsymbol{\alpha}_{r_F}
+\]</span></p>
+<p>dependem de <span class="math inline">\(\mathbf T_{\mathrm{intra}}\)</span> e <span class="math inline">\(\mathbf T_{\mathrm{entre}}\)</span>, que são construídas a partir dos grupos conhecidos. Alterações nos rótulos ou na composição dos grupos podem modificar o subespaço discriminante.</p>
+<p>A <a href="#fig-coordenadas-discriminantes" class="quarto-xref">Figura&nbsp;<span>19.3</span></a> compara a representação das mesmas observações em duas características originais com a representação obtida pelas duas direções discriminantes disponíveis para três grupos. No segundo caso, as coordenadas incorporam conjuntamente as três características para representar a separação supervisionada.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-coordenadas-discriminantes" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-coordenadas-discriminantes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_discriminante_files/figure-html/fig-coordenadas-discriminantes-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="960">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-coordenadas-discriminantes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;19.3: Representação de três grupos em duas características originais e nas duas coordenadas discriminantes de Fisher. As coordenadas são construídas especificamente para representar a separação entre os grupos.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>No segundo painel, as direções são determinadas pelo problema espectral de Fisher. A transformação por</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{intra}}^{-1/2}
+\]</span></p>
+<p>padroniza a dispersão intragrupos, e os autovetores de</p>
+<p><span class="math display">\[
+\mathbf M_F
+\]</span></p>
+<p>identificam as direções de maior separação entre os centroides nesse espaço transformado.</p>
+<p>A construção difere da ACP. No <a href="mod_3_cp.html" class="quarto-xref"><span>Capítulo 14</span></a>, as direções são escolhidas pela variabilidade total; em Fisher, são escolhidas pela separação entre grupos relativamente à dispersão intragrupos.</p>
+<section id="aprofundamento-coeficientes-das-funções-discriminantes" class="level3" data-number="19.9.1">
+<h3 data-number="19.9.1" class="anchored" data-anchor-id="aprofundamento-coeficientes-das-funções-discriminantes"><span class="header-section-number">19.9.1</span> Aprofundamento: coeficientes das funções discriminantes</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>As direções discriminantes determinam as coordenadas utilizadas para representar a separação entre os grupos. Na interpretação das funções, podem aparecer diferentes versões de seus coeficientes e correlações entre as características originais e as coordenadas discriminantes. Esses objetos possuem significados distintos e não devem ser utilizados de forma intercambiável.</p>
+</div>
+</div>
+<p>Os elementos de <span class="math inline">\(\boldsymbol{\alpha}_j\)</span> são os coeficientes utilizados para construir a coordenada discriminante</p>
+<p><span class="math display">\[
+z_j(\mathbf x)
+=
+\boldsymbol{\alpha}_j^\top
+\left(
+\mathbf x-\overline{\mathbf x}
+\right).
+\]</span></p>
+<p>Esses coeficientes dependem da escala das características, de sua estrutura de dispersão e da normalização adotada para a direção. Sua magnitude isolada não fornece, em geral, uma medida direta da importância de cada variável.</p>
+<p>Uma mesma direção discriminante pode ser representada por vetores que diferem por um escalar não nulo. Uma forma adicional de normalização consiste em definir</p>
+<p><span id="eq-coeficientes-normalizados-discriminante"><span class="math display">\[
+\widetilde{\boldsymbol{\alpha}}_j
+=
+\frac{
+\boldsymbol{\alpha}_j
+}{
+\left\|
+\boldsymbol{\alpha}_j
+\right\|_2
+}.
+\tag{19.44}\]</span></span></p>
+<p>Esse reescalonamento não preserva necessariamente a normalização em <a href="#eq-ortogonalidade-fisher" class="quarto-xref">Equação&nbsp;<span>19.36</span></a>, mas preserva a direção geométrica, pois</p>
+<p><span class="math display">\[
+\operatorname{span}
+\left(
+\widetilde{\boldsymbol{\alpha}}_j
+\right)
+=
+\operatorname{span}
+\left(
+\boldsymbol{\alpha}_j
+\right).
+\]</span></p>
+<p>Os <strong>coeficientes normalizados</strong> são, portanto, os coeficientes da mesma direção expressos em outra escala. Eles não constituem uma nova medida de associação entre as características e a função discriminante.</p>
+<p>Outro objeto é fornecido pelos <strong>coeficientes de estrutura</strong>. Para a característica <span class="math inline">\(X_h\)</span> e a coordenada discriminante <span class="math inline">\(Z_j\)</span>, o coeficiente de estrutura é a correlação entre a característica e a coordenada,</p>
+<p><span id="eq-coeficiente-estrutura-discriminante"><span class="math display">\[
+r_{hj}^{(\mathrm{est})}
+=
+\operatorname{Corr}
+\left(
+X_h,
+Z_j
+\right),
+\tag{19.45}\]</span></span></p>
+<p>ou sua correspondente estimativa amostral quando a análise é construída a partir dos dados observados.</p>
+<p>O coeficiente da direção e o coeficiente de estrutura possuem interpretações distintas. O primeiro participa diretamente da construção da combinação linear; o segundo descreve a associação linear entre uma característica e a coordenada resultante. Como as características originais podem estar correlacionadas, uma variável pode apresentar coeficiente relativamente pequeno na combinação linear e, ainda assim, correlação elevada com a função discriminante.</p>
+<p>Assim, a interpretação deve distinguir os coeficientes que definem a direção, seus reescalonamentos e as correlações das características com as coordenadas discriminantes. Critérios operacionais para avaliar a contribuição substantiva das variáveis pertencem à etapa metodológica posterior.</p>
+</section>
+</section>
+<section id="relação-espectral-com-a-manova" class="level2" data-number="19.10">
+<h2 data-number="19.10" class="anchored" data-anchor-id="relação-espectral-com-a-manova"><span class="header-section-number">19.10</span> Relação espectral com a MANOVA</h2>
+<p>A formulação de Fisher e a MANOVA compartilham o mesmo problema espectral quando são aplicadas à mesma estrutura de grupos.</p>
+<p>Na comparação multivariada entre grupos,</p>
+<p><span class="math display">\[
+\mathbf E
+=
+\mathbf T_{\mathrm{intra}}
+\]</span></p>
+<p>e</p>
+<p><span id="eq-correspondencia-manova-fisher"><span class="math display">\[
+\mathbf H
+=
+\mathbf T_{\mathrm{entre}}.
+\tag{19.46}\]</span></span></p>
+<p>Assim, o problema de Fisher</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{entre}}
+\boldsymbol{\alpha}_j
+=
+\lambda_j
+\mathbf T_{\mathrm{intra}}
+\boldsymbol{\alpha}_j
+\]</span></p>
+<p>coincide com o problema de autovalores generalizados desenvolvido no <a href="mod_3_manova.html" class="quarto-xref"><span>Capítulo 18</span></a>.</p>
+<p>As raízes positivas e os subespaços característicos são, portanto, os mesmos quando as matrizes de hipótese e erro da MANOVA correspondem, respectivamente, às dispersões entre e dentro dos grupos.</p>
+<p>O significado estatístico da solução depende da técnica. Na MANOVA, as raízes são agregadas pelos critérios de Wilks, Pillai, Hotelling–Lawley e Roy para avaliar uma hipótese sobre os grupos. Na formulação de Fisher, os autovetores generalizados associados às raízes positivas definem direções utilizadas para representar sua separação.</p>
+<p>A coincidência algébrica não implica coincidência de objetivos: a MANOVA utiliza a estrutura espectral para inferência sobre efeitos, enquanto Fisher a utiliza para construir uma representação discriminante.</p>
+</section>
+<section id="dois-grupos-e-relação-entre-fisher-e-lda" class="level2" data-number="19.11">
+<h2 data-number="19.11" class="anchored" data-anchor-id="dois-grupos-e-relação-entre-fisher-e-lda"><span class="header-section-number">19.11</span> Dois grupos e relação entre Fisher e LDA</h2>
+<p>Quando</p>
+<p><span class="math display">\[
+K=2,
+\]</span></p>
+<p>a matriz de dispersão entre grupos possui posto no máximo <span class="math inline">\(1\)</span>. Existe, portanto, no máximo uma direção discriminante associada a uma raiz positiva.</p>
+<p>Defina</p>
+<p><span id="eq-diferenca-medias-fisher"><span class="math display">\[
+\mathbf d
+=
+\overline{\mathbf x}_1
+-
+\overline{\mathbf x}_2.
+\tag{19.47}\]</span></span></p>
+<p>Para dois grupos,</p>
+<p><span id="eq-tentre-dois-grupos-fisher"><span class="math display">\[
+\mathbf T_{\mathrm{entre}}
+=
+\frac{
+n_1n_2
+}{
+n_1+n_2
+}
+\mathbf d\mathbf d^\top.
+\tag{19.48}\]</span></span></p>
+<p>Se</p>
+<p><span class="math display">\[
+\mathbf d=\mathbf0,
+\]</span></p>
+<p>então</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{entre}}
+=
+\mathbf0,
+\]</span></p>
+<p>e não existe direção com separação amostral positiva.</p>
+<p>Suponha agora</p>
+<p><span class="math display">\[
+\mathbf d\neq\mathbf0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{intra}}
+\succ
+\mathbf0.
+\]</span></p>
+<p>Como <a href="#eq-tentre-dois-grupos-fisher" class="quarto-xref">Equação&nbsp;<span>19.48</span></a> possui posto <span class="math inline">\(1\)</span>, a única direção discriminante possível satisfaz</p>
+<p><span id="eq-direcao-fisher-dois-grupos"><span class="math display">\[
+\boldsymbol{\alpha}_1
+\propto
+\mathbf T_{\mathrm{intra}}^{-1}
+\left(
+\overline{\mathbf x}_1
+-
+\overline{\mathbf x}_2
+\right).
+\tag{19.49}\]</span></span></p>
+<p>A diferença</p>
+<p><span class="math display">\[
+\overline{\mathbf x}_1
+-
+\overline{\mathbf x}_2
+\]</span></p>
+<p>representa a separação bruta entre os centroides. A multiplicação por</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{intra}}^{-1}
+\]</span></p>
+<p>repondera essa separação segundo a dispersão e as associações existentes dentro dos grupos.</p>
+<p>A direção de Fisher não é, portanto, determinada apenas pela distância entre os centroides. Diferenças que ocorrem em direções de elevada dispersão intragrupos recebem menor peso relativo do que diferenças de mesma magnitude em direções de menor dispersão.</p>
+<section id="formulação-populacional-para-dois-grupos" class="level3" data-number="19.11.1">
+<h3 data-number="19.11.1" class="anchored" data-anchor-id="formulação-populacional-para-dois-grupos"><span class="header-section-number">19.11.1</span> Formulação populacional para dois grupos</h3>
+<p>A mesma estrutura aparece na formulação populacional.</p>
+<p>Considere</p>
+<p><span class="math display">\[
+P(\mathsf C=1)
+=
+\pi_1,
+\qquad
+P(\mathsf C=2)
+=
+\pi_2,
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\pi_1+\pi_2=1,
+\]</span></p>
+<p>e defina</p>
+<p><span class="math display">\[
+\mathbf d_\mu
+=
+\boldsymbol{\mu}_1
+-
+\boldsymbol{\mu}_2.
+\]</span></p>
+<p>A dispersão entre grupos é</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_B
+=
+\pi_1\pi_2
+\mathbf d_\mu
+\mathbf d_\mu^\top.
+\]</span></p>
+<p>Se</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_W
+\succ
+\mathbf0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\boldsymbol{\mu}_1
+\neq
+\boldsymbol{\mu}_2,
+\]</span></p>
+<p>uma direção que maximiza o critério populacional de Fisher satisfaz</p>
+<p><span id="eq-direcao-populacional-fisher"><span class="math display">\[
+\mathbf a_F
+\propto
+\boldsymbol{\Sigma}_W^{-1}
+\left(
+\boldsymbol{\mu}_1
+-
+\boldsymbol{\mu}_2
+\right).
+\tag{19.50}\]</span></span></p>
+<p>Esse resultado depende das estruturas de primeiro e segundo momentos e não exige normalidade multivariada.</p>
+</section>
+<section id="relação-com-a-discriminação-linear-normal" class="level3" data-number="19.11.2">
+<h3 data-number="19.11.2" class="anchored" data-anchor-id="relação-com-a-discriminação-linear-normal"><span class="header-section-number">19.11.2</span> Relação com a discriminação linear normal</h3>
+<p>Considere agora duas populações normais com matriz de covariâncias comum,</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+\mid
+\mathsf C=k
+\sim
+N_p
+\left(
+\boldsymbol{\mu}_k,
+\boldsymbol{\Sigma}
+\right),
+\qquad
+k=1,2,
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\succ
+\mathbf0.
+\]</span></p>
+<p>Na LDA, o vetor normal à fronteira entre as duas classes é</p>
+<p><span id="eq-direcao-populacional-lda"><span class="math display">\[
+\boldsymbol{\Sigma}^{-1}
+\left(
+\boldsymbol{\mu}_1
+-
+\boldsymbol{\mu}_2
+\right),
+\tag{19.51}\]</span></span></p>
+<p>conforme <a href="#eq-normal-fronteira-lda" class="quarto-xref">Equação&nbsp;<span>19.11</span></a>.</p>
+<p>Sob covariância condicional comum,</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_W
+=
+\pi_1\boldsymbol{\Sigma}
++
+\pi_2\boldsymbol{\Sigma}
+=
+\boldsymbol{\Sigma}.
+\]</span></p>
+<p>Substituindo em <a href="#eq-direcao-populacional-fisher" class="quarto-xref">Equação&nbsp;<span>19.50</span></a>,</p>
+<p><span class="math display">\[
+\mathbf a_F
+\propto
+\boldsymbol{\Sigma}^{-1}
+\left(
+\boldsymbol{\mu}_1
+-
+\boldsymbol{\mu}_2
+\right).
+\]</span></p>
+<p>Assim, para duas populações com covariância comum, a direção populacional de Fisher é paralela ao vetor normal da fronteira da LDA.</p>
+<p>Essa equivalência refere-se à <strong>orientação</strong>. Os problemas estatísticos continuam distintos.</p>
+<p>Fisher procura uma direção que maximize</p>
+<p><span class="math display">\[
+\frac{
+\mathbf a^\top
+\boldsymbol{\Sigma}_B
+\mathbf a
+}{
+\mathbf a^\top
+\boldsymbol{\Sigma}_W
+\mathbf a
+}.
+\]</span></p>
+<p>A LDA utiliza as distribuições condicionais, as probabilidades <em>a priori</em> e a função de perda para construir uma regra de classificação.</p>
+<p>A posição da fronteira da LDA depende também dos termos</p>
+<p><span class="math display">\[
+-\frac12
+\boldsymbol{\mu}_k^\top
+\boldsymbol{\Sigma}^{-1}
+\boldsymbol{\mu}_k
++
+\log\pi_k.
+\]</span></p>
+<p>Consequentemente, mudanças nas probabilidades <em>a priori</em> podem deslocar a fronteira sem modificar sua orientação. Com funções de perda diferentes da perda zero–um, a regra ótima também pode mudar sem alterar o critério geométrico de Fisher.</p>
+</section>
+<section id="aprofundamento-relação-amostral-entre-fisher-e-lda" class="level3" data-number="19.11.3">
+<h3 data-number="19.11.3" class="anchored" data-anchor-id="aprofundamento-relação-amostral-entre-fisher-e-lda"><span class="header-section-number">19.11.3</span> Aprofundamento: relação amostral entre Fisher e LDA</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A equivalência de orientação entre Fisher e LDA para dois grupos também aparece na solução estimada. Quando as duas formulações utilizam a mesma matriz agrupada de dispersão intragrupos, seus vetores discriminantes diferem apenas por um fator de escala.</p>
+</div>
+</div>
+<p>Na amostra, <a href="#eq-estimativa-covariancia-agrupada-discriminante" class="quarto-xref">Equação&nbsp;<span>19.18</span></a> fornece</p>
+<p><span class="math display">\[
+\mathbf S_p
+=
+\frac1{n-K}
+\mathbf T_{\mathrm{intra}}.
+\]</span></p>
+<p>Consequentemente,</p>
+<p><span class="math display">\[
+\mathbf S_p^{-1}
+=
+(n-K)
+\mathbf T_{\mathrm{intra}}^{-1},
+\]</span></p>
+<p>quando as duas matrizes são não singulares.</p>
+<p>Para</p>
+<p><span class="math display">\[
+K=2,
+\]</span></p>
+<p>segue que</p>
+<p><span id="eq-relacao-amostral-fisher-lda"><span class="math display">\[
+\mathbf S_p^{-1}
+\left(
+\overline{\mathbf x}_1
+-
+\overline{\mathbf x}_2
+\right)
+\propto
+\mathbf T_{\mathrm{intra}}^{-1}
+\left(
+\overline{\mathbf x}_1
+-
+\overline{\mathbf x}_2
+\right).
+\tag{19.52}\]</span></span></p>
+<p>Assim, quando a mesma estimativa agrupada de covariâncias é utilizada, a orientação estimada da fronteira da LDA coincide, até escala, com a direção amostral de Fisher.</p>
+<p>A regra estimada da LDA ainda contém os termos associados às probabilidades <em>a priori</em> e às médias das classes, necessários para determinar a posição da fronteira e classificar novas observações.</p>
+</section>
+<section id="mais-de-dois-grupos" class="level3" data-number="19.11.4">
+<h3 data-number="19.11.4" class="anchored" data-anchor-id="mais-de-dois-grupos"><span class="header-section-number">19.11.4</span> Mais de dois grupos</h3>
+<p>Quando</p>
+<p><span class="math display">\[
+K&gt;2,
+\]</span></p>
+<p>a matriz</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{entre}}
+\]</span></p>
+<p>pode possuir posto superior a <span class="math inline">\(1\)</span>, e Fisher pode produzir</p>
+<p><span class="math display">\[
+r_F
+\leq
+\min
+\left(
+p,K-1
+\right)
+\]</span></p>
+<p>direções discriminantes.</p>
+<p>A LDA, por sua vez, não precisa projetar previamente as observações nessas direções. Sua regra compara diretamente</p>
+<p><span class="math display">\[
+\delta_1(\mathbf x),
+\ldots,
+\delta_K(\mathbf x)
+\]</span></p>
+<p>no espaço original das características.</p>
+<p>As direções de Fisher fornecem uma representação supervisionada da separação entre os grupos; a LDA fornece uma regra probabilística de decisão. As duas formulações compartilham médias e estruturas de dispersão, mas resolvem problemas distintos.</p>
+</section>
+</section>
+<section id="sec-discriminante-pressupostos" class="level2" data-number="19.12">
+<h2 data-number="19.12" class="anchored" data-anchor-id="sec-discriminante-pressupostos"><span class="header-section-number">19.12</span> Pressupostos e limites</h2>
+<p>As formulações desenvolvidas neste capítulo possuem requisitos diferentes. O critério de Fisher depende de estruturas de primeiro e segundo momentos e de condições de não singularidade para sua forma clássica. LDA e QDA acrescentam hipóteses probabilísticas específicas para obter as funções discriminantes normais. As regras estimadas introduzem ainda condições amostrais de posto.</p>
+<p>A <a href="#tbl-pressupostos-discriminante" class="quarto-xref">Tabela&nbsp;<span>19.3</span></a> reúne essas diferenças.</p>
+<div id="tbl-pressupostos-discriminante" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-pressupostos-discriminante-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;19.3: Condições associadas às formulações de Fisher, LDA e QDA.
+</figcaption>
+<div aria-describedby="tbl-pressupostos-discriminante-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Condição</th>
+<th>Fisher</th>
+<th>LDA normal</th>
+<th>QDA normal</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>grupos previamente definidos</td>
+<td>necessária</td>
+<td>necessária</td>
+<td>necessária</td>
+</tr>
+<tr class="even">
+<td>segundos momentos finitos</td>
+<td>necessários na formulação populacional</td>
+<td>satisfeitos sob normalidade</td>
+<td>satisfeitos sob normalidade</td>
+</tr>
+<tr class="odd">
+<td>normalidade multivariada</td>
+<td>não necessária para definir o critério de Fisher</td>
+<td>assumida na formulação normal apresentada</td>
+<td>assumida na formulação normal apresentada</td>
+</tr>
+<tr class="even">
+<td>covariância comum entre classes</td>
+<td>não necessária para o critério geométrico adotado</td>
+<td>assumida</td>
+<td>não assumida</td>
+</tr>
+<tr class="odd">
+<td>não singularidade populacional</td>
+<td><span class="math inline">\(\boldsymbol{\Sigma}_W\succ\mathbf0\)</span> na forma clássica</td>
+<td><span class="math inline">\(\boldsymbol{\Sigma}\succ\mathbf0\)</span></td>
+<td><span class="math inline">\(\boldsymbol{\Sigma}_k\succ\mathbf0\)</span> para cada classe</td>
+</tr>
+<tr class="even">
+<td>não singularidade amostral</td>
+<td><span class="math inline">\(\mathbf T_{\mathrm{intra}}\succ\mathbf0\)</span> na forma clássica</td>
+<td><span class="math inline">\(\mathbf S_p\succ\mathbf0\)</span></td>
+<td><span class="math inline">\(\mathbf S_k\succ\mathbf0\)</span> para cada classe</td>
+</tr>
+<tr class="odd">
+<td>probabilidades <em>a priori</em></td>
+<td>entram como pesos na formulação populacional; não entram como termo de decisão no critério amostral</td>
+<td>entram na regra de decisão</td>
+<td>entram na regra de decisão</td>
+</tr>
+<tr class="even">
+<td>função de perda</td>
+<td>não entra no critério</td>
+<td>as funções apresentadas correspondem à perda zero–um</td>
+<td>as funções apresentadas correspondem à perda zero–um</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<section id="grupos-previamente-definidos" class="level3" data-number="19.12.1">
+<h3 data-number="19.12.1" class="anchored" data-anchor-id="grupos-previamente-definidos"><span class="header-section-number">19.12.1</span> Grupos previamente definidos</h3>
+<p>A Análise Discriminante utiliza rótulos conhecidos durante a construção da solução.</p>
+<p>Na formulação de Fisher, esses rótulos determinam</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{intra}}
+\qquad\text{e}\qquad
+\mathbf T_{\mathrm{entre}}.
+\]</span></p>
+<p>Na formulação probabilística, eles determinam quais observações caracterizam cada distribuição condicional</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf X}
+\mid
+\mathsf C=k.
+\]</span></p>
+<p>A técnica não constrói os grupos a partir dos dados. Se os rótulos utilizados não corresponderem às classes relevantes para o problema, a solução continuará descrevendo separação ou classificação relativamente aos grupos fornecidos.</p>
+</section>
+<section id="normalidade-e-estrutura-das-covariâncias" class="level3" data-number="19.12.2">
+<h3 data-number="19.12.2" class="anchored" data-anchor-id="normalidade-e-estrutura-das-covariâncias"><span class="header-section-number">19.12.2</span> Normalidade e estrutura das covariâncias</h3>
+<p>A normalidade multivariada não é necessária para definir o critério populacional de Fisher,</p>
+<p><span class="math display">\[
+J_F^{(P)}(\mathbf a),
+\]</span></p>
+<p>nem sua versão amostral,</p>
+<p><span class="math display">\[
+J_F(\mathbf a).
+\]</span></p>
+<p>Na formulação probabilística geral, a regra de Bayes também não exige normalidade. Essa hipótese foi introduzida especificamente para obter as formas LDA e QDA apresentadas neste capítulo.</p>
+<p>Na LDA,</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_1
+=
+\cdots
+=
+\boldsymbol{\Sigma}_K
+=
+\boldsymbol{\Sigma},
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\succ
+\mathbf0.
+\]</span></p>
+<p>A matriz comum faz com que os termos quadráticos em <span class="math inline">\(\mathbf x\)</span> sejam iguais nas comparações entre classes e se cancelem, produzindo fronteiras lineares.</p>
+<p>Na QDA,</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_k
+\succ
+\mathbf0,
+\qquad
+k=1,\ldots,K,
+\]</span></p>
+<p>mas as matrizes podem diferir entre classes. Os termos quadráticos permanecem e as fronteiras podem ser quadráticas.</p>
+<p>A condição de covariância comum pertence, portanto, à formulação normal da LDA e não é necessária para definir o critério geométrico de Fisher utilizado neste capítulo.</p>
+<p>Algumas apresentações clássicas de Fisher para várias populações adotam adicionalmente uma matriz de covariâncias comum e de posto completo <span class="citation" data-cites="johnson2007">(<a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>)</span>. Essa hipótese permite relacionar diretamente a separação de Fisher à estrutura probabilística da discriminação linear normal. Aqui, porém, o critério de Fisher é apresentado em sua forma geométrica mais geral, construída a partir da dispersão média intragrupos <span class="math inline">\(\boldsymbol{\Sigma}_W\)</span>.</p>
+</section>
+<section id="não-singularidade-e-dimensão" class="level3" data-number="19.12.3">
+<h3 data-number="19.12.3" class="anchored" data-anchor-id="não-singularidade-e-dimensão"><span class="header-section-number">19.12.3</span> Não singularidade e dimensão</h3>
+<p>A forma clássica do critério populacional de Fisher pressupõe</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_W
+\succ
+\mathbf0.
+\]</span></p>
+<p>Essa condição garante</p>
+<p><span class="math display">\[
+\mathbf a^\top
+\boldsymbol{\Sigma}_W
+\mathbf a
+&gt;
+0
+\]</span></p>
+<p>para todo</p>
+<p><span class="math display">\[
+\mathbf a\neq\mathbf0
+\]</span></p>
+<p>e permite utilizar</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_W^{-1}
+\qquad\text{e}\qquad
+\boldsymbol{\Sigma}_W^{-1/2}.
+\]</span></p>
+<p>A positividade definida de <span class="math inline">\(\boldsymbol{\Sigma}_W\)</span> é uma condição sobre a estrutura de segundo momento dentro das classes e não depende de normalidade.</p>
+<p>Na formulação amostral,</p>
+<p><span id="eq-posto-tintra-discriminante"><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf T_{\mathrm{intra}}
+\right)
+\leq
+\min
+\left(
+p,n-K
+\right).
+\tag{19.53}\]</span></span></p>
+<p>Consequentemente,</p>
+<p><span id="eq-condicao-dimensao-fisher"><span class="math display">\[
+n-K
+\geq
+p
+\tag{19.54}\]</span></span></p>
+<p>é uma condição necessária para que</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{intra}}
+\]</span></p>
+<p>possa possuir posto completo.</p>
+<p>Ela não é suficiente para um conjunto de dados arbitrário. Dependências lineares exatas entre as características dentro dos grupos podem tornar <span class="math inline">\(\mathbf T_{\mathrm{intra}}\)</span> singular mesmo quando</p>
+<p><span class="math display">\[
+n-K
+\geq
+p.
+\]</span></p>
+<p>Quando</p>
+<p><span class="math display">\[
+p&gt;n-K,
+\]</span></p>
+<p>a singularidade é inevitável.</p>
+<p>Na LDA estimada,</p>
+<p><span class="math display">\[
+\mathbf S_p
+=
+\frac1{n-K}
+\mathbf T_{\mathrm{intra}},
+\]</span></p>
+<p>de modo que</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf S_p
+\right)
+=
+\operatorname{posto}
+\left(
+\mathbf T_{\mathrm{intra}}
+\right).
+\]</span></p>
+<p>A regra clássica estimada da LDA e a formulação amostral clássica de Fisher compartilham, portanto, a mesma condição de invertibilidade da dispersão intragrupos.</p>
+<p>Na QDA, cada classe possui sua própria matriz de covariâncias amostral. Para a classe <span class="math inline">\(k\)</span>,</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf S_k
+\right)
+\leq
+\min
+\left(
+p,n_k-1
+\right).
+\]</span></p>
+<p>Assim,</p>
+<p><span id="eq-condicao-dimensao-qda"><span class="math display">\[
+n_k-1
+\geq
+p
+\tag{19.55}\]</span></span></p>
+<p>é condição necessária para que <span class="math inline">\(\mathbf S_k\)</span> possa possuir posto completo. Essa condição deve ser satisfeita separadamente em cada classe.</p>
+<p>A QDA estimada exige, por isso, mais informação por classe do que a LDA quando <span class="math inline">\(p\)</span> é elevado.</p>
+<p>A não singularidade, entretanto, não garante estabilidade. Quando algumas características são aproximadamente combinações lineares de outras, <span class="math inline">\(\mathbf T_{\mathrm{intra}}\)</span>, <span class="math inline">\(\mathbf S_p\)</span> ou alguma <span class="math inline">\(\mathbf S_k\)</span> podem permanecer invertíveis, mas apresentar autovalores muito pequenos. Nesse caso, suas inversas podem amplificar pequenas perturbações dos dados e tornar coeficientes e direções discriminantes sensíveis à amostra.</p>
+<p>Esse problema deve ser distinguido da singularidade exata. Associação entre características é esperada em dados multivariados; quase dependência linear pode produzir mau condicionamento; dependência linear exata pode reduzir o posto das matrizes necessárias.</p>
+<p>Quando as matrizes são singulares, as formulações clássicas baseadas em inversas e raízes quadradas inversas não estão definidas diretamente. Pseudoinversas, regularização e redução preliminar de dimensão correspondem a formulações adicionais e pertencem à etapa metodológica posterior.</p>
+</section>
+<section id="independência-das-unidades-de-treinamento" class="level3" data-number="19.12.4">
+<h3 data-number="19.12.4" class="anchored" data-anchor-id="independência-das-unidades-de-treinamento"><span class="header-section-number">19.12.4</span> Independência das unidades de treinamento</h3>
+<p>As estatísticas</p>
+<p><span class="math display">\[
+\overline{\mathbf x}_k,
+\qquad
+\mathbf S_k
+\qquad\text{e}\qquad
+\mathbf S_p
+\]</span></p>
+<p>podem ser calculadas a partir das observações sem exigir independência.</p>
+<p>As propriedades amostrais usuais dessas estatísticas sob o esquema clássico utilizado nas formulações apresentadas são obtidas supondo independência entre as unidades de treinamento dentro da estrutura probabilística considerada.</p>
+<p>Dependência temporal, espacial, longitudinal ou decorrente de agrupamentos altera a estrutura amostral e pode exigir modelos específicos. Essa questão pertence ao mecanismo probabilístico de geração dos dados e não ao problema algébrico de Fisher.</p>
+</section>
+<section id="probabilidades-a-priori-e-perdas" class="level3" data-number="19.12.5">
+<h3 data-number="19.12.5" class="anchored" data-anchor-id="probabilidades-a-priori-e-perdas"><span class="header-section-number">19.12.5</span> Probabilidades <em>a priori</em> e perdas</h3>
+<p>As probabilidades</p>
+<p><span class="math display">\[
+\pi_k
+=
+P(\mathsf C=k)
+\]</span></p>
+<p>desempenham funções diferentes nas duas formulações do capítulo.</p>
+<p>Na classificação probabilística, elas representam as probabilidades <em>a priori</em> das classes e entram nas funções LDA e QDA pelo termo</p>
+<p><span class="math display">\[
+\log\pi_k.
+\]</span></p>
+<p>Na formulação populacional de Fisher adotada neste capítulo, as mesmas probabilidades aparecem como pesos na construção de</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}_W
+\qquad\text{e}\qquad
+\boldsymbol{\Sigma}_B.
+\]</span></p>
+<p>Sua função, nesse caso, é ponderar as dispersões populacionais das classes, e não determinar diretamente uma ação de classificação.</p>
+<p>Na formulação amostral de Fisher, o critério utiliza <span class="math inline">\(\mathbf T_{\mathrm{intra}}\)</span> e <span class="math inline">\(\mathbf T_{\mathrm{entre}}\)</span>, cujos pesos decorrem dos tamanhos observados <span class="math inline">\(n_k\)</span>. Como discutido anteriormente, <span class="math inline">\(n_k/n\)</span> não deve ser identificado automaticamente com <span class="math inline">\(\pi_k\)</span> quando o delineamento amostral altera as proporções das classes.</p>
+<p>A função de perda pertence ao problema de decisão e não ao critério geométrico de Fisher. Sob perda zero–um, a regra de Bayes reduz-se à escolha da maior probabilidade posterior; quando diferentes erros possuem consequências distintas, a decisão ótima pode mudar mesmo que as densidades condicionais e as probabilidades <em>a priori</em> permaneçam inalteradas.</p>
+</section>
+<section id="identificação-das-direções-discriminantes" class="level3" data-number="19.12.6">
+<h3 data-number="19.12.6" class="anchored" data-anchor-id="identificação-das-direções-discriminantes"><span class="header-section-number">19.12.6</span> Identificação das direções discriminantes</h3>
+<p>As direções de Fisher apresentam as indeterminações próprias do problema de autovalores generalizados.</p>
+<p>Para uma raiz positiva simples,</p>
+<p><span class="math display">\[
+\lambda_j,
+\]</span></p>
+<p>a direção normalizada</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j
+\]</span></p>
+<p>satisfaz</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{entre}}
+\boldsymbol{\alpha}_j
+=
+\lambda_j
+\mathbf T_{\mathrm{intra}}
+\boldsymbol{\alpha}_j
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\mathbf T_{\mathrm{intra}}
+\boldsymbol{\alpha}_j
+=
+1.
+\]</span></p>
+<p>A normalização fixa a escala, mas permanece a indeterminação de sinal:</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j
+\qquad\text{e}\qquad
+-\boldsymbol{\alpha}_j
+\]</span></p>
+<p>representam o mesmo eixo discriminante.</p>
+<p>A mudança de sinal transforma</p>
+<p><span class="math display">\[
+z_j(\mathbf x)
+\]</span></p>
+<p>em</p>
+<p><span class="math display">\[
+-z_j(\mathbf x),
+\]</span></p>
+<p>sem modificar o subespaço, a separação dos centroides ou as distâncias ao longo do eixo.</p>
+<p>Quando uma raiz positiva possui multiplicidade maior que <span class="math inline">\(1\)</span>, os autovetores individuais associados não são únicos. Diferentes bases ortonormais na métrica induzida por</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{intra}}
+\]</span></p>
+<p>podem representar o mesmo autoespaço.</p>
+<p>Nesse caso, o objeto identificado é o subespaço discriminante associado à raiz repetida, e não uma base particular de direções.</p>
+</section>
+<section id="sobreposição-entre-as-classes" class="level3" data-number="19.12.7">
+<h3 data-number="19.12.7" class="anchored" data-anchor-id="sobreposição-entre-as-classes"><span class="header-section-number">19.12.7</span> Sobreposição entre as classes</h3>
+<p>Mesmo quando os parâmetros populacionais são conhecidos e o modelo probabilístico está corretamente especificado, a classificação pode apresentar erro.</p>
+<p>Se duas classes atribuem densidade positiva à mesma região do espaço das características, uma observação nessa região não determina unicamente sua classe de origem.</p>
+<p>A regra de Bayes escolhe a ação de menor risco condicional, mas esse risco mínimo pode ser positivo. Sob perda zero–um, a probabilidade de classificação incorreta da regra de Bayes é denominada <strong>erro de Bayes</strong>.</p>
+<p>Quando as distribuições das classes se sobrepõem, esse erro pode ser positivo mesmo que os parâmetros populacionais sejam conhecidos exatamente. Existe, portanto, uma parcela do erro de classificação associada à própria dificuldade de separar as populações no espaço das características.</p>
+<p>Esse erro populacional deve ser distinguido do erro adicional introduzido pela estimação das médias, covariâncias e demais parâmetros a partir de uma amostra de treinamento.</p>
+<p>A avaliação empírica de uma regra estimada, por procedimentos como amostras de teste, validação cruzada, matrizes de confusão e medidas de desempenho, pertence à etapa metodológica posterior.</p>
+</section>
+</section>
+<section id="relações-com-outras-técnicas" class="level2" data-number="19.13">
+<h2 data-number="19.13" class="anchored" data-anchor-id="relações-com-outras-técnicas"><span class="header-section-number">19.13</span> Relações com outras técnicas</h2>
+<p>A relação entre Análise Discriminante e MANOVA foi estabelecida a partir da correspondência</p>
+<p><span class="math display">\[
+\mathbf H
+=
+\mathbf T_{\mathrm{entre}}
+\qquad\text{e}\qquad
+\mathbf E
+=
+\mathbf T_{\mathrm{intra}},
+\]</span></p>
+<p>que conduz ao mesmo problema de autovalores generalizados quando as duas técnicas utilizam a mesma estrutura de grupos. A diferença está no objetivo estatístico: o <a href="mod_3_manova.html" class="quarto-xref"><span>Capítulo 18</span></a> utiliza as raízes para construir critérios de teste, enquanto Fisher utiliza os autovetores associados para representar a separação entre grupos.</p>
+<p>Duas outras técnicas do módulo permitem delimitar o problema discriminante.</p>
+<section id="análise-de-componentes-principais" class="level3" data-number="19.13.1">
+<h3 data-number="19.13.1" class="anchored" data-anchor-id="análise-de-componentes-principais"><span class="header-section-number">19.13.1</span> Análise de Componentes Principais</h3>
+<p>O <a href="mod_3_cp.html" class="quarto-xref"><span>Capítulo 14</span></a> e a formulação de Fisher constroem combinações lineares, mas utilizam critérios diferentes.</p>
+<p>Na ACP, as direções são determinadas pela variabilidade total. Em Fisher, a direção genérica <span class="math inline">\(\mathbf a\)</span> é avaliada por</p>
+<p><span class="math display">\[
+J_F(\mathbf a)
+=
+\frac{
+\mathbf a^\top
+\mathbf T_{\mathrm{entre}}
+\mathbf a
+}{
+\mathbf a^\top
+\mathbf T_{\mathrm{intra}}
+\mathbf a
+},
+\]</span></p>
+<p>de modo que a separação entre os grupos é comparada com a dispersão existente dentro deles.</p>
+<p>A <a href="#tbl-acp-fisher" class="quarto-xref">Tabela&nbsp;<span>19.4</span></a> sintetiza essa distinção.</p>
+<div id="tbl-acp-fisher" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-acp-fisher-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;19.4: Comparação entre ACP e a formulação de Fisher.
+</figcaption>
+<div aria-describedby="tbl-acp-fisher-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Aspecto</th>
+<th>ACP</th>
+<th>Fisher</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>informação sobre grupos</td>
+<td>não utilizada</td>
+<td>utilizada</td>
+</tr>
+<tr class="even">
+<td>objeto matricial principal</td>
+<td>covariância ou correlação total</td>
+<td>dispersões entre e dentro dos grupos</td>
+</tr>
+<tr class="odd">
+<td>critério</td>
+<td>variabilidade total</td>
+<td>separação entre grupos relativa à dispersão intragrupos</td>
+</tr>
+<tr class="even">
+<td>representação</td>
+<td>não supervisionada em relação aos grupos</td>
+<td>supervisionada</td>
+</tr>
+<tr class="odd">
+<td>dimensão máxima não nula</td>
+<td>limitada pelo posto da matriz analisada</td>
+<td><span class="math inline">\(\min(p,K-1)\)</span></td>
+</tr>
+<tr class="even">
+<td>interpretação das direções</td>
+<td>variabilidade</td>
+<td>separação relativa</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Uma direção de elevada variabilidade total não precisa apresentar elevada capacidade de separação entre grupos. A diferença decorre da informação utilizada para construir cada representação.</p>
+</section>
+<section id="análise-de-agrupamentos" class="level3" data-number="19.13.2">
+<h3 data-number="19.13.2" class="anchored" data-anchor-id="análise-de-agrupamentos"><span class="header-section-number">19.13.2</span> Análise de Agrupamentos</h3>
+<p>A Análise Discriminante e o <a href="mod_3_agrupamento.html" class="quarto-xref"><span>Capítulo 16</span></a> utilizam objetos como centroides, distâncias e dispersões, mas partem de problemas distintos.</p>
+<p>Na Análise Discriminante, os grupos são conhecidos e seus rótulos participam da construção das regras de classificação ou das direções de Fisher. Na Análise de Agrupamentos, os grupos não são fornecidos previamente e devem ser construídos a partir de critérios de proximidade, dispersão ou modelagem probabilística.</p>
+<p>Assim, a presença ou ausência de rótulos conhecidos distingue uma representação supervisionada da separação entre grupos de um problema de formação de grupos.</p>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Correspondência com a implementação utilizada
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A implementação utilizada nas aulas disponibiliza a <strong>Análise Discriminante Linear (LDA)</strong>. A QDA permanece neste capítulo porque a distinção entre covariância comum e covariâncias específicas por classe pertence à formulação estatística da técnica, mesmo quando a implementação adotada não disponibiliza diretamente a regra quadrática.</p>
+<p>A rotina computacional subjacente à LDA utiliza <code>MASS::lda()</code>, do pacote <code>MASS</code> <span class="citation" data-cites="ripley2002mass">(<a href="references.html#ref-ripley2002mass" role="doc-biblioref">Ripley; Venables, 2002</a>)</span>. As funções discriminantes estimadas correspondem às combinações lineares construídas a partir da estrutura intragrupos e das diferenças entre os grupos.</p>
+<p>As probabilidades <em>a priori</em> apresentadas pela implementação devem ser interpretadas de acordo com o problema de classificação e com o mecanismo de amostragem. Proporções amostrais das classes não representam automaticamente probabilidades populacionais quando os tamanhos dos grupos foram fixados pelo delineamento.</p>
+<p>Coeficientes das funções, reescalonamentos, correlações de estrutura e participação relativa das raízes correspondem aos objetos discutidos nas respectivas seções deste capítulo. Sua utilização operacional para interpretação e avaliação da classificação pertence à etapa metodológica posterior.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="síntese" class="level2" data-number="19.14">
+<h2 data-number="19.14" class="anchored" data-anchor-id="síntese"><span class="header-section-number">19.14</span> Síntese</h2>
+<p>A Análise Discriminante utiliza grupos previamente conhecidos para resolver dois problemas relacionados: construir regras de classificação e representar geometricamente a separação entre as classes.</p>
+<p>Na formulação probabilística, cada classe é caracterizada por uma probabilidade <em>a priori</em> <span class="math inline">\(\pi_k\)</span> e por uma densidade condicional <span class="math inline">\(f_k(\mathbf x)\)</span>. Sob perda zero–um, a regra de Bayes atribui uma observação a uma classe que maximize</p>
+<p><span class="math display">\[
+\pi_k f_k(\mathbf x),
+\]</span></p>
+<p>ou, equivalentemente, sua probabilidade posterior.</p>
+<p>Quando as distribuições condicionais são normais e compartilham uma matriz de covariâncias comum, obtém-se a LDA, cujas fronteiras de classificação são lineares. Quando cada classe possui sua própria matriz de covariâncias, obtém-se a QDA, e as fronteiras podem conter termos quadráticos. Na prática, médias, covariâncias e probabilidades <em>a priori</em> desconhecidas são substituídas por estimativas obtidas a partir de uma amostra com classes conhecidas.</p>
+<p>Na formulação geométrica de Fisher, a direção <span class="math inline">\(\mathbf a\)</span> é avaliada pela separação entre os grupos relativamente à dispersão existente dentro deles:</p>
+<p><span class="math display">\[
+J_F(\mathbf a)
+=
+\frac{
+\mathbf a^\top
+\mathbf T_{\mathrm{entre}}
+\mathbf a
+}{
+\mathbf a^\top
+\mathbf T_{\mathrm{intra}}
+\mathbf a
+}.
+\]</span></p>
+<p>Quando</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{intra}}
+\succ
+\mathbf0,
+\]</span></p>
+<p>as direções discriminantes são obtidas pelo problema de autovalores generalizados</p>
+<p><span class="math display">\[
+\mathbf T_{\mathrm{entre}}
+\boldsymbol{\alpha}_j
+=
+\lambda_j
+\mathbf T_{\mathrm{intra}}
+\boldsymbol{\alpha}_j.
+\]</span></p>
+<p>O número de direções com separação não nula satisfaz</p>
+<p><span class="math display">\[
+r_F
+\leq
+\min(p,K-1),
+\]</span></p>
+<p>e as coordenadas obtidas por projeção nessas direções fornecem uma representação supervisionada dos grupos.</p>
+<p>Para duas classes, existe no máximo uma direção discriminante não nula. Sob covariância comum, a direção populacional de Fisher é paralela ao vetor normal da fronteira da LDA,</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}^{-1}
+\left(
+\boldsymbol{\mu}_1
+-
+\boldsymbol{\mu}_2
+\right),
+\]</span></p>
+<p>mas as duas formulações continuam respondendo a problemas distintos: Fisher procura separação, enquanto LDA constrói uma regra probabilística de classificação.</p>
+<p>A normalidade multivariada não é necessária para definir o critério geométrico de Fisher. Ela pertence às formulações normais da LDA e da QDA. A LDA assume uma matriz de covariâncias comum, enquanto a QDA permite matrizes específicas por classe. As formulações clássicas exigem ainda condições de posto e não singularidade das matrizes utilizadas; quase dependências lineares podem produzir mau condicionamento mesmo antes da singularidade.</p>
+<p>Mesmo com os parâmetros populacionais conhecidos, a sobreposição entre as distribuições das classes pode produzir erro de classificação. Sob perda zero–um, a menor probabilidade de erro alcançável pela regra de Bayes é o erro de Bayes e deve ser distinguida do erro adicional introduzido pela estimação.</p>
+<p>A relação com a MANOVA mostra que as mesmas matrizes de dispersão entre e dentro dos grupos podem originar o mesmo problema espectral com finalidades diferentes. A comparação com a ACP mostra que Fisher procura separação supervisionada, e não variabilidade total; a comparação com Agrupamentos mostra que a Análise Discriminante parte de rótulos conhecidos, enquanto os métodos de agrupamento procuram construir os grupos.</p>
+<p>Com a Análise Discriminante, completa-se a formulação das técnicas multivariadas incluídas neste módulo. Ao longo dos capítulos, combinações lineares, projeções, formas quadráticas, distâncias, estruturas de covariância, decomposições matriciais, modelos probabilísticos e problemas espectrais foram reutilizados para resolver problemas estatísticos distintos. As etapas metodológicas posteriores poderão partir dessas formulações para desenvolver implementação, diagnóstico, interpretação, validação e aplicação.</p>
+
+
+<div id="refs" class="references csl-bib-body" data-entry-spacing="1" role="list" style="display: none">
+<div id="ref-anderson2003" class="csl-entry" role="listitem">
+ANDERSON, Theodore W. <strong><a href="https://www.wiley.com/en-us/An+Introduction+to+Multivariate+Statistical+Analysis%2C+3rd+Edition-p-9780471360919">An Introduction to Multivariate Statistical Analysis</a></strong>. 3. ed. Hoboken, NJ: John Wiley &amp; Sons, 2003. p. 752
+</div>
+<div id="ref-johnson2007" class="csl-entry" role="listitem">
+JOHNSON, Richard A.; WICHERN, Dean W. <strong><a href="https://books.google.com/books?id=gFWcQgAACAAJ">Applied Multivariate Statistical Analysis</a></strong>. 6. ed. Upper Saddle River, NJ: Pearson Prentice Hall, 2007.
+</div>
+<div id="ref-rencher2012" class="csl-entry" role="listitem">
+RENCHER, Alvin C.; CHRISTENSEN, William F. <strong><a href="https://doi.org/10.1002/9781118391686">Methods of Multivariate Analysis</a></strong>. 3. ed. Hoboken, NJ: John Wiley &amp; Sons, 2012.
+</div>
+<div id="ref-ripley2002mass" class="csl-entry" role="listitem">
+RIPLEY, Brian D.; VENABLES, William N. <strong><a href="https://www.stats.ox.ac.uk/pub/MASS4/">Modern Applied Statistics with S</a></strong>. Fourth ed. New York: Springer, 2002.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiada");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiada");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./mod_3_manova.html" class="pagination-link" aria-label="Formulação da MANOVA">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Formulação da MANOVA</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link" aria-label="Referências">
+        <span class="nav-page-text">Referências</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

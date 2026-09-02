@@ -1,0 +1,2737 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-BR" xml:lang="pt-BR"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.23">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>18&nbsp; Formulação da MANOVA</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 1em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./mod_3_discriminante.html" rel="next">
+<link href="./mod_3_correspondencia.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-1fe81d0376b2c50856e68e651e390326.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-6f6599830d51be977da3b6af758f8eff.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-1fe81d0376b2c50856e68e651e390326.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-2641b481724464e61c86985d8c912b6f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-4c6d65c679321d81af7ec8b61b1d5a24.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-2641b481724464e61c86985d8c912b6f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Nenhum resultado",
+    "search-matching-documents-text": "documentos correspondentes",
+    "search-copy-link-title": "Copiar link para a busca",
+    "search-hide-matches-text": "Esconder correspondências adicionais",
+    "search-more-match-text": "mais correspondência neste documento",
+    "search-more-matches-text": "mais correspondências neste documento",
+    "search-clear-button-title": "Limpar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Procurar"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./mod_3_estruturas.html">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</a></li><li class="breadcrumb-item"><a href="./mod_3_manova.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Formulação da MANOVA</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Procurar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="./index.html" class="sidebar-logo-link">
+      </a>
+      <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Alternar modo escuro"><i class="bi"></i></a>
+</div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Procurar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Informações Legais e Declaração de Uso de Inteligência Artificial</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./prefacio_multivariada.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prefácio</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./identifica_multivariada.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Identificação da Disciplina</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo I — Fundamentos Matemáticos e Geométricos da Análise Multivariada</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_vetores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Vetores e representação dos dados multivariados</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_matrizes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Álgebra matricial aplicada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_espacos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Espaços vetoriais, bases e projeções</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_transformacoes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Transformações lineares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_autovetores.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Autovalores, autovetores e decomposição espectral</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_svd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Decomposição em Valores Singulares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_calculo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Cálculo Diferencial, Integral e Matricial Aplicado à Estatística Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_1_exc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercícios de fixação do Módulo I</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo II — Fundamentos Probabilísticos e Inferenciais da Análise Multivariada</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_covariancias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Matrizes de covariâncias e correlações</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_normal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Distribuição Normal Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_amostrais.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Estatísticas Amostrais e Estimação</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_modelo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Modelo Linear Multivariado e Hipóteses Lineares</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_inferencia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Inferência Multivariada</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_2_exc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercícios de fixação do Módulo II</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar seção">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_estruturas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Problemas e estruturas das técnicas multivariadas</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_cp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Formulação da Análise de Componentes Principais</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_fatorial.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Formulação da Análise Fatorial</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_agrupamento.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Formulação da Análise de Agrupamentos</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_correspondencia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Formulação da Análise de Correspondência</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_manova.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Formulação da MANOVA</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./mod_3_discriminante.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Formulação da Análise Discriminante</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Referências</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Índice</h2>
+   
+  <ul>
+  <li><a href="#o-problema-de-comparação-multivariada" id="toc-o-problema-de-comparação-multivariada" class="nav-link active" data-scroll-target="#o-problema-de-comparação-multivariada"><span class="header-section-number">18.1</span> O problema de comparação multivariada</a></li>
+  <li><a href="#a-hipótese-no-modelo-linear-multivariado" id="toc-a-hipótese-no-modelo-linear-multivariado" class="nav-link" data-scroll-target="#a-hipótese-no-modelo-linear-multivariado"><span class="header-section-number">18.2</span> A hipótese no modelo linear multivariado</a>
+  <ul class="collapse">
+  <li><a href="#matrizes-de-hipótese-e-erro" id="toc-matrizes-de-hipótese-e-erro" class="nav-link" data-scroll-target="#matrizes-de-hipótese-e-erro"><span class="header-section-number">18.2.1</span> Matrizes de hipótese e erro</a></li>
+  </ul></li>
+  <li><a href="#hipótese-e-erro-em-uma-combinação-linear-das-respostas" id="toc-hipótese-e-erro-em-uma-combinação-linear-das-respostas" class="nav-link" data-scroll-target="#hipótese-e-erro-em-uma-combinação-linear-das-respostas"><span class="header-section-number">18.3</span> Hipótese e erro em uma combinação linear das respostas</a></li>
+  <li><a href="#problema-espectral-da-manova" id="toc-problema-espectral-da-manova" class="nav-link" data-scroll-target="#problema-espectral-da-manova"><span class="header-section-number">18.4</span> Problema espectral da MANOVA</a>
+  <ul class="collapse">
+  <li><a href="#padronização-pela-dispersão-residual-e-interpretação-geométrica" id="toc-padronização-pela-dispersão-residual-e-interpretação-geométrica" class="nav-link" data-scroll-target="#padronização-pela-dispersão-residual-e-interpretação-geométrica"><span class="header-section-number">18.4.1</span> Padronização pela dispersão residual e interpretação geométrica</a></li>
+  </ul></li>
+  <li><a href="#sec-manova-criterios" id="toc-sec-manova-criterios" class="nav-link" data-scroll-target="#sec-manova-criterios"><span class="header-section-number">18.5</span> Critérios multivariados</a></li>
+  <li><a href="#uma-mesma-estrutura-quatro-formas-de-agregação" id="toc-uma-mesma-estrutura-quatro-formas-de-agregação" class="nav-link" data-scroll-target="#uma-mesma-estrutura-quatro-formas-de-agregação"><span class="header-section-number">18.6</span> Uma mesma estrutura, quatro formas de agregação</a>
+  <ul class="collapse">
+  <li><a href="#aprofundamento-base-probabilística-dos-critérios" id="toc-aprofundamento-base-probabilística-dos-critérios" class="nav-link" data-scroll-target="#aprofundamento-base-probabilística-dos-critérios"><span class="header-section-number">18.6.1</span> Aprofundamento: base probabilística dos critérios</a></li>
+  </ul></li>
+  <li><a href="#invariância-a-transformações-lineares-das-respostas" id="toc-invariância-a-transformações-lineares-das-respostas" class="nav-link" data-scroll-target="#invariância-a-transformações-lineares-das-respostas"><span class="header-section-number">18.7</span> Invariância a transformações lineares das respostas</a>
+  <ul class="collapse">
+  <li><a href="#aprofundamento-demonstração-da-invariância-das-raízes" id="toc-aprofundamento-demonstração-da-invariância-das-raízes" class="nav-link" data-scroll-target="#aprofundamento-demonstração-da-invariância-das-raízes"><span class="header-section-number">18.7.1</span> Aprofundamento: demonstração da invariância das raízes</a></li>
+  </ul></li>
+  <li><a href="#sec-manova-pressupostos" id="toc-sec-manova-pressupostos" class="nav-link" data-scroll-target="#sec-manova-pressupostos"><span class="header-section-number">18.8</span> Pressupostos e limites</a>
+  <ul class="collapse">
+  <li><a href="#estrutura-da-média-e-estimabilidade" id="toc-estrutura-da-média-e-estimabilidade" class="nav-link" data-scroll-target="#estrutura-da-média-e-estimabilidade"><span class="header-section-number">18.8.1</span> Estrutura da média e estimabilidade</a></li>
+  <li><a href="#independência-entre-unidades" id="toc-independência-entre-unidades" class="nav-link" data-scroll-target="#independência-entre-unidades"><span class="header-section-number">18.8.2</span> Independência entre unidades</a></li>
+  <li><a href="#covariância-residual-comum" id="toc-covariância-residual-comum" class="nav-link" data-scroll-target="#covariância-residual-comum"><span class="header-section-number">18.8.3</span> Covariância residual comum</a></li>
+  <li><a href="#aprofundamento-teste-m-de-box" id="toc-aprofundamento-teste-m-de-box" class="nav-link" data-scroll-target="#aprofundamento-teste-m-de-box"><span class="header-section-number">18.8.4</span> Aprofundamento: teste <span class="math inline">\(M\)</span> de Box</a></li>
+  <li><a href="#não-singularidade-populacional-e-amostral" id="toc-não-singularidade-populacional-e-amostral" class="nav-link" data-scroll-target="#não-singularidade-populacional-e-amostral"><span class="header-section-number">18.8.5</span> Não singularidade populacional e amostral</a></li>
+  <li><a href="#normalidade-multivariada" id="toc-normalidade-multivariada" class="nav-link" data-scroll-target="#normalidade-multivariada"><span class="header-section-number">18.8.6</span> Normalidade multivariada</a></li>
+  <li><a href="#posto-e-identificação-das-direções" id="toc-posto-e-identificação-das-direções" class="nav-link" data-scroll-target="#posto-e-identificação-das-direções"><span class="header-section-number">18.8.7</span> Posto e identificação das direções</a></li>
+  <li><a href="#associação-entre-as-respostas-condicionamento-e-singularidade" id="toc-associação-entre-as-respostas-condicionamento-e-singularidade" class="nav-link" data-scroll-target="#associação-entre-as-respostas-condicionamento-e-singularidade"><span class="header-section-number">18.8.8</span> Associação entre as respostas, condicionamento e singularidade</a></li>
+  </ul></li>
+  <li><a href="#relações-com-outras-técnicas" id="toc-relações-com-outras-técnicas" class="nav-link" data-scroll-target="#relações-com-outras-técnicas"><span class="header-section-number">18.9</span> Relações com outras técnicas</a>
+  <ul class="collapse">
+  <li><a href="#sec-manova-anova-testes-univariados" id="toc-sec-manova-anova-testes-univariados" class="nav-link" data-scroll-target="#sec-manova-anova-testes-univariados"><span class="header-section-number">18.9.1</span> ANOVA</a></li>
+  <li><a href="#t2-de-hotelling" id="toc-t2-de-hotelling" class="nav-link" data-scroll-target="#t2-de-hotelling"><span class="header-section-number">18.9.2</span> <span class="math inline">\(T^2\)</span> de Hotelling</a></li>
+  <li><a href="#regressão-multivariada" id="toc-regressão-multivariada" class="nav-link" data-scroll-target="#regressão-multivariada"><span class="header-section-number">18.9.3</span> Regressão multivariada</a></li>
+  <li><a href="#análise-discriminante" id="toc-análise-discriminante" class="nav-link" data-scroll-target="#análise-discriminante"><span class="header-section-number">18.9.4</span> Análise Discriminante</a></li>
+  </ul></li>
+  <li><a href="#síntese" id="toc-síntese" class="nav-link" data-scroll-target="#síntese"><span class="header-section-number">18.10</span> Síntese</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./mod_3_estruturas.html">Módulo III — Formulação Matemática e Estatística das Técnicas Multivariadas</a></li><li class="breadcrumb-item"><a href="./mod_3_manova.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Formulação da MANOVA</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-manova" class="quarto-section-identifier"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Formulação da MANOVA</span></span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>A Análise de Variância Multivariada, MANOVA, testa hipóteses sobre funções estimáveis dos parâmetros de um modelo linear com várias respostas. O problema inclui comparações de vetores de médias associados a grupos, tratamentos, fatores, covariáveis ou outros termos representados no delineamento.</p>
+<p>O modelo linear multivariado definido em <a href="mod_2_modelo.html#def-modelo-linear-multivariado" class="quarto-xref">Definição&nbsp;<span>11.3</span></a> é</p>
+<p><span class="math display">\[
+\boldsymbol{\mathcal Y}
+=
+\mathbf Z\mathbf B
++
+\boldsymbol{\mathcal E}.
+\]</span></p>
+<p>Na formulação clássica desenvolvida neste capítulo, as <span class="math inline">\(p\)</span> respostas reunidas em <span class="math inline">\(\boldsymbol{\mathcal Y}\)</span> são variáveis quantitativas. Variáveis categóricas associadas a grupos, tratamentos ou fatores são representadas na matriz de delineamento <span class="math inline">\(\mathbf Z\)</span> por indicadores ou contrastes, enquanto covariáveis quantitativas podem ser incorporadas diretamente às suas colunas. Essa distinção segue a natureza das variáveis apresentada na <a href="mod_1_vetores.html#sec-natureza-variaveis" class="quarto-xref"><span>Seção 1.2</span></a>.</p>
+<p>Neste capítulo, essa estrutura será utilizada sem reconstruir a teoria do modelo linear desenvolvida no Módulo 2. A MANOVA compara a variação multivariada atribuída a uma hipótese com a variação residual, representadas pelas matrizes <span class="math inline">\(\mathbf H\)</span> e <span class="math inline">\(\mathbf E\)</span>.</p>
+<p>Essa comparação conduz a um problema de autovalores generalizados. Suas raízes características são agregadas pelos critérios de Wilks, Pillai, Hotelling–Lawley e Roy <span class="citation" data-cites="anderson2003">(<a href="references.html#ref-anderson2003" role="doc-biblioref">Anderson, 2003</a>)</span>.</p>
+<p>O desenvolvimento será concentrado na construção das matrizes de hipótese e erro, na formulação espectral e na interpretação dos quatro critérios. A base probabilística necessária à inferência clássica será retomada apenas na extensão necessária.</p>
+<p>Os elementos da formulação são resumidos na <a href="#tbl-estrutura-manova" class="quarto-xref">Tabela&nbsp;<span>18.1</span></a>.</p>
+<div id="tbl-estrutura-manova" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-estrutura-manova-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;18.1: Elementos da formulação da MANOVA.
+</figcaption>
+<div aria-describedby="tbl-estrutura-manova-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Elemento</th>
+<th>Objeto</th>
+<th>Papel na MANOVA</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>respostas</td>
+<td><span class="math inline">\(\boldsymbol{\mathcal Y}\)</span></td>
+<td>reúne as <span class="math inline">\(p\)</span> respostas observadas nas mesmas unidades</td>
+</tr>
+<tr class="even">
+<td>delineamento</td>
+<td><span class="math inline">\(\mathbf Z\)</span></td>
+<td>representa grupos, tratamentos, covariáveis e demais termos</td>
+</tr>
+<tr class="odd">
+<td>parâmetros</td>
+<td><span class="math inline">\(\mathbf B\)</span></td>
+<td>determina os vetores de médias condicionais</td>
+</tr>
+<tr class="even">
+<td>hipótese</td>
+<td><span class="math inline">\(\mathbf C_1\mathbf B=\boldsymbol{\Theta}_0\)</span></td>
+<td>especifica uma função estimável sobre todas as respostas</td>
+</tr>
+<tr class="odd">
+<td>variação atribuída à hipótese</td>
+<td><span class="math inline">\(\mathbf H\)</span></td>
+<td>mede o afastamento observado em relação a <span class="math inline">\(H_0\)</span></td>
+</tr>
+<tr class="even">
+<td>variação residual</td>
+<td><span class="math inline">\(\mathbf E\)</span></td>
+<td>mede a variabilidade conjunta não explicada pelo modelo</td>
+</tr>
+<tr class="odd">
+<td>comparação direcional</td>
+<td><span class="math inline">\(\mathbf a^\top\mathbf H\mathbf a/\mathbf a^\top\mathbf E\mathbf a\)</span></td>
+<td>compara hipótese e erro para uma combinação das respostas</td>
+</tr>
+<tr class="even">
+<td>solução espectral</td>
+<td>raízes e direções características</td>
+<td>identifica direções extremas e quantifica o efeito relativo</td>
+</tr>
+<tr class="odd">
+<td>critérios de teste</td>
+<td>Wilks, Pillai, Hotelling–Lawley e Roy</td>
+<td>agregam as mesmas raízes de formas distintas</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<section id="o-problema-de-comparação-multivariada" class="level2" data-number="18.1">
+<h2 data-number="18.1" class="anchored" data-anchor-id="o-problema-de-comparação-multivariada"><span class="header-section-number">18.1</span> O problema de comparação multivariada</h2>
+<p>Considere inicialmente <span class="math inline">\(K\geq2\)</span> grupos e um vetor de <span class="math inline">\(p\)</span> respostas para cada unidade,</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf Y}_i
+=
+\begin{pmatrix}
+\mathsf Y_{i1}\\
+\vdots\\
+\mathsf Y_{ip}
+\end{pmatrix}
+\in
+\mathbb R^p.
+\]</span></p>
+<p>Se o vetor de médias do grupo <span class="math inline">\(k\)</span> é</p>
+<p><span class="math display">\[
+\boldsymbol{\mu}_k
+=
+\begin{pmatrix}
+\mu_{k1}\\
+\vdots\\
+\mu_{kp}
+\end{pmatrix}
+\in
+\mathbb R^p,
+\qquad
+k=1,\ldots,K,
+\]</span></p>
+<p>a hipótese de igualdade entre os grupos é</p>
+<p><span id="eq-hipotese-medias-grupos-manova"><span class="math display">\[
+H_0:
+\boldsymbol{\mu}_1
+=
+\boldsymbol{\mu}_2
+=
+\cdots
+=
+\boldsymbol{\mu}_K.
+\tag{18.1}\]</span></span></p>
+<p>A alternativa afirma que pelo menos dois desses vetores de médias diferem.</p>
+<p>Quando</p>
+<p><span class="math display">\[
+p=1,
+\]</span></p>
+<p>a hipótese em <a href="#eq-hipotese-medias-grupos-manova" class="quarto-xref">Equação&nbsp;<span>18.1</span></a> é univariada e a comparação pode ser expressa pela razão entre uma soma de quadrados associada ao efeito e uma soma de quadrados residual.</p>
+<p>Quando</p>
+<p><span class="math display">\[
+p&gt;1,
+\]</span></p>
+<p>o afastamento entre os grupos possui direção no espaço das respostas. Uma diferença pequena em cada resposta considerada isoladamente pode formar uma combinação linear com separação relevante, enquanto diferenças marginais aparentemente grandes podem refletir informação redundante entre respostas associadas.</p>
+<p>A MANOVA considera simultaneamente a magnitude das diferenças entre os vetores de médias, a variabilidade residual de cada resposta e as covariâncias residuais entre as respostas.</p>
+<p>Por isso, o problema não é equivalente a realizar <span class="math inline">\(p\)</span> análises de variância independentes. A estrutura conjunta é representada por matrizes de somas de quadrados e produtos cruzados.</p>
+</section>
+<section id="a-hipótese-no-modelo-linear-multivariado" class="level2" data-number="18.2">
+<h2 data-number="18.2" class="anchored" data-anchor-id="a-hipótese-no-modelo-linear-multivariado"><span class="header-section-number">18.2</span> A hipótese no modelo linear multivariado</h2>
+<p>O problema de comparação entre grupos é uma aplicação do modelo linear multivariado. Indicadores de grupos, tratamentos, fatores e covariáveis são incorporados à matriz de delineamento <span class="math inline">\(\mathbf Z\)</span>.</p>
+<p>A hipótese linear geral foi definida em <a href="mod_2_modelo.html#def-hipotese-linear-geral-multivariada" class="quarto-xref">Definição&nbsp;<span>11.17</span></a> como</p>
+<p><span id="eq-hipotese-geral-manova"><span class="math display">\[
+H_0:
+\mathbf C_1
+\mathbf B
+\mathbf C_2
+=
+\boldsymbol{\Theta}_0.
+\tag{18.2}\]</span></span></p>
+<p>Na MANOVA formulada para as <span class="math inline">\(p\)</span> respostas originais,</p>
+<p><span class="math display">\[
+\mathbf C_2
+=
+\mathbf I_p,
+\]</span></p>
+<p>e a hipótese torna-se</p>
+<p><span id="eq-hipotese-manova-respostas-originais"><span class="math display">\[
+H_0:
+\mathbf C_1
+\mathbf B
+=
+\boldsymbol{\Theta}_0,
+\tag{18.3}\]</span></span></p>
+<p>com</p>
+<p><span class="math display">\[
+\mathbf C_1
+\in
+\mathbb R^{g\times q}
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\boldsymbol{\Theta}_0
+\in
+\mathbb R^{g\times p}.
+\]</span></p>
+<p>A matriz <span class="math inline">\(\mathbf C_1\)</span> reúne os contrastes ou combinações dos parâmetros que definem o efeito testado. Consideraremos suas linhas linearmente independentes,</p>
+<p><span id="eq-posto-contrastes-manova"><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf C_1
+\right)
+=
+g,
+\tag{18.4}\]</span></span></p>
+<p>e a função <span class="math inline">\(\mathbf C_1\mathbf B\)</span> estimável. Pela condição de <a href="mod_2_modelo.html#eq-condicao-matricial-estimabilidade" class="quarto-xref">Equação&nbsp;<span>11.117</span></a>,</p>
+<p><span id="eq-estimabilidade-hipotese-manova"><span class="math display">\[
+\mathbf C_1
+=
+\mathbf C_1
+\mathbf Z^+
+\mathbf Z.
+\tag{18.5}\]</span></span></p>
+<p>Nessas condições, os graus de liberdade da hipótese são</p>
+<p><span id="eq-gl-hipotese-manova"><span class="math display">\[
+\nu_H
+=
+g.
+\tag{18.6}\]</span></span></p>
+<p>Para o efeito completo de <span class="math inline">\(K\)</span> grupos,</p>
+<p><span id="eq-gl-hipotese-grupos-manova"><span class="math display">\[
+g
+=
+K-1.
+\tag{18.7}\]</span></span></p>
+<p>Assim, a hipótese de igualdade dos vetores de médias em <a href="#eq-hipotese-medias-grupos-manova" class="quarto-xref">Equação&nbsp;<span>18.1</span></a> é um caso particular da hipótese linear geral já construída no Módulo 2.</p>
+<section id="matrizes-de-hipótese-e-erro" class="level3" data-number="18.2.1">
+<h3 data-number="18.2.1" class="anchored" data-anchor-id="matrizes-de-hipótese-e-erro"><span class="header-section-number">18.2.1</span> Matrizes de hipótese e erro</h3>
+<p>A SQPC associada à hipótese foi definida em <a href="mod_2_modelo.html#def-sscp-hipotese-linear" class="quarto-xref">Definição&nbsp;<span>11.18</span></a>. Para a hipótese em <a href="#eq-hipotese-manova-respostas-originais" class="quarto-xref">Equação&nbsp;<span>18.3</span></a>, denote-a por</p>
+<p><span class="math display">\[
+\mathbf H
+\in
+\mathbb R^{p\times p},
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\mathbf H
+=
+\mathbf H^\top
+\succeq
+\mathbf0.
+\]</span></p>
+<p>A matriz <span class="math inline">\(\mathbf H\)</span> representa a variação multivariada associada ao afastamento observado da hipótese. Seus elementos diagonais correspondem às parcelas das respostas individuais, enquanto os elementos fora da diagonal registram produtos cruzados entre esses afastamentos.</p>
+<p>A SQPC residual definida em <a href="mod_2_modelo.html#def-sscp-residual-modelo-multivariado" class="quarto-xref">Definição&nbsp;<span>11.11</span></a> é</p>
+<p><span class="math display">\[
+\mathbf E
+=
+\widehat{\mathbf U}^{\top}
+\widehat{\mathbf U}
+\in
+\mathbb R^{p\times p},
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\mathbf E
+=
+\mathbf E^\top
+\succeq
+\mathbf0.
+\]</span></p>
+<p>Ela representa a variação residual conjunta utilizada como referência para avaliar o efeito.</p>
+<p>A <a href="#tbl-interpretacao-he-manova" class="quarto-xref">Tabela&nbsp;<span>18.2</span></a> resume essas funções.</p>
+<div id="tbl-interpretacao-he-manova" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-interpretacao-he-manova-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;18.2: Funções das matrizes de hipótese e erro na MANOVA.
+</figcaption>
+<div aria-describedby="tbl-interpretacao-he-manova-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Matriz</th>
+<th>Origem</th>
+<th>Interpretação</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(\mathbf H\)</span></td>
+<td>hipótese testada</td>
+<td>variação multivariada associada ao afastamento observado de <span class="math inline">\(H_0\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbf E\)</span></td>
+<td>resíduos do modelo</td>
+<td>variação multivariada residual utilizada como referência</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Se</p>
+<p><span class="math display">\[
+\mathbf H
+=
+\mathbf0,
+\]</span></p>
+<p>não há afastamento observado da hipótese nas funções paramétricas consideradas. Quando <span class="math inline">\(\mathbf H\neq\mathbf0\)</span>, sua magnitude deve ser interpretada relativamente à estrutura residual representada por <span class="math inline">\(\mathbf E\)</span>.</p>
+<p>A formulação da MANOVA consiste, portanto, em comparar essas duas estruturas matriciais.</p>
+</section>
+</section>
+<section id="hipótese-e-erro-em-uma-combinação-linear-das-respostas" class="level2" data-number="18.3">
+<h2 data-number="18.3" class="anchored" data-anchor-id="hipótese-e-erro-em-uma-combinação-linear-das-respostas"><span class="header-section-number">18.3</span> Hipótese e erro em uma combinação linear das respostas</h2>
+<p>Considere uma combinação linear das <span class="math inline">\(p\)</span> respostas definida por</p>
+<p><span id="eq-combinacao-linear-respostas-manova"><span class="math display">\[
+\mathsf W
+=
+\mathbf a^\top
+\boldsymbol{\mathsf Y},
+\qquad
+\mathbf a
+\in
+\mathbb R^p.
+\tag{18.8}\]</span></span></p>
+<p>Aplicando a mesma combinação linear às matrizes observadas de hipótese e erro, obtêm-se os escalares</p>
+<p><span id="eq-hipotese-direcao-manova"><span class="math display">\[
+h(\mathbf a)
+=
+\mathbf a^\top
+\mathbf H
+\mathbf a
+\tag{18.9}\]</span></span></p>
+<p>e</p>
+<p><span id="eq-erro-direcao-manova"><span class="math display">\[
+e(\mathbf a)
+=
+\mathbf a^\top
+\mathbf E
+\mathbf a.
+\tag{18.10}\]</span></span></p>
+<p>As duas expressões são formas quadráticas.</p>
+<p>A quantidade</p>
+<p><span class="math display">\[
+h(\mathbf a)
+\]</span></p>
+<p>mede a variação atribuída à hipótese na combinação das respostas definida por <span class="math inline">\(\mathbf a\)</span>, enquanto</p>
+<p><span class="math display">\[
+e(\mathbf a)
+\]</span></p>
+<p>mede a variação residual dessa mesma combinação.</p>
+<p>Para a formulação espectral clássica desenvolvida a seguir, suponha</p>
+<p><span id="eq-condicao-erro-positivo-definido-manova"><span class="math display">\[
+\mathbf E
+\succ
+\mathbf0.
+\tag{18.11}\]</span></span></p>
+<p>Então,</p>
+<p><span class="math display">\[
+\mathbf a^\top
+\mathbf E
+\mathbf a
+&gt;
+0
+\]</span></p>
+<p>para todo</p>
+<p><span class="math display">\[
+\mathbf a\neq\mathbf0,
+\]</span></p>
+<p>e pode-se definir</p>
+<p><span id="eq-razao-hipotese-erro-manova"><span class="math display">\[
+\mathcal R_{\mathbf H,\mathbf E}
+(\mathbf a)
+=
+\frac{
+\mathbf a^\top
+\mathbf H
+\mathbf a
+}{
+\mathbf a^\top
+\mathbf E
+\mathbf a
+}.
+\tag{18.12}\]</span></span></p>
+<p>A expressão em <a href="#eq-razao-hipotese-erro-manova" class="quarto-xref">Equação&nbsp;<span>18.12</span></a> é o quociente de Rayleigh generalizado definido em <a href="mod_1_autovetores.html#def-quociente-rayleigh-generalizado" class="quarto-xref">Definição&nbsp;<span>5.12</span></a>, aplicado ao par</p>
+<p><span class="math display">\[
+(\mathbf H,\mathbf E).
+\]</span></p>
+<p>As matrizes <span class="math inline">\(\mathbf H\)</span> e <span class="math inline">\(\mathbf E\)</span> fornecem, respectivamente, as formas quadráticas associadas à hipótese e ao erro.</p>
+<p>A razão é invariante à escala de <span class="math inline">\(\mathbf a\)</span>. Para qualquer</p>
+<p><span class="math display">\[
+c\neq0,
+\]</span></p>
+<p><span class="math display">\[
+\mathcal R_{\mathbf H,\mathbf E}
+(c\mathbf a)
+=
+\mathcal R_{\mathbf H,\mathbf E}
+(\mathbf a).
+\]</span></p>
+<p>Portanto, interessa a direção determinada por <span class="math inline">\(\mathbf a\)</span>, e não seu comprimento.</p>
+<p>Uma direção apresenta grande razão hipótese/erro quando a combinação correspondente das respostas exibe variação associada à hipótese elevada relativamente à variabilidade residual nessa mesma combinação.</p>
+</section>
+<section id="problema-espectral-da-manova" class="level2" data-number="18.4">
+<h2 data-number="18.4" class="anchored" data-anchor-id="problema-espectral-da-manova"><span class="header-section-number">18.4</span> Problema espectral da MANOVA</h2>
+<p>O problema consiste em identificar as direções nas quais a razão em <a href="#eq-razao-hipotese-erro-manova" class="quarto-xref">Equação&nbsp;<span>18.12</span></a> assume seus valores extremos. Pelo resultado de <a href="mod_1_autovetores.html#thm-extremos-rayleigh-generalizado" class="quarto-xref">Teorema&nbsp;<span>5.8</span></a>, aplicado ao par simétrico</p>
+<p><span class="math display">\[
+(\mathbf H,\mathbf E),
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\mathbf H
+\succeq
+\mathbf0
+\qquad\text{e}\qquad
+\mathbf E
+\succ
+\mathbf0,
+\]</span></p>
+<p>os extremos de</p>
+<p><span id="eq-maximizacao-manova"><span class="math display">\[
+\max_{\mathbf a\neq\mathbf0}
+\frac{
+\mathbf a^\top
+\mathbf H
+\mathbf a
+}{
+\mathbf a^\top
+\mathbf E
+\mathbf a
+}
+\tag{18.13}\]</span></span></p>
+<p>são determinados pelo problema</p>
+<p><span id="eq-autovalor-generalizado-manova"><span class="math display">\[
+\mathbf H
+\mathbf a
+=
+\lambda
+\mathbf E
+\mathbf a.
+\tag{18.14}\]</span></span></p>
+<p>Essa é a estrutura de autovalor generalizado definida em <a href="mod_1_autovetores.html#def-autovalor-generalizado" class="quarto-xref">Definição&nbsp;<span>5.11</span></a>.</p>
+<div id="def-raizes-caracteristicas-manova" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 18.1 (Raízes características da MANOVA)</strong></span> Sejam</p>
+<p><span class="math display">\[
+\mathbf H,\mathbf E
+\in
+\mathbb R^{p\times p}
+\]</span></p>
+<p>simétricas, com</p>
+<p><span class="math display">\[
+\mathbf H
+\succeq
+\mathbf0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf E
+\succ
+\mathbf0.
+\]</span></p>
+<p>As <strong>raízes características da MANOVA</strong> são os autovalores generalizados</p>
+<p><span class="math display">\[
+\lambda_1
+\geq
+\lambda_2
+\geq
+\cdots
+\geq
+\lambda_p
+\geq
+0
+\]</span></p>
+<p>do par <span class="math inline">\((\mathbf H,\mathbf E)\)</span>. Como <span class="math inline">\(\mathbf E\succ\mathbf0\)</span>, os autovetores generalizados associados podem ser escolhidos com a normalização</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\mathbf E
+\boldsymbol{\alpha}_j
+=
+1.
+\]</span></p>
+<p>Com essa convenção,</p>
+<p><span class="math display">\[
+\mathbf H
+\boldsymbol{\alpha}_j
+=
+\lambda_j
+\mathbf E
+\boldsymbol{\alpha}_j.
+\]</span></p>
+<p>Se</p>
+<p><span class="math display">\[
+r_H
+=
+\operatorname{posto}
+\left(
+\mathbf H
+\right),
+\]</span></p>
+<p>então exatamente <span class="math inline">\(r_H\)</span> raízes são positivas.</p>
+</div>
+<p>Como a matriz de hipótese associada a uma função de posto <span class="math inline">\(g\)</span> satisfaz</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf H
+\right)
+\leq
+\min(p,g),
+\]</span></p>
+<p>tem-se</p>
+<p><span id="eq-numero-raizes-hipotese-manova"><span class="math display">\[
+r_H
+\leq
+\min(p,g).
+\tag{18.15}\]</span></span></p>
+<p>No efeito completo de <span class="math inline">\(K\)</span> grupos,</p>
+<p><span class="math display">\[
+g
+=
+K-1,
+\]</span></p>
+<p>logo</p>
+<p><span id="eq-numero-raizes-grupos-manova"><span class="math display">\[
+r_H
+\leq
+\min
+\left(
+p,
+K-1
+\right).
+\tag{18.16}\]</span></span></p>
+<p>Assim, o número de direções nas quais um efeito pode aparecer é limitado simultaneamente pelo número de respostas e pelo número de contrastes independentes da hipótese.</p>
+<p>Os autovetores generalizados podem ser escolhidos ortonormais segundo o produto interno induzido por <span class="math inline">\(\mathbf E\)</span>:</p>
+<p><span id="eq-ortogonalidade-direcoes-manova"><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\mathbf E
+\boldsymbol{\alpha}_\ell
+=
+\delta_{j\ell}.
+\tag{18.17}\]</span></span></p>
+<p>As direções características não precisam, portanto, ser ortogonais na geometria euclidiana original das respostas.</p>
+<section id="padronização-pela-dispersão-residual-e-interpretação-geométrica" class="level3" data-number="18.4.1">
+<h3 data-number="18.4.1" class="anchored" data-anchor-id="padronização-pela-dispersão-residual-e-interpretação-geométrica"><span class="header-section-number">18.4.1</span> Padronização pela dispersão residual e interpretação geométrica</h3>
+<p>Como</p>
+<p><span class="math display">\[
+\mathbf E
+\succ
+\mathbf0,
+\]</span></p>
+<p>a raiz quadrada principal de <span class="math inline">\(\mathbf E\)</span> e sua inversa existem por <a href="mod_1_autovetores.html#def-raiz-quadrada-principal" class="quarto-xref">Definição&nbsp;<span>5.9</span></a>.</p>
+<p>Defina</p>
+<p><span class="math display">\[
+\mathbf z
+=
+\mathbf E^{1/2}
+\mathbf a.
+\]</span></p>
+<p>Então,</p>
+<p><span class="math display">\[
+\mathbf a
+=
+\mathbf E^{-1/2}
+\mathbf z,
+\]</span></p>
+<p>e o problema generalizado transforma-se em</p>
+<p><span id="eq-problema-simetrico-manova"><span class="math display">\[
+\mathbf M_{\mathrm{HE}}
+\mathbf z
+=
+\lambda
+\mathbf z,
+\tag{18.18}\]</span></span></p>
+<p>em que</p>
+<p><span id="eq-matriz-hipotese-padronizada-manova"><span class="math display">\[
+\mathbf M_{\mathrm{HE}}
+=
+\mathbf E^{-1/2}
+\mathbf H
+\mathbf E^{-1/2}
+\in
+\mathbb R^{p\times p}.
+\tag{18.19}\]</span></span></p>
+<p>Como <span class="math inline">\(\mathbf H\succeq\mathbf0\)</span>,</p>
+<p><span class="math display">\[
+\mathbf M_{\mathrm{HE}}
+=
+\mathbf M_{\mathrm{HE}}^\top
+\succeq
+\mathbf0.
+\]</span></p>
+<p>Além disso,</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf M_{\mathrm{HE}}
+\right)
+=
+\operatorname{posto}
+\left(
+\mathbf H
+\right)
+=
+r_H,
+\]</span></p>
+<p>de modo que seus <span class="math inline">\(r_H\)</span> autovalores positivos são exatamente as raízes positivas da MANOVA.</p>
+<p>A transformação também produz</p>
+<p><span class="math display">\[
+\mathbf a^\top
+\mathbf E
+\mathbf a
+=
+\mathbf z^\top
+\mathbf z
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\mathbf a^\top
+\mathbf H
+\mathbf a
+=
+\mathbf z^\top
+\mathbf M_{\mathrm{HE}}
+\mathbf z.
+\]</span></p>
+<p>Portanto,</p>
+<p><span id="eq-rayleigh-padronizado-manova"><span class="math display">\[
+\mathcal R_{\mathbf H,\mathbf E}
+(\mathbf a)
+=
+\frac{
+\mathbf z^\top
+\mathbf M_{\mathrm{HE}}
+\mathbf z
+}{
+\mathbf z^\top
+\mathbf z
+}.
+\tag{18.20}\]</span></span></p>
+<p>A transformação pela matriz de erro converte a geometria residual em uma geometria euclidiana. Nesse sistema, <span class="math inline">\(\mathbf M_{\mathrm{HE}}\)</span> representa a magnitude da hipótese relativamente à dispersão residual.</p>
+<p>A <a href="#fig-manova-branqueamento" class="quarto-xref">Figura&nbsp;<span>18.1</span></a> ilustra essa transformação no espaço das combinações lineares. Antes da padronização, o conjunto de direções que satisfaz</p>
+<p><span class="math display">\[
+\mathbf a^\top
+\mathbf E
+\mathbf a
+=
+1
+\]</span></p>
+<p>forma uma elipse determinada pela geometria residual. Sob a transformação</p>
+<p><span class="math display">\[
+\mathbf z
+=
+\mathbf E^{1/2}
+\mathbf a,
+\]</span></p>
+<p>esse mesmo conjunto passa a satisfazer</p>
+<p><span class="math display">\[
+\mathbf z^\top
+\mathbf z
+=
+1,
+\]</span></p>
+<p>tornando-se o círculo unitário. Nesse sistema padronizado, as direções características são os autovetores de <span class="math inline">\(\mathbf M_{\mathrm{HE}}\)</span>.</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div id="fig-manova-branqueamento" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-manova-branqueamento-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="mod_3_manova_files/figure-html/fig-manova-branqueamento-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-manova-branqueamento-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;18.1: Branqueamento da geometria residual. À esquerda, o contorno representa as combinações lineares normalizadas por <span class="math inline">\(\mathbf a^\top\mathbf E\mathbf a=1\)</span>. Após a transformação <span class="math inline">\(\mathbf z=\mathbf E^{1/2}\mathbf a\)</span>, a métrica residual torna-se euclidiana e o contorno transforma-se no círculo unitário. As linhas indicam as duas direções características do problema.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A <a href="#fig-manova-branqueamento" class="quarto-xref">Figura&nbsp;<span>18.1</span></a> não representa observações, médias de grupos ou regiões de probabilidade. O contorno representa o conjunto de combinações lineares normalizadas pela forma quadrática residual. O branqueamento também não elimina a variabilidade residual dos dados; ele reexpressa sua métrica de modo que</p>
+<p><span class="math display">\[
+\mathbf a^\top
+\mathbf E
+\mathbf a
+\]</span></p>
+<p>se torne a norma euclidiana</p>
+<p><span class="math display">\[
+\mathbf z^\top
+\mathbf z.
+\]</span></p>
+<p>Nesse sistema, as direções características podem ser interpretadas diretamente como os eixos espectrais de <span class="math inline">\(\mathbf M_{\mathrm{HE}}\)</span>.</p>
+<p>Se uma direção característica for normalizada por</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\mathbf E
+\boldsymbol{\alpha}_j
+=
+1,
+\]</span></p>
+<p>então</p>
+<p><span id="eq-interpretacao-raiz-direcao-manova"><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\mathbf H
+\boldsymbol{\alpha}_j
+=
+\lambda_j.
+\tag{18.21}\]</span></span></p>
+<p>Cada raiz <span class="math inline">\(\lambda_j\)</span> representa, assim, a razão hipótese/erro na respectiva direção característica normalizada. As raízes ordenam as direções segundo a intensidade do efeito relativamente à estrutura residual.</p>
+<p>A hipótese matricial é, desse modo, convertida em uma coleção ordenada de razões hipótese/erro. Os quatro critérios clássicos da MANOVA agregam essa mesma coleção de formas distintas.</p>
+</section>
+</section>
+<section id="sec-manova-criterios" class="level2" data-number="18.5">
+<h2 data-number="18.5" class="anchored" data-anchor-id="sec-manova-criterios"><span class="header-section-number">18.5</span> Critérios multivariados</h2>
+<p>Considere as raízes características</p>
+<p><span class="math display">\[
+\lambda_1
+\geq
+\lambda_2
+\geq
+\cdots
+\geq
+\lambda_p
+\geq
+0
+\]</span></p>
+<p>do par <span class="math inline">\((\mathbf H,\mathbf E)\)</span> definido em <a href="#def-raizes-caracteristicas-manova" class="quarto-xref">Definição&nbsp;<span>18.1</span></a>, sob</p>
+<p><span class="math display">\[
+\mathbf H
+\succeq
+\mathbf0
+\qquad\text{e}\qquad
+\mathbf E
+\succ
+\mathbf0.
+\]</span></p>
+<p>Se</p>
+<p><span class="math display">\[
+r_H
+=
+\operatorname{posto}
+\left(
+\mathbf H
+\right),
+\]</span></p>
+<p>apenas</p>
+<p><span class="math display">\[
+\lambda_1,\ldots,\lambda_{r_H}
+\]</span></p>
+<p>são positivas, quando <span class="math inline">\(r_H&gt;0\)</span>.</p>
+<p>Os quatro critérios clássicos da MANOVA agregam essa mesma coleção de raízes em uma estatística global. Para algumas representações, é útil definir</p>
+<p><span id="eq-raizes-transformadas-manova"><span class="math display">\[
+\theta_j
+=
+\frac{
+\lambda_j
+}{
+1+\lambda_j
+},
+\qquad
+j=1,\ldots,p.
+\tag{18.22}\]</span></span></p>
+<p>Como <span class="math inline">\(\lambda_j\geq0\)</span>,</p>
+<p><span class="math display">\[
+0
+\leq
+\theta_j
+&lt;
+1,
+\]</span></p>
+<p>e a transformação preserva a ordenação das raízes.</p>
+<div id="def-lambda-wilks-manova" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 18.2 (Lambda de Wilks)</strong></span> A <strong>lambda de Wilks</strong> é</p>
+<p><span id="eq-lambda-wilks-manova"><span class="math display">\[
+\Lambda_{\mathrm W}
+=
+\frac{
+|\mathbf E|
+}{
+|\mathbf E+\mathbf H|
+}
+=
+\prod_{j=1}^{p}
+\frac{1}{
+1+\lambda_j
+}.
+\tag{18.23}\]</span></span></p>
+</div>
+<p>De fato,</p>
+<p><span class="math display">\[
+\begin{aligned}
+|\mathbf E+\mathbf H|
+&amp;=
+|\mathbf E|
+\left|
+\mathbf I_p+\mathbf E^{-1}\mathbf H
+\right|
+\\
+&amp;=
+|\mathbf E|
+\prod_{j=1}^{p}
+\left(
+1+\lambda_j
+\right),
+\end{aligned}
+\]</span></p>
+<p>o que produz a representação pelas raízes.</p>
+<p>Em termos de <a href="#eq-raizes-transformadas-manova" class="quarto-xref">Equação&nbsp;<span>18.22</span></a>,</p>
+<p><span id="eq-lambda-wilks-theta-manova"><span class="math display">\[
+\Lambda_{\mathrm W}
+=
+\prod_{j=1}^{p}
+\left(
+1-\theta_j
+\right).
+\tag{18.24}\]</span></span></p>
+<p>A lambda de Wilks satisfaz</p>
+<p><span class="math display">\[
+0
+&lt;
+\Lambda_{\mathrm W}
+\leq
+1,
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\Lambda_{\mathrm W}=1
+\]</span></p>
+<p>se, e somente se,</p>
+<p><span class="math display">\[
+\mathbf H=\mathbf0.
+\]</span></p>
+<p>Valores menores correspondem a maior afastamento relativo entre hipótese e erro. Sua ligação com a razão de verossimilhanças será retomada na base probabilística <span class="citation" data-cites="wilks1932">(<a href="references.html#ref-wilks1932" role="doc-biblioref">Wilks, 1932</a>)</span>.</p>
+<div id="def-traco-pillai-manova" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 18.3 (Traço de Pillai)</strong></span> O <strong>traço de Pillai</strong> é</p>
+<p><span id="eq-traco-pillai-manova"><span class="math display">\[
+V
+=
+\operatorname{tr}
+\left[
+\mathbf H
+\left(
+\mathbf H+\mathbf E
+\right)^{-1}
+\right]
+=
+\sum_{j=1}^{p}
+\frac{
+\lambda_j
+}{
+1+\lambda_j
+}.
+\tag{18.25}\]</span></span></p>
+</div>
+<p>Portanto,</p>
+<p><span class="math display">\[
+V
+=
+\sum_{j=1}^{p}
+\theta_j.
+\]</span></p>
+<p>Cada raiz contribui por uma quantidade limitada ao intervalo <span class="math inline">\([0,1)\)</span>, de modo que raízes muito elevadas não produzem contribuições ilimitadas ao critério <span class="citation" data-cites="pillai1955">(<a href="references.html#ref-pillai1955" role="doc-biblioref">Pillai, 1955</a>)</span>.</p>
+<div id="def-traco-hotelling-lawley-manova" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 18.4 (Traço de Hotelling–Lawley)</strong></span> O <strong>traço de Hotelling–Lawley</strong> é</p>
+<p><span id="eq-traco-hotelling-lawley-manova"><span class="math display">\[
+U
+=
+\operatorname{tr}
+\left(
+\mathbf E^{-1}
+\mathbf H
+\right)
+=
+\sum_{j=1}^{p}
+\lambda_j.
+\tag{18.26}\]</span></span></p>
+</div>
+<p>O critério utiliza diretamente a soma das razões hipótese/erro. Como</p>
+<p><span class="math display">\[
+\lambda_j\geq0,
+\]</span></p>
+<p>tem-se</p>
+<p><span class="math display">\[
+U\geq0,
+\]</span></p>
+<p>com igualdade se, e somente se, <span class="math inline">\(\mathbf H=\mathbf0\)</span>.</p>
+<div id="def-maior-raiz-roy-manova" class="theorem definition">
+<p><span class="theorem-title"><strong>Definição 18.5 (Maior raiz de Roy)</strong></span> A <strong>maior raiz de Roy</strong> é</p>
+<p><span id="eq-maior-raiz-roy-manova"><span class="math display">\[
+\Theta_{\mathrm R}
+=
+\lambda_1.
+\tag{18.27}\]</span></span></p>
+</div>
+<p>Pela caracterização do quociente de Rayleigh generalizado,</p>
+<p><span id="eq-roy-rayleigh-manova"><span class="math display">\[
+\Theta_{\mathrm R}
+=
+\max_{\mathbf a\neq\mathbf0}
+\frac{
+\mathbf a^\top
+\mathbf H
+\mathbf a
+}{
+\mathbf a^\top
+\mathbf E
+\mathbf a
+}.
+\tag{18.28}\]</span></span></p>
+<p>Esse critério utiliza apenas a direção característica de maior razão hipótese/erro.</p>
+</section>
+<section id="uma-mesma-estrutura-quatro-formas-de-agregação" class="level2" data-number="18.6">
+<h2 data-number="18.6" class="anchored" data-anchor-id="uma-mesma-estrutura-quatro-formas-de-agregação"><span class="header-section-number">18.6</span> Uma mesma estrutura, quatro formas de agregação</h2>
+<p>Os quatro critérios são funções da mesma coleção de raízes características</p>
+<p><span class="math display">\[
+\lambda_1,\ldots,\lambda_p
+\]</span></p>
+<p>obtida do problema</p>
+<p><span class="math display">\[
+\mathbf H
+\mathbf a
+=
+\lambda
+\mathbf E
+\mathbf a.
+\]</span></p>
+<p>As raízes nulas não alteram os critérios. A <a href="#tbl-criterios-manova" class="quarto-xref">Tabela&nbsp;<span>18.3</span></a> resume as diferentes formas de agregação.</p>
+<div id="tbl-criterios-manova" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-criterios-manova-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabela&nbsp;18.3: Critérios clássicos da MANOVA como funções das mesmas raízes características.
+</figcaption>
+<div aria-describedby="tbl-criterios-manova-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Critério</th>
+<th>Expressão em função das raízes</th>
+<th>Forma de agregação</th>
+<th>Evidência crescente contra <span class="math inline">\(H_0\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Wilks</td>
+<td><span class="math inline">\(\displaystyle \prod_{j=1}^{p}(1+\lambda_j)^{-1}\)</span></td>
+<td>produto</td>
+<td>valores menores</td>
+</tr>
+<tr class="even">
+<td>Pillai</td>
+<td><span class="math inline">\(\displaystyle \sum_{j=1}^{p}\frac{\lambda_j}{1+\lambda_j}\)</span></td>
+<td>soma limitada</td>
+<td>valores maiores</td>
+</tr>
+<tr class="odd">
+<td>Hotelling–Lawley</td>
+<td><span class="math inline">\(\displaystyle \sum_{j=1}^{p}\lambda_j\)</span></td>
+<td>soma direta</td>
+<td>valores maiores</td>
+</tr>
+<tr class="even">
+<td>Roy</td>
+<td><span class="math inline">\(\lambda_1\)</span></td>
+<td>maior raiz</td>
+<td>valores maiores</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Roy concentra a comparação na direção dominante; Hotelling–Lawley soma diretamente as magnitudes das raízes; Pillai limita a contribuição individual de cada raiz; e Wilks combina multiplicativamente toda a coleção.</p>
+<p>Os critérios podem, portanto, responder de forma diferente à distribuição do efeito entre as direções características, embora todos sejam construídos a partir da mesma relação espectral entre <span class="math inline">\(\mathbf H\)</span> e <span class="math inline">\(\mathbf E\)</span>.</p>
+<p>As transformações utilizadas para obter distribuições de referência ou valores críticos dependem de <span class="math inline">\(p\)</span>, dos graus de liberdade da hipótese e do erro e do modelo probabilístico adotado. Essas calibrações pertencem à etapa inferencial aplicada e não serão desenvolvidas neste capítulo.</p>
+<section id="aprofundamento-base-probabilística-dos-critérios" class="level3" data-number="18.6.1">
+<h3 data-number="18.6.1" class="anchored" data-anchor-id="aprofundamento-base-probabilística-dos-critérios"><span class="header-section-number">18.6.1</span> Aprofundamento: base probabilística dos critérios</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>As matrizes observadas <span class="math inline">\(\mathbf H\)</span> e <span class="math inline">\(\mathbf E\)</span>, suas raízes características e os quatro critérios multivariados podem ser definidos algebricamente sem supor normalidade. A formulação normal acrescenta a estrutura probabilística utilizada na calibração clássica desses critérios.</p>
+<p>Os resultados sobre distribuição de Wishart e sobre as matrizes de hipótese e erro já foram desenvolvidos no Módulo 2. Esta seção apenas os especializa à formulação da MANOVA.</p>
+</div>
+</div>
+<p>Considere</p>
+<p><span class="math display">\[
+\boldsymbol{\mathcal Y}
+=
+\mathbf Z\mathbf B
++
+\boldsymbol{\mathcal E},
+\]</span></p>
+<p>com erros independentes</p>
+<p><span id="eq-normalidade-erros-manova"><span class="math display">\[
+\boldsymbol{\mathsf e}_i
+\sim
+N_p
+\left(
+\mathbf0,
+\boldsymbol{\Sigma}
+\right),
+\qquad
+i=1,\ldots,n,
+\tag{18.29}\]</span></span></p>
+<p>em que</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\succ
+\mathbf0
+\]</span></p>
+<p>é comum às unidades consideradas pelo modelo.</p>
+<p>Para uma hipótese estimável</p>
+<p><span class="math display">\[
+H_0:
+\mathbf C_1
+\mathbf B
+=
+\boldsymbol{\Theta}_0,
+\]</span></p>
+<p>com</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf C_1
+\right)
+=
+g,
+\]</span></p>
+<p>os graus de liberdade residuais são</p>
+<p><span class="math display">\[
+\nu_E
+=
+n-
+\operatorname{posto}
+\left(
+\mathbf Z
+\right),
+\]</span></p>
+<p>conforme <a href="mod_2_modelo.html#def-graus-liberdade-residuais" class="quarto-xref">Definição&nbsp;<span>11.12</span></a> e <a href="mod_2_modelo.html#eq-graus-liberdade-residuais" class="quarto-xref">Equação&nbsp;<span>11.77</span></a>.</p>
+<p>Denote por</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf H}
+\]</span></p>
+<p>a SQPC aleatória da hipótese e por</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf E}_{\mathrm{res}}
+\]</span></p>
+<p>a SQPC residual aleatória. Especializando <a href="mod_2_inferencia.html#prp-distribuicao-sscp-hipotese-nula" class="quarto-xref">Proposição&nbsp;<span>12.12</span></a> para as respostas originais, sob <span class="math inline">\(H_0\)</span>,</p>
+<p><span id="eq-distribuicao-h-manova"><span class="math display">\[
+\boldsymbol{\mathsf H}
+\mid
+\mathbf Z
+\sim
+W_p
+\left(
+g,
+\boldsymbol{\Sigma}
+\right),
+\tag{18.30}\]</span></span></p>
+<p><span id="eq-distribuicao-e-manova"><span class="math display">\[
+\boldsymbol{\mathsf E}_{\mathrm{res}}
+\mid
+\mathbf Z
+\sim
+W_p
+\left(
+\nu_E,
+\boldsymbol{\Sigma}
+\right),
+\tag{18.31}\]</span></span></p>
+<p>e</p>
+<p><span id="eq-independencia-he-manova"><span class="math display">\[
+\boldsymbol{\mathsf H}
+\perp
+\boldsymbol{\mathsf E}_{\mathrm{res}}
+\mid
+\mathbf Z.
+\tag{18.32}\]</span></span></p>
+<p>A distribuição da SQPC residual também foi estabelecida em <a href="mod_2_inferencia.html#prp-distribuicao-sscp-residual-modelo-normal" class="quarto-xref">Proposição&nbsp;<span>12.10</span></a>. Esses resultados não precisam ser novamente demonstrados.</p>
+<p>A estrutura normal–Wishart fornece a base probabilística dos testes clássicos da MANOVA. A mesma matriz populacional</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\]</span></p>
+<p>descreve a dispersão residual das respostas e sustenta a utilização de uma única matriz de erro como referência para a comparação com <span class="math inline">\(\mathbf H\)</span>.</p>
+<p>Quando diferentes grupos possuem matrizes de covariâncias populacionais distintas, essa interpretação comum deixa de ser exata. As consequências dessa violação serão retomadas na <a href="#sec-manova-pressupostos" class="quarto-xref"><span>Seção 18.8</span></a>.</p>
+<section id="lambda-de-wilks-e-razão-de-verossimilhanças" class="level4" data-number="18.6.1.1">
+<h4 data-number="18.6.1.1" class="anchored" data-anchor-id="lambda-de-wilks-e-razão-de-verossimilhanças"><span class="header-section-number">18.6.1.1</span> Lambda de Wilks e razão de verossimilhanças</h4>
+<p>A lambda de Wilks possui uma ligação direta com a razão de verossimilhanças do modelo linear normal multivariado. Essa relação já foi desenvolvida no Módulo 2 e é retomada aqui para conectar a formulação por modelos encaixados à representação espectral da MANOVA.</p>
+<p>Para modelos encaixados, <a href="mod_2_modelo.html#prp-decomposicao-modelos-encaixados" class="quarto-xref">Proposição&nbsp;<span>11.13</span></a> fornece</p>
+<p><span class="math display">\[
+\mathbf E_R
+=
+\mathbf E_F
++
+\mathbf H,
+\]</span></p>
+<p>em que <span class="math inline">\(\mathbf E_F\)</span> e <span class="math inline">\(\mathbf E_R\)</span> são as SQPCs residuais dos modelos completo e reduzido.</p>
+<p>No Módulo 2, <a href="mod_2_inferencia.html#eq-razao-verossimilhancas-modelos-encaixados-hipotese" class="quarto-xref">Equação&nbsp;<span>12.64</span></a> estabeleceu</p>
+<p><span class="math display">\[
+\Lambda_{\mathrm{RV}}
+=
+\left[
+\frac{
+|\mathbf E_F|
+}{
+|\mathbf E_F+\mathbf H|
+}
+\right]^{n/2}.
+\]</span></p>
+<p>Na notação deste capítulo,</p>
+<p><span class="math display">\[
+\mathbf E_F
+=
+\mathbf E,
+\qquad
+\mathbf E_R
+=
+\mathbf E+\mathbf H.
+\]</span></p>
+<p>Como <a href="mod_2_inferencia.html#eq-lambda-wilks-modelos-encaixados" class="quarto-xref">Equação&nbsp;<span>12.65</span></a> define a razão de determinantes como lambda de Wilks,</p>
+<p><span id="eq-relacao-rv-wilks-manova"><span class="math display">\[
+\Lambda_{\mathrm{RV}}
+=
+\Lambda_{\mathrm W}^{\,n/2}.
+\tag{18.33}\]</span></span></p>
+<p>A representação</p>
+<p><span class="math display">\[
+\Lambda_{\mathrm W}
+=
+\frac{
+|\mathbf E|
+}{
+|\mathbf E+\mathbf H|
+}
+\]</span></p>
+<p>evidencia sua origem na comparação entre modelos encaixados, enquanto</p>
+<p><span class="math display">\[
+\Lambda_{\mathrm W}
+=
+\prod_{j=1}^{p}
+\frac1{1+\lambda_j}
+\]</span></p>
+<p>evidencia sua representação espectral <span class="citation" data-cites="wilks1932">(<a href="references.html#ref-wilks1932" role="doc-biblioref">Wilks, 1932</a>)</span>.</p>
+<p>Os critérios de Pillai, Hotelling–Lawley e Roy são construídos a partir da mesma estrutura aleatória <span class="math inline">\((\boldsymbol{\mathsf H},\boldsymbol{\mathsf E}_{\mathrm{res}})\)</span>, embora não correspondam diretamente à razão de verossimilhanças do modelo normal.</p>
+<p>A formulação distingue, portanto, três níveis:</p>
+<ol type="1">
+<li>as matrizes observadas <span class="math inline">\(\mathbf H\)</span> e <span class="math inline">\(\mathbf E\)</span> e suas raízes características;</li>
+<li>os quatro critérios globais calculados a partir dessas raízes;</li>
+<li>a calibração inferencial clássica, que acrescenta a estrutura probabilística normal–Wishart.</li>
+</ol>
+<p>A definição dos critérios pertence aos dois primeiros níveis. A estrutura normal–Wishart fornece sua fundamentação probabilística clássica, mas não é necessária para definir algebricamente <span class="math inline">\(\mathbf H\)</span>, <span class="math inline">\(\mathbf E\)</span> ou suas raízes características.</p>
+<p>As condições do modelo e os limites da inferência serão reunidos posteriormente na <a href="#sec-manova-pressupostos" class="quarto-xref"><span>Seção 18.8</span></a>.</p>
+</section>
+</section>
+</section>
+<section id="invariância-a-transformações-lineares-das-respostas" class="level2" data-number="18.7">
+<h2 data-number="18.7" class="anchored" data-anchor-id="invariância-a-transformações-lineares-das-respostas"><span class="header-section-number">18.7</span> Invariância a transformações lineares das respostas</h2>
+<p>Considere uma transformação linear não singular das respostas,</p>
+<p><span id="eq-transformacao-respostas-manova"><span class="math display">\[
+\boldsymbol{\mathcal Y}^{*}
+=
+\boldsymbol{\mathcal Y}\mathbf A,
+\tag{18.34}\]</span></span></p>
+<p>com</p>
+<p><span class="math display">\[
+\mathbf A
+\in
+\mathbb R^{p\times p},
+\qquad
+\det(\mathbf A)\neq0.
+\]</span></p>
+<p>No sistema transformado,</p>
+<p><span class="math display">\[
+\mathbf B^{*}
+=
+\mathbf B\mathbf A,
+\qquad
+\boldsymbol{\mathcal E}^{*}
+=
+\boldsymbol{\mathcal E}\mathbf A.
+\]</span></p>
+<p>Para representar a mesma hipótese, utiliza-se</p>
+<p><span class="math display">\[
+\boldsymbol{\Theta}_0^{*}
+=
+\boldsymbol{\Theta}_0\mathbf A.
+\]</span></p>
+<p>As matrizes de hipótese e erro transformam-se por congruência:</p>
+<p><span id="eq-transformacao-h-manova"><span class="math display">\[
+\mathbf H^{*}
+=
+\mathbf A^\top
+\mathbf H
+\mathbf A
+\tag{18.35}\]</span></span></p>
+<p>e</p>
+<p><span id="eq-transformacao-e-manova"><span class="math display">\[
+\mathbf E^{*}
+=
+\mathbf A^\top
+\mathbf E
+\mathbf A.
+\tag{18.36}\]</span></span></p>
+<p>Se <span class="math inline">\(\mathbf A\)</span> é não singular, os pares</p>
+<p><span class="math display">\[
+(\mathbf H,\mathbf E)
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+(\mathbf H^{*},\mathbf E^{*})
+\]</span></p>
+<p>possuem as mesmas raízes características, incluindo suas multiplicidades. A demonstração formal desse resultado é apresentada na <a href="#prp-invariancia-raizes-manova" class="quarto-xref">Proposição&nbsp;<span>18.1</span></a>.</p>
+<p>Como Wilks, Pillai, Hotelling–Lawley e Roy dependem somente das raízes características, os quatro critérios são invariantes a transformações lineares não singulares das respostas, desde que a hipótese seja expressa no sistema transformado correspondente.</p>
+<p>As direções características mudam de coordenadas. Se <span class="math inline">\(\boldsymbol{\alpha}_j\)</span> é uma direção característica normalizada no sistema original, pode-se tomar</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j^{*}
+=
+\mathbf A^{-1}
+\boldsymbol{\alpha}_j,
+\]</span></p>
+<p>de modo que</p>
+<p><span class="math display">\[
+\boldsymbol{\mathcal Y}^{*}
+\boldsymbol{\alpha}_j^{*}
+=
+\boldsymbol{\mathcal Y}
+\boldsymbol{\alpha}_j.
+\]</span></p>
+<p>Assim, os coeficientes numéricos das combinações lineares dependem da representação das respostas, enquanto as raízes e os quatro critérios permanecem invariantes sob mudanças invertíveis de coordenadas.</p>
+<section id="aprofundamento-demonstração-da-invariância-das-raízes" class="level3" data-number="18.7.1">
+<h3 data-number="18.7.1" class="anchored" data-anchor-id="aprofundamento-demonstração-da-invariância-das-raízes"><span class="header-section-number">18.7.1</span> Aprofundamento: demonstração da invariância das raízes</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A invariância dos critérios decorre da preservação das raízes características do par <span class="math inline">\((\mathbf H,\mathbf E)\)</span> sob transformações lineares não singulares das respostas. A demonstração utiliza a transformação por congruência de <span class="math inline">\(\mathbf H\)</span> e <span class="math inline">\(\mathbf E\)</span> e propriedades do determinante.</p>
+</div>
+</div>
+<div id="prp-invariancia-raizes-manova" class="theorem proposition">
+<p><span class="theorem-title"><strong>Proposição 18.1 (Invariância das raízes características)</strong></span> Se <span class="math inline">\(\mathbf A\)</span> é não singular, os pares</p>
+<p><span class="math display">\[
+(\mathbf H,\mathbf E)
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+(\mathbf H^{*},\mathbf E^{*})
+\]</span></p>
+<p>possuem as mesmas raízes características, incluindo suas multiplicidades.</p>
+</div>
+<div class="proof">
+<p><span class="proof-title"><em>Comprovação</em>. </span>Tem-se</p>
+<p><span class="math display">\[
+\begin{aligned}
+\det
+\left(
+\mathbf H^{*}
+-
+\lambda\mathbf E^{*}
+\right)
+&amp;=
+\det
+\left[
+\mathbf A^\top
+\left(
+\mathbf H-\lambda\mathbf E
+\right)
+\mathbf A
+\right]
+\\
+&amp;=
+\det(\mathbf A)^2
+\det
+\left(
+\mathbf H-\lambda\mathbf E
+\right).
+\end{aligned}
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\det(\mathbf A)\neq0,
+\]</span></p>
+<p>as duas equações características possuem os mesmos zeros, com as mesmas multiplicidades.</p>
+</div>
+</section>
+</section>
+<section id="sec-manova-pressupostos" class="level2" data-number="18.8">
+<h2 data-number="18.8" class="anchored" data-anchor-id="sec-manova-pressupostos"><span class="header-section-number">18.8</span> Pressupostos e limites</h2>
+<p>A MANOVA combina uma estrutura para as médias, uma comparação algébrica entre hipótese e erro e, na inferência clássica, um modelo probabilístico. As condições abaixo possuem funções diferentes dentro dessa construção.</p>
+<section id="estrutura-da-média-e-estimabilidade" class="level3" data-number="18.8.1">
+<h3 data-number="18.8.1" class="anchored" data-anchor-id="estrutura-da-média-e-estimabilidade"><span class="header-section-number">18.8.1</span> Estrutura da média e estimabilidade</h3>
+<p>O modelo pressupõe</p>
+<p><span class="math display">\[
+E
+\left(
+\boldsymbol{\mathcal Y}
+\mid
+\mathbf Z
+\right)
+=
+\mathbf Z\mathbf B.
+\]</span></p>
+<p>Grupos, tratamentos, covariáveis e demais efeitos relevantes devem estar representados adequadamente em <span class="math inline">\(\mathbf Z\)</span>, pois a especificação da média determina tanto os resíduos quanto a hipótese avaliada.</p>
+<p>Para</p>
+<p><span class="math display">\[
+H_0:
+\mathbf C_1\mathbf B
+=
+\boldsymbol{\Theta}_0,
+\]</span></p>
+<p>a função paramétrica deve ser estimável. Conforme <a href="#eq-estimabilidade-hipotese-manova" class="quarto-xref">Equação&nbsp;<span>18.5</span></a>,</p>
+<p><span class="math display">\[
+\mathbf C_1
+=
+\mathbf C_1
+\mathbf Z^+
+\mathbf Z.
+\]</span></p>
+<p>Essa é uma condição de identificação da hipótese e não depende da normalidade multivariada.</p>
+</section>
+<section id="independência-entre-unidades" class="level3" data-number="18.8.2">
+<h3 data-number="18.8.2" class="anchored" data-anchor-id="independência-entre-unidades"><span class="header-section-number">18.8.2</span> Independência entre unidades</h3>
+<p>Na formulação probabilística clássica, os vetores de erros associados a unidades distintas são independentes:</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf e}_1,
+\ldots,
+\boldsymbol{\mathsf e}_n.
+\]</span></p>
+<p>A dependência entre as componentes de um mesmo vetor resposta é permitida e representada por <span class="math inline">\(\boldsymbol{\Sigma}\)</span>. Dependência não modelada entre unidades, como em medidas repetidas, séries temporais ou estruturas espaciais, exige uma formulação de covariância apropriada.</p>
+</section>
+<section id="covariância-residual-comum" class="level3" data-number="18.8.3">
+<h3 data-number="18.8.3" class="anchored" data-anchor-id="covariância-residual-comum"><span class="header-section-number">18.8.3</span> Covariância residual comum</h3>
+<p>O modelo clássico utiliza</p>
+<p><span class="math display">\[
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf e}_i
+\mid
+\mathbf Z
+\right)
+=
+\boldsymbol{\Sigma},
+\qquad
+i=1,\ldots,n.
+\]</span></p>
+<p>No problema de comparação entre grupos, isso corresponde à utilização de uma matriz de covariâncias residual populacional comum.</p>
+<p>Essa estrutura justifica o uso de uma única matriz <span class="math inline">\(\mathbf E\)</span> como referência para a comparação com <span class="math inline">\(\mathbf H\)</span>. Se as matrizes de covariâncias diferem entre grupos ou unidades, os critérios ainda podem ser calculados quando as operações matriciais necessárias existem, mas a calibração inferencial clássica normal–Wishart não corresponde exatamente a esse mecanismo.</p>
+</section>
+<section id="aprofundamento-teste-m-de-box" class="level3" data-number="18.8.4">
+<h3 data-number="18.8.4" class="anchored" data-anchor-id="aprofundamento-teste-m-de-box"><span class="header-section-number">18.8.4</span> Aprofundamento: teste <span class="math inline">\(M\)</span> de Box</h3>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Leitura de aprofundamento
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A igualdade das matrizes de covariâncias constitui uma condição da formulação clássica de comparação entre grupos. O teste <span class="math inline">\(M\)</span> de Box fornece uma avaliação inferencial dessa hipótese, mas seu resultado não substitui a análise da estrutura residual nem constitui, isoladamente, uma decisão sobre a validade da MANOVA.</p>
+</div>
+</div>
+<p>No problema de comparação entre <span class="math inline">\(K\)</span> grupos, a hipótese de covariância residual comum pode ser expressa como</p>
+<p><span class="math display">\[
+H_0:
+\boldsymbol{\Sigma}_1
+=
+\boldsymbol{\Sigma}_2
+=
+\cdots
+=
+\boldsymbol{\Sigma}_K.
+\]</span></p>
+<p>O teste <span class="math inline">\(M\)</span> de Box compara as matrizes de covariâncias estimadas nos grupos para avaliar sua compatibilidade com essa hipótese. A rejeição de <span class="math inline">\(H_0\)</span> fornece evidência de heterogeneidade entre as matrizes de covariâncias.</p>
+<p>A não rejeição de <span class="math inline">\(H_0\)</span> não demonstra que as matrizes populacionais sejam iguais. O resultado deve ser interpretado em conjunto com a estrutura dos dados e com as hipóteses utilizadas para obter a distribuição de referência do teste. Em particular, desvios da normalidade multivariada podem afetar seu comportamento.</p>
+<p>O teste constitui, portanto, uma avaliação inferencial da hipótese de covariância comum e não uma condição que, isoladamente, determine a validade da MANOVA.</p>
+</section>
+<section id="não-singularidade-populacional-e-amostral" class="level3" data-number="18.8.5">
+<h3 data-number="18.8.5" class="anchored" data-anchor-id="não-singularidade-populacional-e-amostral"><span class="header-section-number">18.8.5</span> Não singularidade populacional e amostral</h3>
+<p>A formulação clássica considera</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\succ
+\mathbf0.
+\]</span></p>
+<p>Essa condição populacional exclui relações lineares exatas entre as respostas.</p>
+<p>A condição amostral necessária ao problema espectral desenvolvido neste capítulo é</p>
+<p><span class="math display">\[
+\mathbf E
+\succ
+\mathbf0.
+\]</span></p>
+<p>Como</p>
+<p><span class="math display">\[
+\mathbf E
+=
+\widehat{\mathbf U}^{\top}
+\widehat{\mathbf U},
+\]</span></p>
+<p>tem-se</p>
+<p><span class="math display">\[
+\operatorname{posto}
+\left(
+\mathbf E
+\right)
+\leq
+\min
+\left(
+p,\nu_E
+\right).
+\]</span></p>
+<p>Consequentemente, uma condição necessária para que <span class="math inline">\(\mathbf E\)</span> seja positiva definida é</p>
+<p><span id="eq-condicao-posto-e-manova"><span class="math display">\[
+\nu_E
+\geq
+p.
+\tag{18.37}\]</span></span></p>
+<p>Essa condição não é suficiente em termos puramente algébricos, pois dependências lineares exatas entre os resíduos podem tornar <span class="math inline">\(\mathbf E\)</span> singular.</p>
+<p>Sob o modelo normal clássico, com</p>
+<p><span class="math display">\[
+\boldsymbol{\Sigma}
+\succ
+\mathbf0
+\]</span></p>
+<p>e</p>
+<p><span class="math display">\[
+\nu_E\geq p,
+\]</span></p>
+<p>a matriz residual é positiva definida com probabilidade <span class="math inline">\(1\)</span> nas condições regulares dessa formulação. A justificativa probabilística desse resultado por meio da distribuição de Wishart é apresentada na leitura de aprofundamento sobre a base probabilística dos critérios.</p>
+<p>Quando <span class="math inline">\(\mathbf E\)</span> é singular, não existem diretamente</p>
+<p><span class="math display">\[
+\mathbf E^{-1}
+\qquad\text{e}\qquad
+\mathbf E^{-1/2},
+\]</span></p>
+<p>e a formulação espectral clássica adotada neste capítulo deixa de se aplicar. Pseudoinversas, regularização e métodos para situações de alta dimensão pertencem ao tratamento metodológico posterior.</p>
+</section>
+<section id="normalidade-multivariada" class="level3" data-number="18.8.6">
+<h3 data-number="18.8.6" class="anchored" data-anchor-id="normalidade-multivariada"><span class="header-section-number">18.8.6</span> Normalidade multivariada</h3>
+<p>A normalidade não é uma condição para a definição algébrica da MANOVA. As matrizes</p>
+<p><span class="math display">\[
+\mathbf H,
+\qquad
+\mathbf E,
+\]</span></p>
+<p>suas raízes características e os quatro critérios podem ser construídos sempre que as operações matriciais necessárias estejam definidas.</p>
+<p>Sob a formulação normal clássica adotada neste capítulo, a normalidade dos erros acrescenta a estrutura probabilística que conduz às distribuições Wishart de <span class="math inline">\(\boldsymbol{\mathsf H}\)</span> e <span class="math inline">\(\boldsymbol{\mathsf E}_{\mathrm{res}}\)</span>, à sua independência sob <span class="math inline">\(H_0\)</span> e à calibração inferencial clássica dos critérios.</p>
+<p>A hipótese de normalidade refere-se aos erros condicionais à estrutura de médias representada por <span class="math inline">\(\mathbf Z\)</span>. Ela não equivale à exigência de que a distribuição marginal obtida ao reunir todas as respostas observadas seja uma única normal multivariada.</p>
+<p>No caso de comparação entre grupos, por exemplo, pode-se ter</p>
+<p><span class="math display">\[
+\boldsymbol{\mathsf Y}_i
+\mid
+G_i=k
+\sim
+N_p
+\left(
+\boldsymbol{\mu}_k,
+\boldsymbol{\Sigma}
+\right),
+\]</span></p>
+<p>com vetores de médias distintos entre os grupos. A distribuição marginal resultante da mistura desses grupos não precisa pertencer à família normal multivariada, mesmo quando o modelo normal condicional está corretamente especificado.</p>
+<p>Consequentemente, um diagnóstico aplicado diretamente às respostas sem considerar a estrutura sistemática das médias avalia uma propriedade diferente da normalidade dos erros assumida pelo modelo. A avaliação desse pressuposto deve ser compatível com a formulação condicional utilizada na MANOVA.</p>
+<p>Devem ser distinguidos:</p>
+<ul>
+<li>a formulação algébrica baseada em <span class="math inline">\(\mathbf H\)</span> e <span class="math inline">\(\mathbf E\)</span>;</li>
+<li>o modelo probabilístico normal com covariância residual comum;</li>
+<li>a calibração inferencial clássica dos critérios.</li>
+</ul>
+<p>Procedimentos robustos, heterocedásticos, de permutação ou reamostragem pertencem à etapa metodológica.</p>
+</section>
+<section id="posto-e-identificação-das-direções" class="level3" data-number="18.8.7">
+<h3 data-number="18.8.7" class="anchored" data-anchor-id="posto-e-identificação-das-direções"><span class="header-section-number">18.8.7</span> Posto e identificação das direções</h3>
+<p>O número de raízes positivas é</p>
+<p><span class="math display">\[
+r_H
+=
+\operatorname{posto}
+\left(
+\mathbf H
+\right)
+\leq
+\min(p,g),
+\]</span></p>
+<p>conforme <a href="#eq-numero-raizes-hipotese-manova" class="quarto-xref">Equação&nbsp;<span>18.15</span></a>.</p>
+<p>Assim, o número de respostas não determina sozinho a quantidade de direções associadas ao efeito. Uma hipótese de baixo posto pode produzir poucas raízes positivas mesmo quando <span class="math inline">\(p\)</span> é elevado.</p>
+<p>Para uma raiz simples, a direção característica é determinada apenas até multiplicação por um escalar não nulo. Adotando a normalização</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j^\top
+\mathbf E
+\boldsymbol{\alpha}_j
+=
+1,
+\]</span></p>
+<p>permanece a indeterminação de sinal:</p>
+<p><span class="math display">\[
+\boldsymbol{\alpha}_j
+\qquad\text{e}\qquad
+-\boldsymbol{\alpha}_j
+\]</span></p>
+<p>representam a mesma direção.</p>
+<p>Quando uma raiz possui multiplicidade maior que <span class="math inline">\(1\)</span>, os autovetores individuais não são únicos; o subespaço característico correspondente é o objeto identificado.</p>
+</section>
+<section id="associação-entre-as-respostas-condicionamento-e-singularidade" class="level3" data-number="18.8.8">
+<h3 data-number="18.8.8" class="anchored" data-anchor-id="associação-entre-as-respostas-condicionamento-e-singularidade"><span class="header-section-number">18.8.8</span> Associação entre as respostas, condicionamento e singularidade</h3>
+<p>Correlação elevada entre respostas não invalida, por si só, a MANOVA. A dependência entre as componentes do vetor resposta faz parte da própria construção de <span class="math inline">\(\mathbf E\)</span> e é uma das razões para utilizar uma análise conjunta.</p>
+<p>Entretanto, respostas muito próximas de uma relação linear exata podem produzir uma matriz <span class="math inline">\(\mathbf E\)</span> mal condicionada. Nesse caso, a matriz ainda pode ser invertível, mas pequenas perturbações nos dados podem produzir alterações relativamente grandes em <span class="math inline">\(\mathbf E^{-1}\)</span> e nas direções características.</p>
+<p>A singularidade constitui o caso limite: uma dependência linear exata suficiente reduz o posto de <span class="math inline">\(\mathbf E\)</span> e impede a utilização direta de</p>
+<p><span class="math display">\[
+\mathbf E^{-1}
+\qquad\text{e}\qquad
+\mathbf E^{-1/2}.
+\]</span></p>
+<p>Devem ser distinguidas, portanto, três situações: associação entre respostas, que é esperada na MANOVA; quase dependência linear, que pode gerar mau condicionamento; e dependência linear exata, que pode tornar a estrutura residual singular.</p>
+</section>
+</section>
+<section id="relações-com-outras-técnicas" class="level2" data-number="18.9">
+<h2 data-number="18.9" class="anchored" data-anchor-id="relações-com-outras-técnicas"><span class="header-section-number">18.9</span> Relações com outras técnicas</h2>
+<p>A MANOVA compartilha estruturas com outros procedimentos inferenciais e multivariados. As relações abaixo mostram como a comparação entre hipótese e erro se especializa ou recebe outra interpretação conforme o problema estatístico.</p>
+<section id="sec-manova-anova-testes-univariados" class="level3" data-number="18.9.1">
+<h3 data-number="18.9.1" class="anchored" data-anchor-id="sec-manova-anova-testes-univariados"><span class="header-section-number">18.9.1</span> ANOVA</h3>
+<p>Quando existe uma única resposta,</p>
+<p><span class="math display">\[
+p=1,
+\]</span></p>
+<p>as matrizes de hipótese e erro reduzem-se a escalares,</p>
+<p><span class="math display">\[
+\mathbf H=(H),
+\qquad
+\mathbf E=(E),
+\]</span></p>
+<p>e existe no máximo uma raiz característica,</p>
+<p><span class="math display">\[
+\lambda
+=
+\frac{H}{E}.
+\]</span></p>
+<p>Se <span class="math inline">\(\nu_H\)</span> e <span class="math inline">\(\nu_E\)</span> são os graus de liberdade da hipótese e do erro, respectivamente, então</p>
+<p><span id="eq-relacao-f-raiz-manova"><span class="math display">\[
+F
+=
+\frac{
+H/\nu_H
+}{
+E/\nu_E
+}
+=
+\frac{\nu_E}{\nu_H}
+\lambda.
+\tag{18.38}\]</span></span></p>
+<p>Os quatro critérios multivariados tornam-se, nesse caso, funções monotônicas da mesma razão utilizada pela ANOVA. A MANOVA preserva, portanto, a comparação entre hipótese e erro, substituindo somas de quadrados escalares por matrizes de somas de quadrados e produtos cruzados.</p>
+<p>Quando <span class="math inline">\(p&gt;1\)</span>, a avaliação multivariada pode ser complementada pelo exame separado das respostas. Para a resposta <span class="math inline">\(j\)</span>, os elementos diagonais</p>
+<p><span class="math display">\[
+H_{jj}
+\qquad\text{e}\qquad
+E_{jj}
+\]</span></p>
+<p>correspondem às somas de quadrados da hipótese e do erro associadas a essa variável, conduzindo à estatística</p>
+<p><span id="eq-f-univariado-pos-manova"><span class="math display">\[
+F_j
+=
+\frac{
+H_{jj}/\nu_H
+}{
+E_{jj}/\nu_E
+}.
+\tag{18.39}\]</span></span></p>
+<p>Esses testes respondem a perguntas marginais sobre cada componente do vetor resposta e não reproduzem a MANOVA. Cada <span class="math inline">\(F_j\)</span> utiliza apenas elementos diagonais de <span class="math inline">\(\mathbf H\)</span> e <span class="math inline">\(\mathbf E\)</span>, enquanto os critérios multivariados utilizam as matrizes completas e incorporam também os produtos cruzados entre as respostas.</p>
+<p>Por isso, uma conclusão global da MANOVA não deve ser substituída por uma coleção de testes univariados. Procedimentos de acompanhamento, controle de multiplicidade e comparações posteriores pertencem à etapa aplicada.</p>
+</section>
+<section id="t2-de-hotelling" class="level3" data-number="18.9.2">
+<h3 data-number="18.9.2" class="anchored" data-anchor-id="t2-de-hotelling"><span class="header-section-number">18.9.2</span> <span class="math inline">\(T^2\)</span> de Hotelling</h3>
+<p>Na comparação clássica de duas populações,</p>
+<p><span class="math display">\[
+K=2,
+\]</span></p>
+<p>há apenas um contraste independente e, portanto,</p>
+<p><span class="math display">\[
+g=1.
+\]</span></p>
+<p>Existe no máximo uma raiz característica positiva.</p>
+<p>Para duas amostras independentes de tamanhos <span class="math inline">\(n_1\)</span> e <span class="math inline">\(n_2\)</span>, com matriz de covariâncias comum, a relação com a estatística definida em <a href="mod_2_inferencia.html#def-t2-duas-amostras-independentes" class="quarto-xref">Definição&nbsp;<span>12.6</span></a> é</p>
+<p><span id="eq-relacao-raiz-t2-manova"><span class="math display">\[
+\lambda_1
+=
+\frac{
+T^2
+}{
+n_1+n_2-2
+}.
+\tag{18.40}\]</span></span></p>
+<p>Assim, o teste <span class="math inline">\(T^2\)</span> para duas populações e a MANOVA de dois grupos utilizam a mesma razão multivariada entre diferença de médias e dispersão residual.</p>
+<p>Com hipóteses de posto superior a <span class="math inline">\(1\)</span>, várias raízes podem ser positivas e os critérios de Wilks, Pillai, Hotelling–Lawley e Roy passam a agregá-las de formas distintas.</p>
+</section>
+<section id="regressão-multivariada" class="level3" data-number="18.9.3">
+<h3 data-number="18.9.3" class="anchored" data-anchor-id="regressão-multivariada"><span class="header-section-number">18.9.3</span> Regressão multivariada</h3>
+<p>MANOVA e regressão multivariada utilizam o mesmo modelo</p>
+<p><span class="math display">\[
+\boldsymbol{\mathcal Y}
+=
+\mathbf Z\mathbf B
++
+\boldsymbol{\mathcal E}.
+\]</span></p>
+<p>A diferença está na estrutura representada em <span class="math inline">\(\mathbf Z\)</span> e nas hipóteses formuladas sobre <span class="math inline">\(\mathbf B\)</span>. Indicadores e contrastes podem representar grupos ou fatores, enquanto variáveis quantitativas podem representar covariáveis ou preditores contínuos.</p>
+<p>Em ambos os casos, hipóteses estimáveis sobre</p>
+<p><span class="math display">\[
+\mathbf C_1\mathbf B
+\]</span></p>
+<p>podem ser avaliadas pelas mesmas matrizes de hipótese e erro.</p>
+</section>
+<section id="análise-discriminante" class="level3" data-number="18.9.4">
+<h3 data-number="18.9.4" class="anchored" data-anchor-id="análise-discriminante"><span class="header-section-number">18.9.4</span> Análise Discriminante</h3>
+<p>MANOVA e Análise Discriminante compartilham estruturas de dispersão associadas às diferenças entre grupos e à variabilidade dentro dos grupos.</p>
+<p>Na MANOVA, o problema</p>
+<p><span class="math display">\[
+\mathbf H\mathbf a
+=
+\lambda
+\mathbf E\mathbf a
+\]</span></p>
+<p>procura direções em que a magnitude da hipótese seja elevada relativamente à dispersão residual. As raízes resultantes sustentam os critérios utilizados para testar a hipótese multivariada.</p>
+<p>No <a href="mod_3_discriminante.html" class="quarto-xref"><span>Capítulo 19</span></a>, uma estrutura espectral relacionada será utilizada com outro objetivo: construir combinações das variáveis que evidenciem a separação entre grupos previamente conhecidos e possam sustentar procedimentos de discriminação ou classificação.</p>
+<p>A proximidade algébrica não implica equivalência estatística. Na MANOVA, os grupos ou efeitos fazem parte da estrutura explicativa e o objetivo principal é testar diferenças no vetor resposta. Na Análise Discriminante, a pertença aos grupos é conhecida na amostra de referência e o interesse passa à representação da separação e, em determinadas formulações, à classificação de novas observações.</p>
+<div class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Correspondência com a implementação utilizada
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nas atividades computacionais, a MANOVA será realizada pela análise <code>MANCOVA</code> do núcleo do <a href="https://www.jamovi.org/">jamovi</a> <span class="citation" data-cites="jamovi2026">(<a href="references.html#ref-jamovi2026" role="doc-biblioref">The jamovi project, 2026</a>)</span>. Sem covariáveis, essa análise corresponde à formulação MANOVA desenvolvida neste capítulo; a inclusão de covariáveis utiliza a mesma estrutura do modelo linear multivariado, ampliando a matriz de delineamento.</p>
+<p>As respostas quantitativas correspondem às colunas de <span class="math inline">\(\boldsymbol{\mathcal Y}\)</span>, enquanto fatores e covariáveis determinam termos da matriz de delineamento. Os critérios de Wilks, Pillai, Hotelling–Lawley e Roy correspondem às funções das raízes características apresentadas na <a href="#sec-manova-criterios" class="quarto-xref"><span>Seção 18.5</span></a>.</p>
+<p>O teste <span class="math inline">\(M\)</span> de Box está relacionado à hipótese de covariância residual comum discutida na <a href="#sec-manova-pressupostos" class="quarto-xref"><span>Seção 18.8</span></a>. Os testes univariados apresentados para respostas individuais correspondem às comparações marginais discutidas na <a href="#sec-manova-anova-testes-univariados" class="quarto-xref"><span>Seção 18.9.1</span></a> e não substituem o teste multivariado.</p>
+<p>Diagnósticos de normalidade devem ser interpretados em relação aos erros do modelo, e não automaticamente como propriedades da distribuição marginal de todas as respostas reunidas.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="síntese" class="level2" data-number="18.10">
+<h2 data-number="18.10" class="anchored" data-anchor-id="síntese"><span class="header-section-number">18.10</span> Síntese</h2>
+<p>A MANOVA testa hipóteses sobre várias respostas conjuntamente no modelo linear multivariado</p>
+<p><span class="math display">\[
+\boldsymbol{\mathcal Y}
+=
+\mathbf Z\mathbf B
++
+\boldsymbol{\mathcal E}.
+\]</span></p>
+<p>Para uma hipótese estimável sobre os parâmetros, a matriz</p>
+<p><span class="math display">\[
+\mathbf H
+\]</span></p>
+<p>representa a variação multivariada associada ao afastamento observado da hipótese, enquanto</p>
+<p><span class="math display">\[
+\mathbf E
+\]</span></p>
+<p>representa a variação residual utilizada como referência.</p>
+<p>A comparação entre essas estruturas é formulada, para uma combinação linear das respostas determinada por <span class="math inline">\(\mathbf a\neq\mathbf0\)</span>, pelo quociente</p>
+<p><span class="math display">\[
+\mathcal R_{\mathbf H,\mathbf E}
+(\mathbf a)
+=
+\frac{
+\mathbf a^\top
+\mathbf H
+\mathbf a
+}{
+\mathbf a^\top
+\mathbf E
+\mathbf a
+}.
+\]</span></p>
+<p>Quando</p>
+<p><span class="math display">\[
+\mathbf E
+\succ
+\mathbf0,
+\]</span></p>
+<p>as direções extremas são determinadas pelo problema de autovalores generalizados</p>
+<p><span class="math display">\[
+\mathbf H\mathbf a
+=
+\lambda
+\mathbf E\mathbf a.
+\]</span></p>
+<p>A transformação</p>
+<p><span class="math display">\[
+\mathbf M_{\mathrm{HE}}
+=
+\mathbf E^{-1/2}
+\mathbf H
+\mathbf E^{-1/2}
+\]</span></p>
+<p>converte esse problema em uma decomposição espectral simétrica na geometria em que a dispersão residual foi padronizada. As raízes características</p>
+<p><span class="math display">\[
+\lambda_1
+\geq
+\cdots
+\geq
+\lambda_p
+\geq
+0
+\]</span></p>
+<p>quantificam a magnitude da hipótese relativamente ao erro nas respectivas direções características.</p>
+<p>Os critérios de Wilks, Pillai, Hotelling–Lawley e Roy são funções dessa mesma coleção de raízes. Eles diferem pela forma de agregação: Wilks combina multiplicativamente todas as raízes; Pillai soma transformações limitadas; Hotelling–Lawley soma diretamente suas magnitudes; e Roy utiliza apenas a raiz dominante. A <a href="#tbl-criterios-manova" class="quarto-xref">Tabela&nbsp;<span>18.3</span></a> reúne essas relações.</p>
+<p>A construção de <span class="math inline">\(\mathbf H\)</span>, <span class="math inline">\(\mathbf E\)</span>, das raízes características e dos quatro critérios é algébrica. A formulação inferencial clássica acrescenta uma estrutura probabilística para os erros. Sob o modelo normal adotado neste capítulo, independência entre unidades, covariância residual comum e normalidade multivariada fornecem a base para a calibração dos critérios. A estrutura normal–Wishart que formaliza essa relação foi apresentada como leitura de aprofundamento e não é necessária para definir algebricamente os critérios da MANOVA.</p>
+<p>A formulação exige distinguir condições com funções diferentes. A estimabilidade determina se a hipótese está identificada; a positividade definida de <span class="math inline">\(\mathbf E\)</span> permite a formulação espectral clássica; a covariância residual comum fornece uma referência compartilhada para a geometria do erro; e a independência entre unidades e a normalidade sustentam a calibração inferencial clássica adotada no capítulo. Associação elevada entre respostas não constitui, por si só, singularidade, embora relações lineares quase exatas possam produzir mau condicionamento da matriz residual.</p>
+<p>Quando <span class="math inline">\(p=1\)</span>, a comparação reduz-se à estrutura da ANOVA. Na comparação de duas populações, existe no máximo uma raiz positiva e a formulação relaciona-se ao <span class="math inline">\(T^2\)</span> de Hotelling. Essas relações mostram que a MANOVA amplia a comparação entre hipótese e erro para situações com várias respostas conjuntamente.</p>
+<p>No próximo capítulo, os grupos continuam previamente conhecidos na amostra utilizada para construir a análise, mas o objetivo estatístico muda. O <a href="mod_3_discriminante.html" class="quarto-xref"><span>Capítulo 19</span></a> utilizará estruturas de dispersão entre e dentro dos grupos e um problema espectral relacionado para construir direções de separação e, sob formulações probabilísticas específicas, regras de classificação de novas observações.</p>
+
+
+<div id="refs" class="references csl-bib-body" data-entry-spacing="1" role="list" style="display: none">
+<div id="ref-anderson2003" class="csl-entry" role="listitem">
+ANDERSON, Theodore W. <strong><a href="https://www.wiley.com/en-us/An+Introduction+to+Multivariate+Statistical+Analysis%2C+3rd+Edition-p-9780471360919">An Introduction to Multivariate Statistical Analysis</a></strong>. 3. ed. Hoboken, NJ: John Wiley &amp; Sons, 2003. p. 752
+</div>
+<div id="ref-pillai1955" class="csl-entry" role="listitem">
+PILLAI, K. C. S. <a href="https://doi.org/10.1214/aoms/1177728599">Some New Test Criteria in Multivariate Analysis</a>. <strong>The Annals of Mathematical Statistics</strong>, v. 26, n. 1, p. 117–121, 1955.
+</div>
+<div id="ref-jamovi2026" class="csl-entry" role="listitem">
+THE JAMOVI PROJECT. <strong>jamovi (Version 2.7) [Computer Software]</strong>., 2026. Disponível em: &lt;<a href="https://www.jamovi.org">https://www.jamovi.org</a>&gt;. Acesso em: 1 set. 2026
+</div>
+<div id="ref-wilks1932" class="csl-entry" role="listitem">
+WILKS, Samuel S. <a href="https://doi.org/10.1093/biomet/24.3-4.471">Certain Generalizations in the Analysis of Variance</a>. <strong>Biometrika</strong>, v. 24, n. 3–4, p. 471–494, 1932.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiada");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiada");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./mod_3_correspondencia.html" class="pagination-link" aria-label="Formulação da Análise de Correspondência">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Formulação da Análise de Correspondência</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./mod_3_discriminante.html" class="pagination-link" aria-label="Formulação da Análise Discriminante">
+        <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Formulação da Análise Discriminante</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
