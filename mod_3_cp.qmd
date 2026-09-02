@@ -346,7 +346,7 @@ $$
 1.
 $$
 
-Esse problema já possui a forma estudada no Módulo 1. O quociente de Rayleigh foi definido na @def-quociente-rayleigh e seus extremos foram caracterizados no @thm-extremos-quociente-rayleigh. Aplicando esse resultado à matriz simétrica e semidefinida positiva $\boldsymbol{\Sigma}$, o máximo é igual ao maior autovalor da matriz de covariâncias.
+Esse problema já possui a foi estudado no Módulo 1. O quociente de Rayleigh foi definido na @def-quociente-rayleigh e seus extremos foram caracterizados no @thm-extremos-quociente-rayleigh. Aplicando esse resultado à matriz simétrica e semidefinida positiva $\boldsymbol{\Sigma}$, o máximo é igual ao maior autovalor da matriz de covariâncias.
 
 A variação do quociente de Rayleigh segundo a direção foi ilustrada na @fig-quociente-rayleigh. Na ACP, a matriz utilizada naquele problema passa a ser $\boldsymbol{\Sigma}$, e o máximo do quociente corresponde à maior variância possível de uma combinação linear com coeficientes de norma unitária.
 
@@ -397,11 +397,11 @@ $$
 \lambda_1
 \boldsymbol{\alpha}_1\\
 &=
-\lambda_1.
+\lambda_1\boldsymbol{\alpha}_1^\top\boldsymbol{\alpha}_1.
 \end{aligned}
 $$
 
-Portanto,
+Portanto, como $\boldsymbol{\alpha}^\top\boldsymbol{\alpha}=1$, temos
 
 $$
 \operatorname{Var}(Y_1)
@@ -933,45 +933,10 @@ $$
 \operatorname{Var}(Y_2)=2.
 $$
 
-Como
-
-$$
-\boldsymbol{\Sigma}
-\boldsymbol{\alpha}_2
-=
-\lambda_2
-\boldsymbol{\alpha}_2
-$$
-
 e
-
 $$
-\boldsymbol{\alpha}_1^\top
-\boldsymbol{\alpha}_2
-=
-0,
+\operatorname{Cov}(Y_1,Y_2)=0
 $$
-
-tem-se
-
-$$
-\begin{aligned}
-\operatorname{Cov}(Y_1,Y_2)
-&=
-\boldsymbol{\alpha}_1^\top
-\boldsymbol{\Sigma}
-\boldsymbol{\alpha}_2\\
-&=
-\lambda_2
-\boldsymbol{\alpha}_1^\top
-\boldsymbol{\alpha}_2\\
-&=
-0.
-\end{aligned}
-$$
-
-Portanto, as duas componentes são não correlacionadas.
-
 A variância total é
 
 $$
@@ -995,29 +960,11 @@ $$
 8.
 $$
 
-A primeira componente representa
+A primeira componente representa $\frac{6}{8}=75\%$.
 
-$$
-\frac{6}{8}
-=
-75\%
-$$
+da variabilidade total, enquanto a segunda representa $\frac{2}{8}=25\%$.
 
-da variabilidade total, enquanto a segunda representa
-
-$$
-\frac{2}{8}
-=
-25\%.
-$$
-
-Se a representação for reduzida de duas para uma dimensão, a direção
-
-$$
-\boldsymbol{\alpha}_1
-$$
-
-preserva $75\%$ da variabilidade e descarta $25\%$. Nesse exemplo, a redução de dimensão possui interpretação direta: a maior parte da dispersão ocorre na direção em que as duas variáveis se deslocam conjuntamente.
+Se a representação for reduzida de duas para uma dimensão, a direção $\boldsymbol{\alpha}_1$ preserva $75\%$ da variabilidade e descarta $25\%$. Nesse exemplo, a redução de dimensão possui interpretação direta: a maior parte da dispersão ocorre na direção em que as duas variáveis se deslocam conjuntamente.
 :::
 
 A @fig-acp-variancia-explicada mostra, em um exemplo didático, duas leituras complementares dos autovalores. O primeiro painel apresenta a variância associada individualmente a cada componente. O segundo apresenta a proporção acumulada da variância representada pelas primeiras componentes.
@@ -1127,136 +1074,855 @@ ggplot() +
   )
 ```
 
-A concentração dos primeiros autovalores determina a capacidade de redução linear de dimensão. Quando $\Pi_k$ é elevada para um valor pequeno de $k$, o subespaço principal representa grande parcela da variabilidade total. A proporção acumulada descreve a decomposição da variância, mas não estabelece um limite para a escolha do número de componentes.
+A concentração dos primeiros autovalores determina a capacidade de redução linear de dimensão. Quando $\Pi_k$ é elevada para um valor pequeno de $k$, o subespaço principal representa grande parcela da variabilidade total. A proporção acumulada descreve a decomposição da variância, mas não estabelece, por si só, quantas componentes devem ser mantidas. Outros critérios utilizados para auxiliar essa escolha são apresentados na @sec-acp-escolha-componentes, incluindo uma regra heurística específica para a ACP baseada na matriz de correlações.
 
-### Aprofundamento: escolha do número de componentes {#sec-acp-escolha-componentes}
+## Subespaço principal, projeção e reconstrução
 
-::: {.callout-note appearance="simple" icon="false"}
-## Leitura de aprofundamento
+Até aqui, as componentes principais foram construídas como direções sucessivas de máxima variabilidade. Quando apenas $k<p$ componentes são mantidas, essas direções podem ser consideradas conjuntamente. As primeiras $k$ componentes definem um **subespaço principal de dimensão $k$**, no qual os dados podem ser representados com menor dimensionalidade.
 
-A formulação da ACP determina e ordena as componentes principais, mas não estabelece, por si só, quantas devem ser mantidas em uma representação reduzida. Esta seção apresenta critérios utilizados para auxiliar essa escolha e discute seus diferentes significados.
+A redução dimensional pode ser interpretada geometricamente como a projeção de $\boldsymbol{\mathsf X}_c$ sobre o subespaço principal. Para uma realização do vetor aleatório, essa projeção fornece uma representação utilizando apenas as primeiras $k$ componentes principais.
+
+Entre todos os subespaços lineares de dimensão $k$, o subespaço principal é aquele que preserva a maior variabilidade total. Essa variabilidade corresponde à soma dos $k$ maiores autovalores de $\boldsymbol{\Sigma}$, enquanto a parcela descartada corresponde à soma dos autovalores associados às direções que não foram mantidas.
+
+As primeiras $k$ componentes também permitem construir, no espaço original, uma aproximação de cada realização de $\boldsymbol{\mathsf X}_c$. Quando $k<p$, a aproximação difere da realização original por um resíduo ortogonal ao subespaço principal.
+
+A variabilidade preservada e o erro de reconstrução descrevem a mesma escolha de subespaço sob perspectivas diferentes. O subespaço de dimensão $k$ que preserva a maior variabilidade total é também aquele que minimiza o erro quadrático médio de reconstrução.
+
+Quando existe separação entre o $k$-ésimo e o $(k+1)$-ésimo autovalores, o subespaço principal de dimensão $k$ é determinado de maneira única. Se houver empate nessa fronteira, diferentes subespaços podem preservar a mesma variabilidade máxima. A definição formal dessa estrutura e as condições de unicidade são apresentadas na @def-subespaco-principal-acp.
+
+A formulação matricial da propriedade de máxima variabilidade é desenvolvida na @sec-acp-subespaco-variancia, enquanto a relação entre variabilidade preservada e erro quadrático de reconstrução é formalizada na @sec-acp-reconstrucao-erro.
+
+## Formulação amostral
+
+A formulação populacional define as componentes em termos de $\boldsymbol{\Sigma}$, que geralmente é desconhecida. A aplicação da técnica utiliza uma amostra para estimar suas direções e variâncias.
+
+Considere uma realização amostral com $n\geq2$ observações, organizada na matriz
+
+$$
+\mathbf X
+\in
+\mathbb R^{n\times p},
+$$
+
+com média observada $\bar{\mathbf x}$ e matriz centralizada
+
+$$
+\mathbf X_c
+=
+\mathbf X
+-
+\mathbf 1_n
+\bar{\mathbf x}^\top.
+$$
+
+A matriz de covariâncias observada foi definida na @def-matriz-covariancias-observada como
+
+$$
+\mathbf S
+=
+\frac{1}{n-1}
+\mathbf X_c^\top
+\mathbf X_c.
+$$
+
+A versão amostral da ACP substitui a matriz populacional $\boldsymbol{\Sigma}$ por $\mathbf S$.
+
+Considere a decomposição espectral
+
+$$
+\mathbf S
+=
+\widehat{\mathbf A}
+\widehat{\boldsymbol{\Lambda}}
+\widehat{\mathbf A}^\top,
+$$
+
+em que
+
+$$
+\widehat{\boldsymbol{\Lambda}}
+=
+\operatorname{diag}
+\left(
+\widehat{\lambda}_1,\ldots,
+\widehat{\lambda}_p
+\right),
+$$
+
+com
+
+$$
+\widehat{\lambda}_1
+\geq
+\cdots
+\geq
+\widehat{\lambda}_p
+\geq
+0,
+$$
+
+e
+
+$$
+\widehat{\mathbf A}
+=
+\begin{pmatrix}
+\widehat{\boldsymbol{\alpha}}_1 &
+\cdots &
+\widehat{\boldsymbol{\alpha}}_p
+\end{pmatrix}.
+$$
+
+A @tbl-acp-populacao-amostra sintetiza a distinção entre os principais objetos populacionais e amostrais da ACP.
+
+| Objeto | População | Amostra observada |
+|---|---|---|
+| Matriz de covariâncias | $\boldsymbol{\Sigma}$ | $\mathbf S$ |
+| Direção principal $j$ | $\boldsymbol{\alpha}_j$ | $\widehat{\boldsymbol{\alpha}}_j$ |
+| Variância da componente $j$ | $\lambda_j$ | $\widehat{\lambda}_j$ |
+| Componente principal | $Y_j=\boldsymbol{\alpha}_j^\top(\boldsymbol{\mathsf X}-\boldsymbol{\mu})$ | construída a partir da direção estimada $\widehat{\boldsymbol{\alpha}}_j$ |
+| Coordenada da observação $i$ na componente $j$ | $y_{ij}=\boldsymbol{\alpha}_j^\top(\mathbf x_i-\boldsymbol{\mu})$ | escore $\widehat y_{ij}=\widehat{\boldsymbol{\alpha}}_j^\top(\mathbf x_i-\bar{\mathbf x})$ |
+
+: Correspondência entre objetos populacionais e amostrais na ACP. {#tbl-acp-populacao-amostra}
+
+A direção $\widehat{\boldsymbol{\alpha}}_j$ é obtida a partir da amostra. Quando a direção populacional correspondente é identificável, ela pode ser interpretada como estimativa dessa direção; a relação entre a solução amostral e a populacional será retomada na seção sobre formulação populacional e inferência.
+
+Para a observação $i$, o escore amostral na componente $j$ é
+
+$$
+\widehat y_{ij}
+=
+\widehat{\boldsymbol{\alpha}}_j^\top
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right).
+$$
+
+::: {#def-escore-componente-principal}
+## Escore de uma componente principal
+
+Considere a observação
+
+$$
+\mathbf x_i
+\in
+\mathbb R^p,
+$$
+
+sua versão centralizada
+
+$$
+\mathbf x_i-\bar{\mathbf x},
+$$
+
+e uma direção principal amostral unitária
+
+$$
+\widehat{\boldsymbol{\alpha}}_j
+\in
+\mathbb R^p.
+$$
+
+O **escore amostral da observação $i$ na componente principal $j$** é sua coordenada na direção principal estimada:
+
+$$
+\widehat y_{ij}
+=
+\widehat{\boldsymbol{\alpha}}_j^\top
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right).
+$$
 :::
 
-A decomposição espectral produz até $p$ componentes, mas a redução de dimensionalidade exige escolher quantas delas serão mantidas. Essa escolha não é determinada unicamente pela solução matemática da ACP: ela depende do objetivo da representação e do compromisso entre redução de dimensão e preservação da estrutura dos dados [@jolliffe2002pca].
-
-A proporção acumulada
+Para as primeiras $k$ componentes, considere
 
 $$
-\Pi_k
+\widehat{\mathbf A}_k
 =
-\frac{
-\sum_{j=1}^k\lambda_j
-}{
-\sum_{\ell=1}^p\lambda_\ell
-}
+\begin{pmatrix}
+\widehat{\boldsymbol{\alpha}}_1 &
+\cdots &
+\widehat{\boldsymbol{\alpha}}_k
+\end{pmatrix}.
 $$
 
-quantifica a parcela da variabilidade total preservada pelas primeiras $k$ componentes. Valores elevados de $\Pi_k$ indicam que poucas dimensões concentram grande parte da variabilidade, mas não existe uma proporção mínima universal que determine, por si só, quantas componentes devem ser retidas.
+Os escores das $n$ observações nas $k$ primeiras componentes podem ser organizados na matriz
 
-Outra informação é fornecida pelo gráfico dos autovalores, usualmente denominado **gráfico de declive** (*scree plot*). Os autovalores são apresentados em ordem decrescente e procura-se identificar uma mudança no padrão de queda. Quando existe um declínio inicial acentuado seguido por uma sequência relativamente mais estável de valores pequenos, essa mudança pode indicar uma dimensão a partir da qual componentes adicionais acrescentam parcelas progressivamente menores da variabilidade.
+$$
+\widehat{\mathbf Y}_k
+=
+\mathbf X_c
+\widehat{\mathbf A}_k
+\in
+\mathbb R^{n\times k}.
+$$
 
-A @fig-acp-scree ilustra esse comportamento. A linha horizontal também permite comparar, no mesmo exemplo, o gráfico de declive com a referência $\lambda=1$ utilizada na ACP baseada em correlações.
+O elemento $\widehat y_{ij}$ de $\widehat{\mathbf Y}_k$ é o escore da observação $i$ na componente $j$. Assim, $\widehat{\mathbf Y}_k$ fornece a representação das observações no espaço principal de dimensão $k$.
+
+Para uma observação específica $i$, suas coordenadas nas primeiras $k$ componentes podem ser reunidas no vetor
+
+$$
+\widehat{\mathbf y}_{i,k}
+=
+\widehat{\mathbf A}_k^\top
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right)
+=
+\begin{pmatrix}
+\widehat y_{i1}\\
+\vdots\\
+\widehat y_{ik}
+\end{pmatrix}.
+$$
+
+Os elementos de $\widehat{\boldsymbol{\alpha}}_j$ são os **coeficientes da componente principal**, enquanto $\widehat y_{ij}$ é o **escore amostral** da observação $i$ nessa componente. Os coeficientes definem as direções principais e os escores fornecem as coordenadas das observações nessas direções.
+
+A matriz centralizada reconstruída a partir das primeiras $k$ componentes pode ser escrita como
+
+$$
+\widetilde{\mathbf X}_{c,k}
+=
+\widehat{\mathbf Y}_k
+\widehat{\mathbf A}_k^\top.
+$$
+
+Como
+
+$$
+\widehat{\mathbf Y}_k
+=
+\mathbf X_c
+\widehat{\mathbf A}_k,
+$$
+
+segue que
+
+$$
+\widetilde{\mathbf X}_{c,k}
+=
+\mathbf X_c
+\widehat{\mathbf A}_k
+\widehat{\mathbf A}_k^\top.
+$$
+
+Assim, a reconstrução amostral também é uma projeção ortogonal sobre o subespaço principal estimado.
+
+Para retornar às unidades e à localização originais, adiciona-se novamente o vetor de médias:
+
+$$
+\widetilde{\mathbf X}_k
+=
+\widetilde{\mathbf X}_{c,k}
++
+\mathbf 1_n
+\bar{\mathbf x}^\top.
+$$
+
+A centralização remove a localização antes da determinação das direções principais; a reconstrução final restitui essa localização.
+
+## Formulação da ACP pela SVD
+
+A formulação amostral pode ser obtida diretamente da matriz centralizada sem formar previamente $\mathbf S$.
+
+Se
+
+$$
+r
+=
+\operatorname{posto}
+\left(
+\mathbf X_c
+\right)
+>0,
+$$
+
+considere a SVD compacta definida na @def-svd-compacta:
+
+$$
+\mathbf X_c
+=
+\mathbf U_r
+\mathbf D_r
+\mathbf V_r^\top,
+$$
+
+em que
+
+$$
+\mathbf U_r
+\in
+\mathbb R^{n\times r},
+\qquad
+\mathbf D_r
+\in
+\mathbb R^{r\times r},
+\qquad
+\mathbf V_r
+\in
+\mathbb R^{p\times r}.
+$$
+
+Os valores singulares são ordenados como
+
+$$
+d_1
+\geq
+d_2
+\geq
+\cdots
+\geq
+d_r
+>
+0.
+$$
+
+Como
+
+$$
+\mathbf S
+=
+\frac{1}{n-1}
+\mathbf X_c^\top
+\mathbf X_c,
+$$
+
+a relação entre a SVD da matriz centralizada e a decomposição espectral da covariância, estabelecida na @prp-svd-covariancia-amostral, fornece
+
+$$
+\mathbf S
+=
+\mathbf V_r
+\frac{\mathbf D_r^2}{n-1}
+\mathbf V_r^\top.
+$$
+
+Portanto, para as componentes associadas a autovalores positivos, a direção principal amostral pode ser escolhida como um autovetor $\mathbf v_j$ associado a $\widehat{\lambda}_j$:
+
+$$
+\widehat{\boldsymbol{\alpha}}_j
+=
+\mathbf v_j.
+$$
+
+Como todo autovetor, $\mathbf v_j$ pode ser substituído por $-\mathbf v_j$ sem alterar a componente principal como direção.
+
+Assim,
+
+$$
+\widehat{\lambda}_j
+=
+\frac{d_j^2}{n-1},
+\qquad
+j=1,\ldots,r.
+$$
+
+Os vetores singulares à direita da matriz centralizada são as direções principais amostrais associadas à variabilidade positiva. O quadrado de cada valor singular, dividido por $n-1$, é a variância observada da componente correspondente.
+
+Se
+
+$$
+r<p,
+$$
+
+as $p-r$ componentes restantes possuem autovalor zero. A SVD compacta não precisa fornecer uma base para esse complemento nulo, pois essas direções não acrescentam variabilidade à representação.
+
+A interpretação geométrica da SVD foi apresentada na @fig-geometria-svd. Na ACP amostral, a matriz decomposta passa a ser $\mathbf X_c$. Os vetores singulares à direita fornecem as direções no espaço das variáveis, enquanto os produtos dos vetores singulares à esquerda pelos valores singulares fornecem as coordenadas das observações nessas direções.
+
+Essa relação mostra que a decomposição espectral de $\mathbf S$ e a SVD de $\mathbf X_c$ não constituem duas técnicas diferentes. Para as componentes de variância positiva, elas fornecem duas formas de obter a mesma solução amostral da ACP.
+
+Os escores também são obtidos diretamente pela SVD:
+
+$$
+\widehat{\mathbf Y}_r
+=
+\mathbf X_c
+\mathbf V_r
+=
+\mathbf U_r
+\mathbf D_r.
+$$
+
+Assim, a SVD separa naturalmente os elementos da representação:
+
+- $\mathbf V_r$ contém as direções principais associadas à variabilidade positiva no espaço das variáveis;
+- $\widehat{\mathbf Y}_r=\mathbf U_r\mathbf D_r$ contém os escores amostrais das observações;
+- $\mathbf D_r$ determina a magnitude da variabilidade em cada direção.
+
+A centralização também limita o número de componentes com variância positiva. Pelo resultado de posto da matriz de covariâncias observada estabelecido na @eq-posto-covariancia-observada,
+
+$$
+\operatorname{posto}
+\left(
+\mathbf S
+\right)
+=
+\operatorname{posto}
+\left(
+\mathbf X_c
+\right)
+\leq
+\min(p,n-1).
+$$
+
+Portanto, existem no máximo
+
+$$
+\min(p,n-1)
+$$
+
+componentes principais com variância amostral positiva.
+
+Em particular, quando $p\geq n$, a matriz $\mathbf S$ é necessariamente singular. Essa singularidade amostral não implica que a matriz populacional $\boldsymbol{\Sigma}$ seja singular; ela pode decorrer apenas do número de direções disponíveis na amostra após a centralização.
+
+## ACP baseada na matriz de correlações {#sec-acp-matriz-correlacoes}
+
+A formulação anterior utiliza a matriz de covariâncias. Quando as variáveis possuem escalas ou unidades de medida diferentes, pode ser definido outro problema: realizar a ACP após padronizar cada variável para variância unitária.
+
+A matriz de correlações populacional $\boldsymbol{\mathcal R}$ foi definida na @def-matriz-correlacoes-populacional, sob a condição de que todas as variâncias marginais populacionais sejam positivas, e sua correspondente observada $\mathbf R$ foi definida na @def-matriz-correlacoes-observada, sob a condição de que
+
+$$
+s_{jj}>0,
+\qquad
+j=1,\ldots,p.
+$$
+
+No nível observado, defina
+
+$$
+\mathbf D_S
+=
+\operatorname{diag}
+\left(
+s_{11},\ldots,s_{pp}
+\right).
+$$
+
+Como
+
+$$
+s_{jj}>0,
+\qquad
+j=1,\ldots,p,
+$$
+
+a matriz $\mathbf D_S$ é positiva definida e $\mathbf D_S^{-1/2}$ existe. Assim,
+
+$$
+\mathbf R
+=
+\mathbf D_S^{-1/2}
+\mathbf S
+\mathbf D_S^{-1/2}.
+$$
+
+O Módulo 2 estabeleceu na @eq-correlacao-produto-dados-padronizados a relação entre a matriz de correlações e as colunas centralizadas e padronizadas. Para manter essa notação distinta da matriz de delineamento $\mathbf Z$ utilizada na @def-modelo-linear-multivariado, neste capítulo denotaremos a matriz padronizada por
+
+$$
+\mathbf X_{\mathrm{pad}}
+=
+\mathbf X_c
+\mathbf D_S^{-1/2}.
+$$
+
+Assim,
+
+$$
+\mathbf R
+=
+\frac{1}{n-1}
+\mathbf X_{\mathrm{pad}}^\top
+\mathbf X_{\mathrm{pad}}.
+$$
+
+Realizar a ACP de $\mathbf R$ equivale, portanto, a realizar a ACP sobre as colunas centralizadas e padronizadas de $\mathbf X$.
+
+Se
+
+$$
+\mathbf R
+=
+\widehat{\mathbf A}_R
+\widehat{\boldsymbol{\Lambda}}_R
+\widehat{\mathbf A}_R^\top,
+$$
+
+as direções principais observadas são obtidas no espaço das variáveis padronizadas. Os autovalores
+
+$$
+\widehat{\lambda}_{R1},
+\ldots,
+\widehat{\lambda}_{Rp}
+$$
+
+representam as variâncias observadas das componentes construídas a partir dessas variáveis.
+
+Como a diagonal de $\mathbf R$ é formada por valores iguais a $1$,
+
+$$
+\operatorname{tr}
+\left(
+\mathbf R
+\right)
+=
+p.
+$$
+
+Logo,
+
+$$
+\sum_{j=1}^p
+\widehat{\lambda}_{Rj}
+=
+p.
+$$
+
+A proporção da variância padronizada representada pela componente $j$ é
+
+$$
+\frac{\widehat{\lambda}_{Rj}}{p},
+$$
+
+e a proporção acumulada nas primeiras $k$ componentes é
+
+$$
+\frac{
+\sum_{j=1}^k
+\widehat{\lambda}_{Rj}
+}{
+p
+}.
+$$
+
+A utilização de $\mathbf S$ ou $\mathbf R$ corresponde a **duas formulações diferentes da ACP**.
+
+Na ACP baseada em $\mathbf S$, as variáveis preservam suas escalas e variâncias originais. Uma variável com maior variabilidade pode exercer maior influência sobre as primeiras componentes.
+
+Na ACP baseada em $\mathbf R$, todas as variáveis entram na análise com variância unitária. As diferenças de escala marginal são removidas antes da decomposição.
+
+A @tbl-acp-covariancia-correlacao resume essa distinção.
+
+| Aspecto | ACP por covariâncias | ACP por correlações |
+|---|---|---|
+| Matriz de entrada | $\mathbf S$ | $\mathbf R$ |
+| Dados equivalentes | Centralizados | Centralizados e padronizados |
+| Variâncias marginais | Mantidas nas unidades originais | Iguais a $1$ |
+| Variância total | $\operatorname{tr}(\mathbf S)$ | $p$ |
+| Influência da escala | Preservada | Removida pela padronização |
+| Problema resolvido | Representar a variabilidade nas escalas originais | Representar a variabilidade após igualar as escalas marginais |
+
+: Diferenças entre a ACP baseada em covariâncias e em correlações. {#tbl-acp-covariancia-correlacao}
+
+
+A @fig-acp-covariancia-correlacao ilustra o efeito da padronização. Os dois painéis representam as mesmas observações, antes e depois da padronização marginal. A mudança das escalas altera a geometria e, consequentemente, as direções principais.
 
 ```{r}
-#| label: fig-acp-scree
+#| label: fig-acp-covariancia-correlacao
 #| echo: false
 #| warning: false
 #| message: false
-#| fig-cap: "Gráfico de declive dos autovalores. A linha tracejada indica a referência autovalor igual a 1 para uma ACP baseada em correlações."
-#| fig-width: 7
+#| fig-cap: "A ACP baseada em covariâncias preserva as escalas originais, enquanto a ACP baseada em correlações utiliza a geometria das variáveis padronizadas."
+#| fig-width: 9
 #| fig-height: 4.6
 #| fig-align: center
 
 library(ggplot2)
 
-autovalores_scree <- c(
-  2.80,
-  1.10,
-  0.60,
-  0.35,
-  0.15
+set.seed(731)
+
+n <- 180
+
+z1 <- stats::rnorm(n)
+
+z2 <- 0.75 * z1 +
+  sqrt(
+    1 - 0.75^2
+  ) *
+  stats::rnorm(n)
+
+X <- cbind(
+  2.5 * z1,
+  z2
 )
 
-dados_scree <- data.frame(
-  componente = seq_along(
-    autovalores_scree
+X <- scale(
+  X,
+  center = TRUE,
+  scale = FALSE
+)
+
+X_pad <- scale(
+  X,
+  center = TRUE,
+  scale = TRUE
+)
+
+S <- stats::cov(X)
+R <- stats::cor(X)
+
+eig_S <- eigen(
+  S,
+  symmetric = TRUE
+)
+
+eig_R <- eigen(
+  R,
+  symmetric = TRUE
+)
+
+a_S <- eig_S$vectors[, 1]
+a_R <- eig_R$vectors[, 1]
+
+if (a_S[1] < 0) {
+  a_S <- -a_S
+}
+
+if (a_R[1] < 0) {
+  a_R <- -a_R
+}
+
+dados <- rbind(
+  data.frame(
+    C1 = X[, 1],
+    C2 = X[, 2],
+    painel = "Covariâncias"
   ),
-  autovalor = autovalores_scree
+  data.frame(
+    C1 = X_pad[, 1],
+    C2 = X_pad[, 2],
+    painel = "Correlações"
+  )
+)
+
+dados$painel <- factor(
+  dados$painel,
+  levels = c(
+    "Covariâncias",
+    "Correlações"
+  )
+)
+
+comprimento <- 3
+
+eixos <- rbind(
+  data.frame(
+    painel = "Covariâncias",
+    x = 0,
+    y = 0,
+    xend = comprimento * a_S[1],
+    yend = comprimento * a_S[2]
+  ),
+  data.frame(
+    painel = "Correlações",
+    x = 0,
+    y = 0,
+    xend = comprimento * a_R[1],
+    yend = comprimento * a_R[2]
+  )
+)
+
+eixos$painel <- factor(
+  eixos$painel,
+  levels = levels(
+    dados$painel
+  )
+)
+
+limite <- 1.05 * max(
+  abs(
+    c(
+      dados$C1,
+      dados$C2
+    )
+  )
 )
 
 ggplot(
-  dados_scree,
+  dados,
   aes(
-    x = componente,
-    y = autovalor
+    x = C1,
+    y = C2
   )
 ) +
   geom_hline(
-    yintercept = 1,
-    linewidth = 0.8,
-    linetype = "dashed",
-    color = "#d62728"
+    yintercept = 0,
+    linewidth = 0.4,
+    color = "gray70"
   ) +
-  geom_line(
-    linewidth = 1,
-    color = "#1f77b4"
+  geom_vline(
+    xintercept = 0,
+    linewidth = 0.4,
+    color = "gray70"
   ) +
   geom_point(
-    size = 2.7,
-    color = "#1f77b4"
+    color = "#1f77b4",
+    alpha = 0.55,
+    size = 1.6
   ) +
-  annotate(
-    "text",
-    x = 5,
-    y = 1.08,
-    label = "λ = 1",
-    hjust = 1,
+  geom_segment(
+    data = eixos,
+    aes(
+      x = x,
+      y = y,
+      xend = xend,
+      yend = yend
+    ),
+    inherit.aes = FALSE,
+    linewidth = 1.15,
     color = "#d62728",
-    size = 4
+    arrow = grid::arrow(
+      length = grid::unit(
+        0.18,
+        "cm"
+      ),
+      type = "closed"
+    )
   ) +
-  scale_x_continuous(
-    breaks = dados_scree$componente
+  facet_wrap(
+    vars(painel)
+  ) +
+  coord_equal(
+    xlim = c(
+      -limite,
+      limite
+    ),
+    ylim = c(
+      -limite,
+      limite
+    )
   ) +
   labs(
-    x = "Componente",
-    y = "Autovalor"
+    x = "Primeira variável",
+    y = "Segunda variável"
   ) +
   theme_minimal(
     base_size = 13
   ) +
   theme(
-    panel.grid.minor = element_blank()
+    panel.grid.minor = element_blank(),
+    strip.text = element_text(
+      face = "bold"
+    )
   )
 ```
 
-No exemplo, os cinco autovalores somam $5$, como ocorre para uma matriz de correlações de ordem $5$. A queda é mais acentuada nas primeiras componentes e se torna progressivamente menor a partir das seguintes. A linha tracejada representa outro critério: apenas os dois primeiros autovalores excedem $1$. A mudança de inclinação e a comparação com $1$ fornecem, portanto, informações distintas.
+A seta vermelha representa a primeira direção principal em cada geometria. A padronização remove as diferenças de escala marginal entre as variáveis e, nesse exemplo, modifica a direção que maximiza a variância.
 
-Na ACP baseada na matriz de correlações, há ainda uma referência específica decorrente da padronização. Como
+A escolha entre as duas matrizes faz parte da definição do problema estatístico. Ela não deve ser tratada como uma decisão puramente computacional.
+
+A padronização modifica a geometria da nuvem de dados por meio de um escalonamento diferente em cada eixo. Consequentemente, os autovetores, os autovalores, os escores e o subespaço principal podem mudar.
+
+Essa distinção será importante também no próximo capítulo. A Análise Fatorial pode ser formulada sobre uma matriz de covariâncias ou de correlações, mas seu objetivo será diferente: em vez de decompor a variabilidade total em direções principais, será especificado um modelo para a estrutura de covariação entre as variáveis.
+
+A decomposição espectral também fornece a interpretação geométrica completa da ACP. As colunas de
 
 $$
-\operatorname{tr}
-(
-\mathbf R
-)
+\mathbf A
 =
-p,
+\begin{pmatrix}
+\boldsymbol{\alpha}_1 &
+\cdots &
+\boldsymbol{\alpha}_p
+\end{pmatrix}
 $$
 
-a média dos $p$ autovalores é igual a $1$. Nesse contexto, o critério de reter componentes com
+formam uma base ortonormal alinhada aos eixos principais da dispersão. Quando todas as componentes são mantidas, a transformação
 
 $$
-\widehat{\lambda}_{Rj}>1
+\boldsymbol{\mathsf Y}
+=
+\mathbf A^\top
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}
+\right)
 $$
 
-pode ser interpretado como a retenção de componentes cuja variância excede a variância de uma variável original padronizada. Esse critério é uma regra heurística e sua justificativa não se transfere diretamente para a ACP baseada em uma matriz de covariâncias, cujas variâncias dependem das escalas das variáveis.
+corresponde a uma mudança ortogonal de coordenadas e
 
-Assim, a escolha de $k$ deve considerar conjuntamente a concentração dos autovalores, a proporção acumulada de variância, o padrão observado no gráfico de declive e a interpretabilidade da representação obtida. Diferentes critérios podem sugerir dimensões distintas, e a decisão deve permanecer vinculada ao objetivo da análise.
+$$
+\operatorname{Cov}
+\left(
+\boldsymbol{\mathsf Y}
+\right)
+=
+\boldsymbol{\Lambda}.
+$$
 
-Nesta formulação, a ACP transforma o problema estatístico de preservar variabilidade em poucas direções em um problema espectral já resolvido matematicamente no Módulo 1. O passo seguinte consiste em mostrar que as primeiras $k$ direções também definem um subespaço que maximiza a variabilidade projetada e minimiza o erro quadrático de reconstrução.
+Assim, os autovetores determinam as direções principais e os autovalores determinam as variâncias nessas direções. Quando apenas as primeiras $k$ componentes são mantidas, a mudança completa de coordenadas é substituída pela projeção sobre o subespaço principal $\mathcal S_k$, formalizada na @prp-acp-variancia-reconstrucao.
 
-## Subespaço principal e projeção
+## Formulação descritiva, populacional e inferencial
 
-As primeiras $k<p$ componentes principais definem um subespaço de dimensão $k$ no qual a variabilidade de $\boldsymbol{\mathsf X}$ será representada.
+A ACP pode ser formulada sem hipótese de normalidade. No nível populacional, basta que $\boldsymbol{\mathsf X}$ possua momentos de segunda ordem finitos para que a matriz de covariâncias $\boldsymbol{\Sigma}$ e suas componentes principais estejam definidas.
+
+Na formulação **descritiva**, a matriz de dados observada é o objeto de interesse, e autovalores, direções e escores descrevem sua estrutura de variabilidade.
+
+Na formulação **populacional**, os autovalores
+
+$$
+\lambda_j
+$$
+
+e os autovetores unitários
+
+$$
+\boldsymbol{\alpha}_j
+$$
+
+são características da matriz populacional $\boldsymbol{\Sigma}$. Quando uma amostra é utilizada para estudar essa estrutura, a matriz observada $\mathbf S$ fornece os correspondentes
+
+$$
+\widehat{\lambda}_j
+\qquad\text{e}\qquad
+\widehat{\boldsymbol{\alpha}}_j.
+$$
+
+Sob as condições de consistência da matriz de covariâncias amostral estabelecidas na @prp-consistencia-covariancia-amostral, a solução amostral pode ser interpretada como estimativa da estrutura espectral populacional. A identificação de uma direção individual requer separação do autovalor correspondente; quando há multiplicidade, o objeto identificado é o autoespaço, como discutido na @sec-acp-multiplicidade-singularidade.
+
+A normalidade multivariada não é necessária para a formulação da ACP. Quando
+
+$$
+\boldsymbol{\mathsf X}
+\sim
+N_p
+\left(
+\boldsymbol{\mu},
+\boldsymbol{\Sigma}
+\right),
+$$
+
+a transformação ortogonal para as componentes produz
+
+$$
+\boldsymbol{\mathsf Y}
+=
+\mathbf A^\top
+\left(
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu}
+\right)
+\sim
+N_p
+\left(
+\mathbf0,
+\boldsymbol{\Lambda}
+\right).
+$$
+
+Nesse caso, as componentes são independentes. Sem normalidade conjunta, a ACP garante que componentes distintas sejam não correlacionadas, mas não necessariamente independentes.
+
+A inferência sobre autovalores, autovetores e subespaços requer hipóteses adicionais e teoria distribucional ou assintótica específica [@anderson2003]. Esses resultados não são necessários para a formulação da técnica desenvolvida neste capítulo.
+
+## Aprofundamento: formulação do subespaço principal e variabilidade máxima {#sec-acp-subespaco-variancia}
+
+::: {.callout-note appearance="simple" icon=false}
+## Leitura de aprofundamento
+
+A formulação matricial explicita a base ortonormal do subespaço principal, a projeção associada e a propriedade de máxima variabilidade entre subespaços de mesma dimensão.
+:::
 
 Considere uma base ortonormal de autovetores de $\boldsymbol{\Sigma}$,
 
@@ -1347,13 +2013,9 @@ $$
 \lambda_k>\lambda_{k+1},
 $$
 
-o subespaço principal de dimensão $k$ é único. Se
+o subespaço principal de dimensão $k$ é único. 
 
-$$
-\lambda_k=\lambda_{k+1},
-$$
-
-podem existir diferentes subespaços principais de dimensão $k$ que preservam a mesma variabilidade máxima.
+Se $\lambda_k=\lambda_{k+1}$, podem existir diferentes subespaços principais de dimensão $k$ que preservam a mesma variabilidade máxima.
 :::
 
 A matriz de projeção ortogonal sobre um subespaço principal $\mathcal S_k$ é
@@ -1530,29 +2192,15 @@ $$
 
 Esse máximo é atingido por qualquer subespaço principal $\mathcal S_k$ de @def-subespaco-principal-acp.
 
-Se $k<p$ e
+Se $k<p$ e $\lambda_k>\lambda_{k+1}$, o subespaço que maximiza a variância é único. 
 
-$$
-\lambda_k>\lambda_{k+1},
-$$
-
-o subespaço que maximiza a variância é único. Se
-
-$$
-\lambda_k=\lambda_{k+1},
-$$
-
-o subespaço maximizador pode não ser único.
+Se $\lambda_k=\lambda_{k+1}$, o subespaço maximizador pode não ser único.
 :::
 
 
-### Aprofundamento: demonstração da variabilidade máxima do subespaço principal
+### Demonstração da variabilidade máxima do subespaço principal
 
-::: {.callout-note appearance="simple" icon="false"}
-## Leitura de aprofundamento
-
-A proposição anterior é suficiente para a formulação da ACP. A demonstração a seguir explicita como a ordenação dos autovalores determina o subespaço de dimensão $k$ que preserva a maior variabilidade total.
-:::
+A demonstração explicita como a ordenação dos autovalores determina o subespaço de dimensão $k$ que preserva a maior variabilidade total.
 
 ::: {.proof}
 Pelo Teorema Espectral de @thm-teorema-espectral,
@@ -1714,7 +2362,13 @@ $$
 podem existir diferentes subespaços de dimensão $k$ que atingem o mesmo máximo.
 :::
 
-## Reconstrução a partir das componentes principais
+## Aprofundamento: reconstrução e erro quadrático {#sec-acp-reconstrucao-erro}
+
+::: {.callout-note appearance="simple" icon=false}
+## Leitura de aprofundamento
+
+A formulação a seguir expressa a reconstrução por projeção ortogonal e relaciona a parcela não representada ao erro quadrático de reconstrução.
+:::
 
 As primeiras $k$ componentes fornecem as coordenadas de $\boldsymbol{\mathsf X}_c$ no subespaço principal. A projeção no espaço original é obtida por
 
@@ -2177,378 +2831,9 @@ ggplot() +
   )
 ```
 
-Os pontos azuis são as observações centralizadas, os pontos verdes são suas representações utilizando somente a primeira componente e os segmentos vermelhos correspondem à parcela descartada. A ACP escolhe um subespaço principal que minimiza conjuntamente esses resíduos quadráticos entre todos os subespaços de mesma dimensão.
+Os pontos azuis são as observações centralizadas, os pontos verdes são suas representações utilizando somente a primeira componente e os segmentos vermelhos representam os resíduos de reconstrução. Entre todas as retas utilizadas como subespaço de representação, a primeira direção principal minimiza a soma dos quadrados desses resíduos. A mesma direção é aquela que preserva a maior variabilidade da nuvem projetada.
 
-Essa equivalência conecta duas interpretações da técnica. A ACP pode ser formulada como busca das direções que preservam maior variabilidade ou como busca do subespaço que produz menor perda quadrática na reconstrução.
-
-## Formulação amostral
-
-A formulação populacional define as componentes em termos de $\boldsymbol{\Sigma}$, que geralmente é desconhecida. A aplicação da técnica utiliza uma amostra para estimar suas direções e variâncias.
-
-Considere uma realização amostral com $n\geq2$ observações, organizada na matriz
-
-$$
-\mathbf X
-\in
-\mathbb R^{n\times p},
-$$
-
-com média observada $\bar{\mathbf x}$ e matriz centralizada
-
-$$
-\mathbf X_c
-=
-\mathbf X
--
-\mathbf 1_n
-\bar{\mathbf x}^\top.
-$$
-
-A matriz de covariâncias observada foi definida na @def-matriz-covariancias-observada como
-
-$$
-\mathbf S
-=
-\frac{1}{n-1}
-\mathbf X_c^\top
-\mathbf X_c.
-$$
-
-A versão amostral da ACP substitui a matriz populacional $\boldsymbol{\Sigma}$ por $\mathbf S$.
-
-Considere a decomposição espectral
-
-$$
-\mathbf S
-=
-\widehat{\mathbf A}
-\widehat{\boldsymbol{\Lambda}}
-\widehat{\mathbf A}^\top,
-$$
-
-em que
-
-$$
-\widehat{\boldsymbol{\Lambda}}
-=
-\operatorname{diag}
-\left(
-\widehat{\lambda}_1,\ldots,
-\widehat{\lambda}_p
-\right),
-$$
-
-com
-
-$$
-\widehat{\lambda}_1
-\geq
-\cdots
-\geq
-\widehat{\lambda}_p
-\geq
-0,
-$$
-
-e
-
-$$
-\widehat{\mathbf A}
-=
-\begin{pmatrix}
-\widehat{\boldsymbol{\alpha}}_1 &
-\cdots &
-\widehat{\boldsymbol{\alpha}}_p
-\end{pmatrix}.
-$$
-
-A @tbl-acp-populacao-amostra sintetiza a distinção entre os principais objetos populacionais e amostrais da ACP.
-
-| Objeto | População | Amostra observada |
-|---|---|---|
-| Matriz de covariâncias | $\boldsymbol{\Sigma}$ | $\mathbf S$ |
-| Direção principal $j$ | $\boldsymbol{\alpha}_j$ | $\widehat{\boldsymbol{\alpha}}_j$ |
-| Variância da componente $j$ | $\lambda_j$ | $\widehat{\lambda}_j$ |
-| Componente principal | $Y_j=\boldsymbol{\alpha}_j^\top(\boldsymbol{\mathsf X}-\boldsymbol{\mu})$ | definida a partir da direção estimada $\widehat{\boldsymbol{\alpha}}_j$ |
-| Coordenada de uma observação | realização de $Y_j$ | escore $t_{ij}$ |
-
-: Correspondência entre objetos populacionais e amostrais na ACP. {#tbl-acp-populacao-amostra}
-
-A direção $\widehat{\boldsymbol{\alpha}}_j$ é obtida a partir da amostra. Quando a direção populacional correspondente é identificável, ela pode ser interpretada como estimativa dessa direção; a relação entre a solução amostral e a populacional será retomada na seção sobre formulação populacional e inferência.
-
-Para a observação $i$, o escore na componente $j$ é
-
-$$
-t_{ij}
-=
-\widehat{\boldsymbol{\alpha}}_j^\top
-\left(
-\mathbf x_i-\bar{\mathbf x}
-\right).
-$$
-
-::: {#def-escore-componente-principal}
-## Escore de uma componente principal
-
-Considere a observação
-
-$$
-\mathbf x_i
-\in
-\mathbb R^p,
-$$
-
-sua versão centralizada
-
-$$
-\mathbf x_i-\bar{\mathbf x},
-$$
-
-e uma direção principal amostral unitária
-
-
-$$
-\widehat{\boldsymbol{\alpha}}_j
-\in
-\mathbb R^p.
-$$
-
-O **escore da observação $i$ na componente principal $j$** é sua coordenada nessa direção:
-
-$$
-t_{ij}
-=
-\widehat{\boldsymbol{\alpha}}_j^\top
-\left(
-\mathbf x_i-\bar{\mathbf x}
-\right).
-$$
-:::
-
-Os escores de todas as observações nas $k$ primeiras componentes são reunidos em
-
-$$
-\mathbf T_k
-=
-\mathbf X_c
-\widehat{\mathbf A}_k,
-$$
-
-em que
-
-$$
-\widehat{\mathbf A}_k
-=
-\begin{pmatrix}
-\widehat{\boldsymbol{\alpha}}_1 &
-\cdots &
-\widehat{\boldsymbol{\alpha}}_k
-\end{pmatrix}.
-$$
-
-A matriz
-
-$$
-\mathbf T_k
-\in
-\mathbb R^{n\times k}
-$$
-
-fornece a representação das $n$ observações no espaço principal de dimensão $k$.
-
-Os elementos de $\widehat{\boldsymbol{\alpha}}_j$ são os **coeficientes da componente principal**. Os elementos da coluna correspondente de $\mathbf T_k$ são os **escores**. Esses objetos desempenham funções diferentes: os coeficientes definem a direção e os escores localizam as observações nessa direção.
-
-A matriz centralizada reconstruída a partir das primeiras $k$ componentes é
-
-$$
-\widetilde{\mathbf X}_{c,k}
-=
-\mathbf T_k
-\widehat{\mathbf A}_k^\top.
-$$
-
-Substituindo a definição dos escores,
-
-$$
-\widetilde{\mathbf X}_{c,k}
-=
-\mathbf X_c
-\widehat{\mathbf A}_k
-\widehat{\mathbf A}_k^\top.
-$$
-
-Assim, a reconstrução amostral também é uma projeção ortogonal sobre o subespaço principal estimado.
-
-Para retornar às unidades e à localização originais, adiciona-se novamente o vetor de médias:
-
-$$
-\widetilde{\mathbf X}_k
-=
-\widetilde{\mathbf X}_{c,k}
-+
-\mathbf 1_n
-\bar{\mathbf x}^\top.
-$$
-
-A centralização remove a localização antes da determinação das direções principais; a reconstrução final restitui essa localização.
-
-## Formulação da ACP pela SVD
-
-A formulação amostral pode ser obtida diretamente da matriz centralizada sem formar previamente $\mathbf S$.
-
-Se
-
-$$
-r
-=
-\operatorname{posto}
-\left(
-\mathbf X_c
-\right)
->0,
-$$
-
-considere a SVD compacta definida na @def-svd-compacta:
-
-$$
-\mathbf X_c
-=
-\mathbf U_r
-\mathbf D_r
-\mathbf V_r^\top,
-$$
-
-em que
-
-$$
-\mathbf U_r
-\in
-\mathbb R^{n\times r},
-\qquad
-\mathbf D_r
-\in
-\mathbb R^{r\times r},
-\qquad
-\mathbf V_r
-\in
-\mathbb R^{p\times r}.
-$$
-
-Os valores singulares são ordenados como
-
-$$
-d_1
-\geq
-d_2
-\geq
-\cdots
-\geq
-d_r
->
-0.
-$$
-
-Como
-
-$$
-\mathbf S
-=
-\frac{1}{n-1}
-\mathbf X_c^\top
-\mathbf X_c,
-$$
-
-a relação entre a SVD da matriz centralizada e a decomposição espectral da covariância, estabelecida na @prp-svd-covariancia-amostral, fornece
-
-$$
-\mathbf S
-=
-\mathbf V_r
-\frac{\mathbf D_r^2}{n-1}
-\mathbf V_r^\top.
-$$
-
-Portanto, para as componentes associadas a autovalores positivos, a direção principal amostral pode ser escolhida como um autovetor $\mathbf v_j$ associado a $\widehat{\lambda}_j$:
-
-$$
-\widehat{\boldsymbol{\alpha}}_j
-=
-\mathbf v_j.
-$$
-
-Como todo autovetor, $\mathbf v_j$ pode ser substituído por $-\mathbf v_j$ sem alterar a componente principal como direção.
-
-Assim,
-
-$$
-\widehat{\lambda}_j
-=
-\frac{d_j^2}{n-1},
-\qquad
-j=1,\ldots,r.
-$$
-
-Os vetores singulares à direita da matriz centralizada são as direções principais amostrais associadas à variabilidade positiva. O quadrado de cada valor singular, dividido por $n-1$, é a variância observada da componente correspondente.
-
-Se
-
-$$
-r<p,
-$$
-
-as $p-r$ componentes restantes possuem autovalor zero. A SVD compacta não precisa fornecer uma base para esse complemento nulo, pois essas direções não acrescentam variabilidade à representação.
-
-A interpretação geométrica da SVD foi apresentada na @fig-geometria-svd. Na ACP amostral, a matriz decomposta passa a ser $\mathbf X_c$. Os vetores singulares à direita fornecem as direções no espaço das variáveis, enquanto os produtos dos vetores singulares à esquerda pelos valores singulares fornecem as coordenadas das observações nessas direções.
-
-Essa relação mostra que a decomposição espectral de $\mathbf S$ e a SVD de $\mathbf X_c$ não constituem duas técnicas diferentes. Para as componentes de variância positiva, elas fornecem duas formas de obter a mesma solução amostral da ACP.
-
-Os escores também são obtidos diretamente pela SVD:
-
-$$
-\begin{aligned}
-\mathbf T_r
-&=
-\mathbf X_c
-\mathbf V_r\\
-&=
-\mathbf U_r
-\mathbf D_r.
-\end{aligned}
-$$
-
-Assim, a SVD separa naturalmente os elementos da representação:
-
-- $\mathbf V_r$ contém as direções principais associadas à variabilidade positiva no espaço das variáveis;
-- $\mathbf U_r\mathbf D_r$ contém os escores das observações;
-- $\mathbf D_r$ determina a magnitude da variabilidade em cada direção.
-
-A centralização também limita o número de componentes com variância positiva. Pelo resultado de posto da matriz de covariâncias observada estabelecido na @eq-posto-covariancia-observada,
-
-$$
-\operatorname{posto}
-\left(
-\mathbf S
-\right)
-=
-\operatorname{posto}
-\left(
-\mathbf X_c
-\right)
-\leq
-\min(p,n-1).
-$$
-
-Portanto, existem no máximo
-
-$$
-\min(p,n-1)
-$$
-
-componentes principais com variância amostral positiva.
-
-Em particular, quando $p\geq n$, a matriz $\mathbf S$ é necessariamente singular. Essa singularidade amostral não implica que a matriz populacional $\boldsymbol{\Sigma}$ seja singular; ela pode decorrer apenas do número de direções disponíveis na amostra após a centralização.
-
-### Aprofundamento: aproximação de posto reduzido
+## Aprofundamento: aproximação de posto reduzido {#sec-acp-aproximacao-posto-reduzido}
 
 ::: {.callout-note appearance="simple" icon="false"}
 ## Leitura de aprofundamento
@@ -2600,10 +2885,10 @@ $$
 \mathbf V_k^\top.
 $$
 
-Como
+Como os escores associados às primeiras $k$ direções são
 
 $$
-\mathbf T_k
+\widehat{\mathbf Y}_k
 =
 \mathbf X_c
 \mathbf V_k,
@@ -2614,7 +2899,7 @@ também se obtém
 $$
 \mathbf X_{c,k}
 =
-\mathbf T_k
+\widehat{\mathbf Y}_k
 \mathbf V_k^\top.
 $$
 
@@ -2629,11 +2914,11 @@ $$
 \mathbf V_k
 \mathbf V_k^\top
 =
-\mathbf T_k
+\widehat{\mathbf Y}_k
 \mathbf V_k^\top.
 $$
 
-A primeira expressão mostra a aproximação de posto reduzido; a segunda mostra a projeção sobre um subespaço principal; a terceira mostra a reconstrução a partir dos escores e das direções principais.
+A primeira expressão mostra a aproximação de posto reduzido; a segunda mostra a projeção sobre o subespaço principal; a terceira mostra a reconstrução a partir dos escores amostrais e das direções principais.
 
 O erro quadrático total da aproximação é
 
@@ -2707,384 +2992,151 @@ A equivalência entre as formulações pode ser resumida pela @tbl-formulacoes-a
 
 A ACP pode, portanto, ser compreendida simultaneamente como um problema estatístico de preservação da variabilidade, um problema geométrico de projeção e um problema matricial de aproximação de posto reduzido. Os resultados dos Módulos 1 e 2 mostram por que essas três perspectivas conduzem à mesma solução.
 
-## ACP baseada na matriz de correlações {#sec-acp-matriz-correlacoes}
 
-A formulação anterior utiliza a matriz de covariâncias. Quando as variáveis possuem escalas ou unidades de medida diferentes, pode ser definido outro problema: realizar a ACP após padronizar cada variável para variância unitária.
+## Aprofundamento: escolha do número de componentes {#sec-acp-escolha-componentes}
 
-A matriz de correlações populacional $\boldsymbol{\mathcal R}$ foi definida na @def-matriz-correlacoes-populacional, sob a condição de que todas as variâncias marginais populacionais sejam positivas, e sua correspondente observada $\mathbf R$ foi definida na @def-matriz-correlacoes-observada, sob a condição de que
+::: {.callout-note appearance="simple" icon="false"}
+## Leitura de aprofundamento
+
+A formulação da ACP determina e ordena as componentes principais, mas não estabelece, por si só, quantas devem ser mantidas em uma representação reduzida. Esta seção apresenta critérios utilizados para auxiliar essa escolha e discute seus diferentes significados.
+:::
+
+Tanto na ACP baseada em covariâncias quanto na baseada em correlações, a decomposição espectral produz até $p$ componentes. A redução de dimensionalidade exige decidir quantas delas serão mantidas. Essa escolha não é determinada unicamente pela solução matemática da ACP: ela depende do objetivo da representação e do compromisso entre redução de dimensão e preservação da estrutura dos dados [@jolliffe2002pca].
+
+Na aplicação amostral, denote por
 
 $$
-s_{jj}>0,
-\qquad
-j=1,\ldots,p.
+\widehat{\lambda}_1
+\geq
+\cdots
+\geq
+\widehat{\lambda}_p
+\geq
+0
 $$
 
-No nível observado, defina
+os autovalores da matriz observada utilizada na ACP. A proporção acumulada observada é
 
 $$
-\mathbf D_S
+\widehat{\Pi}_k
 =
-\operatorname{diag}
-\left(
-s_{11},\ldots,s_{pp}
-\right).
-$$
-
-Como
-
-$$
-s_{jj}>0,
-\qquad
-j=1,\ldots,p,
-$$
-
-a matriz $\mathbf D_S$ é positiva definida e $\mathbf D_S^{-1/2}$ existe. Assim,
-
-$$
-\mathbf R
-=
-\mathbf D_S^{-1/2}
-\mathbf S
-\mathbf D_S^{-1/2}.
-$$
-
-O Módulo 2 estabeleceu na @eq-correlacao-produto-dados-padronizados a relação entre a matriz de correlações e as colunas centralizadas e padronizadas. Para manter essa notação distinta da matriz de delineamento $\mathbf Z$ utilizada na @def-modelo-linear-multivariado, neste capítulo denotaremos a matriz padronizada por
-
-$$
-\mathbf X_{\mathrm{pad}}
-=
-\mathbf X_c
-\mathbf D_S^{-1/2}.
-$$
-
-Assim,
-
-$$
-\mathbf R
-=
-\frac{1}{n-1}
-\mathbf X_{\mathrm{pad}}^\top
-\mathbf X_{\mathrm{pad}}.
-$$
-
-Realizar a ACP de $\mathbf R$ equivale, portanto, a realizar a ACP sobre as colunas centralizadas e padronizadas de $\mathbf X$.
-
-Se
-
-$$
-\mathbf R
-=
-\mathbf A_R
-\boldsymbol{\Lambda}_R
-\mathbf A_R^\top,
-$$
-
-as direções principais são obtidas no espaço das variáveis padronizadas. Os autovalores
-
-$$
-\lambda_{R1},
-\ldots,
-\lambda_{Rp}
-$$
-
-representam as variâncias das componentes construídas a partir dessas variáveis.
-
-Como a diagonal de $\mathbf R$ é formada por valores iguais a $1$,
-
-$$
-\operatorname{tr}
-\left(
-\mathbf R
-\right)
-=
-p.
-$$
-
-Logo,
-
-$$
-\sum_{j=1}^p
-\lambda_{Rj}
-=
-p.
-$$
-
-A proporção da variância padronizada representada pela componente $j$ é
-
-$$
-\frac{\lambda_{Rj}}{p},
-$$
-
-e a proporção acumulada nas primeiras $k$ componentes é
-
-$$
 \frac{
-\sum_{j=1}^k
-\lambda_{Rj}
+\sum_{j=1}^k\widehat{\lambda}_j
 }{
-p
+\sum_{\ell=1}^p\widehat{\lambda}_\ell
 }.
 $$
 
-A utilização de $\mathbf S$ ou $\mathbf R$ corresponde a **duas formulações diferentes da ACP**.
+Essa quantidade descreve a parcela da variabilidade observada representada pelas primeiras $k$ componentes. Valores elevados de $\widehat{\Pi}_k$ indicam que poucas dimensões concentram grande parte da variabilidade, mas não existe uma proporção mínima universal que determine, por si só, quantas componentes devem ser retidas.
 
-Na ACP baseada em $\mathbf S$, as variáveis preservam suas escalas e variâncias originais. Uma variável com maior variabilidade pode exercer maior influência sobre as primeiras componentes.
+Outra informação é fornecida pelo gráfico dos autovalores, usualmente denominado **gráfico de declive** (*scree plot*). Os autovalores são apresentados em ordem decrescente e procura-se identificar uma mudança no padrão de queda. Quando existe um declínio inicial acentuado seguido por uma sequência relativamente mais estável de valores pequenos, essa mudança pode indicar uma dimensão a partir da qual componentes adicionais acrescentam parcelas progressivamente menores da variabilidade.
 
-Na ACP baseada em $\mathbf R$, todas as variáveis entram na análise com variância unitária. As diferenças de escala marginal são removidas antes da decomposição.
-
-A @tbl-acp-covariancia-correlacao resume essa distinção.
-
-| Aspecto | ACP por covariâncias | ACP por correlações |
-|---|---|---|
-| Matriz de entrada | $\mathbf S$ | $\mathbf R$ |
-| Dados equivalentes | Centralizados | Centralizados e padronizados |
-| Variâncias marginais | Mantidas nas unidades originais | Iguais a $1$ |
-| Variância total | $\operatorname{tr}(\mathbf S)$ | $p$ |
-| Influência da escala | Preservada | Removida pela padronização |
-| Problema resolvido | Representar a variabilidade nas escalas originais | Representar a variabilidade após igualar as escalas marginais |
-
-: Diferenças entre a ACP baseada em covariâncias e em correlações. {#tbl-acp-covariancia-correlacao}
-
-
-A @fig-acp-covariancia-correlacao ilustra o efeito da padronização. Os dois painéis representam as mesmas observações, antes e depois da padronização marginal. A mudança das escalas altera a geometria e, consequentemente, as direções principais.
+A @fig-acp-scree ilustra esse comportamento. A linha horizontal também permite comparar, no mesmo exemplo, o gráfico de declive com a referência $\lambda=1$ utilizada na ACP baseada em correlações.
 
 ```{r}
-#| label: fig-acp-covariancia-correlacao
+#| label: fig-acp-scree
 #| echo: false
 #| warning: false
 #| message: false
-#| fig-cap: "A ACP baseada em covariâncias preserva as escalas originais, enquanto a ACP baseada em correlações utiliza a geometria das variáveis padronizadas."
-#| fig-width: 9
+#| fig-cap: "Gráfico de declive dos autovalores. A linha tracejada indica a referência autovalor igual a 1 para uma ACP baseada em correlações."
+#| fig-width: 7
 #| fig-height: 4.6
 #| fig-align: center
 
 library(ggplot2)
 
-set.seed(731)
-
-n <- 180
-
-z1 <- stats::rnorm(n)
-
-z2 <- 0.75 * z1 +
-  sqrt(
-    1 - 0.75^2
-  ) *
-  stats::rnorm(n)
-
-X <- cbind(
-  2.5 * z1,
-  z2
+autovalores_scree <- c(
+  2.80,
+  1.10,
+  0.60,
+  0.35,
+  0.15
 )
 
-X <- scale(
-  X,
-  center = TRUE,
-  scale = FALSE
-)
-
-X_pad <- scale(
-  X,
-  center = TRUE,
-  scale = TRUE
-)
-
-S <- stats::cov(X)
-R <- stats::cor(X)
-
-eig_S <- eigen(
-  S,
-  symmetric = TRUE
-)
-
-eig_R <- eigen(
-  R,
-  symmetric = TRUE
-)
-
-a_S <- eig_S$vectors[, 1]
-a_R <- eig_R$vectors[, 1]
-
-if (a_S[1] < 0) {
-  a_S <- -a_S
-}
-
-if (a_R[1] < 0) {
-  a_R <- -a_R
-}
-
-dados <- rbind(
-  data.frame(
-    C1 = X[, 1],
-    C2 = X[, 2],
-    painel = "Covariâncias"
+dados_scree <- data.frame(
+  componente = seq_along(
+    autovalores_scree
   ),
-  data.frame(
-    C1 = X_pad[, 1],
-    C2 = X_pad[, 2],
-    painel = "Correlações"
-  )
-)
-
-dados$painel <- factor(
-  dados$painel,
-  levels = c(
-    "Covariâncias",
-    "Correlações"
-  )
-)
-
-comprimento <- 3
-
-eixos <- rbind(
-  data.frame(
-    painel = "Covariâncias",
-    x = 0,
-    y = 0,
-    xend = comprimento * a_S[1],
-    yend = comprimento * a_S[2]
-  ),
-  data.frame(
-    painel = "Correlações",
-    x = 0,
-    y = 0,
-    xend = comprimento * a_R[1],
-    yend = comprimento * a_R[2]
-  )
-)
-
-eixos$painel <- factor(
-  eixos$painel,
-  levels = levels(
-    dados$painel
-  )
-)
-
-limite <- 1.05 * max(
-  abs(
-    c(
-      dados$C1,
-      dados$C2
-    )
-  )
+  autovalor = autovalores_scree
 )
 
 ggplot(
-  dados,
+  dados_scree,
   aes(
-    x = C1,
-    y = C2
+    x = componente,
+    y = autovalor
   )
 ) +
   geom_hline(
-    yintercept = 0,
-    linewidth = 0.4,
-    color = "gray70"
+    yintercept = 1,
+    linewidth = 0.8,
+    linetype = "dashed",
+    color = "#d62728"
   ) +
-  geom_vline(
-    xintercept = 0,
-    linewidth = 0.4,
-    color = "gray70"
+  geom_line(
+    linewidth = 1,
+    color = "#1f77b4"
   ) +
   geom_point(
-    color = "#1f77b4",
-    alpha = 0.55,
-    size = 1.6
+    size = 2.7,
+    color = "#1f77b4"
   ) +
-  geom_segment(
-    data = eixos,
-    aes(
-      x = x,
-      y = y,
-      xend = xend,
-      yend = yend
-    ),
-    inherit.aes = FALSE,
-    linewidth = 1.15,
+  annotate(
+    "text",
+    x = 5,
+    y = 1.08,
+    label = "λ = 1",
+    hjust = 1,
     color = "#d62728",
-    arrow = grid::arrow(
-      length = grid::unit(
-        0.18,
-        "cm"
-      ),
-      type = "closed"
-    )
+    size = 4
   ) +
-  facet_wrap(
-    vars(painel)
-  ) +
-  coord_equal(
-    xlim = c(
-      -limite,
-      limite
-    ),
-    ylim = c(
-      -limite,
-      limite
-    )
+  scale_x_continuous(
+    breaks = dados_scree$componente
   ) +
   labs(
-    x = "Primeira variável",
-    y = "Segunda variável"
+    x = "Componente",
+    y = "Autovalor"
   ) +
   theme_minimal(
     base_size = 13
   ) +
   theme(
-    panel.grid.minor = element_blank(),
-    strip.text = element_text(
-      face = "bold"
-    )
+    panel.grid.minor = element_blank()
   )
 ```
 
-A seta vermelha representa a primeira direção principal em cada geometria. A padronização remove as diferenças de escala marginal entre as variáveis e, nesse exemplo, modifica a direção que maximiza a variância.
+No exemplo, os cinco autovalores somam $5$, como ocorre para uma matriz de correlações de ordem $5$. A queda é mais acentuada nas primeiras componentes e se torna progressivamente menor a partir das seguintes. A linha tracejada representa outro critério: apenas os dois primeiros autovalores excedem $1$. A mudança de inclinação e a comparação com $1$ fornecem, portanto, informações distintas.
 
-A escolha entre as duas matrizes faz parte da definição do problema estatístico. Ela não deve ser tratada como uma decisão puramente computacional.
-
-A padronização modifica a geometria da nuvem de dados por meio de um escalonamento diferente em cada eixo. Consequentemente, os autovetores, os autovalores, os escores e o subespaço principal podem mudar.
-
-Essa distinção será importante também no próximo capítulo. A Análise Fatorial pode ser formulada sobre uma matriz de covariâncias ou de correlações, mas seu objetivo será diferente: em vez de decompor a variabilidade total em direções principais, será especificado um modelo para a estrutura de covariação entre as variáveis.
-
-A decomposição espectral também fornece a interpretação geométrica completa da ACP. As colunas de
+Na ACP baseada na matriz de correlações, há ainda uma referência específica decorrente da padronização. Como
 
 $$
-\mathbf A
+\operatorname{tr}
+(
+\mathbf R
+)
 =
-\begin{pmatrix}
-\boldsymbol{\alpha}_1 &
-\cdots &
-\boldsymbol{\alpha}_p
-\end{pmatrix}
+p,
 $$
 
-formam uma base ortonormal alinhada aos eixos principais da dispersão. Quando todas as componentes são mantidas, a transformação
+a média dos $p$ autovalores é igual a $1$. Nesse contexto, o critério de reter componentes com
 
 $$
-\boldsymbol{\mathsf Y}
-=
-\mathbf A^\top
-\left(
-\boldsymbol{\mathsf X}
--
-\boldsymbol{\mu}
-\right)
+\widehat{\lambda}_{Rj}>1
 $$
 
-corresponde a uma mudança ortogonal de coordenadas e
+pode ser interpretado como a retenção de componentes cuja variância excede a variância de uma variável original padronizada. Esse critério é uma regra heurística e sua justificativa não se transfere diretamente para a ACP baseada em uma matriz de covariâncias, cujas variâncias dependem das escalas das variáveis.
 
-$$
-\operatorname{Cov}
-\left(
-\boldsymbol{\mathsf Y}
-\right)
-=
-\boldsymbol{\Lambda}.
-$$
+Assim, a escolha de $k$ deve considerar conjuntamente a concentração dos autovalores, a proporção acumulada de variância, o padrão observado no gráfico de declive e a interpretabilidade da representação obtida. Diferentes critérios podem sugerir dimensões distintas, e a decisão deve permanecer vinculada ao objetivo da análise.
 
-Assim, os autovetores determinam as direções principais e os autovalores determinam as variâncias nessas direções. Quando apenas as primeiras $k$ componentes são mantidas, a mudança completa de coordenadas é substituída pela projeção sobre o subespaço principal $\mathcal S_k$, formalizada na @prp-acp-variancia-reconstrucao.
+Os critérios de retenção fornecem informações complementares sobre a dimensão da representação. A proporção acumulada e o gráfico de declive podem ser utilizados tanto na ACP baseada em covariâncias quanto na baseada em correlações, enquanto o critério do autovalor maior que $1$ possui justificativa específica para a matriz de correlações. A escolha do número de componentes deve, portanto, considerar a matriz utilizada na análise e o objetivo da representação.
 
-## Coeficientes e relação das variáveis com as componentes
+## Aprofundamento: coeficientes e relação das variáveis com as componentes {#sec-acp-coeficientes-correlacoes}
+
+::: {.callout-note appearance="simple" icon=false}
+## Leitura de aprofundamento
+
+Os coeficientes definem as direções principais, enquanto as correlações entre as variáveis e as componentes descrevem a associação das variáveis com essas direções. Esta seção estabelece formalmente a relação entre esses dois objetos e preserva sua distinção na interpretação da ACP.
+:::
 
 Os elementos do vetor
 
@@ -3092,9 +3144,9 @@ $$
 \boldsymbol{\alpha}_j
 =
 \begin{pmatrix}
-a_{1j}\\
+\alpha_{1j}\\
 \vdots\\
-a_{pj}
+\alpha_{pj}
 \end{pmatrix}
 $$
 
@@ -3104,7 +3156,7 @@ $$
 Y_j
 =
 \sum_{i=1}^p
-a_{ij}
+\alpha_{ij}
 \left(
 X_i-\mu_i
 \right).
@@ -3135,7 +3187,7 @@ X_i,
 \right]\\
 &=
 \sum_{\ell=1}^{p}
-a_{\ell j}
+\alpha_{\ell j}
 \operatorname{Cov}
 \left(
 X_i,X_\ell
@@ -3167,7 +3219,7 @@ X_i,Y_j
 \right)
 =
 \lambda_j
-a_{ij}.
+\alpha_{ij}.
 $$
 
 Além disso,
@@ -3207,7 +3259,7 @@ X_i,Y_j
 \right)
 =
 \frac{
-\sqrt{\lambda_j}\,a_{ij}
+\sqrt{\lambda_j}\,\alpha_{ij}
 }{
 \sqrt{\sigma_{ii}}
 }.
@@ -3250,7 +3302,7 @@ X_i,Y_j
 \right)
 =
 \frac{
-\sqrt{\lambda_j}\,a_{ij}
+\sqrt{\lambda_j}\,\alpha_{ij}
 }{
 \sqrt{\sigma_{ii}}
 }.
@@ -3289,7 +3341,7 @@ Y_{Rj}
 \right)
 =
 \sqrt{\lambda_{Rj}}\,
-a_{R,ij}.
+\alpha_{R,ij}.
 $$
 :::
 
@@ -3307,7 +3359,7 @@ $$
 
 e a correlação entre $Y_j$ e qualquer variável não está definida.
 
-A expressão mostra que o coeficiente $a_{ij}$ e a correlação entre $X_i$ e $Y_j$ representam objetos diferentes.
+A expressão mostra que o coeficiente $\alpha_{ij}$ e a correlação entre $X_i$ e $Y_j$ representam objetos diferentes.
 
 A diferença entre os coeficientes da componente e as correlações com as variáveis pode ser visualizada na @fig-acp-coeficientes-correlacoes. O exemplo utiliza uma matriz de covariâncias com variâncias marginais diferentes.
 
@@ -3440,7 +3492,7 @@ X_i,Y_j
 =
 \frac{
 \sqrt{\widehat{\lambda}_j}
-\,\widehat a_{ij}
+\,\widehat \alpha_{ij}
 }{
 \sqrt{s_{ii}}
 }.
@@ -3462,29 +3514,28 @@ Y_{Rj}
 \right)
 =
 \sqrt{\widehat{\lambda}_{Rj}}
-\,\widehat a_{R,ij}.
+\,\widehat \alpha_{R,ij}.
 $$
 
 A interpretação substantiva das componentes pode utilizar conjuntamente os coeficientes e as associações das variáveis com as componentes. A formulação matemática deve preservar a distinção entre os dois objetos.
 
-## Representação das observações e das variáveis {#sec-acp-representacao}
 
-As observações são representadas nas componentes por seus escores, enquanto as variáveis podem ser relacionadas às componentes pelas correlações desenvolvidas na seção anterior. Esses dois objetos são suficientes para estabelecer suas posições na representação reduzida.
+## Aprofundamento: representação das observações e das variáveis {#sec-acp-representacao}
 
-### Aprofundamento: qualidade de representação e contribuição
-
-::: {.callout-note appearance="simple" icon="false"}
+::: {.callout-note appearance="simple" icon=false}
 ## Leitura de aprofundamento
 
-Além das coordenadas, a interpretação de uma ACP pode utilizar medidas que avaliam a qualidade da representação e a participação de observações ou variáveis em cada dimensão. Esta seção desenvolve o cosseno quadrado ($\cos^2$) e a contribuição, mantendo distintos os significados dessas duas medidas.
+As observações podem ser representadas pelas coordenadas fornecidas por seus escores, enquanto as variáveis podem ser representadas por suas associações com as componentes. Além dessas coordenadas, o cosseno quadrado ($\cos^2$) e a contribuição fornecem informações distintas sobre a qualidade da representação e a participação de observações ou variáveis em cada dimensão.
 :::
 
-#### Observações: coordenadas, qualidade de representação e contribuição
+A representação das observações utiliza os escores das componentes. Para as variáveis, podem ser utilizadas as correlações com as componentes desenvolvidas na @sec-acp-coeficientes-correlacoes.
+
+### Observações: coordenadas, qualidade de representação e contribuição
 
 Para a observação $i$, a coordenada na componente $j$ é o próprio escore
 
 $$
-t_{ij}
+\widehat y_{ij}
 =
 \widehat{\boldsymbol{\alpha}}_j^\top
 \left(
@@ -3496,8 +3547,8 @@ Assim, em uma representação pelas duas primeiras componentes, a observação $
 
 $$
 \left(
-t_{i1},
-t_{i2}
+\widehat y_{i1},
+\widehat y_{i2}
 \right).
 $$
 
@@ -3507,7 +3558,7 @@ $$
 d_i^2
 =
 \sum_{\ell=1}^{p}
-t_{i\ell}^2.
+\widehat y_{i\ell}^2.
 $$
 
 Na ACP baseada em covariâncias,
@@ -3528,9 +3579,9 @@ $$
 \cos^2_{ij}
 =
 \frac{
-t_{ij}^2
+\widehat y_{ij}^2
 }{
-\sum_{\ell=1}^{p}t_{i\ell}^2
+\sum_{\ell=1}^{p}\widehat y_{i\ell}^2
 }.
 $$ {#eq-acp-cos2-observacao}
 
@@ -3551,9 +3602,9 @@ $$
 \operatorname{ctr}_{ij}
 =
 \frac{
-t_{ij}^2
+\widehat y_{ij}^2
 }{
-\sum_{h=1}^{n}t_{hj}^2
+\sum_{h=1}^{n}\widehat y_{hj}^2
 }.
 $$ {#eq-acp-contribuicao-observacao}
 
@@ -3570,7 +3621,7 @@ Na convenção amostral utilizada neste capítulo,
 
 $$
 \sum_{h=1}^{n}
-t_{hj}^2
+\widehat y_{hj}^2
 =
 (n-1)\widehat{\lambda}_j,
 $$
@@ -3581,7 +3632,7 @@ $$
 \operatorname{ctr}_{ij}
 =
 \frac{
-t_{ij}^2
+\widehat y_{ij}^2
 }{
 (n-1)\widehat{\lambda}_j
 }.
@@ -3589,19 +3640,11 @@ $$
 
 Uma contribuição elevada indica que a observação responde por parcela relativamente elevada da soma de quadrados associada à componente. Essa medida não deve ser confundida com qualidade de representação.
 
-Assim,
+O $\cos^2$ e a contribuição possuem interpretações complementares. O $\cos^2$ avalia quanto uma componente representa uma determinada observação, enquanto a contribuição avalia quanto essa observação participa da variabilidade representada pela componente.
 
-$$
-\cos^2
-\quad\text{e}\quad
-\text{contribuição}
-$$
+### Variáveis: coordenadas, qualidade de representação e contribuição
 
-possuem orientações complementares. O $\cos^2$ avalia quanto uma componente representa uma determinada observação; a contribuição avalia quanto uma determinada observação participa da variabilidade representada por uma componente.
-
-#### Variáveis: coordenadas, qualidade de representação e contribuição
-
-A seção anterior mostrou que as correlações entre as variáveis e as componentes são distintas dos coeficientes que definem as direções principais. Essas correlações também fornecem uma representação das variáveis no espaço das componentes.
+A @sec-acp-coeficientes-correlacoes mostrou que as correlações entre as variáveis e as componentes são distintas dos coeficientes que definem as direções principais. Essas correlações também fornecem uma representação das variáveis no espaço das componentes.
 
 Na ACP amostral, denote por
 
@@ -3629,7 +3672,7 @@ $$
 r_{ij}
 =
 \sqrt{\widehat{\lambda}_{Rj}}\,
-\widehat a_{R,ij},
+\widehat \alpha_{R,ij},
 $$
 
 para componentes com autovalor positivo. Como cada variável padronizada possui variância igual a $1$, o quadrado da correlação
@@ -3668,7 +3711,7 @@ e, utilizando a relação entre correlações e coeficientes,
 $$
 \operatorname{ctr}_{ij}^{(\mathrm{var})}
 =
-\widehat a_{R,ij}^{\,2}.
+\widehat \alpha_{R,ij}^{\,2}.
 $$
 
 Como os autovetores são unitários,
@@ -3682,7 +3725,7 @@ $$
 
 A contribuição identifica quais variáveis participam mais intensamente da construção de uma determinada direção na geometria padronizada, enquanto o $\cos^2$ informa quão bem cada variável é representada por essa direção ou pelo subespaço considerado.
 
-#### Duas representações complementares
+### Duas representações complementares
 
 A ACP permite, portanto, examinar dois espaços relacionados, mas conceitualmente distintos.
 
@@ -3716,9 +3759,13 @@ Coordenada, qualidade de representação e contribuição devem permanecer conce
 Essas medidas complementam a interpretação dos autovalores. Enquanto os autovalores descrevem a importância global das componentes, coordenadas, $\cos^2$ e contribuições permitem examinar quais observações e variáveis caracterizam a representação obtida.
 
 
-## Propriedades da solução
+## Aprofundamento: propriedades da solução {#sec-acp-propriedades}
 
-A ACP herda propriedades da matriz de covariâncias e da decomposição espectral. Algumas delas possuem consequências diretas para a interpretação das componentes.
+::: {.callout-note appearance="simple" icon=false}
+## Leitura de aprofundamento
+
+A solução da ACP herda propriedades da matriz de covariâncias e da decomposição espectral. Esta seção examina consequências relacionadas a translações, mudanças de escala, indeterminação do sinal, multiplicidade de autovalores e singularidade da matriz analisada.
+:::
 
 ### Invariância a translações
 
@@ -3815,9 +3862,9 @@ A orientação positiva ou negativa de um eixo principal é, portanto, arbitrár
 
 Essa propriedade é especialmente importante na comparação de resultados produzidos por diferentes programas ou diferentes decomposições numéricas. Duas soluções podem apresentar sinais opostos e ainda representar exatamente a mesma componente.
 
-A mudança de sinal não é a única situação em que as direções podem deixar de ser únicas. Quando há autovalores repetidos, a ACP identifica o autoespaço correspondente, mas não uma base única dentro dele. Além disso, quando a matriz analisada é singular, a variabilidade está restrita a um subespaço de dimensão inferior a $p$. Essas situações são desenvolvidas a seguir como aprofundamento.
+A mudança de sinal não é a única situação em que as direções podem deixar de ser únicas. Quando há autovalores repetidos, a ACP identifica o autoespaço correspondente, mas não uma base única dentro dele. Além disso, quando a matriz analisada é singular, a variabilidade está restrita a um subespaço de dimensão inferior a $p$. Essas duas situações são desenvolvidas a seguir.
 
-### Aprofundamento: unicidade, multiplicidade e dimensão efetiva {#sec-acp-multiplicidade-singularidade}
+### Unicidade, multiplicidade e dimensão efetiva {#sec-acp-multiplicidade-singularidade}
 
 Quando todos os autovalores são simples, cada direção principal é determinada até mudança de sinal. Autovalores repetidos e matrizes singulares exigem distinguir a unicidade das direções, a unicidade dos subespaços e a dimensão efetivamente ocupada pela variabilidade.
 
@@ -3942,68 +3989,6 @@ $$
 
 a matriz de covariâncias amostral é necessariamente singular, ainda que a matriz populacional não seja. A SVD representa diretamente o subespaço de variabilidade observado e continua aplicável sem exigir a inversão de $\mathbf S$.
 
-## Formulação descritiva, populacional e inferencial
-
-A ACP pode ser formulada sem hipótese de normalidade. No nível populacional, basta que $\boldsymbol{\mathsf X}$ possua momentos de segunda ordem finitos para que a matriz de covariâncias $\boldsymbol{\Sigma}$ e suas componentes principais estejam definidas.
-
-Na formulação **descritiva**, a matriz de dados observada é o objeto de interesse, e autovalores, direções e escores descrevem sua estrutura de variabilidade.
-
-Na formulação **populacional**, os autovalores
-
-$$
-\lambda_j
-$$
-
-e os autovetores unitários
-
-$$
-\boldsymbol{\alpha}_j
-$$
-
-são características da matriz populacional $\boldsymbol{\Sigma}$. Quando uma amostra é utilizada para estudar essa estrutura, a matriz observada $\mathbf S$ fornece os correspondentes
-
-$$
-\widehat{\lambda}_j
-\qquad\text{e}\qquad
-\widehat{\boldsymbol{\alpha}}_j.
-$$
-
-Sob as condições de consistência da matriz de covariâncias amostral estabelecidas na @prp-consistencia-covariancia-amostral, a solução amostral pode ser interpretada como estimativa da estrutura espectral populacional. A identificação de uma direção individual requer separação do autovalor correspondente; quando há multiplicidade, o objeto identificado é o autoespaço, como discutido na @sec-acp-multiplicidade-singularidade.
-
-A normalidade multivariada não é necessária para a formulação da ACP. Quando
-
-$$
-\boldsymbol{\mathsf X}
-\sim
-N_p
-\left(
-\boldsymbol{\mu},
-\boldsymbol{\Sigma}
-\right),
-$$
-
-a transformação ortogonal para as componentes produz
-
-$$
-\boldsymbol{\mathsf Y}
-=
-\mathbf A^\top
-\left(
-\boldsymbol{\mathsf X}
--
-\boldsymbol{\mu}
-\right)
-\sim
-N_p
-\left(
-\mathbf0,
-\boldsymbol{\Lambda}
-\right).
-$$
-
-Nesse caso, as componentes são independentes. Sem normalidade conjunta, a ACP garante que componentes distintas sejam não correlacionadas, mas não necessariamente independentes.
-
-A inferência sobre autovalores, autovetores e subespaços requer hipóteses adicionais e teoria distribucional ou assintótica específica [@anderson2003]. Esses resultados não são necessários para a formulação da técnica desenvolvida neste capítulo.
 
 ## Aprofundamento: elementos ativos e suplementares na ACP {#sec-acp-elementos-suplementares}
 
@@ -4026,7 +4011,7 @@ $$
 que não tenha participado do cálculo da matriz de covariâncias e das direções principais. Mantendo a solução obtida a partir das observações ativas, sua coordenada na componente $j$ pode ser calculada por
 
 $$
-t_{*j}
+\widehat y_{*j}
 =
 \widehat{\boldsymbol{\alpha}}_j^\top
 \left(
@@ -4125,7 +4110,7 @@ $$
 
 cujas colunas geram o subespaço principal. A projeção sobre esse subespaço preserva a maior variabilidade possível entre todos os subespaços de mesma dimensão e, de forma equivalente, minimiza o erro quadrático de reconstrução.
 
-No nível amostral, a construção é aplicada à matriz de covariâncias $\mathbf S$ ou à matriz de correlações $\mathbf R$. A SVD da matriz de dados centralizada fornece uma formulação equivalente, relacionando valores singulares, direções principais, autovalores e escores. A escolha entre covariâncias e correlações determina se as diferenças de escala entre as variáveis participam diretamente da geometria da solução.
+No nível amostral, a construção pode ser aplicada à matriz de covariâncias $\mathbf S$ ou à matriz de correlações $\mathbf R$. Na ACP baseada em covariâncias, a SVD da matriz centralizada $\mathbf X_c$ fornece uma formulação equivalente; na ACP baseada em correlações, a formulação correspondente utiliza a matriz centralizada e padronizada $\mathbf X_{\mathrm{pad}}$. Em ambos os casos, valores singulares, direções principais, autovalores e escores descrevem a mesma geometria definida pela matriz utilizada na análise.
 
 A definição da ACP exige momentos de segunda ordem finitos, mas não normalidade multivariada. A normalidade torna-se relevante quando se deseja desenvolver resultados inferenciais específicos sobre a estrutura populacional.
 
