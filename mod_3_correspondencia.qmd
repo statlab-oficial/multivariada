@@ -1,10 +1,10 @@
 # Formulação da Análise de Correspondência {#sec-correspondencia}
 
-A Análise de Correspondência representa geometricamente a associação entre as categorias de duas variáveis qualitativas a partir de uma tabela de contingência. A técnica compara os perfis observados com a estrutura correspondente à independência em uma geometria ponderada pelas frequências marginais [@greenacre2017ca].
+A Análise de Correspondência simples representa geometricamente a estrutura de associação entre as categorias de duas variáveis qualitativas a partir de uma tabela de contingência. A técnica compara os perfis observados com a estrutura correspondente à independência em uma geometria ponderada pelas frequências marginais [@greenacre2017ca].
 
-Os desvios da independência são padronizados pelas massas e organizados em uma matriz cuja SVD fornece as dimensões da associação, suas inércias e as coordenadas das categorias de linhas e colunas.
+Os desvios da independência são padronizados pelas massas e reunidos em uma matriz cuja SVD fornece as dimensões da associação, suas inércias e as coordenadas das categorias de linhas e colunas. Essa construção é geométrica e descritiva. Sua relação com a estatística de Pearson exige distinguir a identidade algébrica válida para a tabela observada da inferência sobre independência em uma população.
 
-O capítulo desenvolve a formulação matemática e estatística da Análise de Correspondência simples. Critérios operacionais de escolha da dimensão, interpretação aplicada de mapas, implementação computacional e extensões serão tratados posteriormente. Categorias suplementares serão apresentadas ao final como aprofundamento da geometria desenvolvida para as categorias ativas.
+O núcleo do capítulo desenvolve a técnica a partir da tabela de contingência, das massas, dos perfis, da geometria qui-quadrado e da SVD. Também apresenta os sistemas de coordenadas, a representação conjunta das duas margens, a distinção entre formulação descritiva e inferencial, a relação com a ACP e os limites de interpretação. Os aprofundamentos teóricos tratam do limite do posto, das relações baricêntricas, da centralização das coordenadas, da reconstrução dos desvios e da relação com a estatística de Pearson. Os aprofundamentos metodológicos e aplicados apresentam as contribuições, a qualidade de representação, a escolha das dimensões, a leitura do mapa reduzido e as categorias suplementares.
 
 Os elementos da formulação são organizados na @tbl-estrutura-correspondencia.
 
@@ -203,7 +203,7 @@ $$
 $$
 :::
 
-A definição admite massas nulas. A geometria ativa da Análise de Correspondência, entretanto, utiliza inversas e raízes inversas dessas matrizes. No desenvolvimento do capítulo serão consideradas categorias ativas com
+A definição admite massas nulas. A geometria ativa da Análise de Correspondência utiliza inversas e raízes inversas das matrizes de massas. Por isso, o desenvolvimento considera categorias ativas com
 
 $$
 r_i>0,
@@ -804,98 +804,7 @@ $$ {#eq-elemento-desvio-padronizado-ca}
 
 A matriz $\mathbf Q_{\mathrm{CA}}$ representa, em coordenadas ponderadas, os desvios da distribuição observada em relação à independência.
 
-Ela também possui restrições lineares decorrentes das próprias marginais. Como
-
-$$
-\mathbf P\mathbf1_J
-=
-\mathbf r
-$$
-
-e
-
-$$
-\mathbf c^\top\mathbf1_J
-=
-1,
-$$
-
-segue que
-
-$$
-\begin{aligned}
-\mathbf Q_{\mathrm{CA}}
-\mathbf D_c^{1/2}
-\mathbf1_J
-&=
-\mathbf D_r^{-1/2}
-\left(
-\mathbf P
--
-\mathbf r\mathbf c^\top
-\right)
-\mathbf1_J
-\\
-&=
-\mathbf D_r^{-1/2}
-\left(
-\mathbf r-\mathbf r
-\right)
-\\
-&=
-\mathbf0.
-\end{aligned}
-$$ {#eq-nucleo-colunas-qca}
-
-Analogamente,
-
-$$
-\mathbf Q_{\mathrm{CA}}^\top
-\mathbf D_r^{1/2}
-\mathbf1_I
-=
-\mathbf0.
-$$ {#eq-nucleo-linhas-qca}
-
-Como
-
-$$
-\mathbf D_c^{1/2}\mathbf1_J
-\neq
-\mathbf0
-$$
-
-e
-
-$$
-\mathbf D_r^{1/2}\mathbf1_I
-\neq
-\mathbf0
-$$
-
-sob massas positivas, $\mathbf Q_{\mathrm{CA}}$ possui um vetor não nulo em seu núcleo à direita e um vetor não nulo no núcleo de sua transposta. Portanto,
-
-$$
-\operatorname{posto}
-\left(
-\mathbf Q_{\mathrm{CA}}
-\right)
-\leq
-J-1
-$$
-
-e
-
-$$
-\operatorname{posto}
-\left(
-\mathbf Q_{\mathrm{CA}}
-\right)
-\leq
-I-1.
-$$
-
-Consequentemente,
+As restrições impostas pelas marginais reduzem em pelo menos uma unidade o posto disponível em cada lado. Assim,
 
 $$
 \operatorname{posto}
@@ -910,7 +819,7 @@ J-1
 \right).
 $$ {#eq-posto-maximo-ca}
 
-Essa restrição explica por que a Análise de Correspondência possui, no máximo,
+A demonstração algébrica desse limite é apresentada na @sec-ca-limite-posto. A restrição explica por que a Análise de Correspondência possui, no máximo,
 
 $$
 \min
@@ -1309,7 +1218,7 @@ n
 \lambda_\ell.
 $$ {#eq-decomposicao-qui-quadrado-ca}
 
-Essa igualdade continua sendo uma decomposição algébrica da estatística observada. A distribuição inferencial de $\chi^2$ será considerada posteriormente e não é necessária para definir as inércias principais.
+Essa igualdade é uma decomposição algébrica da estatística observada e não depende de uma distribuição amostral. A formulação probabilística da estatística de Pearson é desenvolvida na @sec-ca-formulacao-probabilistica.
 
 Como
 
@@ -1755,7 +1664,626 @@ $$
 
 dimensões forem mantidas, a distância representada entre dois perfis não pode exceder a distância completa, pois as parcelas quadráticas associadas às dimensões descartadas são não negativas. A representação reduzida preserva apenas a parcela da geometria qui-quadrado contida no subespaço retido.
 
-### Relações baricêntricas
+## Representação conjunta de linhas e colunas
+
+A Análise de Correspondência fornece coordenadas para as duas margens da tabela. Para representar linhas e colunas simultaneamente, é necessário especificar quais sistemas de coordenadas serão utilizados para cada nuvem.
+
+A @tbl-escalas-representacao-ca reúne três representações particularmente úteis para compreender essa geometria.
+
+| Representação | Linhas | Colunas | Propriedade principal |
+|---|---|---|---|
+| métrica das linhas | principais $\mathbf F_r$ | padrão $\mathbf A_c$ | preserva a geometria das linhas e utiliza escalas compatíveis com a dualidade entre linhas e colunas |
+| métrica das colunas | padrão $\mathbf A_r$ | principais $\mathbf F_c$ | preserva a geometria das colunas e utiliza escalas compatíveis com a dualidade entre linhas e colunas |
+| simétrica | principais $\mathbf F_r$ | principais $\mathbf F_c$ | representa ambas as nuvens em escalas associadas às inércias principais |
+
+: Sistemas de coordenadas para representar linhas e colunas na Análise de Correspondência. {#tbl-escalas-representacao-ca}
+
+Na representação métrica das linhas, as distâncias euclidianas entre os pontos de linhas reproduzem exatamente suas distâncias qui-quadrado quando todas as dimensões não nulas são mantidas. As colunas aparecem em coordenadas padrão e participam diretamente das relações baricêntricas das linhas.
+
+Na representação métrica das colunas ocorre a relação dual.
+
+Na representação simétrica, linhas e colunas são expressas por coordenadas principais. Essa representação é útil para examinar simultaneamente as duas margens, mas não cria uma métrica qui-quadrado comum entre pontos pertencentes a margens diferentes.
+
+### O significado das proximidades
+
+Dentro da nuvem das linhas, proximidades representam semelhança entre perfis segundo a distância qui-quadrado; a interpretação dual vale para as colunas.
+
+A distância entre um ponto de linha e um ponto de coluna não corresponde, em geral, a uma distância qui-quadrado definida pela técnica. Por isso, proximidade gráfica entre categorias pertencentes a margens diferentes não constitui uma medida métrica direta de associação.
+
+A interpretação conjunta deve considerar os perfis, as relações baricêntricas e o sistema de coordenadas utilizado. Nas representações simétricas, a proximidade entre uma categoria de linha e uma categoria de coluna não deve ser interpretada, isoladamente, como uma medida direta de associação.
+
+## Formulação descritiva e inferencial {#sec-ca-descritiva-inferencial}
+
+A identidade
+
+$$
+\chi^2
+=
+n\mathcal I
+$$
+
+estabelecida em @eq-qui-quadrado-inercia-ca relaciona a estatística de Pearson calculada para a tabela observada com a inércia total da Análise de Correspondência. Essa igualdade é algébrica e não exige, por si só, um modelo probabilístico.
+
+Na formulação descritiva,
+
+$$
+p_{ij},
+\qquad
+r_i
+\qquad\text{e}\qquad
+c_j
+$$
+
+são quantidades calculadas a partir da tabela observada. A inércia
+
+$$
+\mathcal I
+$$
+
+mede e decompõe geometricamente o afastamento de
+
+$$
+\mathbf P
+=
+\mathbf r\mathbf c^\top.
+$$
+
+Quando a estatística de Pearson é utilizada em um teste de independência, ela avalia globalmente a compatibilidade entre os dados e uma estrutura populacional de independência. As dimensões obtidas pela SVD, por sua vez, decompõem descritivamente o afastamento observado:
+
+$$
+\mathcal I
+=
+\sum_{\ell=1}^{L}
+\lambda_\ell.
+$$
+
+Uma dimensão da Correspondência não corresponde automaticamente a uma hipótese inferencial populacional separada. O teste global e a decomposição geométrica respondem, portanto, a problemas distintos.
+
+A identidade
+
+$$
+\chi^2
+=
+n\mathcal I
+$$
+
+também separa magnitude geométrica e tamanho amostral. Se todas as contagens forem multiplicadas por um mesmo inteiro positivo $a$, a matriz de frequências relativas $\mathbf P$, as massas, a matriz $\mathbf Q_{\mathrm{CA}}$, a inércia e as coordenadas permanecem inalteradas, enquanto
+
+$$
+\chi^{2*}
+=
+a\chi^2.
+$$
+
+Assim, significância estatística e magnitude geométrica da associação não são a mesma quantidade. A Correspondência pode ser utilizada descritivamente mesmo quando não se pretende realizar um teste formal de independência [@greenacre2017ca].
+
+## Relação com a Análise de Componentes Principais
+
+A Análise de Correspondência e a ACP compartilham estruturas de decomposição e representação em baixa dimensão, mas partem de objetos estatísticos e geometrias diferentes.
+
+No @sec-acp, a ACP representa a variabilidade de dados quantitativos por meio de direções principais. Na Análise de Correspondência, a estrutura de entrada é uma tabela de contingência e a representação é construída a partir de perfis e da geometria qui-quadrado.
+
+Considere a matriz dos perfis de linhas,
+
+$$
+\mathbf P^{(r)}
+=
+\mathbf D_r^{-1}
+\mathbf P.
+$$
+
+Pela definição de $\mathbf P^{(r)}$ e por @eq-matriz-desvios-padronizados-ca,
+
+$$
+\mathbf Q_{\mathrm{CA}}
+=
+\mathbf D_r^{1/2}
+\left(
+\mathbf P^{(r)}
+-
+\mathbf1_I\mathbf c^\top
+\right)
+\mathbf D_c^{-1/2}.
+$$ {#eq-ca-matriz-perfis-ponderados}
+
+Antes da SVD, portanto, os perfis de linhas são:
+
+1. centralizados em torno de $\mathbf c$;
+2. ponderados pelas massas das linhas;
+3. reescalonados pelas massas das colunas.
+
+Essa expressão permite interpretar a Análise de Correspondência como uma decomposição ponderada dos perfis centralizados. A semelhança com a ACP está no uso de uma estrutura centralizada, da SVD e de aproximações de posto reduzido. A diferença está no objeto analisado, nos pesos e na geometria: na Correspondência, as massas participam da construção e a métrica entre perfis é a métrica qui-quadrado.
+
+A @tbl-relacao-acp-ca resume essas diferenças.
+
+| Aspecto | ACP | Análise de Correspondência |
+|---|---|---|
+| objeto inicial | matriz de dados quantitativos ou matriz de covariâncias/correlações | tabela de contingência |
+| unidades representadas | observações e/ou variáveis | categorias de linhas e colunas |
+| centro | vetor de médias | perfis marginais $\mathbf c$ e $\mathbf r$ |
+| pesos | usualmente iguais na formulação básica | massas $r_i$ e $c_j$ |
+| geometria | euclidiana ou padronizada | qui-quadrado |
+| quantidade decomposta | variância | inércia |
+| ferramenta espectral | autovalores ou SVD | SVD dos desvios padronizados |
+
+: Relação entre a ACP e a Análise de Correspondência. {#tbl-relacao-acp-ca}
+
+A presença de SVD e de aproximações de posto reduzido nas duas técnicas não as torna equivalentes. A ACP representa variabilidade de variáveis quantitativas; a Correspondência representa associações entre categorias por meio de perfis ponderados. Ela não deve, portanto, ser interpretada simplesmente como uma ACP aplicada a variáveis qualitativas [@greenacre2017ca].
+
+## Condições e limites da representação
+
+A formulação da Análise de Correspondência é predominantemente geométrica e descritiva. Por isso, convém distinguir as condições necessárias para definir sua geometria das hipóteses adicionais utilizadas quando se realiza inferência sobre independência.
+
+### Tabela ativa e massas
+
+A tabela de frequências observadas satisfaz
+
+$$
+\mathbf N
+\in
+\mathbb N_0^{I\times J}
+$$
+
+e
+
+$$
+n>0.
+$$
+
+A geometria ativa requer
+
+$$
+r_i>0,
+\qquad
+i=1,\ldots,I,
+$$
+
+e
+
+$$
+c_j>0,
+\qquad
+j=1,\ldots,J,
+$$
+
+para que os perfis e as inversas de $\mathbf D_r$ e $\mathbf D_c$ utilizados na técnica estejam definidos.
+
+Linhas ou colunas com massa nula não possuem perfis ativos e devem ser retiradas da geometria formulada neste capítulo.
+
+Massas positivas muito pequenas não impedem matematicamente a análise, mas podem exercer influência elevada porque a distância qui-quadrado utiliza os inversos das massas.
+
+Uma frequência celular nula,
+
+$$
+n_{ij}=0,
+$$
+
+também não impede a análise quando as massas marginais correspondentes permanecem positivas. Zeros estruturais, por outro lado, exigem interpretação de acordo com o mecanismo que produziu a tabela.
+
+Na formulação inferencial, frequências esperadas pequenas podem comprometer a qualidade da aproximação assintótica de Pearson. Essa questão pertence à avaliação aplicada do teste e não à definição geométrica da Correspondência.
+
+### Dimensão da representação
+
+Por @eq-posto-maximo-ca,
+
+$$
+L
+=
+\operatorname{posto}
+\left(
+\mathbf Q_{\mathrm{CA}}
+\right)
+\leq
+\min
+\left(
+I-1,
+J-1
+\right).
+$$
+
+Quando apenas
+
+$$
+1\leq k<L
+$$
+
+dimensões são mantidas, a parcela da inércia representada é aquela definida na @eq-inercia-acumulada-ca.
+
+O mapa é, nesse caso, uma representação de posto reduzido. Uma representação bidimensional não implica que a associação observada seja intrinsecamente bidimensional.
+
+### Sinais, multiplicidades e orientação
+
+Para um valor singular simples, a troca simultânea
+
+$$
+\mathbf u_\ell
+\longmapsto
+-
+\mathbf u_\ell,
+\qquad
+\mathbf v_\ell
+\longmapsto
+-
+\mathbf v_\ell
+$$
+
+não altera
+
+$$
+d_\ell
+\mathbf u_\ell
+\mathbf v_\ell^\top.
+$$
+
+Consequentemente, todas as coordenadas de linhas e colunas na dimensão $\ell$ podem ter seus sinais invertidos simultaneamente sem modificar a solução. A designação dos lados do eixo como positivo e negativo é, portanto, arbitrária. Permanecem invariantes, contudo, as posições relativas: categorias situadas no mesmo lado continuam no mesmo lado, e categorias situadas em lados opostos continuam em lados opostos. Por esse motivo, resultados produzidos por programas ou execuções diferentes podem apresentar um eixo refletido sem representar soluções distintas.
+
+Quando um valor singular $d$ possui multiplicidade $m>1$, a indeterminação é mais ampla. Se $\mathbf U_B$ e $\mathbf V_B$ reúnem os vetores singulares do bloco correspondente, então, para qualquer matriz ortogonal $\mathbf R\in\mathbb R^{m\times m}$,
+
+$$
+\mathbf U_B
+\longmapsto
+\mathbf U_B\mathbf R,
+\qquad
+\mathbf V_B
+\longmapsto
+\mathbf V_B\mathbf R
+$$
+
+preserva a reconstrução, pois
+
+$$
+\mathbf U_B\mathbf R
+\left(
+d\mathbf I_m
+\right)
+\left(
+\mathbf V_B\mathbf R
+\right)^\top
+=
+\mathbf U_B
+\left(
+d\mathbf I_m
+\right)
+\mathbf V_B^\top.
+$$
+
+Nesse caso, os eixos individuais do bloco não são únicos; o subespaço por eles gerado é o objeto geometricamente determinado. Se todas as dimensões de uma multiplicidade forem mantidas, o subespaço, as distâncias e a parcela de inércia correspondente permanecem invariantes. Se o truncamento ocorrer dentro desse bloco, o subespaço retido não será único. Sempre que possível, um bloco de valores singulares repetidos deve ser mantido ou descartado integralmente; caso isso não seja feito, a não unicidade precisa ser informada.
+
+Valores singulares muito próximos, embora não produzam multiplicidade exata, também podem tornar instável a orientação dos eixos individuais. Nessas situações, a interpretação deve privilegiar inércias, distâncias dentro de cada nuvem, relações entre perfis e o subespaço conjunto, em vez do sinal ou da orientação isolada de cada eixo.
+
+### Proximidade entre linhas e colunas
+
+As distâncias entre linhas em coordenadas principais completas reproduzem as distâncias qui-quadrado entre seus perfis; a interpretação dual vale para as colunas.
+
+A distância gráfica entre uma linha e uma coluna não possui, em geral, essa interpretação. A @fig-ca-mapa-conjunto ilustra a diferença entre distâncias definidas dentro de cada nuvem e a posição simultânea das duas margens.
+
+```{r}
+#| label: fig-ca-mapa-conjunto
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Representação conjunta das categorias de linhas e colunas. Distâncias dentro da mesma nuvem possuem interpretação geométrica própria; a distância entre uma linha e uma coluna não corresponde, em geral, a uma distância qui-quadrado."
+#| fig-width: 7.5
+#| fig-height: 5.8
+#| fig-align: center
+
+library(ggplot2)
+
+N <- matrix(
+  c(
+    40, 15, 10,  5,
+    10, 35, 20,  5,
+     5, 15, 40, 20,
+    10, 10, 15, 35
+  ),
+  nrow = 4,
+  byrow = TRUE
+)
+
+rownames(N) <- paste0(
+  "L",
+  1:4
+)
+
+colnames(N) <- paste0(
+  "C",
+  1:4
+)
+
+P <- N / sum(
+  N
+)
+
+r <- rowSums(
+  P
+)
+
+c <- colSums(
+  P
+)
+
+Dr_menos_meio <- diag(
+  1 / sqrt(
+    r
+  )
+)
+
+Dc_menos_meio <- diag(
+  1 / sqrt(
+    c
+  )
+)
+
+Qca <- Dr_menos_meio %*%
+  (
+    P -
+      r %o% c
+  ) %*%
+  Dc_menos_meio
+
+decomp <- svd(
+  Qca
+)
+
+tol <- 1e-10
+
+L <- sum(
+  decomp$d > tol
+)
+
+U <- decomp$u[
+  ,
+  seq_len(L),
+  drop = FALSE
+]
+
+V <- decomp$v[
+  ,
+  seq_len(L),
+  drop = FALSE
+]
+
+D <- diag(
+  decomp$d[
+    seq_len(L)
+  ],
+  nrow = L
+)
+
+Fr <- Dr_menos_meio %*%
+  U %*%
+  D
+
+Fc <- Dc_menos_meio %*%
+  V %*%
+  D
+
+linhas <- data.frame(
+  categoria = rownames(
+    N
+  ),
+  Dim1 = Fr[, 1],
+  Dim2 = Fr[, 2],
+  tipo = "Linhas"
+)
+
+colunas <- data.frame(
+  categoria = colnames(
+    N
+  ),
+  Dim1 = Fc[, 1],
+  Dim2 = Fc[, 2],
+  tipo = "Colunas"
+)
+
+ggplot() +
+  geom_hline(
+    yintercept = 0,
+    linewidth = 0.4,
+    color = "gray75"
+  ) +
+  geom_vline(
+    xintercept = 0,
+    linewidth = 0.4,
+    color = "gray75"
+  ) +
+  geom_point(
+    data = linhas,
+    aes(
+      x = Dim1,
+      y = Dim2
+    ),
+    size = 3,
+    color = "#1f77b4"
+  ) +
+  geom_text(
+    data = linhas,
+    aes(
+      x = Dim1,
+      y = Dim2,
+      label = categoria
+    ),
+    nudge_y = 0.08,
+    color = "#1f77b4"
+  ) +
+  geom_point(
+    data = colunas,
+    aes(
+      x = Dim1,
+      y = Dim2
+    ),
+    size = 3,
+    shape = 17,
+    color = "#2ca02c"
+  ) +
+  geom_text(
+    data = colunas,
+    aes(
+      x = Dim1,
+      y = Dim2,
+      label = categoria
+    ),
+    nudge_y = -0.08,
+    color = "#2ca02c"
+  ) +
+  coord_equal() +
+  labs(
+    x = "Dimensão 1",
+    y = "Dimensão 2"
+  ) +
+  theme_minimal(
+    base_size = 13
+  ) +
+  theme(
+    panel.grid.minor = element_blank()
+  )
+```
+
+O mapa permite examinar simultaneamente as duas margens, mas sua leitura deve respeitar a geometria de cada nuvem.
+
+As duas nuvens estão relacionadas pelos perfis: a posição de uma categoria de uma margem depende da distribuição relativa das categorias da outra margem. Essa dualidade será formalizada pelas relações baricêntricas na @sec-ca-relacoes-baricentricas.
+
+A distância gráfica direta entre uma categoria de linha e uma categoria de coluna não constitui, em geral, uma distância qui-quadrado definida pela técnica.
+
+A Análise de Correspondência descreve associações entre categorias. Uma inércia positiva,
+
+$$
+\mathcal I>0,
+$$
+
+indica que a tabela observada se afasta da estrutura
+
+$$
+\mathbf P
+=
+\mathbf r\mathbf c^\top.
+$$
+
+Mesmo quando o teste global fornece evidência de associação populacional, esse resultado não estabelece causalidade.
+
+Uma dimensão da Correspondência é uma direção singular que organiza parte dos desvios padronizados da independência. Ela não corresponde, por definição, a uma variável latente.
+
+A interpretação de uma dimensão deve considerar os perfis, as coordenadas das categorias e o padrão dos desvios em relação à independência. Um nome atribuído ao eixo deve decorrer dessas informações e do problema analisado.
+
+## Aprofundamentos teóricos {#sec-ca-aprofundamentos-teoricos}
+
+::: {.callout-note appearance="simple" icon=false}
+## Leitura de aprofundamento
+
+Esta parte desenvolve propriedades algébricas e probabilísticas da Análise de Correspondência. São examinados o limite do posto decorrente das restrições marginais, as relações baricêntricas entre as duas nuvens, as propriedades das coordenadas padrão e principais, a reconstrução dos desvios da independência, a decomposição da estatística de Pearson pelas dimensões e a formulação probabilística do teste global de independência.
+:::
+
+### Limite do posto da matriz de desvios padronizados {#sec-ca-limite-posto}
+
+O limite apresentado em @eq-posto-maximo-ca decorre de restrições lineares produzidas pelas próprias marginais da tabela. Como
+
+$$
+\mathbf P\mathbf1_J
+=
+\mathbf r
+$$
+
+e
+
+$$
+\mathbf c^\top\mathbf1_J
+=
+1,
+$$
+
+segue que
+
+$$
+\begin{aligned}
+\mathbf Q_{\mathrm{CA}}
+\mathbf D_c^{1/2}
+\mathbf1_J
+&=
+\mathbf D_r^{-1/2}
+\left(
+\mathbf P
+-
+\mathbf r\mathbf c^\top
+\right)
+\mathbf1_J
+\\
+&=
+\mathbf D_r^{-1/2}
+\left(
+\mathbf r-\mathbf r
+\right)
+\\
+&=
+\mathbf0.
+\end{aligned}
+$$ {#eq-nucleo-colunas-qca}
+
+Analogamente,
+
+$$
+\mathbf Q_{\mathrm{CA}}^\top
+\mathbf D_r^{1/2}
+\mathbf1_I
+=
+\mathbf0.
+$$ {#eq-nucleo-linhas-qca}
+
+Como
+
+$$
+\mathbf D_c^{1/2}\mathbf1_J
+\neq
+\mathbf0
+$$
+
+e
+
+$$
+\mathbf D_r^{1/2}\mathbf1_I
+\neq
+\mathbf0
+$$
+
+sob massas positivas, $\mathbf Q_{\mathrm{CA}}$ possui um vetor não nulo em seu núcleo à direita e um vetor não nulo no núcleo de sua transposta. Portanto,
+
+$$
+\operatorname{posto}
+\left(
+\mathbf Q_{\mathrm{CA}}
+\right)
+\leq
+J-1
+$$
+
+e
+
+$$
+\operatorname{posto}
+\left(
+\mathbf Q_{\mathrm{CA}}
+\right)
+\leq
+I-1.
+$$
+
+Consequentemente,
+
+$$
+\operatorname{posto}
+\left(
+\mathbf Q_{\mathrm{CA}}
+\right)
+\leq
+\min
+\left(
+I-1,
+J-1
+\right),
+$$
+
+o que demonstra o limite enunciado em @eq-posto-maximo-ca.
+
+### Relações baricêntricas {#sec-ca-relacoes-baricentricas}
 
 As duas nuvens de categorias são construídas a partir da mesma tabela e da mesma SVD. Essa estrutura produz relações diretas entre suas coordenadas.
 
@@ -2068,15 +2596,71 @@ ggplot() +
   )
 ```
 
-A figura representa uma relação de centro ponderado. Ela **não** afirma que a distância euclidiana entre um ponto de linha e um ponto de coluna seja uma distância qui-quadrado definida pela técnica.
+A figura representa uma relação de média ponderada entre as duas margens. A relação baricêntrica não define uma distância qui-quadrado entre uma categoria de linha e uma categoria de coluna.
 
-### Aprofundamento: reconstrução dos desvios da independência {#sec-ca-reconstrucao-desvios}
+### Centralização ponderada das coordenadas padrão e principais {#sec-ca-propriedades-coordenadas}
 
-::: {.callout-note appearance="simple" icon=false}
-## Leitura de aprofundamento
+A ortonormalidade das coordenadas padrão e a dispersão das coordenadas principais já foram estabelecidas na @sec-ca-coordenadas. Uma propriedade adicional decorre das restrições marginais demonstradas em @sec-ca-limite-posto.
 
-A SVD não apenas produz as dimensões utilizadas na representação geométrica. Ela também permite decompor e reconstruir, dimensão por dimensão, os desvios observados em relação à estrutura de independência.
-:::
+A partir de @eq-nucleo-colunas-qca e @eq-nucleo-linhas-qca, utilizando a SVD compacta de $\mathbf Q_{\mathrm{CA}}$, obtêm-se
+
+$$
+\mathbf V^\top
+\mathbf D_c^{1/2}
+\mathbf1_J
+=
+\mathbf0
+$$
+
+e
+
+$$
+\mathbf U^\top
+\mathbf D_r^{1/2}
+\mathbf1_I
+=
+\mathbf0.
+$$
+
+De fato, a matriz $\mathbf D$ da SVD compacta reúne apenas os valores singulares positivos e, portanto, é invertível. Pelas definições de @eq-coordenadas-padrao-linhas-ca e @eq-coordenadas-padrao-colunas-ca, segue que
+
+$$
+\begin{aligned}
+\mathbf r^\top\mathbf A_r
+&=
+\left(
+\mathbf D_r^{1/2}\mathbf1_I
+\right)^\top
+\mathbf U
+=
+\mathbf0^\top,
+\\
+\mathbf c^\top\mathbf A_c
+&=
+\left(
+\mathbf D_c^{1/2}\mathbf1_J
+\right)^\top
+\mathbf V
+=
+\mathbf0^\top.
+\end{aligned}
+$$
+
+As coordenadas principais herdam a mesma centralização:
+
+$$
+\mathbf r^\top\mathbf F_r
+=
+\mathbf0^\top,
+\qquad
+\mathbf c^\top\mathbf F_c
+=
+\mathbf0^\top.
+$$
+
+Portanto, o centro ponderado das categorias de linhas e o centro ponderado das categorias de colunas coincidem com a origem, tanto nas coordenadas padrão quanto nas coordenadas principais. Essa centralização utiliza as massas das categorias e não, em geral, pesos iguais. A propriedade permanece válida coordenada a coordenada quando apenas parte das dimensões é mantida.
+
+### Reconstrução dos desvios da independência {#sec-ca-reconstrucao-desvios}
 
 A SVD também permite reconstruir a matriz de frequências relativas observadas a partir da estrutura de independência e das dimensões da associação.
 
@@ -2164,7 +2748,7 @@ a_{i\ell}^{(r)}
 a_{j\ell}^{(c)}.
 $$
 
-Seu sinal indica a direção do desvio reconstruído naquela dimensão, e sua magnitude depende das massas, do valor singular e das coordenadas padrão correspondentes.
+O sinal do produto $a_{i\ell}^{(r)}a_{j\ell}^{(c)}$ indica se a contribuição daquela dimensão acrescenta ou subtrai valor em relação à frequência relativa determinada pelas marginais. Embora o sinal individual das coordenadas seja arbitrário, sua inversão simultânea nas duas margens preserva esse produto e, portanto, preserva a contribuição da dimensão para o desvio reconstruído.
 
 Com apenas as primeiras $k<L$ dimensões,
 
@@ -2174,7 +2758,7 @@ $$
 r_ic_j
 \left[
 1+
-\sum_{\ell=1}^{k}
+\sum_{\ell=1}^{L}
 d_\ell
 a_{i\ell}^{(r)}
 a_{j\ell}^{(c)}
@@ -2188,43 +2772,195 @@ $$
 \geq0
 $$
 
-para todas as células. Ela não deve, portanto, ser interpretada automaticamente como uma nova distribuição conjunta válida.
+para todas as células. A reconstrução completa da tabela relativa foi estabelecida na @eq-reconstrucao-frequencia-relativa-ca. Para uma representação truncada, as dimensões descartadas determinam o erro de aproximação da matriz de desvios padronizados.
 
-## Representação conjunta de linhas e colunas
+Quando apenas as primeiras $k<K$ dimensões são mantidas, a reconstrução é aproximada. A matriz resultante preserva a estrutura de baixa dimensão utilizada na representação, mas seus elementos não precisam constituir, em todas as situações, uma nova tabela de probabilidades válida. Em particular, uma aproximação truncada pode produzir elementos negativos.
 
-A Análise de Correspondência fornece coordenadas para as duas margens da tabela. Para representar linhas e colunas simultaneamente, é necessário especificar quais sistemas de coordenadas serão utilizados para cada nuvem.
+Para a aproximação com as primeiras $k$ dimensões,
 
-A @tbl-escalas-representacao-ca reúne três representações particularmente úteis para compreender essa geometria.
+$$
+\mathbf Q_{\mathrm{CA},k}
+=
+\mathbf U_k
+\mathbf D_k
+\mathbf V_k^\top,
+$$
 
-| Representação | Linhas | Colunas | Propriedade principal |
-|---|---|---|---|
-| métrica das linhas | principais $\mathbf F_r$ | padrão $\mathbf A_c$ | preserva a geometria das linhas e explicita sua relação baricêntrica com as colunas |
-| métrica das colunas | padrão $\mathbf A_r$ | principais $\mathbf F_c$ | preserva a geometria das colunas e explicita sua relação baricêntrica com as linhas |
-| simétrica | principais $\mathbf F_r$ | principais $\mathbf F_c$ | representa ambas as nuvens em escalas associadas às inércias principais |
+o erro de reconstrução é
 
-: Sistemas de coordenadas para representar linhas e colunas na Análise de Correspondência. {#tbl-escalas-representacao-ca}
+$$
+\left\|
+\mathbf Q_{\mathrm{CA}}
+-
+\mathbf Q_{\mathrm{CA},k}
+\right\|_F^2
+=
+\sum_{\ell=k+1}^{L}
+d_\ell^2
+=
+\sum_{\ell=k+1}^{L}
+\lambda_\ell.
+$$
 
-Na representação métrica das linhas, as distâncias euclidianas entre os pontos de linhas reproduzem exatamente suas distâncias qui-quadrado quando todas as dimensões não nulas são mantidas. As colunas aparecem em coordenadas padrão e participam diretamente das relações baricêntricas das linhas.
+A soma das inércias principais descartadas é, portanto, simultaneamente a **inércia não representada** e o **erro quadrático de reconstrução** da matriz de desvios padronizados.
 
-Na representação métrica das colunas ocorre a relação dual.
+### Decomposição da estatística de Pearson pelas dimensões {#sec-ca-decomposicao-pearson}
 
-Na representação simétrica, linhas e colunas são expressas por coordenadas principais. Essa representação é útil para examinar simultaneamente as duas margens, mas não cria uma métrica qui-quadrado comum entre pontos pertencentes a margens diferentes.
+Pela @eq-decomposicao-qui-quadrado-ca,
 
-### O significado das proximidades
+$$
+\chi^2
+=
+n
+\sum_{\ell=1}^{L}
+\lambda_\ell
+=
+\sum_{\ell=1}^{L}
+n\lambda_\ell.
+$$ {#eq-decomposicao-pearson-dimensoes-ca}
 
-Dentro da nuvem das linhas, proximidades representam semelhança entre perfis segundo a distância qui-quadrado; a interpretação dual vale para as colunas.
+Cada quantidade
 
-A distância entre um ponto de linha e um ponto de coluna não corresponde, em geral, a uma distância qui-quadrado definida pela técnica. Por isso, proximidade gráfica entre categorias pertencentes a margens diferentes não constitui uma medida métrica direta de associação.
+$$
+n\lambda_\ell
+$$
 
-A interpretação conjunta deve considerar os perfis, as relações baricêntricas e o sistema de coordenadas utilizado. Nas representações simétricas, a proximidade entre uma categoria de linha e uma categoria de coluna não deve ser interpretada, isoladamente, como uma medida direta de associação.
+é a parcela algébrica da estatística de Pearson associada à dimensão $\ell$ da tabela observada.
 
-### Aprofundamento: contribuição e qualidade de representação {#sec-ca-contribuicao-cos2}
+Essa decomposição não transforma
+
+$$
+n\lambda_\ell
+$$
+
+em uma estatística qui-quadrado independente nem fornece, por si só, um teste separado para cada dimensão. A distribuição inferencial da estatística global é tratada na @sec-ca-formulacao-probabilistica.
+
+### Formulação probabilística e teste de independência {#sec-ca-formulacao-probabilistica}
+
+Para uma interpretação inferencial, considere duas variáveis categóricas com probabilidades populacionais
+
+$$
+\pi_{ij}
+=
+P
+\left(
+\mathsf A=i,
+\mathsf B=j
+\right),
+$$
+
+com
+
+$$
+\pi_{ij}\geq0,
+\qquad
+\sum_{i=1}^{I}
+\sum_{j=1}^{J}
+\pi_{ij}
+=
+1.
+$$
+
+As probabilidades marginais são
+
+$$
+\pi_{i\cdot}
+=
+\sum_{j=1}^{J}
+\pi_{ij}
+$$
+
+e
+
+$$
+\pi_{\cdot j}
+=
+\sum_{i=1}^{I}
+\pi_{ij}.
+$$
+
+A hipótese populacional de independência é
+
+$$
+H_0:
+\pi_{ij}
+=
+\pi_{i\cdot}
+\pi_{\cdot j},
+\qquad
+i=1,\ldots,I,
+\quad
+j=1,\ldots,J.
+$$ {#eq-hipotese-independencia-ca}
+
+Considere uma amostra de tamanho $n$ formada por observações independentes dessa distribuição conjunta. O vetor das frequências celulares possui distribuição multinomial com parâmetros $n$ e probabilidades $\pi_{ij}$.
+
+::: {#prp-qui-quadrado-assintotico-ca}
+## Distribuição assintótica da estatística de Pearson sob independência
+
+Considere uma tabela de contingência $I\times J$, com $I$ e $J$ fixos, obtida de uma amostra multinomial de tamanho $n$.
+
+Sob
+
+$$
+H_0:
+\pi_{ij}
+=
+\pi_{i\cdot}\pi_{\cdot j},
+$$
+
+suponha
+
+$$
+\pi_{i\cdot}>0,
+\qquad
+i=1,\ldots,I,
+$$
+
+e
+
+$$
+\pi_{\cdot j}>0,
+\qquad
+j=1,\ldots,J.
+$$
+
+Então, quando
+
+$$
+n\longrightarrow\infty,
+$$
+
+a estatística de Pearson satisfaz
+
+$$
+\chi^2
+\overset{d}{\longrightarrow}
+\chi^2_{(I-1)(J-1)}.
+$$ {#eq-distribuicao-assintotica-qui-ca}
+:::
+
+Esse resultado é **assintótico**, no sentido de @def-resultados-exatos-assintoticos, e deve ser distinguido da identidade exata
+
+$$
+\chi^2
+=
+n\mathcal I.
+$$
+
+A distribuição qui-quadrado fornece a referência inferencial sob a hipótese populacional de independência, enquanto a identidade $\chi^2=n\mathcal I$ permanece uma propriedade algébrica da tabela observada.
+
+
+
+## Aprofundamentos metodológicos e aplicados {#sec-ca-aprofundamentos-metodologicos}
 
 ::: {.callout-note appearance="simple" icon=false}
 ## Leitura de aprofundamento
 
-As coordenadas principais fornecem a representação geométrica das categorias. Depois de construída essa representação, medidas adicionais podem ser utilizadas para identificar quais categorias participam mais intensamente da construção de cada dimensão e quanto da posição de cada categoria é representado pelas dimensões consideradas.
+Esta parte reúne decisões e medidas utilizadas para examinar a representação obtida pela Análise de Correspondência. São tratadas a escolha do número de dimensões, a contribuição das categorias, a qualidade de representação por $\cos^2$, a leitura do mapa reduzido e a projeção de categorias suplementares.
 :::
+
+### Contribuição e qualidade de representação {#sec-ca-contribuicao-cos2}
 
 A identidade de @eq-inercia-eixo-linhas-ca,
 
@@ -2384,45 +3120,66 @@ A @tbl-contribuicao-cos2-ca distingue as duas decomposições.
 
 A contribuição distribui a **inércia de uma dimensão entre as categorias**, enquanto o $\cos^2$ distribui a **distância de uma categoria entre as dimensões**. Uma categoria pode contribuir fortemente para um eixo sem ser bem representada apenas por ele, e pode ser bem representada por um eixo mesmo contribuindo pouco para sua inércia.
 
-Critérios operacionais de seleção de categorias, limiares de contribuição ou $\cos^2$ e regras de leitura de mapas pertencem à etapa aplicada.
+Contribuição e $\cos^2$ respondem a perguntas diferentes e devem ser examinados depois de definida a dimensão da representação. A contribuição identifica quais categorias participam da construção de um eixo, enquanto o $\cos^2$ informa quanto da posição de uma categoria é representado pelas dimensões consideradas. A escolha do número de dimensões é discutida na @sec-ca-escolha-dimensoes.
 
-## Formulação descritiva e inferencial {#sec-ca-descritiva-inferencial}
+### Escolha do número de dimensões {#sec-ca-escolha-dimensoes}
 
-A identidade
+O número de dimensões com inércia positiva é
 
 $$
-\chi^2
+L
 =
-n\mathcal I
+\operatorname{posto}
+\left(
+\mathbf Q_{\mathrm{CA}}
+\right),
 $$
 
-estabelecida em @eq-qui-quadrado-inercia-ca relaciona a estatística de Pearson calculada para a tabela observada com a inércia total da Análise de Correspondência. Essa igualdade é algébrica e não exige, por si só, um modelo probabilístico.
+conforme definido na formulação da SVD.
 
-Na formulação descritiva,
-
-$$
-p_{ij},
-\qquad
-r_i
-\qquad\text{e}\qquad
-c_j
-$$
-
-são quantidades calculadas a partir da tabela observada. A inércia
+Se
 
 $$
-\mathcal I
+\mathcal I=0,
 $$
 
-mede e decompõe geometricamente o afastamento de
+então
 
 $$
-\mathbf P
+\mathbf Q_{\mathrm{CA}}
 =
-\mathbf r\mathbf c^\top.
+\mathbf0
 $$
 
-Quando a estatística de Pearson é utilizada em um teste de independência, ela avalia globalmente a compatibilidade entre os dados e uma estrutura populacional de independência. As dimensões obtidas pela SVD, por sua vez, decompõem descritivamente o afastamento observado:
+e
+
+$$
+L=0.
+$$
+
+Nesse caso, a tabela observada coincide com a estrutura de independência e não existem dimensões com inércia positiva.
+
+Quando
+
+$$
+L\geq1,
+$$
+
+as inércias principais são ordenadas como
+
+$$
+\lambda_1
+\geq
+\lambda_2
+\geq
+\cdots
+\geq
+\lambda_L
+>
+0,
+$$
+
+e satisfazem
 
 $$
 \mathcal I
@@ -2431,211 +3188,65 @@ $$
 \lambda_\ell.
 $$
 
-Uma dimensão da Correspondência não corresponde automaticamente a uma hipótese inferencial populacional separada. O teste global e a decomposição geométrica respondem, portanto, a problemas distintos.
-
-A identidade
+Uma representação de dimensão reduzida mantém
 
 $$
-\chi^2
-=
-n\mathcal I
+1
+\leq
+k
+<
+L
 $$
 
-também separa magnitude geométrica e tamanho amostral. Se todas as contagens forem multiplicadas por um mesmo inteiro positivo $a$, a matriz de frequências relativas $\mathbf P$, as massas, a matriz $\mathbf Q_{\mathrm{CA}}$, a inércia e as coordenadas permanecem inalteradas, enquanto
+dimensões.
+
+A proporção de inércia associada a cada dimensão foi definida na @eq-proporcao-inercia-ca, e a proporção acumulada das primeiras $k$ dimensões foi definida na @eq-inercia-acumulada-ca.
+
+Na escolha da dimensão da representação, a @eq-inercia-acumulada-ca informa a parcela da inércia total preservada pelas primeiras $k$ dimensões. A parcela não representada é
 
 $$
-\chi^{2*}
-=
-a\chi^2.
-$$
-
-Assim, significância estatística e magnitude geométrica da associação não são a mesma quantidade. A Correspondência pode ser utilizada descritivamente mesmo quando não se pretende realizar um teste formal de independência [@greenacre2017ca].
-
-### Aprofundamento: formulação probabilística e teste de independência
-
-::: {.callout-note appearance="simple" icon=false}
-## Leitura de aprofundamento
-
-A identidade $\chi^2=n\mathcal I$ é uma propriedade algébrica da tabela observada. Para utilizar a estatística de Pearson em um teste de independência populacional, é necessário acrescentar um modelo probabilístico para a geração das frequências e considerar sua distribuição amostral.
-:::
-
-Para uma interpretação inferencial, considere duas variáveis categóricas com probabilidades populacionais
-
-$$
-\pi_{ij}
-=
-P
-\left(
-\mathsf A=i,
-\mathsf B=j
-\right),
-$$
-
-com
-
-$$
-\pi_{ij}\geq0,
-\qquad
-\sum_{i=1}^{I}
-\sum_{j=1}^{J}
-\pi_{ij}
-=
-1.
-$$
-
-As probabilidades marginais são
-
-$$
-\pi_{i\cdot}
-=
-\sum_{j=1}^{J}
-\pi_{ij}
-$$
-
-e
-
-$$
-\pi_{\cdot j}
-=
-\sum_{i=1}^{I}
-\pi_{ij}.
-$$
-
-A hipótese populacional de independência é
-
-$$
-H_0:
-\pi_{ij}
-=
-\pi_{i\cdot}
-\pi_{\cdot j},
-\qquad
-i=1,\ldots,I,
-\quad
-j=1,\ldots,J.
-$$ {#eq-hipotese-independencia-ca}
-
-Considere uma amostra de tamanho $n$ formada por observações independentes dessa distribuição conjunta. O vetor das frequências celulares possui distribuição multinomial com parâmetros $n$ e probabilidades $\pi_{ij}$.
-
-::: {#prp-qui-quadrado-assintotico-ca}
-## Distribuição assintótica da estatística de Pearson sob independência
-
-Considere uma tabela de contingência $I\times J$, com $I$ e $J$ fixos, obtida de uma amostra multinomial de tamanho $n$.
-
-Sob
-
-$$
-H_0:
-\pi_{ij}
-=
-\pi_{i\cdot}\pi_{\cdot j},
-$$
-
-suponha
-
-$$
-\pi_{i\cdot}>0,
-\qquad
-i=1,\ldots,I,
-$$
-
-e
-
-$$
-\pi_{\cdot j}>0,
-\qquad
-j=1,\ldots,J.
-$$
-
-Então, quando
-
-$$
-n\longrightarrow\infty,
-$$
-
-a estatística de Pearson satisfaz
-
-$$
-\chi^2
-\overset{d}{\longrightarrow}
-\chi^2_{(I-1)(J-1)}.
-$$ {#eq-distribuicao-assintotica-qui-ca}
-:::
-
-Esse resultado é **assintótico**, no sentido de @def-resultados-exatos-assintoticos, e deve ser distinguido da identidade exata
-
-$$
-\chi^2
-=
-n\mathcal I.
-$$
-
-A distribuição qui-quadrado fornece a referência inferencial sob a hipótese populacional de independência, enquanto a identidade $\chi^2=n\mathcal I$ permanece uma propriedade algébrica da tabela observada.
-
-## Relação com a Análise de Componentes Principais
-
-A Análise de Correspondência e a ACP compartilham estruturas de decomposição e representação em baixa dimensão, mas partem de objetos estatísticos e geometrias diferentes.
-
-No @sec-acp, a ACP representa a variabilidade de dados quantitativos por meio de direções principais. Na Análise de Correspondência, a estrutura de entrada é uma tabela de contingência e a representação é construída a partir de perfis e da geometria qui-quadrado.
-
-Considere a matriz dos perfis de linhas,
-
-$$
-\mathbf P^{(r)}
-=
-\mathbf D_r^{-1}
-\mathbf P.
-$$
-
-Pela definição de $\mathbf P^{(r)}$ e por @eq-matriz-desvios-padronizados-ca,
-
-$$
-\mathbf Q_{\mathrm{CA}}
-=
-\mathbf D_r^{1/2}
-\left(
-\mathbf P^{(r)}
+1
 -
-\mathbf1_I\mathbf c^\top
-\right)
-\mathbf D_c^{-1/2}.
-$$ {#eq-ca-matriz-perfis-ponderados}
+\Pi_k^{(\mathrm{CA})}
+=
+\frac{
+\displaystyle
+\sum_{\ell=k+1}^{L}
+\lambda_\ell
+}{
+\displaystyle
+\sum_{\ell=1}^{L}
+\lambda_\ell
+}.
+$$
 
-Antes da SVD, portanto, os perfis de linhas são:
+A sequência das inércias principais também pode ser examinada em ordem decrescente. Uma mudança acentuada no padrão de queda indica que as dimensões seguintes acrescentam parcelas progressivamente menores da associação observada.
 
-1. centralizados em torno de $\mathbf c$;
-2. ponderados pelas massas das linhas;
-3. reescalonados pelas massas das colunas.
+Não existe um valor universal de inércia acumulada que determine o número de dimensões a ser mantido. A escolha deve considerar a parcela de inércia representada, o comportamento das inércias principais e se as dimensões retidas podem ser descritas a partir dos perfis e das categorias que mais contribuem para sua construção [@johnson2007; @hair2019multivariate].
 
-Essa expressão permite interpretar a Análise de Correspondência como uma decomposição ponderada dos perfis centralizados. A semelhança com a ACP está no uso de uma estrutura centralizada, da SVD e de aproximações de posto reduzido. A diferença está no objeto analisado, nos pesos e na geometria: na Correspondência, as massas participam da construção e a métrica entre perfis é a métrica qui-quadrado.
+O critério do autovalor maior que $1$, utilizado como referência em algumas aplicações da ACP baseada em correlações, não possui justificativa análoga na Análise de Correspondência. As inércias principais dependem da tabela e da geometria qui-quadrado, e sua soma é a inércia total da associação, não o número de variáveis.
 
-A @tbl-relacao-acp-ca resume essas diferenças.
+Uma representação bidimensional é especialmente conveniente para visualização, mas sua escolha não implica que a associação observada possua apenas duas dimensões.
 
-| Aspecto | ACP | Análise de Correspondência |
-|---|---|---|
-| objeto inicial | matriz de dados quantitativos ou matriz de covariâncias/correlações | tabela de contingência |
-| unidades representadas | observações e/ou variáveis | categorias de linhas e colunas |
-| centro | vetor de médias | perfis marginais $\mathbf c$ e $\mathbf r$ |
-| pesos | usualmente iguais na formulação básica | massas $r_i$ e $c_j$ |
-| geometria | euclidiana ou padronizada | qui-quadrado |
-| quantidade decomposta | variância | inércia |
-| ferramenta espectral | autovalores ou SVD | SVD dos desvios padronizados |
+### Leitura da representação reduzida {#sec-ca-leitura-mapa}
 
-: Relação entre a ACP e a Análise de Correspondência. {#tbl-relacao-acp-ca}
+A leitura de um mapa reduzido deve considerar simultaneamente a inércia representada, a qualidade de representação das categorias e a geometria definida pela técnica.
 
-A presença de SVD e de aproximações de posto reduzido nas duas técnicas não as torna equivalentes. A ACP representa variabilidade de variáveis quantitativas; a Correspondência representa associações entre categorias por meio de perfis ponderados. Ela não deve, portanto, ser interpretada simplesmente como uma ACP aplicada a variáveis qualitativas [@greenacre2017ca].
+Para categorias de linhas, distâncias pequenas indicam perfis de linhas semelhantes segundo a métrica qui-quadrado. A mesma interpretação vale entre categorias de colunas. Quando apenas $k<L$ dimensões são representadas, essas distâncias são aproximações das distâncias completas.
 
-## Aprofundamento: categorias suplementares {#sec-ca-categorias-suplementares}
+O $\cos^2$ informa se a posição de uma categoria é bem representada pelo subespaço escolhido. Uma categoria com $\cos^2$ baixo nas dimensões apresentadas possui parte importante de sua distância ao centro fora do mapa. Sua posição no plano deve, portanto, ser interpretada com cautela.
 
-::: {.callout-note appearance="simple" icon=false}
-## Leitura de aprofundamento
+A contribuição fornece outra informação. Uma categoria com contribuição elevada participa intensamente da construção da dimensão. Contribuição elevada e $\cos^2$ elevado não são condições equivalentes, conforme mostrado na @sec-ca-contribuicao-cos2.
 
-Categorias suplementares permitem acrescentar informação a uma solução já construída sem modificar os eixos, as inércias principais ou as coordenadas das categorias ativas. Elas são projetadas posteriormente na geometria determinada pelas categorias que participaram da construção da análise.
-:::
+As massas também devem ser examinadas. Como a distância qui-quadrado pondera diferenças pelos inversos das massas marginais, categorias de pequena massa podem apresentar coordenadas afastadas do centro. Uma coordenada extrema deve ser examinada em conjunto com a massa, a contribuição e o perfil correspondente.
+
+A distância gráfica entre uma categoria de linha e uma categoria de coluna não constitui, em geral, uma distância qui-quadrado definida pela técnica. Relações entre as duas margens devem ser examinadas por meio dos perfis, dos desvios em relação à independência e das relações baricêntricas desenvolvidas na @sec-ca-relacoes-baricentricas.
+
+### Categorias suplementares {#sec-ca-categorias-suplementares}
 
 A formulação desenvolvida até aqui utiliza categorias **ativas**, que participam da construção da tabela de frequências relativas, das massas, dos perfis e da matriz de desvios padronizados. Consequentemente, essas categorias participam da SVD que determina as dimensões da associação.
 
-Uma categoria **suplementar** é relacionada posteriormente à solução obtida com as categorias ativas. Sua inclusão não modifica os valores singulares, as inércias principais nem as coordenadas das categorias que participaram da construção da análise. O objetivo é utilizar a geometria já determinada para posicionar informações adicionais e auxiliar sua interpretação [@greenacre2017ca].
+Uma categoria **suplementar** é projetada depois que a solução das categorias ativas foi construída. Sua inclusão não modifica os valores singulares, as inércias principais nem as coordenadas das categorias ativas. A projeção utiliza a geometria já determinada para posicionar informações adicionais [@greenacre2017ca].
 
 ### Linhas suplementares
 
@@ -2800,336 +3411,7 @@ Assim, para uma categoria suplementar podem ser examinadas sua posição e sua q
 
 A distinção entre categorias ativas e suplementares separa duas etapas da análise. As categorias ativas determinam a geometria da associação; as categorias suplementares utilizam essa geometria para acrescentar informação interpretativa sem alterar a solução obtida.
 
-## Condições e limites da representação
 
-A formulação da Análise de Correspondência é predominantemente geométrica e descritiva. Por isso, convém distinguir as condições necessárias para definir sua geometria das hipóteses adicionais utilizadas quando se realiza inferência sobre independência.
-
-### Tabela ativa e massas
-
-A tabela de frequências observadas satisfaz
-
-$$
-\mathbf N
-\in
-\mathbb N_0^{I\times J}
-$$
-
-e
-
-$$
-n>0.
-$$
-
-A geometria ativa requer
-
-$$
-r_i>0,
-\qquad
-i=1,\ldots,I,
-$$
-
-e
-
-$$
-c_j>0,
-\qquad
-j=1,\ldots,J,
-$$
-
-para que os perfis e as inversas de $\mathbf D_r$ e $\mathbf D_c$ utilizados na técnica estejam definidos.
-
-Linhas ou colunas com massa nula não possuem perfis ativos e devem ser retiradas da geometria formulada neste capítulo.
-
-Massas positivas muito pequenas não impedem matematicamente a análise, mas podem exercer influência elevada porque a distância qui-quadrado utiliza os inversos das massas.
-
-Uma frequência celular nula,
-
-$$
-n_{ij}=0,
-$$
-
-também não impede a análise quando as massas marginais correspondentes permanecem positivas. Zeros estruturais, por outro lado, exigem interpretação de acordo com o mecanismo que produziu a tabela.
-
-Na formulação inferencial, frequências esperadas pequenas podem comprometer a qualidade da aproximação assintótica de Pearson. Essa questão pertence à avaliação aplicada do teste e não à definição geométrica da Correspondência.
-
-### Dimensão da representação
-
-Por @eq-posto-maximo-ca,
-
-$$
-L
-=
-\operatorname{posto}
-\left(
-\mathbf Q_{\mathrm{CA}}
-\right)
-\leq
-\min
-\left(
-I-1,
-J-1
-\right).
-$$
-
-Quando apenas
-
-$$
-1\leq k<L
-$$
-
-dimensões são mantidas, a proporção da inércia representada é
-
-$$
-\frac{
-\displaystyle
-\sum_{\ell=1}^{k}
-\lambda_\ell
-}{
-\displaystyle
-\sum_{\ell=1}^{L}
-\lambda_\ell
-}.
-$$
-
-O mapa é, nesse caso, uma representação de posto reduzido. Uma representação bidimensional não implica que a associação observada seja intrinsecamente bidimensional.
-
-### Sinais, multiplicidades e orientação
-
-A troca simultânea
-
-$$
-\mathbf u_\ell
-\longmapsto
--
-\mathbf u_\ell,
-\qquad
-\mathbf v_\ell
-\longmapsto
--
-\mathbf v_\ell
-$$
-
-não altera
-
-$$
-d_\ell
-\mathbf u_\ell
-\mathbf v_\ell^\top.
-$$
-
-O sinal absoluto de uma dimensão é, portanto, arbitrário.
-
-Quando um valor singular é repetido, os vetores singulares individuais associados não são únicos; o subespaço correspondente é o objeto geometricamente relevante. Se o truncamento ocorre dentro de uma multiplicidade, diferentes subespaços de mesma dimensão podem produzir representações igualmente admissíveis.
-
-A interpretação deve privilegiar estruturas invariantes, como inércias, distâncias dentro de cada nuvem, subespaços e relações entre perfis.
-
-### Proximidade entre linhas e colunas
-
-As distâncias entre linhas em coordenadas principais completas reproduzem as distâncias qui-quadrado entre seus perfis; a interpretação dual vale para as colunas.
-
-A distância gráfica entre uma linha e uma coluna, entretanto, não possui, em geral, essa interpretação. A @fig-ca-mapa-conjunto ilustra essa distinção na representação simultânea das duas nuvens.
-
-```{r}
-#| label: fig-ca-mapa-conjunto
-#| echo: false
-#| warning: false
-#| message: false
-#| fig-cap: "Representação conjunta das categorias de linhas e colunas. Distâncias dentro da mesma nuvem possuem interpretação geométrica própria; a distância entre uma linha e uma coluna não corresponde, em geral, a uma distância qui-quadrado."
-#| fig-width: 7.5
-#| fig-height: 5.8
-#| fig-align: center
-
-library(ggplot2)
-
-N <- matrix(
-  c(
-    40, 15, 10,  5,
-    10, 35, 20,  5,
-     5, 15, 40, 20,
-    10, 10, 15, 35
-  ),
-  nrow = 4,
-  byrow = TRUE
-)
-
-rownames(N) <- paste0(
-  "L",
-  1:4
-)
-
-colnames(N) <- paste0(
-  "C",
-  1:4
-)
-
-P <- N / sum(
-  N
-)
-
-r <- rowSums(
-  P
-)
-
-c <- colSums(
-  P
-)
-
-Dr_menos_meio <- diag(
-  1 / sqrt(
-    r
-  )
-)
-
-Dc_menos_meio <- diag(
-  1 / sqrt(
-    c
-  )
-)
-
-Qca <- Dr_menos_meio %*%
-  (
-    P -
-      r %o% c
-  ) %*%
-  Dc_menos_meio
-
-decomp <- svd(
-  Qca
-)
-
-tol <- 1e-10
-
-L <- sum(
-  decomp$d > tol
-)
-
-U <- decomp$u[
-  ,
-  seq_len(L),
-  drop = FALSE
-]
-
-V <- decomp$v[
-  ,
-  seq_len(L),
-  drop = FALSE
-]
-
-D <- diag(
-  decomp$d[
-    seq_len(L)
-  ],
-  nrow = L
-)
-
-Fr <- Dr_menos_meio %*%
-  U %*%
-  D
-
-Fc <- Dc_menos_meio %*%
-  V %*%
-  D
-
-linhas <- data.frame(
-  categoria = rownames(
-    N
-  ),
-  Dim1 = Fr[, 1],
-  Dim2 = Fr[, 2],
-  tipo = "Linhas"
-)
-
-colunas <- data.frame(
-  categoria = colnames(
-    N
-  ),
-  Dim1 = Fc[, 1],
-  Dim2 = Fc[, 2],
-  tipo = "Colunas"
-)
-
-ggplot() +
-  geom_hline(
-    yintercept = 0,
-    linewidth = 0.4,
-    color = "gray75"
-  ) +
-  geom_vline(
-    xintercept = 0,
-    linewidth = 0.4,
-    color = "gray75"
-  ) +
-  geom_point(
-    data = linhas,
-    aes(
-      x = Dim1,
-      y = Dim2
-    ),
-    size = 3,
-    color = "#1f77b4"
-  ) +
-  geom_text(
-    data = linhas,
-    aes(
-      x = Dim1,
-      y = Dim2,
-      label = categoria
-    ),
-    nudge_y = 0.08,
-    color = "#1f77b4"
-  ) +
-  geom_point(
-    data = colunas,
-    aes(
-      x = Dim1,
-      y = Dim2
-    ),
-    size = 3,
-    shape = 17,
-    color = "#2ca02c"
-  ) +
-  geom_text(
-    data = colunas,
-    aes(
-      x = Dim1,
-      y = Dim2,
-      label = categoria
-    ),
-    nudge_y = -0.08,
-    color = "#2ca02c"
-  ) +
-  coord_equal() +
-  labs(
-    x = "Dimensão 1",
-    y = "Dimensão 2"
-  ) +
-  theme_minimal(
-    base_size = 13
-  ) +
-  theme(
-    panel.grid.minor = element_blank()
-  )
-```
-
-O mapa permite examinar simultaneamente as duas margens, mas sua leitura deve respeitar a geometria de cada nuvem. Relações entre linhas e colunas devem ser interpretadas a partir dos perfis, das relações baricêntricas e dos desvios padronizados da independência, e não pela distância gráfica direta entre símbolos de tipos diferentes.
-
-A Análise de Correspondência descreve associações entre categorias. Uma inércia positiva,
-
-$$
-\mathcal I>0,
-$$
-
-indica que a tabela observada se afasta da estrutura
-
-$$
-\mathbf P
-=
-\mathbf r\mathbf c^\top.
-$$
-
-Mesmo quando o teste global fornece evidência de associação populacional, esse resultado não estabelece causalidade.
-
-Uma dimensão da Correspondência também não deve ser interpretada automaticamente como uma variável latente substantiva. Ela é uma direção singular que organiza parte dos desvios padronizados da independência. Sua interpretação deve considerar os perfis, as coordenadas das categorias, as relações baricêntricas e o contexto do problema.
 
 ::: {.callout-note appearance="simple" icon=false}
 ## Correspondência com a implementação utilizada
@@ -3138,9 +3420,11 @@ Nas atividades computacionais, a Análise de Correspondência será realizada pe
 
 A entrada da análise é uma tabela de contingência, correspondente ao objeto desenvolvido na @sec-ca-tabela-contingencia. Códigos eventualmente utilizados para representar categorias não constituem valores quantitativos; a análise utiliza as frequências conjuntas da tabela.
 
-As dimensões, inércias principais e coordenadas apresentadas pela implementação correspondem à decomposição por SVD e aos sistemas de coordenadas desenvolvidos nas @sec-ca-svd e @sec-ca-coordenadas.
+As dimensões, inércias principais e coordenadas apresentadas pela implementação correspondem à decomposição por SVD e aos sistemas de coordenadas desenvolvidos nas @sec-ca-svd e @sec-ca-coordenadas. A proporção de inércia representada pelas dimensões pode ser utilizada na escolha da dimensão do mapa, conforme a @sec-ca-escolha-dimensoes.
 
-Medidas adicionais de contribuição e qualidade de representação, o teste global de independência e a projeção de categorias suplementares devem ser interpretados segundo as respectivas formulações apresentadas neste capítulo.
+As contribuições indicam quais categorias participam da construção de cada dimensão, enquanto os $\cos^2$ descrevem sua qualidade de representação. Esses objetos são definidos na @sec-ca-contribuicao-cos2 e sua utilização conjunta é discutida na @sec-ca-leitura-mapa.
+
+Categorias suplementares são projetadas depois da construção da solução ativa e não alteram os valores singulares, as inércias principais ou as coordenadas das categorias ativas, conforme a @sec-ca-categorias-suplementares.
 :::
 
 ## Síntese
