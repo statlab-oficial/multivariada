@@ -668,25 +668,25 @@ Tabela&nbsp;13.2: Correspondência entre problemas, estruturas e técnicas multi
 <tr class="odd">
 <td>Formar grupos de objetos semelhantes</td>
 <td>Matriz de dados ou de dissimilaridades</td>
-<td>Critérios de proximidade, dispersão ou ligação</td>
+<td>Critérios de proximidade, dispersão ou ligação; modelos probabilísticos de mistura</td>
 <td>Análise de Agrupamentos</td>
 </tr>
 <tr class="even">
 <td>Representar associações entre categorias</td>
-<td>Tabela de contingência</td>
-<td>Geometria do qui-quadrado e decomposição da inércia</td>
+<td>Tabela de contingência, massas e perfis</td>
+<td>Geometria qui-quadrado, SVD e decomposição da inércia</td>
 <td>Análise de Correspondência</td>
 </tr>
 <tr class="odd">
 <td>Comparar conjuntamente várias respostas</td>
 <td>Matrizes de hipótese e erro</td>
-<td>Critérios multivariados de teste</td>
+<td>Raízes características e critérios multivariados de teste</td>
 <td>Análise de Variância Multivariada</td>
 </tr>
 <tr class="even">
 <td>Separar grupos conhecidos e classificar observações</td>
-<td>Médias, covariâncias e dispersões de grupos</td>
-<td>Critério de Fisher ou regra de decisão probabilística</td>
+<td>Médias, covariâncias, probabilidades de classe e dispersões de grupos</td>
+<td>Regra de Bayes, LDA/QDA ou critério de Fisher</td>
 <td>Análise Discriminante</td>
 </tr>
 </tbody>
@@ -696,7 +696,7 @@ Tabela&nbsp;13.2: Correspondência entre problemas, estruturas e técnicas multi
 </div>
 <p>Os objetos utilizados nessa tabela já começaram a ser construídos nos módulos anteriores. A matriz de dados definida na <a href="mod_1_vetores.html#def-matriz-dados" class="quarto-xref">Definição&nbsp;<span>1.6</span></a> permite trabalhar diretamente com observações e variáveis. A matriz de covariâncias populacional <span class="math inline">\(\boldsymbol{\Sigma}\)</span>, definida na <a href="mod_2_covariancias.html#def-matriz-covariancias-populacional" class="quarto-xref">Definição&nbsp;<span>8.2</span></a>, e sua correspondente observada <span class="math inline">\(\mathbf S\)</span>, definida na <a href="mod_2_covariancias.html#def-matriz-covariancias-observada" class="quarto-xref">Definição&nbsp;<span>8.11</span></a>, descrevem a variabilidade conjunta. A matriz de correlações observada <span class="math inline">\(\mathbf R\)</span>, definida na <a href="mod_2_covariancias.html#def-matriz-correlacoes-observada" class="quarto-xref">Definição&nbsp;<span>8.12</span></a>, corresponde à estrutura obtida após a padronização marginal das variáveis.</p>
 <p>A escolha entre covariâncias e correlações não altera o objetivo estatístico da técnica, mas modifica a representação da variabilidade utilizada na formulação e pode, consequentemente, modificar a solução. A matriz de covariâncias preserva as escalas originais, enquanto a matriz de correlações atribui variância unitária às variáveis. Essa diferença será retomada no <a href="mod_3_cp.html" class="quarto-xref"><span>Capítulo 14</span></a> ao formular a Análise de Componentes Principais (ACP) a partir de <span class="math inline">\(\mathbf S\)</span> ou <span class="math inline">\(\mathbf R\)</span>. A influência da escala também será retomada no <a href="mod_3_agrupamento.html" class="quarto-xref"><span>Capítulo 16</span></a>, pois a padronização das variáveis pode modificar as distâncias entre os objetos e, consequentemente, a estrutura dos grupos obtidos.</p>
-<p>Outras técnicas utilizam estruturas diferentes. A Análise de Agrupamentos pode partir de dados multivariados ou de dissimilaridades entre objetos. A Análise de Correspondência parte de frequências organizadas em uma tabela de contingência. A Análise de Variância Multivariada (MANOVA - <em>Multivariate Analysis of Variance</em>) utiliza a estrutura do modelo linear multivariado. A Análise Discriminante utiliza informações sobre grupos previamente conhecidos e pode ser formulada a partir de estruturas de dispersão ou de modelos probabilísticos.</p>
+<p>Outras técnicas utilizam estruturas diferentes. A <a href="mod_3_agrupamento.html" class="quarto-xref"><span>Capítulo 16</span></a> pode partir de dados multivariados ou de dissimilaridades entre objetos e admite diferentes definições matemáticas de grupo. A <a href="mod_3_correspondencia.html" class="quarto-xref"><span>Capítulo 17</span></a> parte de frequências organizadas em uma tabela de contingência e constrói massas, perfis e uma geometria ponderada. A <a href="mod_3_manova.html" class="quarto-xref"><span>Capítulo 18</span></a> utiliza diretamente a estrutura do modelo linear multivariado definido na <a href="mod_2_modelo.html#def-modelo-linear-multivariado" class="quarto-xref">Definição&nbsp;<span>11.3</span></a>. A <a href="mod_3_discriminante.html" class="quarto-xref"><span>Capítulo 19</span></a> utiliza informações sobre grupos previamente conhecidos e articula formulações probabilísticas de classificação com a formulação geométrica de Fisher.</p>
 <p>A estrutura de entrada delimita a informação disponível para a técnica. Uma matriz de covariâncias resume relações de segunda ordem entre variáveis. Uma matriz de dissimilaridades representa relações entre pares de objetos. Uma tabela de contingência registra frequências conjuntas entre categorias. A formulação deve preservar essa diferença.</p>
 </section>
 <section id="classes-de-problemas-multivariados" class="level2" data-number="13.2">
@@ -716,27 +716,28 @@ Tabela&nbsp;13.2: Correspondência entre problemas, estruturas e técnicas multi
 </section>
 <section id="formação-de-grupos" class="level3" data-number="13.2.3">
 <h3 data-number="13.2.3" class="anchored" data-anchor-id="formação-de-grupos"><span class="header-section-number">13.2.3</span> Formação de grupos</h3>
-<p>A Análise de Agrupamentos organiza objetos em grupos sem utilizar classes conhecidas previamente. A solução depende da representação dos objetos, da medida de proximidade e do critério que define a estrutura de grupos.</p>
-<p>A distância euclidiana definida na <a href="mod_1_vetores.html#def-distancia-euclidiana" class="quarto-xref">Definição&nbsp;<span>1.13</span></a> fornece uma medida de proximidade já estabelecida no Módulo 1. Outras medidas de proximidade e dissimilaridade serão introduzidas quando necessárias nos capítulos específicos. Na Análise de Agrupamentos, a medida adotada passa a participar da geometria do problema. Métodos baseados em centroides, critérios de ligação ou outras estruturas podem produzir agrupamentos diferentes para os mesmos dados.</p>
-<p>Sem um modelo probabilístico explícito, os grupos obtidos representam a solução do critério adotado e não correspondem automaticamente a populações distintas.</p>
+<p>A Análise de Agrupamentos organiza objetos em grupos sem utilizar classes conhecidas previamente. A solução depende da representação dos objetos, da medida de proximidade e do critério que define a organização procurada.</p>
+<p>A distância euclidiana definida na <a href="mod_1_vetores.html#def-distancia-euclidiana" class="quarto-xref">Definição&nbsp;<span>1.13</span></a> fornece uma medida de proximidade já estabelecida no Módulo 1. Na <a href="mod_3_agrupamento.html" class="quarto-xref"><span>Capítulo 16</span></a>, uma dissimilaridade é formalizada na <a href="mod_3_agrupamento.html#def-dissimilaridade-agrupamento" class="quarto-xref">Definição&nbsp;<span>16.1</span></a>. As <span class="math inline">\(K\)</span>-médias produzem uma partição, objeto definido na <a href="mod_3_agrupamento.html#def-particao-agrupamento" class="quarto-xref">Definição&nbsp;<span>16.2</span></a>, enquanto os métodos hierárquicos produzem uma sequência de partições aninhadas, formalizada na <a href="mod_3_agrupamento.html#def-hierarquia-agrupamentos" class="quarto-xref">Definição&nbsp;<span>16.4</span></a>. Uma terceira formulação define grupos probabilisticamente por meio do modelo da <a href="mod_3_agrupamento.html#def-modelo-mistura-agrupamento" class="quarto-xref">Definição&nbsp;<span>16.6</span></a>.</p>
+<p>Essas estruturas não são equivalentes. Sem um modelo probabilístico explícito, os grupos obtidos representam a solução do critério adotado e não correspondem automaticamente a populações distintas.</p>
 </section>
 <section id="representação-de-associações-em-tabelas-de-contingência" class="level3" data-number="13.2.4">
 <h3 data-number="13.2.4" class="anchored" data-anchor-id="representação-de-associações-em-tabelas-de-contingência"><span class="header-section-number">13.2.4</span> Representação de associações em tabelas de contingência</h3>
 <p>A Análise de Correspondência parte de uma tabela de frequências e representa os desvios em relação à independência entre suas categorias.</p>
-<p>A técnica utiliza perfis, massas, distância qui-quadrado e uma decomposição de baixa dimensão baseada em SVD <span class="citation" data-cites="greenacre2017ca">(<a href="references.html#ref-greenacre2017ca" role="doc-biblioref">Greenacre, 2017</a>)</span>. A geometria resultante difere daquela utilizada para dados quantitativos porque linhas e colunas possuem ponderações determinadas por suas frequências marginais.</p>
-<p>O capítulo específico mostrará como a inércia total está relacionada ao afastamento da independência e como sua decomposição produz as dimensões da representação.</p>
+<p>Na <a href="mod_3_correspondencia.html" class="quarto-xref"><span>Capítulo 17</span></a>, as frequências marginais originam as massas definidas na <a href="mod_3_correspondencia.html#def-massas-correspondencia" class="quarto-xref">Definição&nbsp;<span>17.1</span></a> e os perfis definidos na <a href="mod_3_correspondencia.html#def-perfis-correspondencia" class="quarto-xref">Definição&nbsp;<span>17.2</span></a>. A comparação entre perfis utiliza a distância qui-quadrado da <a href="mod_3_correspondencia.html#def-distancia-qui-quadrado-ca" class="quarto-xref">Definição&nbsp;<span>17.3</span></a>, e os desvios padronizados da independência são organizados pela matriz definida na <a href="mod_3_correspondencia.html#def-matriz-desvios-padronizados-ca" class="quarto-xref">Definição&nbsp;<span>17.5</span></a>.</p>
+<p>A <a href="mod_3_correspondencia.html#sec-ca-svd" class="quarto-xref"><span>Seção 17.7</span></a> mostra como a SVD dessa matriz decompõe a inércia e produz as dimensões da representação. As coordenadas padrão e principais são formalizadas, respectivamente, na <a href="mod_3_correspondencia.html#def-coordenadas-padrao-ca" class="quarto-xref">Definição&nbsp;<span>17.7</span></a> e na <a href="mod_3_correspondencia.html#def-coordenadas-principais-ca" class="quarto-xref">Definição&nbsp;<span>17.8</span></a>.</p>
 </section>
 <section id="comparação-de-vetores-de-médias" class="level3" data-number="13.2.5">
 <h3 data-number="13.2.5" class="anchored" data-anchor-id="comparação-de-vetores-de-médias"><span class="header-section-number">13.2.5</span> Comparação de vetores de médias</h3>
 <p>Na MANOVA, a comparação de vetores de médias constitui um caso particular de um problema mais geral: testar hipóteses sobre funções estimáveis dos parâmetros de um modelo linear multivariado com várias respostas.</p>
-<p>O modelo definido na <a href="mod_2_modelo.html#def-modelo-linear-multivariado" class="quarto-xref">Definição&nbsp;<span>11.3</span></a> e a hipótese linear geral da <a href="mod_2_modelo.html#def-hipotese-linear-geral-multivariada" class="quarto-xref">Definição&nbsp;<span>11.17</span></a> fornecem a estrutura necessária. A formulação da MANOVA acrescentará os critérios construídos a partir das matrizes de hipótese e erro, sem reconstruir a teoria do modelo linear desenvolvida no Módulo 2.</p>
+<p>O modelo definido na <a href="mod_2_modelo.html#def-modelo-linear-multivariado" class="quarto-xref">Definição&nbsp;<span>11.3</span></a> e a hipótese linear geral da <a href="mod_2_modelo.html#def-hipotese-linear-geral-multivariada" class="quarto-xref">Definição&nbsp;<span>11.17</span></a> fornecem a estrutura necessária. A <a href="mod_3_manova.html" class="quarto-xref"><span>Capítulo 18</span></a> acrescenta as matrizes de hipótese e erro e conduz ao problema de autovalores generalizados apresentado em <a href="mod_3_manova.html#eq-autovalor-generalizado-manova" class="quarto-xref">Equação&nbsp;<span>18.14</span></a>. Suas raízes são formalizadas na <a href="mod_3_manova.html#def-raizes-caracteristicas-manova" class="quarto-xref">Definição&nbsp;<span>18.1</span></a> e utilizadas na construção dos quatro critérios reunidos na <a href="mod_3_manova.html#sec-manova-criterios" class="quarto-xref"><span>Seção 18.5</span></a>.</p>
 <p>A análise conjunta das respostas distingue a MANOVA de uma coleção de análises univariadas separadas.</p>
 </section>
 <section id="discriminação-e-classificação" class="level3" data-number="13.2.6">
 <h3 data-number="13.2.6" class="anchored" data-anchor-id="discriminação-e-classificação"><span class="header-section-number">13.2.6</span> Discriminação e classificação</h3>
-<p>A Análise Discriminante utiliza grupos conhecidos durante a construção da solução. Seu objetivo pode ser representar as direções de maior separação entre esses grupos ou construir regras de classificação para novas observações.</p>
-<p>A formulação geométrica utiliza a relação entre dispersão entre grupos e dispersão dentro dos grupos. A formulação probabilística combina distribuições condicionais e probabilidades <em>a priori</em> para construir regras de classificação. Sob perda zero–um, a regra de Bayes atribui a observação à classe de maior probabilidade posterior; perdas distintas para diferentes erros constituem uma extensão dessa formulação. A distribuição normal multivariada definida na <a href="mod_2_normal.html#def-normal-multivariada" class="quarto-xref">Definição&nbsp;<span>9.1</span></a> e a distância de Mahalanobis definida na <a href="mod_2_covariancias.html#def-distancia-mahalanobis" class="quarto-xref">Definição&nbsp;<span>8.9</span></a> fornecem parte dessa base.</p>
-<p>A Análise Discriminante e a MANOVA compartilham estruturas de dispersão entre e dentro dos grupos, mas possuem objetivos diferentes <span class="citation" data-cites="huberty2006manova">(<a href="references.html#ref-huberty2006manova" role="doc-biblioref">Huberty; Olejnik, 2006</a>)</span>.</p>
+<p>A Análise Discriminante utiliza grupos conhecidos durante a construção da solução. Seu objetivo pode ser representar direções de separação entre esses grupos ou construir regras de classificação para novas observações.</p>
+<p>Na formulação probabilística, distribuições condicionais e probabilidades <em>a priori</em> conduzem à regra de Bayes apresentada em <a href="mod_3_discriminante.html#eq-regra-bayes-classificacao-discriminante" class="quarto-xref">Equação&nbsp;<span>19.3</span></a>. A distribuição normal multivariada definida na <a href="mod_2_normal.html#def-normal-multivariada" class="quarto-xref">Definição&nbsp;<span>9.1</span></a> e a distância de Mahalanobis definida na <a href="mod_2_covariancias.html#def-distancia-mahalanobis" class="quarto-xref">Definição&nbsp;<span>8.9</span></a> fornecem a base para as formulações da <a href="mod_3_discriminante.html#sec-discriminante-lda" class="quarto-xref"><span>Seção 19.3</span></a> e da <a href="mod_3_discriminante.html#sec-discriminante-qda" class="quarto-xref"><span>Seção 19.4</span></a>.</p>
+<p>A formulação geométrica da <a href="mod_3_discriminante.html#sec-discriminante-fisher" class="quarto-xref"><span>Seção 19.6</span></a> compara a dispersão entre grupos à dispersão intragrupos. O critério amostral é definido na <a href="mod_3_discriminante.html#def-criterio-fisher-discriminante" class="quarto-xref">Definição&nbsp;<span>19.8</span></a> e conduz ao problema de autovalores generalizados de <a href="mod_3_discriminante.html#eq-autovalor-generalizado-fisher" class="quarto-xref">Equação&nbsp;<span>19.30</span></a>.</p>
+<p>A Análise Discriminante e a MANOVA compartilham estruturas de dispersão e problemas espectrais relacionados, mas possuem objetivos diferentes <span class="citation" data-cites="huberty2006manova">(<a href="references.html#ref-huberty2006manova" role="doc-biblioref">Huberty; Olejnik, 2006</a>)</span>. Essa relação é explicitada posteriormente em <a href="mod_3_discriminante.html#eq-correspondencia-manova-fisher" class="quarto-xref">Equação&nbsp;<span>19.40</span></a>.</p>
 </section>
 </section>
 <section id="diferentes-formas-de-classificar-as-técnicas" class="level2" data-number="13.3">
@@ -845,15 +846,16 @@ Y
 \mathbf a^\top
 \boldsymbol{\mathsf X}.
 \]</span></p>
-<p>O significado de <span class="math inline">\(\mathbf a\)</span> depende do critério da técnica. Na ACP, seus coeficientes definem uma direção de variabilidade. Na Análise Discriminante, definem uma direção de separação entre grupos.</p>
-<p>As projeções ortogonais definidas na <a href="mod_1_espacos.html#def-projecao-ortogonal" class="quarto-xref">Definição&nbsp;<span>3.19</span></a> permitem representar observações em subespaços. Essa geometria é utilizada no <a href="mod_3_cp.html" class="quarto-xref"><span>Capítulo 14</span></a> para interpretar a ACP como projeção sobre um subespaço principal e será retomada no <a href="mod_3_discriminante.html" class="quarto-xref"><span>Capítulo 19</span></a> na construção de direções de separação entre grupos.</p>
+<p>O significado de <span class="math inline">\(\mathbf a\)</span> depende do critério da técnica. Na <a href="mod_3_cp.html" class="quarto-xref"><span>Capítulo 14</span></a>, seus coeficientes definem direções de variabilidade. Na <a href="mod_3_manova.html" class="quarto-xref"><span>Capítulo 18</span></a>, combinações lineares das respostas são utilizadas para comparar hipótese e erro. Na <a href="mod_3_discriminante.html#sec-discriminante-fisher" class="quarto-xref"><span>Seção 19.6</span></a>, os coeficientes definem direções de separação entre grupos.</p>
+<p>As projeções ortogonais definidas na <a href="mod_1_espacos.html#def-projecao-ortogonal" class="quarto-xref">Definição&nbsp;<span>3.19</span></a> permitem representar observações em subespaços. Essa geometria é utilizada no <a href="mod_3_cp.html" class="quarto-xref"><span>Capítulo 14</span></a> para interpretar a projeção sobre o subespaço principal e na <a href="mod_3_discriminante.html#sec-discriminante-representacao" class="quarto-xref"><span>Seção 19.9</span></a> para representar as observações no subespaço discriminante.</p>
 </section>
 <section id="formas-quadráticas-e-problemas-espectrais" class="level3" data-number="13.4.2">
 <h3 data-number="13.4.2" class="anchored" data-anchor-id="formas-quadráticas-e-problemas-espectrais"><span class="header-section-number">13.4.2</span> Formas quadráticas e problemas espectrais</h3>
 <p>As formas quadráticas definidas na <a href="mod_1_matrizes.html#def-forma-quadratica" class="quarto-xref">Definição&nbsp;<span>2.23</span></a> aparecem na variância de combinações lineares, em distâncias ponderadas e em diferentes medidas de dispersão. Quando o critério depende da direção escolhida, surgem problemas de otimização espectral.</p>
-<p>O quociente de Rayleigh definido na <a href="mod_1_autovetores.html#def-quociente-rayleigh" class="quarto-xref">Definição&nbsp;<span>5.7</span></a> relaciona a otimização de uma forma quadrática aos autovalores de uma matriz simétrica. O resultado do <a href="mod_1_autovetores.html#thm-extremos-quociente-rayleigh" class="quarto-xref">Teorema&nbsp;<span>5.5</span></a> é aplicado no <a href="mod_3_cp.html" class="quarto-xref"><span>Capítulo 14</span></a> à matriz de covariâncias para formular as componentes principais.</p>
-<p>Quando duas formas quadráticas são comparadas, o quociente de Rayleigh generalizado da <a href="mod_1_autovetores.html#def-quociente-rayleigh-generalizado" class="quarto-xref">Definição&nbsp;<span>5.12</span></a> conduz ao problema de autovalores generalizados descrito no <a href="mod_1_autovetores.html#thm-extremos-rayleigh-generalizado" class="quarto-xref">Teorema&nbsp;<span>5.8</span></a>. Essa estrutura será retomada no <a href="mod_3_discriminante.html" class="quarto-xref"><span>Capítulo 19</span></a> e no <a href="mod_3_manova.html" class="quarto-xref"><span>Capítulo 18</span></a>.</p>
-<p>A decomposição espectral, sintetizada na <a href="mod_1_autovetores.html#tbl-sintese-espectral" class="quarto-xref">Tabela&nbsp;<span>5.2</span></a>, fornece as direções e magnitudes associadas a uma matriz simétrica. A interpretação dessas direções depende da matriz que foi construída.</p>
+<p>O quociente de Rayleigh definido na <a href="mod_1_autovetores.html#def-quociente-rayleigh" class="quarto-xref">Definição&nbsp;<span>5.7</span></a> relaciona a otimização de uma forma quadrática aos autovalores de uma matriz simétrica. O resultado do <a href="mod_1_autovetores.html#thm-extremos-quociente-rayleigh" class="quarto-xref">Teorema&nbsp;<span>5.5</span></a> é aplicado no <a href="mod_3_cp.html" class="quarto-xref"><span>Capítulo 14</span></a> à matriz de covariâncias ou de correlações para formular as componentes principais.</p>
+<p>Quando duas formas quadráticas são comparadas, o quociente de Rayleigh generalizado da <a href="mod_1_autovetores.html#def-quociente-rayleigh-generalizado" class="quarto-xref">Definição&nbsp;<span>5.12</span></a> conduz ao problema de autovalores generalizados descrito no <a href="mod_1_autovetores.html#thm-extremos-rayleigh-generalizado" class="quarto-xref">Teorema&nbsp;<span>5.8</span></a>. Essa estrutura aparece concretamente em <a href="mod_3_manova.html#eq-autovalor-generalizado-manova" class="quarto-xref">Equação&nbsp;<span>18.14</span></a> e <a href="mod_3_discriminante.html#eq-autovalor-generalizado-fisher" class="quarto-xref">Equação&nbsp;<span>19.30</span></a>.</p>
+<p>Quando a matriz do denominador é positiva definida, a ideia de branqueamento já desenvolvida em <a href="mod_2_covariancias.html#eq-transformacao-branqueamento-ponto" class="quarto-xref">Equação&nbsp;<span>8.50</span></a> permite transformar a métrica correspondente em uma geometria euclidiana. Essa construção reaparece no problema simétrico da MANOVA em <a href="mod_3_manova.html#eq-problema-simetrico-manova" class="quarto-xref">Equação&nbsp;<span>18.18</span></a> e na matriz branqueada de Fisher em <a href="mod_3_discriminante.html#eq-matriz-fisher-branqueada" class="quarto-xref">Equação&nbsp;<span>19.31</span></a>.</p>
+<p>A decomposição espectral, sintetizada na <a href="mod_1_autovetores.html#tbl-sintese-espectral" class="quarto-xref">Tabela&nbsp;<span>5.2</span></a>, fornece as direções e magnitudes associadas a uma matriz simétrica. A interpretação dessas direções depende da matriz que foi construída e do problema estatístico que a originou.</p>
 </section>
 <section id="sec-estruturas-otimizacao" class="level3" data-number="13.4.3">
 <h3 data-number="13.4.3" class="anchored" data-anchor-id="sec-estruturas-otimizacao"><span class="header-section-number">13.4.3</span> Otimização sob restrições e critérios de ajuste</h3>
@@ -875,19 +877,19 @@ Q(\boldsymbol{\theta}),
 <section id="svd-e-representações-de-baixa-dimensão" class="level3" data-number="13.4.4">
 <h3 data-number="13.4.4" class="anchored" data-anchor-id="svd-e-representações-de-baixa-dimensão"><span class="header-section-number">13.4.4</span> SVD e representações de baixa dimensão</h3>
 <p>A decomposição em valores singulares relaciona os espaços de linhas e colunas de uma matriz e permite construir aproximações de posto reduzido. Suas propriedades foram sintetizadas na <a href="mod_1_svd.html#tbl-sintese-svd" class="quarto-xref">Tabela&nbsp;<span>6.6</span></a>.</p>
-<p>No Módulo 3, a SVD aparece em contextos distintos. No <a href="mod_3_cp.html" class="quarto-xref"><span>Capítulo 14</span></a>, é aplicada à matriz de dados centralizada. No <a href="mod_3_correspondencia.html" class="quarto-xref"><span>Capítulo 17</span></a>, é aplicada a uma matriz de desvios padronizados em relação à independência.</p>
+<p>No Módulo 3, a SVD aparece em contextos distintos. No <a href="mod_3_cp.html" class="quarto-xref"><span>Capítulo 14</span></a>, é aplicada à matriz de dados centralizada. Na <a href="mod_3_correspondencia.html" class="quarto-xref"><span>Capítulo 17</span></a>, é aplicada à matriz de desvios padronizados definida na <a href="mod_3_correspondencia.html#def-matriz-desvios-padronizados-ca" class="quarto-xref">Definição&nbsp;<span>17.5</span></a>, e a decomposição correspondente é desenvolvida na <a href="mod_3_correspondencia.html#sec-ca-svd" class="quarto-xref"><span>Seção 17.7</span></a>.</p>
 <p>O mecanismo algébrico é compartilhado, mas a matriz decomposta e o significado estatístico dos vetores e valores singulares são diferentes.</p>
 </section>
 <section id="distâncias-e-métricas" class="level3" data-number="13.4.5">
 <h3 data-number="13.4.5" class="anchored" data-anchor-id="distâncias-e-métricas"><span class="header-section-number">13.4.5</span> Distâncias e métricas</h3>
-<p>Distâncias organizam relações de proximidade entre observações; quando uma técnica admite dissimilaridades mais gerais, elas serão especificadas no capítulo correspondente. A distância euclidiana já foi definida na <a href="mod_1_vetores.html#def-distancia-euclidiana" class="quarto-xref">Definição&nbsp;<span>1.13</span></a> e será retomada no <a href="mod_3_agrupamento.html" class="quarto-xref"><span>Capítulo 16</span></a> na construção de medidas de proximidade entre objetos.</p>
-<p>A distância de Mahalanobis, definida na <a href="mod_2_covariancias.html#def-distancia-mahalanobis" class="quarto-xref">Definição&nbsp;<span>8.9</span></a>, incorpora a estrutura de dispersão à geometria. A expressão em eixos espectrais apresentada em <a href="mod_2_covariancias.html#eq-mahalanobis-eixos-espectrais" class="quarto-xref">Equação&nbsp;<span>8.49</span></a> mostra que o afastamento é ponderado pela variabilidade existente em cada direção. Essa estrutura será retomada no <a href="mod_3_discriminante.html" class="quarto-xref"><span>Capítulo 19</span></a> na formulação probabilística das regras de classificação.</p>
+<p>Distâncias organizam relações de proximidade entre observações; quando uma técnica admite dissimilaridades mais gerais, elas serão especificadas no capítulo correspondente. A distância euclidiana definida na <a href="mod_1_vetores.html#def-distancia-euclidiana" class="quarto-xref">Definição&nbsp;<span>1.13</span></a> é central na formulação das <span class="math inline">\(K\)</span>-médias e participa da construção de métodos de agrupamento. A <a href="mod_3_agrupamento.html#def-dissimilaridade-agrupamento" class="quarto-xref">Definição&nbsp;<span>16.1</span></a> amplia essa representação no <a href="mod_3_agrupamento.html" class="quarto-xref"><span>Capítulo 16</span></a>.</p>
+<p>Na <a href="mod_3_correspondencia.html" class="quarto-xref"><span>Capítulo 17</span></a>, a <a href="mod_3_correspondencia.html#def-distancia-qui-quadrado-ca" class="quarto-xref">Definição&nbsp;<span>17.3</span></a> estabelece uma geometria ponderada adequada aos perfis. A distância de Mahalanobis, definida na <a href="mod_2_covariancias.html#def-distancia-mahalanobis" class="quarto-xref">Definição&nbsp;<span>8.9</span></a>, incorpora a estrutura de dispersão à geometria. A expressão em eixos espectrais apresentada em <a href="mod_2_covariancias.html#eq-mahalanobis-eixos-espectrais" class="quarto-xref">Equação&nbsp;<span>8.49</span></a> mostra que o afastamento é ponderado pela variabilidade existente em cada direção e fornece parte da base geométrica das regras normais desenvolvidas na <a href="mod_3_discriminante.html#sec-discriminante-lda" class="quarto-xref"><span>Seção 19.3</span></a> e na <a href="mod_3_discriminante.html#sec-discriminante-qda" class="quarto-xref"><span>Seção 19.4</span></a>.</p>
 </section>
 <section id="modelos-lineares-e-probabilísticos" class="level3" data-number="13.4.6">
 <h3 data-number="13.4.6" class="anchored" data-anchor-id="modelos-lineares-e-probabilísticos"><span class="header-section-number">13.4.6</span> Modelos lineares e probabilísticos</h3>
-<p>O modelo linear multivariado definido na <a href="mod_2_modelo.html#def-modelo-linear-multivariado" class="quarto-xref">Definição&nbsp;<span>11.3</span></a> organiza conjuntamente várias respostas, um delineamento e uma matriz de parâmetros. A hipótese linear geral da <a href="mod_2_modelo.html#def-hipotese-linear-geral-multivariada" class="quarto-xref">Definição&nbsp;<span>11.17</span></a> fornece a estrutura para testar combinações desses parâmetros. A <a href="mod_3_manova.html" class="quarto-xref"><span>Capítulo 18</span></a> utiliza diretamente esses resultados e acrescenta a construção e a interpretação dos critérios multivariados associados às matrizes de hipótese e erro.</p>
-<p>Outras técnicas acrescentam estruturas probabilísticas específicas à sua formulação. Na <a href="mod_3_fatorial.html" class="quarto-xref"><span>Capítulo 15</span></a>, o modelo de fatores comuns especifica uma estrutura para a matriz de covariâncias, e a estimação por máxima verossimilhança acrescenta uma formulação probabilística baseada na normalidade multivariada. Na <a href="mod_3_discriminante.html" class="quarto-xref"><span>Capítulo 19</span></a>, distribuições condicionais aos grupos e probabilidades <em>a priori</em> são utilizadas na construção de regras probabilísticas de classificação. Quando a normalidade multivariada é utilizada, sua definição e suas propriedades são as estabelecidas na <a href="mod_2_normal.html#def-normal-multivariada" class="quarto-xref">Definição&nbsp;<span>9.1</span></a>.</p>
-<p>Essas hipóteses probabilísticas devem ser distinguidas das estruturas algébricas e geométricas utilizadas na formulação das técnicas. A normalidade multivariada, por exemplo, não constitui uma condição geral para toda construção baseada em combinações lineares, formas quadráticas, projeções ou decomposições matriciais. Quando uma hipótese distribucional for necessária para estimação ou inferência, essa função será explicitada no capítulo correspondente.</p>
+<p>O modelo linear multivariado definido na <a href="mod_2_modelo.html#def-modelo-linear-multivariado" class="quarto-xref">Definição&nbsp;<span>11.3</span></a> organiza conjuntamente várias respostas, um delineamento e uma matriz de parâmetros. A hipótese linear geral da <a href="mod_2_modelo.html#def-hipotese-linear-geral-multivariada" class="quarto-xref">Definição&nbsp;<span>11.17</span></a> fornece a estrutura para testar combinações desses parâmetros. A <a href="mod_3_manova.html" class="quarto-xref"><span>Capítulo 18</span></a> utiliza diretamente esses resultados e acrescenta as matrizes de hipótese e erro, as raízes características e os critérios da <a href="mod_3_manova.html#sec-manova-criterios" class="quarto-xref"><span>Seção 18.5</span></a>.</p>
+<p>Outras técnicas acrescentam estruturas probabilísticas específicas à sua formulação. Na <a href="mod_3_fatorial.html" class="quarto-xref"><span>Capítulo 15</span></a>, o modelo definido na <a href="mod_3_fatorial.html#def-modelo-fatores-comuns" class="quarto-xref">Definição&nbsp;<span>15.1</span></a> especifica uma estrutura para a matriz de covariâncias, e a estimação por máxima verossimilhança acrescenta uma formulação probabilística baseada na normalidade multivariada. Na <a href="mod_3_discriminante.html" class="quarto-xref"><span>Capítulo 19</span></a>, distribuições condicionais aos grupos e probabilidades <em>a priori</em> são utilizadas na construção de regras probabilísticas de classificação. Na <a href="mod_3_agrupamento.html#sec-agrupamentos-definicoes-grupo" class="quarto-xref"><span>Seção 16.8</span></a>, a <a href="mod_3_agrupamento.html#def-modelo-mistura-agrupamento" class="quarto-xref">Definição&nbsp;<span>16.6</span></a> apresenta uma definição probabilística alternativa de grupo.</p>
+<p>Quando a normalidade multivariada é utilizada, sua definição e suas propriedades são as estabelecidas na <a href="mod_2_normal.html#def-normal-multivariada" class="quarto-xref">Definição&nbsp;<span>9.1</span></a>. Essa hipótese deve ser distinguida das estruturas algébricas e geométricas utilizadas na formulação das técnicas: ela não constitui uma condição geral para construções baseadas em combinações lineares, formas quadráticas, projeções, SVD ou problemas espectrais.</p>
 <p>Da mesma forma, quando uma técnica utilizar máxima verossimilhança ou comparação de modelos por verossimilhanças, serão retomadas a função de verossimilhança definida na <a href="mod_2_amostrais.html#def-funcao-verossimilhanca" class="quarto-xref">Definição&nbsp;<span>10.11</span></a> e a razão de verossimilhanças definida na <a href="mod_2_inferencia.html#def-razao-verossimilhancas" class="quarto-xref">Definição&nbsp;<span>12.3</span></a>. Os resultados inferenciais também preservarão a distinção entre resultados exatos e assintóticos estabelecida na <a href="mod_2_inferencia.html#def-resultados-exatos-assintoticos" class="quarto-xref">Definição&nbsp;<span>12.1</span></a>.</p>
 <p>A <a href="#tbl-estruturas-recorrentes-tecnicas" class="quarto-xref">Tabela&nbsp;<span>13.4</span></a> reúne essas conexões.</p>
 <div id="tbl-estruturas-recorrentes-tecnicas" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -918,7 +920,7 @@ Tabela&nbsp;13.4: Estruturas dos Módulos 1 e 2 reutilizadas na formulação das
 <tr class="even">
 <td>Combinações lineares</td>
 <td>Construção de novas direções ou variáveis</td>
-<td>ACP, Discriminante</td>
+<td>ACP, MANOVA, Discriminante</td>
 </tr>
 <tr class="odd">
 <td>Projeções</td>
@@ -927,8 +929,8 @@ Tabela&nbsp;13.4: Estruturas dos Módulos 1 e 2 reutilizadas na formulação das
 </tr>
 <tr class="even">
 <td>Formas quadráticas</td>
-<td>Medida de variabilidade, distância ou separação</td>
-<td>ACP, Discriminante, MANOVA</td>
+<td>Medida de variabilidade, distância, associação ou separação</td>
+<td>ACP, Correspondência, MANOVA, Discriminante</td>
 </tr>
 <tr class="odd">
 <td>Otimização sob restrições e critérios de ajuste</td>
@@ -943,7 +945,7 @@ Tabela&nbsp;13.4: Estruturas dos Módulos 1 e 2 reutilizadas na formulação das
 <tr class="odd">
 <td>Autovalores e autovetores generalizados</td>
 <td>Comparação entre formas quadráticas e determinação de direções extremas</td>
-<td>Discriminante, MANOVA</td>
+<td>MANOVA, Discriminante</td>
 </tr>
 <tr class="even">
 <td>SVD</td>
@@ -951,31 +953,36 @@ Tabela&nbsp;13.4: Estruturas dos Módulos 1 e 2 reutilizadas na formulação das
 <td>ACP, Correspondência</td>
 </tr>
 <tr class="odd">
-<td>Distâncias</td>
-<td>Representação da proximidade entre objetos e classificação</td>
-<td>Agrupamentos, Discriminante</td>
+<td>Massas, perfis e ponderações marginais</td>
+<td>Construção da geometria de associações categóricas</td>
+<td>Correspondência</td>
 </tr>
 <tr class="even">
-<td>Covariâncias e correlações</td>
-<td>Representação da variabilidade conjunta e da associação linear</td>
-<td>ACP, Fatorial, Discriminante</td>
+<td>Distâncias e métricas</td>
+<td>Representação de proximidade, associação, dispersão ou classificação</td>
+<td>Agrupamentos, Correspondência, MANOVA, Discriminante</td>
 </tr>
 <tr class="odd">
-<td>Dispersão dentro e entre grupos</td>
-<td>Comparação da estrutura de grupos</td>
-<td>Agrupamentos, Discriminante, MANOVA</td>
+<td>Covariâncias e correlações</td>
+<td>Representação da variabilidade conjunta e da associação linear</td>
+<td>ACP, Fatorial, MANOVA, Discriminante</td>
 </tr>
 <tr class="even">
+<td>Dispersão dentro e entre grupos</td>
+<td>Comparação da estrutura de grupos</td>
+<td>Agrupamentos, MANOVA, Discriminante</td>
+</tr>
+<tr class="odd">
 <td>Modelo linear multivariado</td>
 <td>Representação conjunta de respostas e efeitos</td>
 <td>MANOVA</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Normal multivariada</td>
 <td>Formulações probabilísticas e resultados inferenciais sob hipóteses específicas</td>
 <td>Fatorial, Discriminante, MANOVA</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Função e razão de verossimilhanças</td>
 <td>Estimação e comparação sob formulações probabilísticas específicas</td>
 <td>Fatorial por máxima verossimilhança; MANOVA na fundamentação probabilística de critérios específicos</td>
@@ -1049,6 +1056,7 @@ Tabela&nbsp;13.5: Exemplos de estruturas matemáticas com diferentes significado
 </figure>
 </div>
 <p>A interpretação de um autovalor, autovetor, valor singular, vetor singular ou coordenada exige a identificação da matriz de origem e do critério que definiu sua construção. A operação matemática utilizada, isoladamente, não identifica a técnica: procedimentos distintos podem empregar a mesma decomposição, otimização ou medida de distância e, ainda assim, resolver problemas estatísticos diferentes. A identificação do método exige considerar conjuntamente o objeto analisado, o critério ou modelo adotado e o significado atribuído à solução.</p>
+<p>As fontes de não unicidade também devem ser distinguidas. Na ACP, a indeterminação de sinal e os efeitos da multiplicidade são desenvolvidos na <a href="mod_3_cp.html#sec-acp-multiplicidade-singularidade" class="quarto-xref"><span>Seção 14.13.4.4</span></a>. Na Análise Fatorial, a <a href="mod_3_fatorial.html#prp-indeterminacao-rotacional-fatorial" class="quarto-xref">Proposição&nbsp;<span>15.2</span></a> formaliza uma indeterminação adicional, associada à rotação dos fatores. Na Análise de Agrupamentos, a não unicidade pode decorrer da existência de diferentes soluções ótimas, como discutido na <a href="mod_3_agrupamento.html#sec-agrupamentos-existencia-nao-unicidade" class="quarto-xref"><span>Seção 16.12.2</span></a>, ou de empates durante a construção de uma hierarquia, tratados na <a href="mod_3_agrupamento.html#sec-agrupamentos-empates-hierarquia" class="quarto-xref"><span>Seção 16.12.5</span></a>. Na MANOVA, sinais e multiplicidades das direções são discutidos na <a href="mod_3_manova.html#sec-manova-identificacao-direcoes" class="quarto-xref"><span>Seção 18.9.4</span></a>. Essas situações possuem origens matemáticas distintas e não devem ser interpretadas como uma única forma de indeterminação.</p>
 </section>
 <section id="sec-relacoes-tecnicas-multivariadas" class="level2" data-number="13.6">
 <h2 data-number="13.6" class="anchored" data-anchor-id="sec-relacoes-tecnicas-multivariadas"><span class="header-section-number">13.6</span> Relações entre as técnicas</h2>
@@ -1098,21 +1106,19 @@ Tabela&nbsp;13.6: Relações conceituais entre técnicas do Módulo 3.
 </div>
 </figure>
 </div>
-<p>A relação entre ACP e Análise Fatorial é desenvolvida no <a href="mod_3_fatorial.html" class="quarto-xref"><span>Capítulo 15</span></a>. A conexão entre Agrupamentos e Análise Discriminante será retomada no <a href="mod_3_discriminante.html" class="quarto-xref"><span>Capítulo 19</span></a>, enquanto a relação entre MANOVA e Discriminante será estabelecida a partir das estruturas de dispersão associadas aos grupos. O <a href="mod_3_correspondencia.html" class="quarto-xref"><span>Capítulo 17</span></a> retomará a relação com a ACP a partir de sua própria decomposição de baixa dimensão.</p>
+<p>A relação entre ACP e Análise Fatorial é desenvolvida no <a href="mod_3_fatorial.html" class="quarto-xref"><span>Capítulo 15</span></a> e sintetizada na <a href="mod_3_fatorial.html#tbl-acp-fatorial-formulacao" class="quarto-xref">Tabela&nbsp;<span>15.4</span></a>. As relações da Análise de Agrupamentos com outras técnicas são organizadas na <a href="mod_3_agrupamento.html#tbl-relacoes-agrupamentos-tecnicas" class="quarto-xref">Tabela&nbsp;<span>16.6</span></a>. A conexão espectral entre MANOVA e a formulação de Fisher é explicitada em <a href="mod_3_discriminante.html#eq-correspondencia-manova-fisher" class="quarto-xref">Equação&nbsp;<span>19.40</span></a>. A relação entre ACP e Análise de Correspondência é desenvolvida na <a href="mod_3_correspondencia.html" class="quarto-xref"><span>Capítulo 17</span></a> e sintetizada na <a href="mod_3_correspondencia.html#tbl-relacao-acp-ca" class="quarto-xref">Tabela&nbsp;<span>17.3</span></a>.</p>
 <p>Essas conexões mostram que a identificação da técnica depende do problema estatístico, do objeto analisado e do critério de solução. A operação matricial utilizada, isoladamente, não determina o método.</p>
 </section>
 <section id="síntese" class="level2" data-number="13.7">
 <h2 data-number="13.7" class="anchored" data-anchor-id="síntese"><span class="header-section-number">13.7</span> Síntese</h2>
 <p>As técnicas multivariadas deste módulo utilizam os fundamentos construídos nos Módulos 1 e 2 para resolver problemas estatísticos distintos. A formulação de cada técnica combina uma estrutura de dados, um objeto matemático e um critério ou modelo.</p>
-<p>A centralização e a padronização definem a origem e a escala da representação utilizada por determinadas técnicas. Combinações lineares e projeções produzem novas direções e representações. Formas quadráticas e problemas espectrais permitem estudar variabilidade e separação. Problemas de otimização expressam critérios que definem determinadas soluções, como maximização da variância ou da separação entre grupos e minimização da dispersão ou de resíduos. Autovalores e autovetores definem diretamente a solução da ACP e aparecem na Análise Fatorial em métodos específicos de extração, como fatores principais; o modelo fatorial, porém, é definido pela decomposição da covariância em uma parte comum e uma parte específica. A SVD fornece representações de baixa dimensão na ACP e na Análise de Correspondência. Distâncias participam da construção de grupos e de regras de discriminação. Estruturas de dispersão, modelos lineares e modelos probabilísticos fornecem a base para Agrupamentos, MANOVA, Análise Discriminante e determinadas formulações da Análise Fatorial.</p>
+<p>A centralização e a padronização definem a origem e a escala da representação utilizada por determinadas técnicas. Combinações lineares e projeções produzem novas direções e representações. Formas quadráticas e problemas espectrais permitem estudar variabilidade e comparar diferentes fontes de dispersão. Na MANOVA e na formulação de Fisher, o branqueamento converte a métrica determinada pela matriz de referência em uma geometria euclidiana e conduz a problemas espectrais simétricos equivalentes.</p>
+<p>Autovalores e autovetores definem diretamente a solução da ACP e aparecem na Análise Fatorial em métodos específicos de extração; o modelo fatorial, porém, é definido pela decomposição da covariância em uma parte comum e uma parte específica. A SVD fornece representações de baixa dimensão na ACP e, na <a href="mod_3_correspondencia.html#sec-ca-svd" class="quarto-xref"><span>Seção 17.7</span></a>, decompõe a inércia da Análise de Correspondência. Na <a href="mod_3_agrupamento.html#sec-agrupamentos-definicoes-grupo" class="quarto-xref"><span>Seção 16.8</span></a>, diferentes critérios geométricos e probabilísticos mostram que grupo não corresponde a um único objeto matemático. A <a href="mod_3_manova.html#sec-manova-criterios" class="quarto-xref"><span>Seção 18.5</span></a> constrói quatro critérios a partir das mesmas raízes características, enquanto a <a href="mod_3_discriminante.html" class="quarto-xref"><span>Capítulo 19</span></a> articula decisão probabilística, LDA/QDA e a geometria de Fisher.</p>
 <p>As hipóteses probabilísticas devem ser distinguidas das estruturas algébricas e geométricas. Normalidade, máxima verossimilhança e resultados inferenciais serão utilizados somente quando fizerem parte da formulação específica da técnica.</p>
 <p>Os capítulos seguintes utilizarão esses fundamentos sem reconstruí-los. O <a href="mod_3_cp.html" class="quarto-xref"><span>Capítulo 14</span></a> inicia esse percurso formulando a Análise de Componentes Principais a partir da variância de combinações lineares, do quociente de Rayleigh, da decomposição espectral, das projeções e da SVD.</p>
 
 
 <div id="refs" class="references csl-bib-body" data-entry-spacing="1" role="list" style="display: none">
-<div id="ref-greenacre2017ca" class="csl-entry" role="listitem">
-GREENACRE, Michael. <strong><a href="https://www.routledge.com/Correspondence-Analysis-in-Practice/Greenacre/p/book/9781498731775">Correspondence Analysis in Practice</a></strong>. 3. ed. Boca Raton: CRC Press, 2017.
-</div>
 <div id="ref-huberty2006manova" class="csl-entry" role="listitem">
 HUBERTY, Carl J.; OLEJNIK, Stephen. <strong><a href="https://doi.org/10.1002/047178947X">Applied MANOVA and Discriminant Analysis</a></strong>. 2. ed. Hoboken, NJ: John Wiley &amp; Sons, 2006.
 </div>
