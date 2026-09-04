@@ -1,6 +1,6 @@
 # Formulação da Análise Discriminante {#sec-discriminante}
 
-A Análise Discriminante utiliza grupos previamente conhecidos para resolver dois problemas relacionados: representar a separação entre os grupos e construir regras para classificar novas observações.
+A Análise Discriminante utiliza grupos previamente conhecidos para resolver dois problemas relacionados: representar a separação entre os grupos e construir regras para classificar novas observações [@johnson2007].
 
 O capítulo desenvolve duas formulações. Na formulação probabilística, as classes são descritas por distribuições condicionais e a classificação é tratada como um problema de decisão envolvendo probabilidades *a priori*, perdas e probabilidades posteriores. Na formulação geométrica de Fisher, procuram-se combinações lineares que maximizem a separação entre grupos relativamente à dispersão intragrupos.
 
@@ -84,7 +84,7 @@ $$
 
 que associe uma nova observação $\mathbf x$ a uma das classes.
 
-A qualidade preditiva de uma regra estimada constitui um problema adicional. Taxas de erro, matrizes de confusão, validação cruzada e outros procedimentos de avaliação pertencem à etapa metodológica e não serão utilizados para definir a regra neste capítulo.
+A qualidade preditiva de uma regra estimada constitui um problema adicional. Taxas de erro, matrizes de classificação, validação cruzada e outros procedimentos de avaliação são tratados na @sec-discriminante-aprofundamentos-metodologicos e não participam da definição da regra.
 
 ## Classificação como problema de decisão
 
@@ -1340,7 +1340,7 @@ $$
 \mathbf S_1,\ldots,\mathbf S_K.
 $$
 
-A QDA exige, portanto, informação suficiente para estimar e inverter uma matriz de covariâncias em cada classe. As condições de posto correspondentes serão reunidas posteriormente na @sec-discriminante-pressupostos.
+A QDA exige, portanto, amostras de classe que permitam estimar matrizes de covariâncias não singulares. As condições de posto correspondentes são reunidas na @sec-discriminante-pressupostos.
 
 A @tbl-lda-qda sintetiza a diferença entre as duas formulações.
 
@@ -2036,7 +2036,7 @@ ggplot(
   )
 ```
 
-A figura ilustra o papel do denominador de @eq-criterio-fisher-discriminante: uma diferença entre centroides é mais informativa quando ocorre em uma direção na qual a dispersão intragrupos é relativamente pequena.
+A figura ilustra o papel do denominador de @eq-criterio-fisher-discriminante: para a mesma dispersão entre grupos projetada, o critério de Fisher é maior em direções com menor dispersão intragrupos.
 
 ## Direções discriminantes e autovalores generalizados
 
@@ -2370,7 +2370,7 @@ $$
 \boldsymbol{\alpha}_{r_F}
 $$
 
-é o subespaço discriminante de Fisher. A próxima seção utiliza essas direções para construir coordenadas supervisionadas das observações e dos centroides.
+é o subespaço discriminante de Fisher. A @sec-discriminante-representacao utiliza essas direções para construir coordenadas supervisionadas das observações e dos centroides.
 
 ## Representação no subespaço discriminante {#sec-discriminante-representacao}
 
@@ -3282,7 +3282,7 @@ $$ {#eq-condicao-dimensao-qda}
 
 é condição necessária para que $\mathbf S_k$ possa possuir posto completo. Essa condição deve ser satisfeita separadamente em cada classe.
 
-A QDA estimada exige, por isso, mais informação por classe do que a LDA quando $p$ é elevado.
+A QDA estimada impõe, portanto, uma condição de posto separada em cada classe e se torna particularmente exigente em tamanho amostral quando $p$ é elevado.
 
 A não singularidade, entretanto, não garante estabilidade. Quando algumas características são aproximadamente combinações lineares de outras, $\mathbf T_{\mathrm{intra}}$, $\mathbf S_p$ ou alguma $\mathbf S_k$ podem permanecer invertíveis, mas apresentar autovalores muito pequenos. Nesse caso, suas inversas podem amplificar pequenas perturbações dos dados e tornar coeficientes e direções discriminantes sensíveis à amostra.
 
@@ -3353,7 +3353,7 @@ Quando as distribuições das classes se sobrepõem, esse erro pode ser positivo
 
 Esse erro populacional deve ser distinguido do erro adicional introduzido pela estimação das médias, covariâncias e demais parâmetros a partir de uma amostra de treinamento.
 
-A avaliação empírica de uma regra estimada, por procedimentos como amostras de teste, validação cruzada, matrizes de confusão e medidas de desempenho, pertence à etapa metodológica posterior.
+A avaliação empírica de uma regra estimada, por procedimentos como amostras de teste, validação cruzada, matrizes de classificação e medidas de desempenho, é tratada na @sec-discriminante-aprofundamentos-metodologicos.
 
 ## Relações com outras técnicas
 
@@ -4021,7 +4021,7 @@ Nesse caso, o objeto identificado é o subespaço discriminante associado à rai
 ::: {.callout-note appearance="simple" icon=false}
 ## Leitura de aprofundamento
 
-Esta parte reúne procedimentos utilizados para avaliar o desempenho da regra de classificação e interpretar as funções discriminantes. São examinados o erro aparente e o erro em novas observações, os diferentes coeficientes associados às funções discriminantes e a correspondência entre os objetos desenvolvidos no capítulo e a implementação utilizada.
+Esta parte reúne procedimentos utilizados para avaliar o desempenho da regra de classificação e interpretar as funções discriminantes. São examinados os diferentes coeficientes associados às funções discriminantes, o erro aparente, o erro em novas observações, a matriz de classificação e a correspondência entre os objetos desenvolvidos no capítulo e a implementação utilizada.
 :::
 
 ### Coeficientes das funções discriminantes
@@ -4112,9 +4112,9 @@ $$ {#eq-erro-aparente-discriminante}
 
 em que $\mathbb 1\{\cdot\}$ é a função indicadora.
 
-Esse erro descreve o desempenho da regra nas unidades que também contribuíram para estimar seus parâmetros. Ele não mede diretamente o comportamento da regra diante de novas observações.
+Esse erro descreve o desempenho da regra nas unidades que também contribuíram para estimar seus parâmetros e tende a ser otimista como estimativa do erro em novas observações, porque os mesmos dados participam do ajuste e da avaliação [@johnson2007].
 
-Considere agora uma amostra de teste formada por $m$ pares
+Considere agora uma amostra de teste independente da amostra de treinamento, formada por $m$ pares
 
 $$
 (\mathbf x_i^*,c_i^*),
@@ -4137,7 +4137,15 @@ c_i^*
 \right\}.
 $$ {#eq-erro-teste-discriminante}
 
-O erro aparente descreve o comportamento da regra nas observações utilizadas em sua construção, enquanto o erro de teste descreve seu comportamento em observações que não participaram da estimação. Quando a amostra de teste representa o mecanismo populacional no qual a regra será aplicada, esse erro fornece uma avaliação externa de seu desempenho preditivo. Validação cruzada e outros procedimentos procuram obter avaliações análogas sem reutilizar uma observação simultaneamente para ajustar e avaliar a mesma regra.
+O erro aparente descreve o comportamento da regra nas observações utilizadas em sua construção, enquanto o erro de teste descreve seu comportamento em observações que não participaram da estimação. Quando a amostra de teste representa o mecanismo populacional no qual a regra será aplicada, esse erro fornece uma avaliação externa de seu desempenho preditivo. Validação cruzada e outros procedimentos procuram obter avaliações análogas sem reutilizar uma observação simultaneamente para ajustar e avaliar a mesma regra [@johnson2007; @hair2019multivariate].
+
+### Matriz de classificação {#sec-discriminante-matriz-classificacao}
+
+A **matriz de classificação** cruza a classe observada com a classe atribuída pela regra. As entradas da diagonal correspondem às classificações corretas, enquanto as entradas fora da diagonal identificam os tipos de erro cometidos.
+
+A proporção global de classificações incorretas resume o desempenho da regra, mas pode ocultar diferenças importantes entre as classes. As proporções calculadas dentro de cada classe permitem identificar classes com maior ou menor frequência de classificação correta e quais erros de classificação ocorrem com maior frequência [@johnson2007; @hair2019multivariate].
+
+No caso de duas classes, medidas como sensibilidade e especificidade podem ser obtidas depois de definida qual classe representa o evento de interesse. Para mais de duas classes, essas medidas exigem uma definição específica por classe ou uma estratégia de comparação de uma classe contra as demais.
 
 ::: {.callout-note appearance="simple" icon=false}
 ## Correspondência com a implementação utilizada {#sec-discriminante-implementacao}

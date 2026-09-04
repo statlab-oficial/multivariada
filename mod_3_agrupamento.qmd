@@ -42,7 +42,7 @@ Os grupos não são conhecidos previamente. O objetivo é construir uma organiza
 
 O significado de pertencer ao mesmo grupo depende desse critério. Nas $K$-médias, os grupos são definidos pela concentração das observações em torno de centroides; nos métodos hierárquicos, pela regra utilizada para comparar e reunir conjuntos de objetos.
 
-Essa formulação distingue a Análise de Agrupamentos da Análise Discriminante, que utilizará grupos previamente conhecidos. Aqui, a própria organização dos objetos faz parte da solução.
+Essa formulação distingue a Análise de Agrupamentos da @sec-discriminante. Na Análise de Agrupamentos, a própria organização dos objetos faz parte da solução; na Análise Discriminante, os grupos são conhecidos previamente e integram a informação utilizada pela técnica.
 
 A @fig-agrupamentos-particoes-plausiveis mostra uma mesma configuração bidimensional organizada de duas formas. A figura ilustra que os pontos observados, isoladamente, não determinam qual partição deve ser escolhida.
 
@@ -594,7 +594,7 @@ No agrupamento por centroides, a proximidade entre uma observação e um grupo �
 
 ### Dispersão dentro e entre grupos
 
-A decomposição da dispersão para grupos já foi estabelecida no Módulo 2. A matriz de dispersão intragrupos foi definida em @def-sscp-intragrupos, a matriz entre grupos em @def-sscp-entre-grupos, e @prp-decomposicao-dispersao-grupos demonstrou que
+A @def-sscp-intragrupos e a @def-sscp-entre-grupos definem as matrizes de dispersão dentro e entre grupos, e a @prp-decomposicao-dispersao-grupos estabelece
 
 $$
 \mathbf T
@@ -604,7 +604,7 @@ $$
 \mathbf T_{\mathrm{entre}}.
 $$
 
-Naquele resultado, os grupos eram considerados conhecidos. Na Análise de Agrupamentos, a mesma decomposição adquire outra função: a partição passa a ser desconhecida e deve ser construída.
+Nesses resultados, os grupos são dados. Na Análise de Agrupamentos, a mesma decomposição assume outra função: a partição é desconhecida e passa a integrar o problema de otimização.
 
 Para uma partição
 
@@ -2004,7 +2004,7 @@ A existência de diferentes critérios mostra que “grupo” não corresponde a
 
 Nas $K$-médias, um grupo é representado por proximidade a um centroide. Na ligação simples, a formação de grupos depende da conectividade produzida por pares próximos. Na ligação completa, controla-se a maior dissimilaridade entre elementos de grupos candidatos à fusão. Na ligação média, considera-se conjuntamente o conjunto de dissimilaridades entre os dois grupos. Em Ward, a fusão é avaliada por seu efeito sobre a dispersão quadrática intragrupos.
 
-Além disso, uma partição selecionada de uma hierarquia não é equivalente a uma solução obtida diretamente pela otimização de um critério para o mesmo número de grupos. A hierarquia conserva as fusões realizadas anteriormente e, portanto, restringe as partições que podem aparecer nas etapas posteriores.
+Além disso, uma partição selecionada de uma hierarquia não precisa coincidir com a solução obtida pela otimização direta de um critério para o mesmo número de grupos. A hierarquia conserva as fusões realizadas anteriormente e, portanto, restringe as partições que podem aparecer nas etapas posteriores.
 
 Além dessas formulações geométricas, grupos também podem ser definidos probabilisticamente como componentes de uma distribuição. Essa definição probabilística é apresentada na @sec-agrupamentos-definicoes-grupo.
 
@@ -2136,6 +2136,8 @@ A solução depende das escolhas que definem o problema. A @tbl-dependencia-solu
 : Elementos dos quais depende uma solução de agrupamento. {#tbl-dependencia-solucao-agrupamento}
 
 Adicionar, retirar ou transformar variáveis modifica a representação dos objetos e pode alterar as relações de proximidade. Mudanças de escala e de métrica modificam a geometria utilizada para compará-los.
+
+Observações muito afastadas das demais também podem alterar a solução. Nas $K$-médias, elas podem deslocar centroides e aumentar fortemente a dispersão quadrática; nos métodos hierárquicos, podem modificar as proximidades e a sequência de fusões. Como as fusões realizadas por um procedimento aglomerativo não são desfeitas, seus efeitos podem permanecer nas etapas posteriores da hierarquia [@johnson2007; @hair2019multivariate].
 
 A forma de grupo procurada também depende do critério. As $K$-médias representam grupos por centroides e minimizam dispersão quadrática intragrupos. As ligações simples, completa e média utilizam diferentes definições de proximidade entre conjuntos. O método de Ward seleciona fusões segundo o aumento da dispersão intragrupos. Em modelos de mistura, os grupos correspondem a componentes de uma distribuição especificada.
 
@@ -2534,10 +2536,12 @@ Para $1\leq K<n$,
 $$
 W_{K+1}
 \leq
-W_K,
+W_K.
 $$
 
-pois permitir um grupo adicional amplia as possibilidades de representar as observações com menor dispersão intragrupos. No caso extremo $K=n$, cada observação pode formar um grupo unitário e
+De fato, em qualquer partição em $K<n$ grupos, pelo menos um grupo contém duas ou mais observações. Esse grupo pode ser dividido em dois grupos não vazios e, após o recálculo de seus centroides, a soma das dispersões quadráticas desses dois grupos não pode exceder a dispersão do grupo original. Portanto, existe uma partição admissível em $K+1$ grupos cujo critério não é maior que o da partição considerada. Em particular, essa propriedade vale para a partição que atinge $W_K$.
+
+No caso extremo $K=n$, cada observação pode formar um grupo unitário e
 
 $$
 W_n=0.
@@ -2545,9 +2549,15 @@ $$
 
 A redução de $W_K$ à medida que $K$ aumenta mostra que o menor valor da função objetivo não pode, isoladamente, determinar o número de grupos. A escolha exige avaliar se o ganho obtido ao aumentar $K$ justifica a maior complexidade da partição.
 
-O **gráfico do cotovelo** (*elbow plot*) examina a sequência de valores de dispersão intragrupos para diferentes valores de $K$. A interpretação procura uma região em que reduções adicionais de $W_K$ passam a ser relativamente pequenas. Essa mudança de comportamento pode fornecer uma indicação de dimensão, mas não constitui uma regra que determine um número verdadeiro de grupos.
+O **gráfico do cotovelo** (*elbow plot*) examina a sequência de valores de dispersão intragrupos para diferentes valores de $K$. A interpretação procura uma região em que reduções adicionais de $W_K$ passam a ser relativamente pequenas. Essa mudança de comportamento pode fornecer uma indicação para a escolha de $K$, mas não constitui uma regra que determine um número verdadeiro de grupos.
 
-Outro critério utiliza a **silhueta**, que compara a coesão de uma observação com seu próprio grupo e sua separação em relação aos demais [@kaufman1990groups]. Para uma observação $i$, seja $a(i)$ a dissimilaridade média entre $i$ e as demais observações de seu grupo e seja $b(i)$ a menor dissimilaridade média entre $i$ e as observações de qualquer outro grupo. Quando essas quantidades estão definidas, o coeficiente de silhueta é
+Outro critério utiliza a **silhueta**, que compara a coesão de uma observação com seu próprio grupo e sua separação em relação aos demais [@kaufman1990groups]. Considere uma partição com pelo menos dois grupos e uma observação $i$ pertencente a um grupo com pelo menos duas observações. Seja $a(i)$ a dissimilaridade média entre $i$ e as demais observações de seu grupo e seja $b(i)$ a menor dissimilaridade média entre $i$ e as observações de qualquer outro grupo. Quando
+
+$$
+\max\{a(i),b(i)\}>0,
+$$
+
+o coeficiente de silhueta é
 
 $$
 s(i)
@@ -2569,24 +2579,42 @@ s(i)
 1.
 $$
 
+Para uma observação que forma sozinha um grupo, adota-se usualmente $s(i)=0$. Para uma partição com apenas um grupo, a silhueta não está definida.
+
 Valores elevados indicam que a observação está relativamente próxima das observações de seu grupo e afastada dos grupos concorrentes. Valores próximos de zero indicam posições intermediárias, enquanto valores negativos indicam maior proximidade média com outro grupo. A média dos coeficientes fornece uma medida descritiva da coesão e da separação da partição.
 
-A **estatística gap** compara a dispersão intragrupos observada com aquela obtida sob uma distribuição de referência utilizada como modelo nulo para a estrutura de agrupamento [@tibshirani2001gap]. Para cada valor de $K$,
+A **estatística gap** compara a dispersão intragrupos da solução observada com aquela obtida sob uma distribuição de referência utilizada como modelo nulo para a estrutura de agrupamento [@tibshirani2001gap].
+
+Para distinguir essa quantidade do mínimo global $W_K$ definido em @eq-minimo-k-agrupamentos, denote por
+
+$$
+\widetilde W_K
+$$
+
+a dispersão intragrupos da solução efetivamente obtida pelo procedimento de agrupamento para $K$ grupos. Então,
 
 $$
 \operatorname{Gap}(K)
 =
 E^*
 \left[
-\log W_K^*
+\log \widetilde W_K^*
 \right]
 -
-\log W_K,
+\log \widetilde W_K,
 $$ {#eq-gap-agrupamento}
 
-em que $W_K^*$ é a dispersão intragrupos calculada em dados gerados pela distribuição de referência e $E^*$ representa a média sob esse mecanismo de geração.
+em que $\widetilde W_K^*$ é a dispersão obtida aplicando o mesmo procedimento a dados gerados pela distribuição de referência, e $E^*$ representa a média sob esse mecanismo de geração.
 
-O valor da estatística depende, portanto, da distribuição de referência utilizada.
+Quando o procedimento utilizado não garante o mínimo global das $K$-médias,
+
+$$
+\widetilde W_K
+\geq
+W_K.
+$$
+
+A aplicação da estatística gap depende, portanto, da distribuição de referência e do procedimento utilizado para obter as soluções observadas e de referência.
 
 O cotovelo, a silhueta e a estatística gap fornecem informações diferentes sobre as soluções obtidas para cada valor de $K$. Nenhum desses critérios estabelece, isoladamente, a existência de um número verdadeiro de grupos na população.
 
