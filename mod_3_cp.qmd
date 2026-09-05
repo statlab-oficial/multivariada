@@ -2060,7 +2060,7 @@ $$
 \lambda_j.
 $$
 
-Esse resultado fornece uma interpretação conjunta das primeiras $k$ componentes. A ACP não procura somente a melhor primeira direção e depois as seguintes de forma isolada. O conjunto das primeiras $k$ direções determina um subespaço que concentra a maior variabilidade possível entre os subespaços lineares de mesma dimensão.
+Esse resultado fornece uma interpretação conjunta das primeiras $k$ componentes. Elas determinam um subespaço linear de dimensão $k$ que concentra a maior variabilidade possível entre todos os subespaços de mesma dimensão.
 
 Considere qualquer matriz
 
@@ -2178,12 +2178,7 @@ Se $k<p$ e $\lambda_k>\lambda_{k+1}$, o subespaço que maximiza a variância é 
 Se $\lambda_k=\lambda_{k+1}$, o subespaço maximizador pode não ser único.
 :::
 
-
-#### Demonstração da variabilidade máxima do subespaço principal
-
-A demonstração explicita como a ordenação dos autovalores determina o subespaço de dimensão $k$ que preserva a maior variabilidade total.
-
-::: {.proof}
+::: {.callout-note collapse="true" appearance="simple" title="Demonstração"}
 Pelo Teorema Espectral de @thm-teorema-espectral,
 
 $$
@@ -2596,7 +2591,7 @@ E
 $$
 :::
 
-::: {.proof}
+::: {.callout-note collapse="true" appearance="simple" title="Demonstração"}
 Como $\mathbf Q\mathbf Q^\top$ é um projetor ortogonal,
 
 $$
@@ -2807,6 +2802,361 @@ ggplot() +
 ```
 
 Os pontos azuis são as observações centralizadas, os pontos verdes são suas representações utilizando somente a primeira componente e os segmentos vermelhos representam os resíduos de reconstrução. Entre todas as retas utilizadas como subespaço de representação, a primeira direção principal minimiza a soma dos quadrados desses resíduos. A mesma direção é aquela que preserva a maior variabilidade da nuvem projetada.
+
+### Geometria da qualidade de representação {#sec-acp-geometria-representacao}
+
+A qualidade de representação pelas componentes principais pode ser expressa pela relação entre a norma quadrática da projeção e a norma quadrática do vetor representado. Para as observações, essa projeção ocorre em $\mathbb R^p$, sobre as direções principais. Para as variáveis, ocorre em $\mathbb R^n$, sobre as direções definidas pelos vetores de escores. As duas construções utilizam as relações entre produto interno, ângulo, norma e projeção desenvolvidas no Módulo I.
+
+#### Qualidade de representação das observações
+
+Defina o vetor da observação centralizada por
+
+$$
+\mathbf z_i
+=
+\mathbf x_i-\bar{\mathbf x}.
+$$
+
+A direção da componente $j$ é dada pelo autovetor unitário
+
+$$
+\widehat{\boldsymbol{\alpha}}_j,
+\qquad
+\left\|
+\widehat{\boldsymbol{\alpha}}_j
+\right\|
+=
+1.
+$$
+
+Quando $\mathbf z_i\neq\mathbf0$, seja $\theta_{ij}$ o ângulo entre $\mathbf z_i$ e $\widehat{\boldsymbol{\alpha}}_j$. Pela definição de ângulo entre vetores em @def-angulo-vetores,
+
+$$
+\cos\theta_{ij}
+=
+\frac{
+\mathbf z_i^\top
+\widehat{\boldsymbol{\alpha}}_j
+}{
+\|\mathbf z_i\|
+\left\|
+\widehat{\boldsymbol{\alpha}}_j
+\right\|
+}.
+$$
+
+Como $\left\|\widehat{\boldsymbol{\alpha}}_j\right\|=1$ e
+
+$$
+\widehat y_{ij}
+=
+\widehat{\boldsymbol{\alpha}}_j^\top
+\mathbf z_i,
+$$
+
+segue que
+
+$$
+\cos\theta_{ij}
+=
+\frac{
+\widehat y_{ij}
+}{
+\|\mathbf z_i\|
+}.
+$$
+
+A relação também pode ser expressa pela projeção ortogonal. Pela @prp-projecao-direcao,
+
+$$
+\operatorname{proj}_{
+\operatorname{span}
+\{\widehat{\boldsymbol{\alpha}}_j\}
+}
+(\mathbf z_i)
+=
+\widehat y_{ij}
+\widehat{\boldsymbol{\alpha}}_j,
+$$
+
+e, portanto,
+
+$$
+\left\|
+\operatorname{proj}_{
+\operatorname{span}
+\{\widehat{\boldsymbol{\alpha}}_j\}
+}
+(\mathbf z_i)
+\right\|^2
+=
+\widehat y_{ij}^2.
+$$
+
+Defina a distância quadrática da observação ao centro por
+
+$$
+d_i^2
+=
+\|\mathbf z_i\|^2.
+$$
+
+As direções principais formam uma base ortonormal. A transformação completa para as coordenadas principais é ortogonal e preserva normas, conforme @prp-preservacao-geometria-transformacao-ortogonal. Assim,
+
+$$
+d_i^2
+=
+\left\|
+\mathbf x_i-\bar{\mathbf x}
+\right\|^2
+=
+\sum_{\ell=1}^{p}
+\widehat y_{i\ell}^2.
+$$
+
+Na ACP baseada em correlações, a mesma relação é aplicada ao vetor da observação no espaço das variáveis centralizadas e padronizadas.
+
+Elevando a relação angular ao quadrado,
+
+$$
+\cos^2\theta_{ij}
+=
+\frac{
+\widehat y_{ij}^2
+}{
+\|\mathbf z_i\|^2
+}
+=
+\frac{
+\widehat y_{ij}^2
+}{
+\sum_{\ell=1}^{p}
+\widehat y_{i\ell}^2
+}.
+$$
+
+Essa razão é denominada **cosseno quadrado da observação $i$ em relação à componente $j$**:
+
+$$
+\cos^{2\,(\mathrm{obs})}_{ij}
+=
+\frac{
+\widehat y_{ij}^2
+}{
+\sum_{\ell=1}^{p}
+\widehat y_{i\ell}^2
+}.
+$$ {#eq-acp-cos2-observacao}
+
+O numerador é a norma quadrática da projeção da observação centralizada sobre a direção principal $j$. O denominador é sua distância quadrática total ao centro. O $\cos^2$ mede a parcela dessa distância representada pela componente.
+
+Considere agora o subespaço
+
+$$
+S_k
+=
+\operatorname{span}
+\left\{
+\widehat{\boldsymbol{\alpha}}_1,
+\ldots,
+\widehat{\boldsymbol{\alpha}}_k
+\right\}.
+$$
+
+Pela projeção sobre uma base ortonormal estabelecida em @prp-projecao-base-ortonormal,
+
+$$
+\operatorname{proj}_{S_k}(\mathbf z_i)
+=
+\sum_{j=1}^{k}
+\widehat y_{ij}
+\widehat{\boldsymbol{\alpha}}_j,
+$$
+
+e
+
+$$
+\left\|
+\operatorname{proj}_{S_k}(\mathbf z_i)
+\right\|^2
+=
+\sum_{j=1}^{k}
+\widehat y_{ij}^2.
+$$
+
+A qualidade de representação da observação pelas primeiras $k$ componentes é, portanto,
+
+$$
+\begin{aligned}
+\cos^{2\,(\mathrm{obs})}_{i,(1:k)}
+&=
+\sum_{j=1}^{k}
+\cos^{2\,(\mathrm{obs})}_{ij}\\
+&=
+\frac{
+\left\|
+\operatorname{proj}_{S_k}(\mathbf z_i)
+\right\|^2
+}{
+\|\mathbf z_i\|^2
+}.
+\end{aligned}
+$$ {#eq-acp-cos2-observacao-subespaco}
+
+Pela decomposição ortogonal em @thm-decomposicao-ortogonal,
+
+$$
+\cos^{2\,(\mathrm{obs})}_{i,(1:k)}
+=
+1
+-
+\frac{
+\left\|
+\mathbf z_i-
+\operatorname{proj}_{S_k}(\mathbf z_i)
+\right\|^2
+}{
+\|\mathbf z_i\|^2
+}.
+$$
+
+Valores próximos de $1$ correspondem a pequena distância residual em relação ao subespaço retido. Valores pequenos correspondem a uma parcela maior da posição da observação nas dimensões descartadas.
+
+#### Qualidade de representação das variáveis
+
+A denominação **cosseno quadrado** para as variáveis decorre da interpretação geométrica da correlação já estabelecida em @eq-correlacao-cosseno-colunas.
+
+Considere uma variável $X_i$ com
+
+$$
+s_{ii}>0
+$$
+
+e uma componente $Y_j$ com
+
+$$
+\widehat{\lambda}_j>0.
+$$
+
+Se $\vartheta_{ij}$ é o ângulo entre o vetor centralizado das observações de $X_i$ e o vetor de escores da componente $Y_j$, então
+
+$$
+r_{ij}
+=
+\widehat{\operatorname{Corr}}
+\left(
+X_i,Y_j
+\right)
+=
+\cos\vartheta_{ij}.
+$$
+
+Consequentemente,
+
+$$
+r_{ij}^2
+=
+\cos^2\vartheta_{ij}.
+$$
+
+Essa quantidade é denominada **cosseno quadrado da variável $i$ em relação à componente $j$**:
+
+$$
+\cos^{2\,(\mathrm{var})}_{ij}
+=
+r_{ij}^2.
+$$ {#eq-acp-cos2-variavel}
+
+Como
+
+$$
+r_{ij}
+=
+\frac{
+q_{ij}
+}{
+\sqrt{s_{ii}}
+},
+$$
+
+também se pode escrever
+
+$$
+\cos^{2\,(\mathrm{var})}_{ij}
+=
+\frac{
+q_{ij}^2
+}{
+s_{ii}
+}.
+$$
+
+O numerador representa a parcela da variância da variável associada à direção principal $j$, enquanto $s_{ii}$ é sua variância total.
+
+Se $\mathbf S$ possui posto $r$, as componentes associadas aos $r$ autovalores positivos satisfazem
+
+$$
+\sum_{j:\,\widehat{\lambda}_j>0}
+r_{ij}^2
+=
+1.
+$$
+
+De fato,
+
+$$
+\begin{aligned}
+\sum_{j:\,\widehat{\lambda}_j>0}
+r_{ij}^2
+&=
+\frac{1}{s_{ii}}
+\sum_{j:\,\widehat{\lambda}_j>0}
+\widehat{\lambda}_j
+\widehat{\alpha}_{ij}^2\\
+&=
+\frac{s_{ii}}{s_{ii}}\\
+&=
+1.
+\end{aligned}
+$$
+
+Quando $\mathbf S$ é positiva definida, todos os autovalores são positivos e a soma pode ser escrita como
+
+$$
+\sum_{j=1}^{p}
+r_{ij}^2
+=
+1.
+$$
+
+Para um subespaço formado pelas primeiras $k$ componentes com autovalores positivos,
+
+$$
+\cos^{2\,(\mathrm{var})}_{i,(1:k)}
+=
+\sum_{j=1}^{k}
+r_{ij}^2.
+$$
+
+Essa soma possui a mesma estrutura geométrica da representação das observações. Para cada componente com $\widehat{\lambda}_j>0$, defina o vetor de escores normalizado por
+
+$$
+\mathbf u_j
+=
+\frac{
+\widehat{\mathbf y}_j
+}{
+\left\|
+\widehat{\mathbf y}_j
+\right\|
+}.
+$$
+
+Como os vetores de escores de componentes distintas são ortogonais, os vetores $\mathbf u_j$ formam um conjunto ortonormal em $\mathbb R^n$. Pela @prp-projecao-base-ortonormal, a soma dos cossenos quadrados corresponde à norma quadrática da projeção do vetor centralizado e normalizado da variável sobre o subespaço gerado pelos primeiros $k$ vetores de escores normalizados.
+
+Assim, $\cos^{2\,(\mathrm{var})}_{i,(1:k)}$ mede a parcela da variância da variável $i$ representada pelo subespaço principal considerado.
+
+As duas construções utilizam a mesma relação geométrica. Para as observações, o ângulo é definido em $\mathbb R^p$ entre o vetor centralizado e uma direção principal. Para as variáveis, o ângulo é definido em $\mathbb R^n$ entre o vetor centralizado da variável e o vetor de escores da componente. Em ambos os casos, o $\cos^2$ expressa uma proporção quadrática de representação.
 
 ### Aproximação de posto reduzido {#sec-acp-aproximacao-posto-reduzido}
 
@@ -3490,7 +3840,7 @@ $$
 
 pode ser interpretado como a retenção de componentes cuja variância excede a variância de uma variável original padronizada. Esse critério é uma regra heurística e sua justificativa não se transfere diretamente para a ACP baseada em uma matriz de covariâncias, cujas variâncias dependem das escalas das variáveis.
 
-Assim, a escolha de $k$ deve considerar conjuntamente a concentração dos autovalores, a proporção acumulada de variância, o padrão observado no gráfico de declive e a interpretabilidade da representação obtida. Diferentes critérios podem sugerir dimensões distintas, e a decisão deve permanecer vinculada ao objetivo da análise [@johnson2007; @jolliffe2002pca].
+Assim, a escolha de $k$ deve considerar conjuntamente a concentração dos autovalores, a proporção acumulada de variância, o padrão observado no gráfico de declive e a interpretabilidade da representação obtida. Diferentes critérios podem sugerir dimensões distintas, e a decisão deve permanecer vinculada ao objetivo da análise [@jolliffe2002pca].
 
 A proporção acumulada e o gráfico de declive podem ser utilizados tanto na ACP baseada em covariâncias quanto na baseada em correlações, enquanto o critério do autovalor maior que $1$ possui justificativa específica para a matriz de correlações. Mesmo nesse caso, trata-se de uma regra heurística, e não de uma condição necessária para retenção: uma componente com autovalor inferior a $1$ pode ainda ser relevante para a representação ou para a interpretação do problema [@johnson2007].
 
@@ -3906,28 +4256,9 @@ $$
 \right).
 $$
 
-A magnitude de uma coordenada informa a posição da observação em uma determinada direção, mas não informa, isoladamente, se essa dimensão representa bem sua posição no espaço original. Para avaliar essa representação, considere a soma dos quadrados das coordenadas da observação em todas as componentes,
+O escore fornece a coordenada da observação ao longo da direção principal. Seu sinal indica o lado do eixo e seu módulo indica o afastamento da origem nessa direção.
 
-$$
-d_i^2
-=
-\sum_{\ell=1}^{p}
-\widehat y_{i\ell}^2.
-$$
-
-Na ACP baseada em covariâncias,
-
-$$
-d_i^2
-=
-\left\|
-\mathbf x_i-\bar{\mathbf x}
-\right\|^2,
-$$
-
-pois a transformação completa para as componentes é ortogonal. Na ACP baseada em correlações, a mesma interpretação se aplica no espaço das variáveis centralizadas e padronizadas.
-
-Quando $d_i^2>0$, o **cosseno quadrado** da observação $i$ em relação à componente $j$ é
+A qualidade de representação é avaliada pelo cosseno quadrado desenvolvido na @sec-acp-geometria-representacao. Para a componente $j$,
 
 $$
 \cos^{2\,(\mathrm{obs})}_{ij}
@@ -3935,22 +4266,23 @@ $$
 \frac{
 \widehat y_{ij}^2
 }{
-\sum_{\ell=1}^{p}\widehat y_{i\ell}^2
+\sum_{\ell=1}^{p}
+\widehat y_{i\ell}^2
 }.
-$$ {#eq-acp-cos2-observacao}
+$$
 
-Essa quantidade mede a parcela da distância quadrática da observação ao centro representada pela componente $j$. Para um subespaço formado pelas primeiras $k$ componentes, a qualidade de representação é
+Para as primeiras $k$ componentes,
 
 $$
 \cos^{2\,(\mathrm{obs})}_{i,(1:k)}
 =
 \sum_{j=1}^{k}
 \cos^{2\,(\mathrm{obs})}_{ij}.
-$$ {#eq-acp-cos2-observacao-subespaco}
+$$
 
-Valores próximos de $1$ indicam que a posição da observação em relação ao centro é bem representada pelo subespaço retido. Valores pequenos indicam que parcela importante de sua posição permanece em dimensões não representadas.
+Valores próximos de $1$ indicam que o subespaço retido representa bem a posição da observação em relação ao centro.
 
-Com pesos iguais para as observações, a **contribuição** da observação $i$ para a componente $j$ é
+Para uma componente com $\widehat{\lambda}_j>0$ e pesos iguais para as observações, a **contribuição** da observação $i$ para a componente $j$ é
 
 $$
 \operatorname{ctr}^{(\mathrm{obs})}_{ij}
@@ -4046,43 +4378,15 @@ q_{R,ij}
 =
 r_{R,ij}.
 $$
-
-As correlações fornecem uma escala comum para avaliar a representação das variáveis. Para qualquer ACP em que $s_{ii}>0$, o **cosseno quadrado** da variável $i$ em relação à componente $j$ é
+A qualidade de representação da variável é avaliada pelo cosseno quadrado desenvolvido na @sec-acp-geometria-representacao. Para uma componente com $\widehat{\lambda}_j>0$,
 
 $$
 \cos^{2\,(\mathrm{var})}_{ij}
 =
 r_{ij}^2.
-$$ {#eq-acp-cos2-variavel}
-
-A soma dessas quantidades sobre todas as componentes é
-
-$$
-\sum_{j=1}^{p}
-r_{ij}^2
-=
-1.
 $$
 
-De fato,
-
-$$
-\begin{aligned}
-\sum_{j=1}^{p}
-r_{ij}^2
-&=
-\frac{1}{s_{ii}}
-\sum_{j=1}^{p}
-\widehat{\lambda}_j
-\widehat{\alpha}_{ij}^2\\
-&=
-\frac{s_{ii}}{s_{ii}}\\
-&=
-1.
-\end{aligned}
-$$
-
-Para um subespaço formado pelas primeiras $k$ componentes,
+Para as primeiras $k$ componentes,
 
 $$
 \cos^{2\,(\mathrm{var})}_{i,(1:k)}
@@ -4091,9 +4395,10 @@ $$
 r_{ij}^2.
 $$
 
-Essa quantidade representa a parcela da variância da variável $i$ associada ao subespaço principal considerado.
+Valores próximos de $1$ indicam que a variância da variável está bem representada pelo subespaço considerado.
 
-Com pesos iguais para as variáveis, a contribuição da variável $i$ para a componente $j$ pode ser escrita como
+
+Para uma componente com $\widehat{\lambda}_j>0$ e pesos iguais para as variáveis, a contribuição da variável $i$ para a componente $j$ pode ser escrita como
 
 $$
 \operatorname{ctr}^{(\mathrm{var})}_{ij}
@@ -4131,7 +4436,8 @@ $$
 1.
 $$
 
-Na ACP baseada em correlações,
+Na ACP baseada em correlações, para uma componente com
+$\widehat{\lambda}_{Rj}>0$,
 
 $$
 q_{R,ij}
@@ -4155,9 +4461,9 @@ A coordenada localiza a variável na geometria associada às componentes. O $\co
 
 #### Duas representações complementares
 
-A ACP permite, portanto, examinar dois espaços relacionados, mas conceitualmente distintos.
+A ACP permite examinar dois espaços relacionados e distintos. A geometria dos respectivos cossenos quadrados foi desenvolvida na @sec-acp-geometria-representacao. Nesta seção, essas medidas são utilizadas para avaliar a qualidade das representações produzidas pelos mapas.
 
-No **mapa das observações**, os pontos são posicionados pelos escores. A proximidade entre pontos descreve proximidade no subespaço definido pelas componentes representadas, e a qualidade dessa representação pode ser avaliada pelos respectivos $\cos^2$.
+No **mapa das observações**, os pontos são posicionados pelos escores. A distância entre os pontos descreve a proximidade no subespaço representado, segundo a geometria das variáveis originais na ACP baseada em covariâncias e das variáveis padronizadas na ACP baseada em correlações. A qualidade da representação de cada observação é avaliada pelos respectivos $\cos^2$.
 
 No **mapa das variáveis**, duas representações devem ser distinguidas. As coordenadas $q_{ij}$ descrevem a posição das variáveis na geometria associada às componentes. As correlações $r_{ij}$ colocam todas as variáveis em uma escala comum.
 
@@ -4287,9 +4593,7 @@ As coordenadas das categorias são calculadas depois da construção dos eixos. 
 
 Os elementos suplementares preservam a separação entre a construção das componentes e a interpretação posterior da solução.
 
-
-::: {.callout-note appearance="simple" icon=false}
-## Correspondência com a implementação utilizada
+### Correspondência com a implementação utilizada
 
 Nas atividades computacionais, a ACP será realizada pelo módulo [`MEDA`](https://sebastien-le.github.io/medasite/) [@meda2026] do [jamovi](https://www.jamovi.org/) [@jamovi2026]. O `MEDA` utiliza procedimentos do pacote `FactoMineR` [@le2008factominer] e permite definir variáveis quantitativas ativas, variáveis quantitativas suplementares e variáveis categóricas suplementares.
 
@@ -4342,7 +4646,6 @@ Para as variáveis ativas, o `FactoMineR` distingue coordenadas, correlações c
 As variáveis e observações suplementares são relacionadas à solução depois que os eixos principais são determinados. Elas recebem coordenadas e medidas de representação sem participar da estimação das direções principais.
 
 A padronização para variância unitária é a configuração inicial do `MEDA`. Sua utilização deve ser definida a partir das escalas das variáveis e do objetivo da análise. A configuração padrão do programa não determina essa escolha.
-:::
 
 ## Síntese
 
