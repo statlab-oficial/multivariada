@@ -564,7 +564,7 @@ window.Quarto = {
   <li><a href="#o-centroide-como-minimizador" id="toc-o-centroide-como-minimizador" class="nav-link" data-scroll-target="#o-centroide-como-minimizador"><span class="header-section-number">16.12.1</span> O centroide como minimizador</a></li>
   <li><a href="#sec-agrupamentos-existencia-nao-unicidade" id="toc-sec-agrupamentos-existencia-nao-unicidade" class="nav-link" data-scroll-target="#sec-agrupamentos-existencia-nao-unicidade"><span class="header-section-number">16.12.2</span> Existência e não unicidade da solução</a></li>
   <li><a href="#sec-agrupamentos-algoritmo-kmedias" id="toc-sec-agrupamentos-algoritmo-kmedias" class="nav-link" data-scroll-target="#sec-agrupamentos-algoritmo-kmedias"><span class="header-section-number">16.12.3</span> Algoritmo alternante das <span class="math inline">\(K\)</span>-médias e redução do critério</a></li>
-  <li><a href="#sec-agrupamentos-invariancias-kmedias" id="toc-sec-agrupamentos-invariancias-kmedias" class="nav-link" data-scroll-target="#sec-agrupamentos-invariancias-kmedias"><span class="header-section-number">16.12.4</span> Transformações que preservam o critério das <span class="math inline">\(K\)</span>-médias</a></li>
+  <li><a href="#sec-agrupamentos-invariancias-kmedias" id="toc-sec-agrupamentos-invariancias-kmedias" class="nav-link" data-scroll-target="#sec-agrupamentos-invariancias-kmedias"><span class="header-section-number">16.12.4</span> Transformações que preservam a solução das <span class="math inline">\(K\)</span>-médias</a></li>
   <li><a href="#sec-agrupamentos-derivacao-ward" id="toc-sec-agrupamentos-derivacao-ward" class="nav-link" data-scroll-target="#sec-agrupamentos-derivacao-ward"><span class="header-section-number">16.12.5</span> Derivação do incremento de Ward</a></li>
   <li><a href="#sec-agrupamentos-empates-hierarquia" id="toc-sec-agrupamentos-empates-hierarquia" class="nav-link" data-scroll-target="#sec-agrupamentos-empates-hierarquia"><span class="header-section-number">16.12.6</span> Empates e não unicidade da hierarquia</a></li>
   <li><a href="#sec-agrupamentos-modelos-mistura" id="toc-sec-agrupamentos-modelos-mistura" class="nav-link" data-scroll-target="#sec-agrupamentos-modelos-mistura"><span class="header-section-number">16.12.7</span> Modelos de mistura como definição probabilística de grupos</a></li>
@@ -609,7 +609,7 @@ window.Quarto = {
 
 <p>A Análise de Agrupamentos organiza objetos em grupos a partir de uma representação dos dados, de uma medida de proximidade e de um critério que define a organização procurada <span class="citation" data-cites="everitt2011cluster">(<a href="references.html#ref-everitt2011cluster" role="doc-biblioref">Everitt et al., 2011</a>)</span>.</p>
 <p>Sua formulação reutiliza a matriz de dados de <a href="mod_1_vetores.html#def-matriz-dados" class="quarto-xref">Definição&nbsp;<span>1.6</span></a>, a distância euclidiana de <a href="mod_1_vetores.html#def-distancia-euclidiana" class="quarto-xref">Definição&nbsp;<span>1.13</span></a>, as geometrias induzidas de <a href="mod_1_espacos.html#def-norma-induzida" class="quarto-xref">Definição&nbsp;<span>3.17</span></a> e a decomposição da dispersão entre e dentro de grupos estabelecida em <a href="mod_2_covariancias.html#prp-decomposicao-dispersao-grupos" class="quarto-xref">Proposição&nbsp;<span>8.10</span></a>.</p>
-<p>O núcleo desenvolve a representação dos objetos, as medidas de proximidade, as partições, a formulação das <span class="math inline">\(K\)</span>-médias, os métodos hierárquicos, Ward, o dendrograma, diferentes definições matemáticas de grupo e os limites da análise. Os aprofundamentos teóricos desenvolvem propriedades das soluções e das funções objetivo, enquanto os aprofundamentos metodológicos e aplicados tratam de dados mistos, escolha do número de grupos e aspectos computacionais da obtenção das soluções.</p>
+<p>A formulação distingue partições, hierarquias e modelos probabilísticos de grupos. As <span class="math inline">\(K\)</span>-médias definem uma partição pela minimização da dispersão intragrupos, enquanto os métodos hierárquicos constroem uma sequência de fusões segundo uma medida de proximidade e uma regra de ligação. Modelos de mistura fornecem uma definição probabilística alternativa de grupo. Depois da formulação dos métodos, são examinadas as decisões sobre representação dos objetos, número de grupos, inicialização, estabilidade e interpretação da solução.</p>
 <p>Os elementos que definem o problema são organizados na <a href="#tbl-estrutura-problema-agrupamento" class="quarto-xref">Tabela&nbsp;<span>16.1</span></a>.</p>
 <div id="tbl-estrutura-problema-agrupamento" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -639,7 +639,7 @@ Tabela&nbsp;16.1: Elementos que definem um problema de Análise de Agrupamentos.
 <tr class="even">
 <td>Proximidade</td>
 <td>distância, dissimilaridade ou similaridade</td>
-<td>estabelece o significado de objetos próximos</td>
+<td>define como diferenças ou semelhanças entre objetos são quantificadas</td>
 </tr>
 <tr class="odd">
 <td>Organização</td>
@@ -1305,7 +1305,7 @@ n_k
 \mathbf c_k^\top\mathbf c_k.
 \tag{16.13}\]</span></span></p>
 <p>A fronteira é, portanto, um hiperplano.</p>
-<p>As regiões definidas simultaneamente por todos os centroides formam uma partição de Voronoi do espaço. Uma região de Voronoi pode não conter nenhuma das observações disponíveis para uma determinada configuração de centros; isso não altera sua definição geométrica.</p>
+<p>Os centroides determinam um diagrama de Voronoi: o espaço é coberto pelas regiões dos pontos para os quais cada centroide é um dos mais próximos. Essas regiões podem compartilhar fronteiras quando há empate; para obter uma partição rígida do espaço, é necessário adotar uma regra de desempate nessas fronteiras. Uma região de Voronoi pode não conter nenhuma das observações disponíveis para uma determinada configuração de centros; isso não altera sua definição geométrica.</p>
 <p>Essa geometria explica por que as <span class="math inline">\(K\)</span>-médias favorecem grupos associados a regiões convexas em torno de centros.</p>
 <p>A <a href="#fig-kmedias-voronoi" class="quarto-xref">Figura&nbsp;<span>16.3</span></a> representa uma solução com três centroides. As regiões de fundo indicam qual centroide é o mais próximo em cada posição do plano, enquanto os símbolos maiores identificam os centroides da solução.</p>
 <div class="cell" data-layout-align="center">
@@ -1608,7 +1608,7 @@ D_{\mathrm{media}}(A,B)
 </section>
 <section id="sec-agrupamentos-ward" class="level3" data-number="16.7.2">
 <h3 data-number="16.7.2" class="anchored" data-anchor-id="sec-agrupamentos-ward"><span class="header-section-number">16.7.2</span> Método de Ward e dispersão intragrupos</h3>
-<p>O método de Ward utiliza um critério de fusão baseado na dispersão quadrática intragrupos. Na formulação desenvolvida neste capítulo, os objetos possuem coordenadas em um espaço euclidiano e, em cada etapa da hierarquia, são comparados os aumentos de dispersão produzidos pelas fusões possíveis <span class="citation" data-cites="ward1963 johnson2007">(<a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>; <a href="references.html#ref-ward1963" role="doc-biblioref">Ward, 1963</a>)</span>.</p>
+<p>O método de Ward utiliza um critério de fusão baseado na dispersão quadrática intragrupos. Na formulação desenvolvida neste capítulo, os objetos possuem coordenadas em um espaço euclidiano e, em cada etapa da hierarquia, são comparados os aumentos de dispersão produzidos pelas fusões possíveis <span class="citation" data-cites="ward1963 johnson2002">(<a href="references.html#ref-johnson2002" role="doc-biblioref">Johnson; Wichern, 2002</a>; <a href="references.html#ref-ward1963" role="doc-biblioref">Ward, 1963</a>)</span>.</p>
 <p>Essa interpretação utiliza a matriz <span class="math inline">\(\mathbf T_{\mathrm{intra}}\)</span> definida em <a href="mod_2_covariancias.html#def-sscp-intragrupos" class="quarto-xref">Definição&nbsp;<span>8.14</span></a> e a decomposição estabelecida em <a href="mod_2_covariancias.html#prp-decomposicao-dispersao-grupos" class="quarto-xref">Proposição&nbsp;<span>8.10</span></a>.</p>
 <div id="prp-incremento-ward" class="theorem proposition">
 <p><span class="theorem-title"><strong>Proposição 16.1 (Incremento de dispersão no método de Ward)</strong></span> Para dois grupos não vazios <span class="math inline">\(A\)</span> e <span class="math inline">\(B\)</span>, com tamanhos <span class="math inline">\(n_A\)</span> e <span class="math inline">\(n_B\)</span> e centroides <span class="math inline">\(\mathbf c_A\)</span> e <span class="math inline">\(\mathbf c_B\)</span>, a fusão aumenta a soma de quadrados intragrupos em</p>
@@ -1645,7 +1645,7 @@ n_A+n_B
 \right)
 \right].
 \]</span></p>
-<p>No método de Ward, a hierarquia é construída sequencialmente. Em cada etapa, entre as fusões disponíveis, são reunidos os dois grupos que produzem o menor aumento da dispersão intragrupos <span class="citation" data-cites="ward1963 johnson2007">(<a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>; <a href="references.html#ref-ward1963" role="doc-biblioref">Ward, 1963</a>)</span>.</p>
+<p>No método de Ward, a hierarquia é construída sequencialmente. Em cada etapa, entre as fusões disponíveis, são reunidos os dois grupos que produzem o menor aumento da dispersão intragrupos <span class="citation" data-cites="ward1963 johnson2002">(<a href="references.html#ref-johnson2002" role="doc-biblioref">Johnson; Wichern, 2002</a>; <a href="references.html#ref-ward1963" role="doc-biblioref">Ward, 1963</a>)</span>.</p>
 <p>Uma fusão realizada em uma etapa não é desfeita posteriormente. Por isso, cortar o dendrograma de Ward em <span class="math inline">\(K\)</span> grupos não equivale, em geral, a resolver o problema global das <span class="math inline">\(K\)</span>-médias para esse mesmo valor de <span class="math inline">\(K\)</span>.</p>
 <p>A <a href="#fig-agrupamentos-ligacoes" class="quarto-xref">Figura&nbsp;<span>16.4</span></a> representa a diferença conceitual entre ligação simples, ligação completa e Ward para dois grupos.</p>
 <div class="cell" data-layout-align="center">
@@ -1833,7 +1833,7 @@ Tabela&nbsp;16.5: Elementos dos quais depende uma solução de agrupamento.
 </figure>
 </div>
 <p>Adicionar, retirar ou transformar variáveis modifica a representação dos objetos e pode alterar as relações de proximidade. Mudanças de escala e de métrica modificam a geometria utilizada para compará-los.</p>
-<p>Observações muito afastadas das demais também podem alterar a solução. Nas <span class="math inline">\(K\)</span>-médias, elas podem deslocar centroides e aumentar fortemente a dispersão quadrática; nos métodos hierárquicos, podem modificar as proximidades e a sequência de fusões. Como as fusões realizadas por um procedimento aglomerativo não são desfeitas, seus efeitos podem permanecer nas etapas posteriores da hierarquia <span class="citation" data-cites="johnson2007 hair2019multivariate">(<a href="references.html#ref-hair2019multivariate" role="doc-biblioref">Hair et al., 2018</a>; <a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>)</span>.</p>
+<p>Observações muito afastadas das demais também podem alterar a solução. Nas <span class="math inline">\(K\)</span>-médias, elas podem deslocar centroides e aumentar fortemente a dispersão quadrática; nos métodos hierárquicos, podem modificar as proximidades e a sequência de fusões. Como as fusões realizadas por um procedimento aglomerativo não são desfeitas, seus efeitos podem permanecer nas etapas posteriores da hierarquia <span class="citation" data-cites="johnson2002 hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>; <a href="references.html#ref-johnson2002" role="doc-biblioref">Johnson; Wichern, 2002</a>)</span>.</p>
 <p>A forma de grupo procurada também depende do critério. As <span class="math inline">\(K\)</span>-médias representam grupos por centroides e minimizam dispersão quadrática intragrupos. As ligações simples, completa e média utilizam diferentes definições de proximidade entre conjuntos. O método de Ward seleciona fusões segundo o aumento da dispersão intragrupos. Em modelos de mistura, os grupos correspondem a componentes de uma distribuição especificada.</p>
 <p>A solução pode não ser única. Nas <span class="math inline">\(K\)</span>-médias, diferentes partições podem atingir o mesmo mínimo; nos métodos hierárquicos, empates podem produzir diferentes sequências de fusões. Além disso, os rótulos atribuídos aos grupos são arbitrários.</p>
 <p>Os pressupostos e os limites devem, portanto, ser interpretados relativamente à formulação utilizada. A representação dos objetos, a proximidade e o critério de agrupamento fazem parte da própria definição do problema.</p>
@@ -1945,7 +1945,7 @@ Tabela&nbsp;16.6: Relações entre a Análise de Agrupamentos e outras técnicas
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Esta parte desenvolve propriedades matemáticas das soluções de agrupamento. São examinados o centroide como minimizador do critério quadrático, a existência e a não unicidade das soluções, a redução do critério pelas etapas alternadas das <span class="math inline">\(K\)</span>-médias, as transformações que preservam esse critério, a derivação do incremento de Ward, a não unicidade associada a empates nos métodos hierárquicos e a formulação probabilística de grupos por modelos de mistura. Esses resultados ampliam propriedades e formulações apresentadas no núcleo, mas não são necessários para uma primeira leitura da técnica.</p>
+<p>Esta parte desenvolve propriedades matemáticas das soluções de agrupamento. São examinados o centroide como minimizador do critério quadrático, a existência e a não unicidade das soluções, a redução do critério pelas etapas alternadas das <span class="math inline">\(K\)</span>-médias, as transformações que preservam a ordenação das partições e a solução do critério, a derivação do incremento de Ward, a não unicidade associada a empates nos métodos hierárquicos e a formulação probabilística de grupos por modelos de mistura.</p>
 </div>
 </div>
 <section id="o-centroide-como-minimizador" class="level3" data-number="16.12.1">
@@ -1999,7 +1999,7 @@ J_K
 </section>
 <section id="sec-agrupamentos-algoritmo-kmedias" class="level3" data-number="16.12.3">
 <h3 data-number="16.12.3" class="anchored" data-anchor-id="sec-agrupamentos-algoritmo-kmedias"><span class="header-section-number">16.12.3</span> Algoritmo alternante das <span class="math inline">\(K\)</span>-médias e redução do critério</h3>
-<p>A solução global definida na <a href="#eq-solucao-global-kmedias" class="quarto-xref">Equação&nbsp;<span>16.8</span></a> é um problema de otimização sobre todas as partições admissíveis. Os algoritmos usuais de <span class="math inline">\(K\)</span>-médias procuram essa solução alternando dois subproblemas já estabelecidos no núcleo: atribuição aos centroides mais próximos e atualização dos centroides pelas médias dos grupos <span class="citation" data-cites="johnson2007">(<a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>)</span>.</p>
+<p>O problema que define uma solução global na <a href="#eq-solucao-global-kmedias" class="quarto-xref">Equação&nbsp;<span>16.8</span></a> consiste em minimizar <span class="math inline">\(J_K(\mathcal P)\)</span> sobre todas as partições admissíveis. Os algoritmos usuais de <span class="math inline">\(K\)</span>-médias procuram uma solução para esse problema alternando dois subproblemas já estabelecidos no núcleo: atribuição aos centroides mais próximos e atualização dos centroides pelas médias dos grupos <span class="citation" data-cites="johnson2002">(<a href="references.html#ref-johnson2002" role="doc-biblioref">Johnson; Wichern, 2002</a>)</span>.</p>
 <div id="prp-kmedias-reducao-criterio" class="theorem proposition">
 <p><span class="theorem-title"><strong>Proposição 16.2 (Redução do critério nas etapas alternadas das <span class="math inline">\(K\)</span>-médias)</strong></span> Considere uma partição</p>
 <p><span class="math display">\[
@@ -2128,11 +2128,11 @@ J_K
 </div>
 </div>
 <p>A proposição estabelece uma propriedade de descida do critério. Se uma etapa não modifica mais as atribuições, a partição é estável em relação às duas operações alternadas.</p>
-<p>Essa estabilidade não implica que a solução obtida seja uma solução global da <a href="#eq-solucao-global-kmedias" class="quarto-xref">Equação&nbsp;<span>16.8</span></a>. Diferentes inicializações podem conduzir a partições estáveis distintas e a valores diferentes de <span class="math inline">\(J_K\)</span> <span class="citation" data-cites="johnson2007">(<a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>)</span>.</p>
+<p>Essa estabilidade não implica que a solução obtida seja uma solução global da <a href="#eq-solucao-global-kmedias" class="quarto-xref">Equação&nbsp;<span>16.8</span></a>. Diferentes inicializações podem conduzir a partições estáveis distintas e a valores diferentes de <span class="math inline">\(J_K\)</span> <span class="citation" data-cites="johnson2002">(<a href="references.html#ref-johnson2002" role="doc-biblioref">Johnson; Wichern, 2002</a>)</span>.</p>
 <p>Quando cada mudança efetiva de partição produz redução estrita do critério, o número finito de partições admissíveis impede uma sequência infinita de mudanças. Empates podem exigir regras adicionais de desempate na implementação.</p>
 </section>
 <section id="sec-agrupamentos-invariancias-kmedias" class="level3" data-number="16.12.4">
-<h3 data-number="16.12.4" class="anchored" data-anchor-id="sec-agrupamentos-invariancias-kmedias"><span class="header-section-number">16.12.4</span> Transformações que preservam o critério das <span class="math inline">\(K\)</span>-médias</h3>
+<h3 data-number="16.12.4" class="anchored" data-anchor-id="sec-agrupamentos-invariancias-kmedias"><span class="header-section-number">16.12.4</span> Transformações que preservam a solução das <span class="math inline">\(K\)</span>-médias</h3>
 <p>Considere a transformação</p>
 <p><span class="math display">\[
 \mathbf x_i^{*}
@@ -2232,13 +2232,13 @@ n_A\mathbf c_A+n_B\mathbf c_B
 n_A+n_B
 }.
 \tag{16.19}\]</span></span></p>
-<p>Defina</p>
+<p>Para qualquer grupo não vazio <span class="math inline">\(G\)</span>, com centroide <span class="math inline">\(\mathbf c_G\)</span>, defina</p>
 <p><span class="math display">\[
-J(A)
+J(G)
 =
-\sum_{i\in A}
+\sum_{i\in G}
 \left\|
-\mathbf x_i-\mathbf c_A
+\mathbf x_i-\mathbf c_G
 \right\|^2.
 \]</span></p>
 <p>O aumento da dispersão intragrupos produzido pela fusão é</p>
@@ -2366,10 +2366,10 @@ f_\ell
 \right)
 }.
 \tag{16.22}\]</span></span></p>
-<p>A diferença em relação a uma partição rígida aparece diretamente nessa expressão. Uma observação pode apresentar probabilidades positivas de associação a várias componentes. Uma classificação rígida pode ser obtida, por exemplo, pela regra</p>
+<p>A diferença em relação a uma partição rígida aparece diretamente nessa expressão. Uma observação pode apresentar probabilidades positivas de associação a várias componentes. Uma classificação rígida pode ser obtida escolhendo</p>
 <p><span class="math display">\[
 \widehat C(\mathbf x)
-=
+\in
 \operatorname*{arg\,max}_{1\leq k\leq K}
 P
 \left(
@@ -2378,6 +2378,7 @@ P
 \boldsymbol{\mathsf X}=\mathbf x
 \right).
 \]</span></p>
+<p>Quando o máximo é único, a observação recebe diretamente o rótulo da componente com maior probabilidade posterior. Em caso de empate, é necessária uma regra de desempate para produzir uma classificação rígida.</p>
 <p>Essa classificação posterior não elimina a informação probabilística da solução: além do rótulo atribuído, permanecem disponíveis as probabilidades de associação às diferentes componentes.</p>
 <p>A normalidade multivariada não é necessária para a definição do modelo. Quando</p>
 <p><span class="math display">\[
@@ -2408,7 +2409,7 @@ f_k
 </div>
 <section id="sec-agrupamentos-preparacao" class="level3" data-number="16.13.1">
 <h3 data-number="16.13.1" class="anchored" data-anchor-id="sec-agrupamentos-preparacao"><span class="header-section-number">16.13.1</span> Preparação da representação para o agrupamento</h3>
-<p>Na Análise de Agrupamentos, as variáveis utilizadas para representar os objetos participam diretamente da definição de proximidade. Sua escolha, escala e redundância podem modificar a solução antes mesmo da aplicação do algoritmo <span class="citation" data-cites="hair2019multivariate">(<a href="references.html#ref-hair2019multivariate" role="doc-biblioref">Hair et al., 2018</a>)</span>.</p>
+<p>Na Análise de Agrupamentos, as variáveis utilizadas para representar os objetos participam diretamente da definição de proximidade. Sua escolha, escala e redundância podem modificar a solução antes mesmo da aplicação do algoritmo <span class="citation" data-cites="hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>)</span>.</p>
 <section id="variáveis-utilizadas-na-formação-dos-grupos" class="level4" data-number="16.13.1.1">
 <h4 data-number="16.13.1.1" class="anchored" data-anchor-id="variáveis-utilizadas-na-formação-dos-grupos"><span class="header-section-number">16.13.1.1</span> Variáveis utilizadas na formação dos grupos</h4>
 <p>O conjunto de variáveis deve ser definido de acordo com o objetivo da análise. Incluir uma variável significa permitir que suas diferenças participem da construção dos grupos.</p>
@@ -2417,13 +2418,13 @@ f_k
 <section id="escala-e-ponderação" class="level4" data-number="16.13.1.2">
 <h4 data-number="16.13.1.2" class="anchored" data-anchor-id="escala-e-ponderação"><span class="header-section-number">16.13.1.2</span> Escala e ponderação</h4>
 <p>O efeito da escala foi desenvolvido na <a href="#sec-agrupamentos-escala" class="quarto-xref"><span>Seção 16.3.1</span></a>. Na condução da análise, a decisão é determinar se diferenças de escala devem representar diferenças reais de importância entre as variáveis.</p>
-<p>Quando essa ponderação não é desejada, a padronização pode colocar as variáveis em escalas comparáveis. Quando as diferenças de escala possuem significado substantivo, a padronização modifica esse significado e não deve ser adotada automaticamente.</p>
+<p>Quando essa ponderação não é desejada, a padronização pode colocar as variáveis em escalas comparáveis. Quando as diferenças de escala representam diferenças que devem ser preservadas na análise, a padronização modifica essa relação e não deve ser adotada automaticamente.</p>
 </section>
 <section id="redundância-entre-variáveis" class="level4" data-number="16.13.1.3">
 <h4 data-number="16.13.1.3" class="anchored" data-anchor-id="redundância-entre-variáveis"><span class="header-section-number">16.13.1.3</span> Redundância entre variáveis</h4>
 <p>Variáveis fortemente relacionadas podem produzir uma forma de ponderação implícita. Se várias variáveis representam praticamente a mesma característica, essa característica participa repetidamente do cálculo das proximidades.</p>
 <p>Assim, mesmo quando todas as variáveis recebem o mesmo peso explícito, um conjunto numeroso de variáveis redundantes pode dominar a geometria da análise.</p>
-<p>Esse problema difere da multicolinearidade em modelos de regressão. Na Análise de Agrupamentos, o efeito principal é a alteração da importância relativa das dimensões utilizadas para comparar os objetos <span class="citation" data-cites="hair2019multivariate">(<a href="references.html#ref-hair2019multivariate" role="doc-biblioref">Hair et al., 2018</a>)</span>.</p>
+<p>Esse problema difere da multicolinearidade em modelos de regressão. Na Análise de Agrupamentos, o efeito principal é a alteração da importância relativa das dimensões utilizadas para comparar os objetos <span class="citation" data-cites="hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>)</span>.</p>
 </section>
 <section id="observações-atípicas-e-representatividade" class="level4" data-number="16.13.1.4">
 <h4 data-number="16.13.1.4" class="anchored" data-anchor-id="observações-atípicas-e-representatividade"><span class="header-section-number">16.13.1.4</span> Observações atípicas e representatividade</h4>
@@ -2435,7 +2436,13 @@ f_k
 <li>uma observação de um grupo pequeno que está sub-representado na amostra.</li>
 </ul>
 <p>A decisão deve considerar a origem da observação e o objetivo da análise. A retirada de unidades pertencentes a grupos pequenos pode eliminar justamente uma estrutura que deveria ser identificada.</p>
-<p>A generalização dos grupos também depende da representatividade da amostra. O procedimento de agrupamento não fornece um mecanismo para corrigir uma amostra que não representa adequadamente a população de interesse <span class="citation" data-cites="hair2019multivariate">(<a href="references.html#ref-hair2019multivariate" role="doc-biblioref">Hair et al., 2018</a>)</span>.</p>
+<p>A generalização dos grupos também depende da relação entre a amostra e a população de interesse. O procedimento de agrupamento não corrige a ausência ou a sub-representação, na amostra, de partes da população que deveriam participar da análise <span class="citation" data-cites="hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>)</span>.</p>
+</section>
+<section id="tamanho-da-amostra-e-grupos-pequenos" class="level4" data-number="16.13.1.5">
+<h4 data-number="16.13.1.5" class="anchored" data-anchor-id="tamanho-da-amostra-e-grupos-pequenos"><span class="header-section-number">16.13.1.5</span> Tamanho da amostra e grupos pequenos</h4>
+<p>Na Análise de Agrupamentos, não há um tamanho amostral mínimo geral determinado por poder estatístico ou por uma distribuição de referência. A adequação do tamanho da amostra depende de sua capacidade de representar a heterogeneidade da população e, em particular, grupos de baixa frequência que sejam importantes para o objetivo da análise <span class="citation" data-cites="hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>)</span>.</p>
+<p>Uma amostra pode não conter observações de um grupo raro existente na população. Nessa situação, especificar um número maior de grupos não recupera uma estrutura que não está representada nos dados <span class="citation" data-cites="johnson2002">(<a href="references.html#ref-johnson2002" role="doc-biblioref">Johnson; Wichern, 2002</a>)</span>.</p>
+<p>Também deve ser examinada a quantidade de observações disponível em cada grupo candidato. Grupos muito pequenos podem representar unidades atípicas, grupos raros ou instabilidade da solução. O tamanho do grupo, isoladamente, não determina sua exclusão; sua interpretação depende do objetivo da análise, da origem das observações e da possibilidade de caracterizar adequadamente o grupo.</p>
 <div id="tbl-preparacao-agrupamentos" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-preparacao-agrupamentos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -2477,9 +2484,9 @@ Tabela&nbsp;16.7: Aspectos da preparação da representação que afetam a Anál
 <td>são erros, unidades relevantes ou grupos sub-representados?</td>
 </tr>
 <tr class="odd">
-<td><strong>representatividade amostral</strong></td>
-<td>limita a generalização da estrutura encontrada</td>
-<td>a amostra representa a população para a qual os grupos serão interpretados?</td>
+<td><strong>tamanho da amostra</strong></td>
+<td>pode impedir que grupos de baixa frequência estejam representados nos dados</td>
+<td>há observações suficientes para representar e caracterizar os grupos relevantes?</td>
 </tr>
 </tbody>
 </table>
@@ -2530,6 +2537,7 @@ R_j
 <h3 data-number="16.13.3" class="anchored" data-anchor-id="sec-agrupamentos-escolha-metodo"><span class="header-section-number">16.13.3</span> Escolha da medida de proximidade e do procedimento</h3>
 <p>A medida de proximidade e o procedimento de agrupamento devem ser escolhidos de forma compatível. A mesma matriz de dados pode produzir soluções diferentes quando muda a geometria utilizada para comparar os objetos ou o critério que define a formação dos grupos.</p>
 <p>A primeira decisão é determinar qual informação deve representar a proximidade entre os objetos. Para variáveis quantitativas, a distância euclidiana utiliza diretamente as diferenças entre suas coordenadas e é compatível com métodos baseados em centroides e dispersão quadrática. A distância de Mahalanobis incorpora a estrutura de covariâncias e modifica a geometria segundo a variabilidade e a associação entre as variáveis, conforme <a href="mod_2_covariancias.html#def-distancia-mahalanobis" class="quarto-xref">Definição&nbsp;<span>8.9</span></a>.</p>
+<p>Essa escolha depende também de a comparação procurar proximidade entre os níveis das variáveis ou semelhança entre os padrões dos objetos. Medidas de distância comparam diretamente as posições dos objetos no espaço das variáveis. Quando o interesse está na semelhança do padrão apresentado pelas características, uma medida de similaridade baseada em correlação pode ser considerada <span class="citation" data-cites="hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>)</span>. Nesse caso, objetos com níveis diferentes podem apresentar padrões semelhantes. Essa representação deve ser utilizada apenas com procedimentos compatíveis com a medida de similaridade adotada.</p>
 <p>Para dados de tipos diferentes, uma matriz de dissimilaridades construída pela medida de Gower pode fornecer uma representação comum, conforme a <a href="#sec-agrupamentos-gower" class="quarto-xref"><span>Seção 16.13.2</span></a>. Nesse caso, o procedimento subsequente deve aceitar uma matriz de dissimilaridades ou utilizar uma função objetivo própria para dados mistos.</p>
 <p>A segunda decisão é definir qual noção de grupo é compatível com o objetivo da análise. Os principais procedimentos desenvolvidos neste capítulo privilegiam estruturas diferentes.</p>
 <div id="tbl-escolha-metodo-agrupamentos" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2581,7 +2589,7 @@ Tabela&nbsp;16.8: Relação entre procedimentos de agrupamento e a estrutura pri
 <tr class="odd">
 <td><strong>Ward</strong></td>
 <td>aumento da dispersão quadrática intragrupos</td>
-<td>grupos compactos segundo um critério de variância</td>
+<td>grupos compactos segundo a dispersão quadrática intragrupos</td>
 <td>requer compatibilidade com a geometria euclidiana adotada</td>
 </tr>
 </tbody>
@@ -2591,11 +2599,11 @@ Tabela&nbsp;16.8: Relação entre procedimentos de agrupamento e a estrutura pri
 </div>
 <p>A ligação simples pode reunir objetos por cadeias sucessivas de proximidade. Essa propriedade permite representar estruturas conectadas que não precisam ser compactas, mas também torna o método sensível à presença de pontes formadas por observações intermediárias.</p>
 <p>A ligação completa utiliza a maior dissimilaridade entre os grupos candidatos à fusão. Ela evita o mecanismo de encadeamento da ligação simples e tende a produzir grupos mais compactos, embora a comparação dependa dos elementos mais afastados de cada par de grupos.</p>
-<p>A ligação média utiliza todas as dissimilaridades entre os dois grupos e não depende exclusivamente do par mais próximo ou mais afastado. Por isso, representa uma alternativa intermediária entre as ligações simples e completa <span class="citation" data-cites="hair2019multivariate">(<a href="references.html#ref-hair2019multivariate" role="doc-biblioref">Hair et al., 2018</a>)</span>.</p>
+<p>A ligação média utiliza todas as dissimilaridades entre os dois grupos e não depende exclusivamente do par mais próximo ou mais afastado. Por isso, representa uma alternativa intermediária entre as ligações simples e completa <span class="citation" data-cites="hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>)</span>.</p>
 <p>O método de Ward procura limitar o aumento da dispersão intragrupos a cada fusão. Sua interpretação está diretamente vinculada à formulação quadrática desenvolvida na <a href="#sec-agrupamentos-ward" class="quarto-xref"><span>Seção 16.7.2</span></a>. Observações atípicas podem alterar fortemente essa dispersão e, consequentemente, a sequência de fusões.</p>
-<p>As <span class="math inline">\(K\)</span>-médias utilizam uma partição com número de grupos previamente especificado e permitem a realocação das observações durante a busca computacional. Métodos hierárquicos produzem simultaneamente uma sequência de partições aninhadas e não desfazem fusões realizadas em etapas anteriores <span class="citation" data-cites="johnson2007">(<a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>)</span>.</p>
-<p>Quando o objetivo e os dados permitem mais de um procedimento, a comparação entre soluções pode fornecer informação sobre a dependência da estrutura em relação ao método. Johnson e Wichern recomendam examinar diferentes procedimentos e medidas de proximidade quando houver alternativas plausíveis; concordância aproximada entre soluções fornece evidência de maior estabilidade da estrutura encontrada <span class="citation" data-cites="johnson2007">(<a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>)</span>.</p>
-<p>Uma estratégia possível consiste em utilizar inicialmente um método hierárquico para examinar diferentes números de grupos e obter centroides candidatos, seguidos por <span class="math inline">\(K\)</span>-médias com esses centroides como valores iniciais <span class="citation" data-cites="hair2019multivariate">(<a href="references.html#ref-hair2019multivariate" role="doc-biblioref">Hair et al., 2018</a>)</span>. Essa combinação é uma estratégia computacional e não estabelece equivalência entre os dois critérios.</p>
+<p>As <span class="math inline">\(K\)</span>-médias utilizam uma partição com número de grupos previamente especificado e permitem a realocação das observações durante a busca computacional. Métodos hierárquicos produzem simultaneamente uma sequência de partições aninhadas e não desfazem fusões realizadas em etapas anteriores <span class="citation" data-cites="johnson2002">(<a href="references.html#ref-johnson2002" role="doc-biblioref">Johnson; Wichern, 2002</a>)</span>.</p>
+<p>Quando o objetivo e os dados permitem mais de um procedimento, a comparação entre soluções pode fornecer informação sobre a dependência da estrutura em relação ao método. Johnson e Wichern recomendam examinar diferentes procedimentos e medidas de proximidade quando houver alternativas plausíveis; concordância aproximada entre soluções fornece evidência de maior estabilidade da estrutura encontrada <span class="citation" data-cites="johnson2002">(<a href="references.html#ref-johnson2002" role="doc-biblioref">Johnson; Wichern, 2002</a>)</span>.</p>
+<p>Uma estratégia possível consiste em utilizar inicialmente um método hierárquico para examinar diferentes números de grupos e obter centroides candidatos, seguidos por <span class="math inline">\(K\)</span>-médias com esses centroides como valores iniciais <span class="citation" data-cites="hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>)</span>. Essa combinação é uma estratégia computacional e não estabelece equivalência entre os dois critérios.</p>
 </section>
 <section id="sec-escolha-k-agrupamentos" class="level3" data-number="16.13.4">
 <h3 data-number="16.13.4" class="anchored" data-anchor-id="sec-escolha-k-agrupamentos"><span class="header-section-number">16.13.4</span> Escolha do número de grupos</h3>
@@ -2670,7 +2678,7 @@ W_K.
 \]</span></p>
 <p>A aplicação da estatística gap depende, portanto, da distribuição de referência e do procedimento utilizado para obter as soluções observadas e de referência.</p>
 <p>O cotovelo, a silhueta e a estatística gap fornecem informações diferentes sobre as soluções obtidas para cada valor de <span class="math inline">\(K\)</span>. Nenhum desses critérios estabelece, isoladamente, a existência de um número verdadeiro de grupos na população.</p>
-<p>A escolha de <span class="math inline">\(K\)</span> deve considerar conjuntamente o comportamento desses critérios, a estabilidade da partição e a possibilidade de caracterizar os grupos a partir das variáveis utilizadas e do objetivo da análise <span class="citation" data-cites="hair2019multivariate">(<a href="references.html#ref-hair2019multivariate" role="doc-biblioref">Hair et al., 2018</a>)</span>. A estabilidade e a validação da solução são desenvolvidas na <a href="#sec-agrupamentos-validacao" class="quarto-xref"><span>Seção 16.13.7</span></a>.</p>
+<p>A escolha de <span class="math inline">\(K\)</span> deve considerar conjuntamente o comportamento desses critérios, a estabilidade da partição e a possibilidade de caracterizar os grupos a partir das variáveis utilizadas e do objetivo da análise <span class="citation" data-cites="hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>)</span>. A estabilidade e a validação da solução são desenvolvidas na <a href="#sec-agrupamentos-validacao" class="quarto-xref"><span>Seção 16.13.7</span></a>.</p>
 <section id="escolha-de-uma-partição-na-hierarquia" class="level4" data-number="16.13.4.1">
 <h4 data-number="16.13.4.1" class="anchored" data-anchor-id="escolha-de-uma-partição-na-hierarquia"><span class="header-section-number">16.13.4.1</span> Escolha de uma partição na hierarquia</h4>
 <p>Um método hierárquico não produz diretamente uma única partição final com <span class="math inline">\(K\)</span> grupos. Ele fornece uma sequência aninhada de partições, representada pelo dendrograma. A escolha de <span class="math inline">\(K\)</span> corresponde a selecionar um nível dessa hierarquia.</p>
@@ -2691,7 +2699,7 @@ W_K.
 <section id="sec-agrupamentos-inicializacao-kmedias" class="level3" data-number="16.13.5">
 <h3 data-number="16.13.5" class="anchored" data-anchor-id="sec-agrupamentos-inicializacao-kmedias"><span class="header-section-number">16.13.5</span> Inicialização e comparação entre execuções</h3>
 <p>A <a href="#prp-kmedias-reducao-criterio" class="quarto-xref">Proposição&nbsp;<span>16.2</span></a> mostra que as etapas alternadas das <span class="math inline">\(K\)</span>-médias não aumentam o critério, mas essa propriedade não garante que uma execução encontre a solução global.</p>
-<p>O procedimento pode começar por uma partição inicial das observações ou por <span class="math inline">\(K\)</span> centroides iniciais. A escolha desses valores influencia a trajetória seguida pelo algoritmo e pode produzir soluções finais distintas <span class="citation" data-cites="johnson2007">(<a href="references.html#ref-johnson2007" role="doc-biblioref">Johnson; Wichern, 2007</a>)</span>.</p>
+<p>O procedimento pode começar por uma partição inicial das observações ou por <span class="math inline">\(K\)</span> centroides iniciais. A escolha desses valores influencia a trajetória seguida pelo algoritmo e pode produzir soluções finais distintas <span class="citation" data-cites="johnson2002">(<a href="references.html#ref-johnson2002" role="doc-biblioref">Johnson; Wichern, 2002</a>)</span>.</p>
 <p>Para um mesmo valor de <span class="math inline">\(K\)</span>, a mesma representação dos dados e o mesmo critério, é recomendável executar o procedimento a partir de diferentes inicializações. Entre as soluções obtidas, valores menores de</p>
 <p><span class="math display">\[
 J_K
@@ -2701,7 +2709,7 @@ J_K
 \]</span></p>
 <p>indicam melhor atendimento ao critério das <span class="math inline">\(K\)</span>-médias.</p>
 <p>A comparação não deve se limitar ao valor da função objetivo. Duas execuções podem produzir valores próximos de <span class="math inline">\(J_K\)</span> e ainda assim gerar composições diferentes dos grupos. Por isso, também devem ser examinados os tamanhos dos grupos, seus centroides e a permanência das observações em grupos correspondentes.</p>
-<p>Uma estratégia de inicialização pode utilizar centroides obtidos previamente por um método hierárquico. Outra possibilidade é utilizar diferentes conjuntos de pontos iniciais aleatórios. Hair et al.&nbsp;utilizam precisamente a repetição da análise não hierárquica com pontos-semente distintos como uma verificação de estabilidade da solução <span class="citation" data-cites="hair2019multivariate">(<a href="references.html#ref-hair2019multivariate" role="doc-biblioref">Hair et al., 2018</a>)</span>.</p>
+<p>Uma estratégia de inicialização pode utilizar centroides obtidos previamente por um método hierárquico. Outra possibilidade é utilizar diferentes conjuntos de pontos iniciais aleatórios. Hair et al.&nbsp;utilizam precisamente a repetição da análise não hierárquica com pontos-semente distintos como uma verificação de estabilidade da solução <span class="citation" data-cites="hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>)</span>.</p>
 <p>A estabilidade em relação à inicialização informa se a solução é sensível ao procedimento de busca. Ela não demonstra, por si só, que os grupos correspondam a uma estrutura populacional.</p>
 </section>
 <section id="sec-agrupamentos-ward-computacional" class="level3" data-number="16.13.6">
@@ -2725,7 +2733,7 @@ n_A+n_B
 </section>
 <section id="sec-agrupamentos-validacao" class="level3" data-number="16.13.7">
 <h3 data-number="16.13.7" class="anchored" data-anchor-id="sec-agrupamentos-validacao"><span class="header-section-number">16.13.7</span> Estabilidade, validação e perfil dos grupos</h3>
-<p>Uma solução de agrupamento deve ser examinada além do valor do critério que a produziu. Como os grupos são construídos a partir dos próprios dados, é necessário avaliar sua estabilidade, sua interpretação e sua relação com informações que não participaram diretamente da formação da partição <span class="citation" data-cites="hair2019multivariate">(<a href="references.html#ref-hair2019multivariate" role="doc-biblioref">Hair et al., 2018</a>)</span>.</p>
+<p>Uma solução de agrupamento deve ser examinada além do valor do critério que a produziu. Como os grupos são construídos a partir dos próprios dados, é necessário avaliar sua estabilidade, sua interpretação e sua relação com informações que não participaram diretamente da formação da partição <span class="citation" data-cites="hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>)</span>.</p>
 <section id="estabilidade-da-solução" class="level4" data-number="16.13.7.1">
 <h4 data-number="16.13.7.1" class="anchored" data-anchor-id="estabilidade-da-solução"><span class="header-section-number">16.13.7.1</span> Estabilidade da solução</h4>
 <p>A estabilidade examina se uma estrutura semelhante reaparece quando aspectos razoáveis do procedimento são modificados.</p>
@@ -2733,22 +2741,27 @@ n_A+n_B
 <p>Também podem ser comparadas soluções obtidas em subamostras, após pequenas perturbações dos dados ou por procedimentos de agrupamento compatíveis com o mesmo objetivo. Em uma estrutura bem definida, pequenas alterações na representação não deveriam produzir uma reorganização completa dos grupos. Nesses casos, a comparação deve considerar que os rótulos dos grupos são arbitrários. Antes de comparar dois agrupamentos, é necessário estabelecer a correspondência entre grupos com perfis semelhantes.</p>
 <p>A estabilidade não significa identidade exata entre partições. O objetivo é verificar se o número de grupos, seus perfis e a alocação das observações apresentam mudanças suficientemente pequenas para sustentar a interpretação proposta.</p>
 </section>
-<section id="perfil-dos-grupos" class="level4" data-number="16.13.7.2">
-<h4 data-number="16.13.7.2" class="anchored" data-anchor-id="perfil-dos-grupos"><span class="header-section-number">16.13.7.2</span> Perfil dos grupos</h4>
-<p>Depois de escolhida uma solução, os grupos devem ser caracterizados pelas variáveis que participaram da análise.</p>
+<section id="caracterização-pelas-variáveis-de-agrupamento" class="level4" data-number="16.13.7.2">
+<h4 data-number="16.13.7.2" class="anchored" data-anchor-id="caracterização-pelas-variáveis-de-agrupamento"><span class="header-section-number">16.13.7.2</span> Caracterização pelas variáveis de agrupamento</h4>
+<p>Depois de escolhida uma solução, os grupos devem ser caracterizados pelas variáveis que participaram de sua formação.</p>
 <p>Para métodos baseados em centroides, os vetores</p>
 <p><span class="math display">\[
 \mathbf c_1,\ldots,\mathbf c_K
 \]</span></p>
 <p>fornecem perfis médios diretamente relacionados à construção da solução. A comparação entre esses perfis permite identificar quais variáveis distinguem os grupos e quais apresentam pouca variação entre eles.</p>
-<p>O perfil não deve ser reduzido apenas aos centroides. Tamanho dos grupos, dispersão interna e presença de observações afastadas também ajudam a caracterizar a estrutura obtida.</p>
+<p>A caracterização não deve ser reduzida apenas aos centroides. Tamanho dos grupos, dispersão interna e presença de observações afastadas também ajudam a descrever a estrutura obtida.</p>
 </section>
-<section id="variáveis-externas-à-formação-dos-grupos" class="level4" data-number="16.13.7.3">
-<h4 data-number="16.13.7.3" class="anchored" data-anchor-id="variáveis-externas-à-formação-dos-grupos"><span class="header-section-number">16.13.7.3</span> Variáveis externas à formação dos grupos</h4>
-<p>Variáveis que não participaram do agrupamento podem ser utilizadas para examinar diferenças externas entre os grupos.</p>
-<p>Se uma variável externa possui relação substantiva esperada com a estrutura procurada, diferenças coerentes entre os grupos fornecem evidência adicional para a interpretação da solução. Hair et al.&nbsp;tratam essa etapa como avaliação de validade de critério <span class="citation" data-cites="hair2019multivariate">(<a href="references.html#ref-hair2019multivariate" role="doc-biblioref">Hair et al., 2018</a>)</span>.</p>
-<p>Essa avaliação deve ser distinguida da própria formação dos grupos. A variável externa não participa das proximidades ou da função objetivo utilizada para construir a partição.</p>
-<p>A existência de diferenças estatisticamente significativas entre grupos em variáveis externas não demonstra, isoladamente, que a solução seja uma estrutura populacional verdadeira. A interpretação deve considerar o delineamento amostral, a estabilidade da solução e o significado das diferenças encontradas.</p>
+<section id="validade-de-critério-com-variáveis-externas" class="level4" data-number="16.13.7.3">
+<h4 data-number="16.13.7.3" class="anchored" data-anchor-id="validade-de-critério-com-variáveis-externas"><span class="header-section-number">16.13.7.3</span> Validade de critério com variáveis externas</h4>
+<p>Variáveis que não participaram da formação dos grupos podem ser reservadas para avaliar a relação da solução com critérios externos.</p>
+<p>Quando existe, com base no problema de pesquisa, uma relação esperada entre uma variável externa e a estrutura procurada, diferenças coerentes entre os grupos fornecem evidência adicional para a interpretação da solução. Hair et al.&nbsp;tratam essa etapa como avaliação de validade de critério <span class="citation" data-cites="hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>)</span>.</p>
+<p>Essa avaliação deve ser distinguida da própria formação dos grupos. A variável utilizada como critério externo não participa das proximidades ou da função objetivo empregada para construir a partição.</p>
+</section>
+<section id="perfil-dos-grupos-com-variáveis-externas" class="level4" data-number="16.13.7.4">
+<h4 data-number="16.13.7.4" class="anchored" data-anchor-id="perfil-dos-grupos-com-variáveis-externas"><span class="header-section-number">16.13.7.4</span> Perfil dos grupos com variáveis externas</h4>
+<p>Outras variáveis que não participaram da formação dos grupos podem ser utilizadas para caracterizar a solução depois que a partição foi escolhida. Nesse caso, sua função é descrever características dos grupos que auxiliem sua interpretação, e não avaliar necessariamente a validade de critério <span class="citation" data-cites="hair2009">(<a href="references.html#ref-hair2009" role="doc-biblioref">Hair et al., 2009</a>)</span>.</p>
+<p>Essas variáveis podem representar características demográficas, ambientais, comportamentais ou outras informações pertinentes ao problema estudado. Diferenças entre os grupos ajudam a construir seus perfis, mas não demonstram, isoladamente, que a partição corresponda a grupos existentes na população.</p>
+<p>Tanto a validade de critério quanto o perfil externo devem ser interpretados considerando o delineamento amostral, a estabilidade da solução e a magnitude das diferenças encontradas.</p>
 <div id="tbl-validacao-agrupamentos" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-validacao-agrupamentos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -2785,26 +2798,31 @@ Tabela&nbsp;16.9: Dimensões utilizadas para avaliar e interpretar uma solução
 <td>dependência da solução em relação ao método</td>
 </tr>
 <tr class="even">
-<td><strong>perfil interno</strong></td>
+<td><strong>caracterização pelas variáveis de agrupamento</strong></td>
 <td>examinar centroides, dispersões e tamanhos dos grupos</td>
-<td>características que definem cada grupo</td>
+<td>características utilizadas para interpretar a própria solução</td>
 </tr>
 <tr class="odd">
-<td><strong>variáveis externas</strong></td>
-<td>comparar grupos em variáveis não utilizadas na formação</td>
+<td><strong>validade de critério</strong></td>
+<td>comparar os grupos em variáveis externas para as quais exista uma relação esperada</td>
 <td>relação da solução com critérios externos</td>
+</tr>
+<tr class="even">
+<td><strong>perfil externo</strong></td>
+<td>descrever os grupos com variáveis adicionais não utilizadas na formação</td>
+<td>características que auxiliam a interpretação e a descrição dos grupos</td>
 </tr>
 </tbody>
 </table>
 </div>
 </figure>
 </div>
-<p>Uma solução estável pode continuar sendo pouco útil se sua interpretação não estiver relacionada ao objetivo da análise. Da mesma forma, uma solução facilmente interpretável pode ser frágil diante de pequenas mudanças nos dados ou na inicialização. A avaliação deve considerar conjuntamente estabilidade e significado.</p>
+<p>Uma solução estável pode não responder ao objetivo da análise, enquanto uma solução de interpretação simples pode mudar com pequenas alterações nos dados ou na inicialização. A avaliação deve verificar, separadamente, a estabilidade da partição e sua relação com o problema que motivou o agrupamento.</p>
 </section>
 </section>
 <section id="sec-agrupamentos-correspondencia-implementacao" class="level3" data-number="16.13.8">
 <h3 data-number="16.13.8" class="anchored" data-anchor-id="sec-agrupamentos-correspondencia-implementacao"><span class="header-section-number">16.13.8</span> Correspondência com a implementação utilizada</h3>
-<p>Nas atividades computacionais, a Análise de Agrupamentos será realizada pelo módulo <code>snowCluster</code> <span class="citation" data-cites="seol2026snowcluster">(<a href="references.html#ref-seol2026snowcluster" role="doc-biblioref">Seol, 2026</a>)</span> do <code>jamovi</code> <span class="citation" data-cites="jamovi2026">(<a href="references.html#ref-jamovi2026" role="doc-biblioref">The jamovi project, 2026</a>)</span>. A implementação oferece procedimentos distintos para variáveis quantitativas, dados mistos e agrupamento hierárquico. Essas opções devem ser relacionadas aos respectivos critérios estatísticos e não tratadas como variações de um único algoritmo.</p>
+<p>Nas atividades computacionais, a Análise de Agrupamentos será realizada pelo módulo <code>snowCluster</code> <span class="citation" data-cites="seol2026snowcluster">(<a href="references.html#ref-seol2026snowcluster" role="doc-biblioref">Seol, 2026</a>)</span> do <code>jamovi</code> <span class="citation" data-cites="jamovi2026">(<a href="references.html#ref-jamovi2026" role="doc-biblioref">The jamovi project, 2026</a>)</span>. A implementação reúne procedimentos que correspondem a formulações distintas desenvolvidas no capítulo.</p>
 <div id="tbl-correspondencia-implementacao-agrupamentos" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-correspondencia-implementacao-agrupamentos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -2827,12 +2845,12 @@ Tabela&nbsp;16.10: Correspondência entre elementos da implementação e os obje
 <tbody>
 <tr class="odd">
 <td><strong>K-means Clustering</strong></td>
-<td>partição de observações pela minimização da soma de quadrados intragrupos</td>
+<td>partição pela minimização da soma de quadrados intragrupos</td>
 <td><a href="#sec-agrupamentos-kmedias" class="quarto-xref"><span>Seção 16.6.2</span></a></td>
 </tr>
 <tr class="even">
 <td><strong>Number of clusters</strong></td>
-<td>número <span class="math inline">\(K\)</span> de grupos especificado para a partição</td>
+<td>número <span class="math inline">\(K\)</span> de grupos</td>
 <td><a href="#sec-escolha-k-agrupamentos" class="quarto-xref"><span>Seção 16.13.4</span></a></td>
 </tr>
 <tr class="odd">
@@ -2842,12 +2860,12 @@ Tabela&nbsp;16.10: Correspondência entre elementos da implementação e os obje
 </tr>
 <tr class="even">
 <td><strong>Algorithm</strong></td>
-<td>procedimento computacional utilizado para procurar uma solução do critério das <span class="math inline">\(K\)</span>-médias</td>
+<td>algoritmo utilizado para procurar uma solução do critério das <span class="math inline">\(K\)</span>-médias</td>
 <td><a href="#sec-agrupamentos-algoritmo-kmedias" class="quarto-xref"><span>Seção 16.12.3</span></a></td>
 </tr>
 <tr class="odd">
 <td><strong>Number of random starting values</strong></td>
-<td>número de inicializações utilizadas na busca por uma solução</td>
+<td>número de inicializações utilizadas na busca</td>
 <td><a href="#sec-agrupamentos-inicializacao-kmedias" class="quarto-xref"><span>Seção 16.13.5</span></a></td>
 </tr>
 <tr class="even">
@@ -2857,7 +2875,7 @@ Tabela&nbsp;16.10: Correspondência entre elementos da implementação e os obje
 </tr>
 <tr class="odd">
 <td><strong>Within-cluster, between-cluster e total sum of squares</strong></td>
-<td>dispersão intragrupos, entre grupos e total</td>
+<td>dispersões intragrupos, entre grupos e total</td>
 <td><a href="#sec-agrupamentos-dispersao" class="quarto-xref"><span>Seção 16.6.1</span></a></td>
 </tr>
 <tr class="even">
@@ -2872,49 +2890,59 @@ Tabela&nbsp;16.10: Correspondência entre elementos da implementação e os obje
 </tr>
 <tr class="even">
 <td><strong>Gower distance</strong></td>
-<td>procedimento para variáveis quantitativas e categóricas baseado em uma dissimilaridade para dados mistos</td>
+<td>agrupamento de dados mistos por procedimento baseado em dissimilaridade de Gower</td>
 <td><a href="#sec-agrupamentos-gower" class="quarto-xref"><span>Seção 16.13.2</span></a></td>
 </tr>
 <tr class="odd">
-<td><strong>Silhouette index</strong> e <strong>Silhouette plot</strong></td>
-<td>avaliação da coesão e separação da solução considerada</td>
+<td><strong>Silhouette index</strong></td>
+<td>medida de avaliação da separação e coesão dos grupos</td>
 <td><a href="#sec-escolha-k-agrupamentos" class="quarto-xref"><span>Seção 16.13.4</span></a></td>
 </tr>
 <tr class="even">
-<td><strong>Distance measure</strong> no agrupamento hierárquico</td>
-<td>medida utilizada para construir as dissimilaridades entre observações</td>
-<td><a href="#sec-agrupamentos-hierarquicos" class="quarto-xref"><span>Seção 16.7</span></a> e <a href="#sec-agrupamentos-escolha-metodo" class="quarto-xref"><span>Seção 16.13.3</span></a></td>
+<td><strong>Silhouette plot</strong></td>
+<td>na versão auditada, não corresponde ao gráfico de silhueta definido no capítulo</td>
+<td><a href="#sec-escolha-k-agrupamentos" class="quarto-xref"><span>Seção 16.13.4</span></a></td>
 </tr>
 <tr class="odd">
-<td><strong>Clustering method</strong> no agrupamento hierárquico</td>
+<td><strong>Distance measure</strong></td>
+<td>medida utilizada para construir as dissimilaridades no agrupamento hierárquico</td>
+<td><a href="#sec-agrupamentos-escolha-metodo" class="quarto-xref"><span>Seção 16.13.3</span></a></td>
+</tr>
+<tr class="even">
+<td><strong>Clustering method</strong></td>
 <td>regra de ligação utilizada na sequência de fusões</td>
 <td><a href="#sec-agrupamentos-hierarquicos" class="quarto-xref"><span>Seção 16.7</span></a> e <a href="#sec-agrupamentos-escolha-metodo" class="quarto-xref"><span>Seção 16.13.3</span></a></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>Ward.D</strong> e <strong>Ward.D2</strong></td>
-<td>convenções computacionais distintas para o método de Ward</td>
+<td>convenções computacionais distintas associadas ao método de Ward</td>
 <td><a href="#sec-agrupamentos-ward-computacional" class="quarto-xref"><span>Seção 16.13.6</span></a></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong>Dendrogram</strong></td>
 <td>representação da sequência hierárquica de fusões</td>
-<td><a href="#def-dendrograma" class="quarto-xref">Definição&nbsp;<span>16.5</span></a> e <a href="#sec-escolha-k-agrupamentos" class="quarto-xref"><span>Seção 16.13.4</span></a></td>
+<td><a href="#def-dendrograma" class="quarto-xref">Definição&nbsp;<span>16.5</span></a></td>
+</tr>
+<tr class="odd">
+<td><strong>Variable clustering (PCA)</strong></td>
+<td>agrupamento de variáveis em uma representação obtida por ACP</td>
+<td>não corresponde ao agrupamento das observações desenvolvido no núcleo</td>
+</tr>
+<tr class="even">
+<td><strong>With p-values</strong></td>
+<td>agrupamento hierárquico de variáveis com avaliação por reamostragem</td>
+<td>não corresponde à validação da partição das observações</td>
 </tr>
 </tbody>
 </table>
 </div>
 </figure>
 </div>
-<p>Na análise de <span class="math inline">\(K\)</span>-médias com variáveis quantitativas, o <code>snowCluster</code> utiliza a função <code>kmeans</code> do R. A implementação permite selecionar os algoritmos Hartigan–Wong, Lloyd, Forgy e MacQueen e definir o número de inicializações aleatórias. Essas opções modificam o procedimento utilizado para procurar uma partição, mas não modificam o critério <span class="math inline">\(J_K\)</span> que define as <span class="math inline">\(K\)</span>-médias. A saída apresenta os tamanhos dos grupos, seus centroides e as somas de quadrados dentro dos grupos, entre os grupos e total.</p>
-<p>A opção <strong>Standardize variables</strong> está ativada por padrão na implementação atual. A padronização altera as distâncias entre as observações e, portanto, pode alterar a própria partição. Sua utilização deve ser definida de acordo com a escala das variáveis e com o significado atribuído às diferenças entre elas, conforme discutido na <a href="#sec-agrupamentos-preparacao" class="quarto-xref"><span>Seção 16.13.1</span></a>. A configuração padrão do programa não determina essa escolha.</p>
-<p>O gráfico do cotovelo é calculado para uma sequência de valores de <span class="math inline">\(K\)</span> utilizando a mesma opção de padronização, o algoritmo e o número de inicializações definidos para a análise. O gráfico da estatística gap também utiliza a opção de padronização, mas, na versão considerada do <code>snowCluster</code>, sua chamada computacional não repassa ao procedimento auxiliar as escolhas de <strong>Algorithm</strong> e <strong>Number of random starting values</strong>. Assim, os valores da estatística gap não devem ser interpretados como resultados obtidos necessariamente sob a mesma configuração de busca da solução principal de <span class="math inline">\(K\)</span>-médias.</p>
-<p>A opção <strong>Cluster scatter plot</strong> representa graficamente a partição obtida. Quando mais de duas variáveis são utilizadas, a função empregada pela implementação projeta as observações nas duas primeiras componentes principais para construir o gráfico. A proximidade visual nesse plano não corresponde, nesse caso, a toda a distância utilizada para formar os grupos. O gráfico representa a solução em duas dimensões e não redefine o critério de agrupamento.</p>
-<p>Para dados que incluem variáveis categóricas, a opção <strong>Gower distance</strong> segue uma rota computacional distinta da <span class="math inline">\(K\)</span>-médias euclidiana. A implementação utiliza um procedimento para dados mistos com dissimilaridade de Gower. Portanto, essa opção não deve ser interpretada como simples substituição da distância euclidiana por Gower dentro da função objetivo das <span class="math inline">\(K\)</span>-médias desenvolvida na <a href="#sec-agrupamentos-kmedias" class="quarto-xref"><span>Seção 16.6.2</span></a>.</p>
-<p>Na versão considerada, o cálculo do índice e do gráfico de silhueta na análise <code>K-means Clustering</code> está associado à rota para dados mistos com Gower. A definição geral da silhueta apresentada na <a href="#sec-escolha-k-agrupamentos" class="quarto-xref"><span>Seção 16.13.4</span></a> permanece aplicável a uma partição acompanhada de uma medida de dissimilaridade, mas a presença da opção na interface não implica que a implementação a calcule para todas as modalidades de agrupamento oferecidas pelo módulo.</p>
-<p>No agrupamento hierárquico usual, o <code>snowCluster</code> permite selecionar a medida de distância, a regra de ligação, o número de grupos utilizado para cortar a hierarquia e a forma de representação do dendrograma. A opção de padronização também está ativada por padrão. As opções <strong>Ward.D</strong> e <strong>Ward.D2</strong> devem ser interpretadas conforme as convenções discutidas na <a href="#sec-agrupamentos-ward-computacional" class="quarto-xref"><span>Seção 16.13.6</span></a>.</p>
-<p>A opção <strong>Variable clustering (PCA)</strong> da análise de <span class="math inline">\(K\)</span>-médias constitui um procedimento diferente daquele utilizado para agrupar as observações. A implementação realiza uma ACP das variáveis padronizadas e aplica <span class="math inline">\(K\)</span>-médias às coordenadas das variáveis nessa representação. O resultado é, portanto, um agrupamento de <strong>variáveis</strong>, não a partição das observações definida na <a href="#sec-agrupamentos-kmedias" class="quarto-xref"><span>Seção 16.6.2</span></a>. Esse procedimento não é desenvolvido neste capítulo.</p>
-<p>A modalidade hierárquica <strong>With p-values</strong> também deve ser distinguida do agrupamento das observações. Na implementação atual, essa opção utiliza <code>pvclust</code> sobre a matriz formada pelas variáveis selecionadas. Como <code>pvclust</code> considera as colunas da matriz como os objetos a serem agrupados, os nós avaliados correspondem a grupos de <strong>variáveis</strong> <span class="citation" data-cites="suzuki2006pvclust">(<a href="references.html#ref-suzuki2006pvclust" role="doc-biblioref">Suzuki; Shimodaira, 2006</a>)</span>. Os valores AU (<em>approximately unbiased</em>) e BP (<em>bootstrap probability</em>) produzidos por esse procedimento não constituem, portanto, uma validação por reamostragem da partição das observações obtida pelo agrupamento hierárquico usual.</p>
-<p>A avaliação da estabilidade e da validade dos agrupamentos de observações permanece vinculada aos procedimentos discutidos na <a href="#sec-agrupamentos-validacao" class="quarto-xref"><span>Seção 16.13.7</span></a>. Uma opção disponível no software deve ser interpretada de acordo com o objeto efetivamente agrupado e com o critério computacional utilizado.</p>
+<p>Na análise de <span class="math inline">\(K\)</span>-médias, a opção <strong>Standardize variables</strong> altera a representação utilizada no cálculo das distâncias e pode modificar a partição. Os centroides e as somas de quadrados apresentados na saída referem-se à escala efetivamente utilizada no ajuste. A configuração padrão da interface não substitui a decisão sobre a escala discutida na <a href="#sec-agrupamentos-preparacao" class="quarto-xref"><span>Seção 16.13.1</span></a>.</p>
+<p>As opções <strong>Algorithm</strong> e <strong>Number of random starting values</strong> modificam a busca computacional por uma solução, mas não o critério <span class="math inline">\(J_K\)</span> que define as <span class="math inline">\(K\)</span>-médias. O gráfico do cotovelo utiliza esse mesmo critério para diferentes valores de <span class="math inline">\(K\)</span>. Na versão auditada, o cálculo da estatística gap não reproduz necessariamente todas as opções de algoritmo e inicialização selecionadas para a solução principal; essa diferença deve ser considerada quando os resultados são comparados.</p>
+<p>A opção <strong>Gower distance</strong> segue uma formulação distinta da <span class="math inline">\(K\)</span>-médias euclidiana e deve ser interpretada segundo a dissimilaridade para dados mistos desenvolvida na <a href="#sec-agrupamentos-gower" class="quarto-xref"><span>Seção 16.13.2</span></a>. Na mesma rota, o <strong>Silhouette index</strong> pode ser utilizado como medida de avaliação. O <strong>Silhouette plot</strong>, entretanto, não utiliza na versão auditada a matriz de dissimilaridades entre observações exigida pela definição apresentada na <a href="#sec-escolha-k-agrupamentos" class="quarto-xref"><span>Seção 16.13.4</span></a> e não deve ser interpretado como o gráfico de silhueta definido neste capítulo.</p>
+<p>No agrupamento hierárquico, a medida de distância e a regra de ligação são escolhas distintas. Para interpretar <strong>Ward.D2</strong> segundo o aumento da dispersão quadrática desenvolvido neste capítulo, a análise deve partir da distância euclidiana, conforme a <a href="#sec-agrupamentos-ward-computacional" class="quarto-xref"><span>Seção 16.13.6</span></a>.</p>
+<p>As opções <strong>Variable clustering (PCA)</strong> e <strong>With p-values</strong> agrupam variáveis, e não as observações utilizadas na formulação principal do capítulo. A primeira utiliza uma representação por ACP; a segunda utiliza <code>pvclust</code> e fornece valores AU e BP para os nós da hierarquia de variáveis <span class="citation" data-cites="suzuki2006pvclust">(<a href="references.html#ref-suzuki2006pvclust" role="doc-biblioref">Suzuki; Shimodaira, 2006</a>)</span>. Esses resultados não constituem validação da partição de observações discutida na <a href="#sec-agrupamentos-validacao" class="quarto-xref"><span>Seção 16.13.7</span></a>.</p>
 </section>
 </section>
 <section id="síntese" class="level2" data-number="16.14">
@@ -2998,14 +3026,14 @@ EVERITT, Brian S. <em>et al.</em> <strong><a href="https://doi.org/10.1002/97804
 <div id="ref-gower1971similarity" class="csl-entry" role="listitem">
 GOWER, John C. <a href="https://doi.org/10.2307/2528823">A General Coefficient of Similarity and Some of Its Properties</a>. <strong>Biometrics</strong>, v. 27, n. 4, p. 857–871, 1971.
 </div>
-<div id="ref-hair2019multivariate" class="csl-entry" role="listitem">
-HAIR, Jr., Joseph F. <em>et al.</em> <strong><a href="https://au.cengage.com/c/isbn/9781473756540/">Multivariate Data Analysis</a></strong>. 8. ed. Andover: Cengage Learning, 2018.
+<div id="ref-hair2009" class="csl-entry" role="listitem">
+HAIR, Jr., Joseph F. <em>et al.</em> <strong>Análise Multivariada de Dados</strong>. Tradução: Adonai Schlup Sant’Anna. 6. ed. Porto Alegre: Bookman, 2009.
 </div>
 <div id="ref-huang1998kprototypes" class="csl-entry" role="listitem">
 HUANG, Zhexue. <a href="https://doi.org/10.1023/A:1009769707641">Extensions to the <span class="math inline">\(k\)</span>-Means Algorithm for Clustering Large Data Sets with Categorical Values</a>. <strong>Data Mining and Knowledge Discovery</strong>, v. 2, n. 3, p. 283–304, 1998.
 </div>
-<div id="ref-johnson2007" class="csl-entry" role="listitem">
-JOHNSON, Richard A.; WICHERN, Dean W. <strong><a href="https://books.google.com/books?id=gFWcQgAACAAJ">Applied Multivariate Statistical Analysis</a></strong>. 6. ed. Upper Saddle River, NJ: Pearson Prentice Hall, 2007.
+<div id="ref-johnson2002" class="csl-entry" role="listitem">
+JOHNSON, Richard A.; WICHERN, Dean W. <strong>Applied Multivariate Statistical Analysis</strong>. 5. ed. Upper Saddle River, NJ: Prentice Hall, 2002.
 </div>
 <div id="ref-kaufman1990groups" class="csl-entry" role="listitem">
 KAUFMAN, Leonard; ROUSSEEUW, Peter J. <strong><a href="https://doi.org/10.1002/9780470316801">Finding Groups in Data: An Introduction to Cluster Analysis</a></strong>. New York: John Wiley &amp; Sons, 1990.
