@@ -2,9 +2,9 @@
 
 A Análise de Agrupamentos organiza objetos em grupos a partir de uma representação dos dados, de uma medida de proximidade e de um critério que define a organização procurada [@everitt2011cluster].
 
-Sua formulação reutiliza a matriz de dados de @def-matriz-dados, a distância euclidiana de @def-distancia-euclidiana, as geometrias induzidas de @def-norma-induzida e a decomposição da dispersão entre e dentro de grupos estabelecida em @prp-decomposicao-dispersao-grupos.
+Sua formulação reutiliza a matriz de dados da @def-matriz-dados, a distância euclidiana da @def-distancia-euclidiana, as geometrias induzidas da @def-norma-induzida e a decomposição da dispersão entre e dentro de grupos estabelecida na @prp-decomposicao-dispersao-grupos.
 
-A formulação distingue partições, hierarquias e modelos probabilísticos de grupos. As $K$-médias definem uma partição pela minimização da dispersão intragrupos, enquanto os métodos hierárquicos constroem uma sequência de fusões segundo uma medida de proximidade e uma regra de ligação. Modelos de mistura fornecem uma definição probabilística alternativa de grupo. Depois da formulação dos métodos, são examinadas as decisões sobre representação dos objetos, número de grupos, inicialização, estabilidade e interpretação da solução.
+A formulação distingue partições, hierarquias e modelos probabilísticos de grupos. As $K$-médias definem uma partição pela minimização da dispersão intragrupos, enquanto os métodos hierárquicos constroem uma sequência de fusões segundo uma medida de proximidade e uma regra de ligação. Modelos de mistura fornecem uma definição probabilística alternativa de grupo. O capítulo também examina as decisões sobre representação dos objetos, número de grupos, inicialização, estabilidade e interpretação da solução.
 
 Os elementos que definem o problema são organizados na @tbl-estrutura-problema-agrupamento.
 
@@ -13,8 +13,8 @@ Os elementos que definem o problema são organizados na @tbl-estrutura-problema-
 | Representação dos objetos | matriz de dados $\mathbf X$ ou matriz de dissimilaridades $\boldsymbol{\Delta}$ | determina a informação disponível para comparar os objetos |
 | Proximidade | distância, dissimilaridade ou similaridade | define como diferenças ou semelhanças entre objetos são quantificadas |
 | Organização | partição $\mathcal P$ ou estrutura hierárquica | representa os grupos construídos |
-| Critério | função de perda, dispersão ou ligação | permite comparar diferentes organizações |
-| Solução | grupos de objetos | resulta da otimização ou da regra de construção adotada |
+| Critério | função de perda, medida de dispersão ou regra de ligação | define como organizações candidatas são avaliadas ou construídas |
+| Solução | organização resultante | partição ou hierarquia obtida segundo o critério adotado |
 
 : Elementos que definem um problema de Análise de Agrupamentos. {#tbl-estrutura-problema-agrupamento}
 
@@ -36,7 +36,7 @@ $$
 \mathbb R^{n\times p},
 $$
 
-conforme @def-matriz-dados.
+conforme a @def-matriz-dados.
 
 Os grupos não são conhecidos previamente. O objetivo é construir uma organização dos índices das observações segundo a representação dos objetos, a medida de proximidade e o critério adotado.
 
@@ -196,7 +196,7 @@ As duas organizações mantêm os mesmos pontos e alteram somente a regra utiliz
 
 A matriz de dados não é a única forma de entrada da Análise de Agrupamentos. Quando as coordenadas dos objetos estão disponíveis, a proximidade pode ser calculada a partir das linhas de $\mathbf X$. Quando as relações entre os objetos já são fornecidas diretamente, a análise pode partir de uma matriz de dissimilaridades.
 
-A distância euclidiana já foi definida em @def-distancia-euclidiana. Para duas observações $\mathbf x_i$ e $\mathbf x_j$, utilizaremos diretamente
+A distância euclidiana definida na @def-distancia-euclidiana, para duas observações $\mathbf x_i$ e $\mathbf x_j$, é
 
 $$
 d_{ij}
@@ -206,9 +206,9 @@ d_{ij}
 \right\|.
 $$
 
-Não é necessário reconstruir suas propriedades métricas neste capítulo. O resultado será aplicado para definir a geometria de métodos como as $K$-médias e o método de Ward.
+A distância euclidiana define a geometria das $K$-médias e participa, por meio das somas de quadrados intragrupos, da formulação do método de Ward.
 
-Pela @def-norma-induzida, uma matriz positiva definida determina uma geometria ponderada para comprimentos e distâncias. Diferentes escolhas dessa geometria podem atribuir proximidades diferentes ao mesmo conjunto de observações. A distância de Mahalanobis, definida em @def-distancia-mahalanobis, é uma aplicação estatística dessa construção.
+Pela @def-norma-induzida, uma matriz positiva definida determina uma geometria ponderada para comprimentos e distâncias. Diferentes escolhas dessa geometria podem atribuir proximidades diferentes ao mesmo conjunto de observações. A distância de Mahalanobis, definida na @def-distancia-mahalanobis, é uma aplicação estatística dessa construção.
 
 A Análise de Agrupamentos também pode receber como entrada uma matriz
 
@@ -306,15 +306,15 @@ A distinção entre matriz de atributos e matriz de dissimilaridades é sintetiz
 
 : Formas de representação utilizadas na Análise de Agrupamentos. {#tbl-representacao-agrupamentos}
 
-A escolha entre essas representações também delimita os métodos disponíveis. O critério das $K$-médias utiliza explicitamente centroides no espaço das variáveis e requer as coordenadas das observações. Métodos hierárquicos podem ser formulados diretamente a partir de uma matriz de dissimilaridades, desde que a regra de ligação seja compatível com a informação disponível.
+A escolha entre essas representações também delimita os métodos disponíveis. O critério das $K$-médias utiliza explicitamente centroides no espaço das variáveis e requer as coordenadas das observações. Ligações simples, completa e média podem ser formuladas diretamente a partir das dissimilaridades entre objetos; procedimentos que dependem de centroides ou de somas de quadrados exigem estrutura adicional sobre a representação.
 
 A presença de uma medida de dissimilaridade não significa que ela possa substituir livremente a distância euclidiana quadrática na formulação das $K$-médias. O centroide é o representante ótimo de um grupo porque a média minimiza a soma das distâncias euclidianas quadráticas às observações. Ao modificar essa função de perda, podem mudar o representante ótimo do grupo, a função objetivo e a própria definição do método. Por isso, procedimentos construídos a partir de outras dissimilaridades devem ser identificados pela formulação que efetivamente utilizam.
 
 ### Efeito da escala {#sec-agrupamentos-escala}
 
-Pela @def-distancia-euclidiana, a contribuição de cada coordenada para a distância depende de sua escala. A padronização observada é dada em @eq-matriz-dados-padronizados-observada. Na Análise de Agrupamentos, padronizar as variáveis modifica as proximidades e pode alterar os grupos obtidos.
+Pela @def-distancia-euclidiana, a contribuição de cada coordenada para a distância depende de sua escala. A padronização observada é dada pela @eq-matriz-dados-padronizados-observada. Na Análise de Agrupamentos, padronizar as variáveis modifica as proximidades e pode alterar os grupos obtidos.
 
-A @fig-agrupamentos-efeito-escala mostra essa consequência para uma configuração bidimensional. A figura não redefine a padronização; ela mostra seu efeito sobre o problema de agrupamento.
+A @fig-agrupamentos-efeito-escala ilustra, em uma configuração bidimensional, como a mudança de escala modifica a geometria utilizada para comparar os mesmos objetos.
 
 ```{r}
 #| label: fig-agrupamentos-efeito-escala
@@ -432,7 +432,7 @@ ggplot(
 
 A ampliação da segunda coordenada aumenta sua contribuição para as distâncias. Um método baseado nessas distâncias passa a comparar os mesmos objetos segundo outra geometria.
 
-A padronização deve ser entendida da mesma forma. Ela não constitui uma exigência geral da Análise de Agrupamentos. Sua utilização altera a contribuição relativa das variáveis e, portanto, altera o problema geométrico resolvido pelo método.
+A padronização não constitui uma exigência geral da Análise de Agrupamentos. Ao alterar a contribuição relativa das variáveis para as proximidades, ela modifica o problema geométrico resolvido pelo método.
 
 ## Partições
 
@@ -538,7 +538,7 @@ $$ {#eq-restricao-pertinencia-rigida}
 
 A partição rígida não é a única forma de representar a associação entre objetos e grupos. Métodos difusos podem atribuir graus de pertencimento a diferentes grupos, enquanto formulações probabilísticas podem associar probabilidades de pertinência às observações.
 
-Essas representações correspondem a definições distintas de grupo. O desenvolvimento principal deste capítulo utilizará partições rígidas, pois elas fornecem a estrutura empregada nas $K$-médias e nos métodos hierárquicos. Uma definição probabilística de grupo é apresentada na @sec-agrupamentos-definicoes-grupo.
+Essas representações correspondem a diferentes formas de expressar a pertinência dos objetos aos grupos. As $K$-médias produzem diretamente uma partição rígida; nos métodos hierárquicos, cada nível da hierarquia corresponde a uma partição dos objetos. Uma definição probabilística de grupo é apresentada na @sec-agrupamentos-definicoes-grupo.
 
 ## Homogeneidade interna e separação
 
@@ -554,13 +554,13 @@ $$
 
 Alguns critérios avaliam diretamente a dispersão dentro dos grupos; outros utilizam relações de proximidade entre observações ou entre conjuntos de observações. A separação entre grupos pode resultar dessas construções sem constituir uma parcela explícita da função objetivo.
 
-Nas $K$-médias, o critério é a dispersão quadrática intragrupos. A relação com a dispersão entre grupos é dada por @prp-decomposicao-dispersao-grupos.
+Nas $K$-médias, o critério é a dispersão quadrática intragrupos. A relação entre as dispersões intra e entre grupos é estabelecida pela @prp-decomposicao-dispersao-grupos.
 
-A caracterização da média como centroide e como minimizadora da soma das distâncias euclidianas quadráticas já foi estabelecida em @prp-centroide-media-amostral. Essa propriedade será aplicada a cada grupo da partição.
+A @prp-centroide-media-amostral estabelece que a média minimiza a soma das distâncias euclidianas quadráticas. Aplicada a cada grupo da partição, essa propriedade identifica seu centroide como o ponto que minimiza a dispersão quadrática intragrupo.
 
 ## Agrupamento por centroides
 
-Uma partição pode ser representada geometricamente por um ponto que resume cada grupo. Para
+Cada grupo de uma partição pode ser resumido geometricamente por seu centroide. Para
 
 $$
 \mathcal P
@@ -616,7 +616,7 @@ C_1,\ldots,C_K
 \right\},
 $$
 
-a matriz intragrupos pode ser escrita, utilizando os centroides de @eq-centroide-grupo, como
+a matriz intragrupos pode ser escrita, utilizando os centroides definidos na @eq-centroide-grupo, como
 
 $$
 \mathbf T_{\mathrm{intra}}
@@ -667,7 +667,7 @@ $$
 \end{aligned}
 $$ {#eq-traco-dispersao-intra-agrupamento}
 
-A expressão em @eq-traco-dispersao-intra-agrupamento transforma a matriz intragrupos definida em @def-sscp-intragrupos em um critério escalar para comparar partições.
+A @eq-traco-dispersao-intra-agrupamento expressa o traço da matriz intragrupos definida na @def-sscp-intragrupos como um critério escalar para comparar partições.
 
 Quanto menores forem as distâncias quadráticas das observações aos centroides de seus grupos, menor será
 
@@ -707,7 +707,7 @@ $$
 \right).
 $$ {#eq-traco-decomposicao-agrupamento}
 
-Para $K$ fixado, reduzir a dispersão intragrupos aumenta a parcela da dispersão atribuída aos centroides dos grupos em relação ao centroide global. Essa relação fornece a formulação utilizada pelas $K$-médias.
+Para $K$ fixado, $\operatorname{tr}(\mathbf T)$ é constante em relação à partição. Portanto, minimizar $\operatorname{tr}(\mathbf T_{\mathrm{intra}})$ equivale a maximizar $\operatorname{tr}(\mathbf T_{\mathrm{entre}})$. As $K$-médias adotam o primeiro desses critérios.
 
 ### Formulação das $K$-médias {#sec-agrupamentos-kmedias}
 
@@ -814,7 +814,7 @@ $$
 \mathbf x_i.
 $$
 
-A propriedade de que esses centroides minimizam o critério para uma partição fixada decorre diretamente de @prp-centroide-media-amostral.
+A propriedade de que esses centroides minimizam o critério para uma partição fixada decorre diretamente da @prp-centroide-media-amostral.
 
 Uma **solução global** das $K$-médias é qualquer partição
 
@@ -833,7 +833,7 @@ em que $\mathcal A_K$ é o conjunto das partições de $\{1,\ldots,n\}$ em exata
 A existência e a possível não unicidade dessa solução são desenvolvidas na @sec-agrupamentos-existencia-nao-unicidade.
 :::
 
-Pela relação em @eq-traco-dispersao-intra-agrupamento,
+Pela relação na @eq-traco-dispersao-intra-agrupamento,
 
 $$
 J_K
@@ -850,9 +850,9 @@ J_K
 \right].
 $$ {#eq-kmedias-traco-intra}
 
-Nas $K$-médias, a estrutura de @def-sscp-intragrupos e @prp-decomposicao-dispersao-grupos é aplicada a uma partição desconhecida, que passa a integrar o problema de otimização.
+Nas $K$-médias, a estrutura da @def-sscp-intragrupos e da @prp-decomposicao-dispersao-grupos é aplicada a uma partição desconhecida, que passa a integrar o problema de otimização.
 
-A partir de @eq-traco-decomposicao-agrupamento,
+A partir da @eq-traco-decomposicao-agrupamento,
 
 $$
 J_K
@@ -973,13 +973,13 @@ $$ {#eq-alocacao-centroide-proximo}
 
 Assim, cada observação é associada a um centroide de menor distância. Em caso de empate, mais de uma atribuição pode produzir a mesma contribuição mínima.
 
-Quando essa regra produz $K$ grupos não vazios, ela também minimiza o critério entre as atribuições admissíveis para os centroides fixados. Se algum centro não receber observações, a restrição de não vacuidade impede que o subproblema restrito seja resolvido apenas pela minimização ponto a ponto. O tratamento computacional desses casos pertence à etapa de implementação e não será desenvolvido neste capítulo.
+Quando essa regra produz $K$ grupos não vazios, ela também minimiza o critério entre as atribuições admissíveis para os centroides fixados. Se algum centro não receber observações, a restrição de não vacuidade impede que o subproblema restrito seja resolvido apenas pela minimização ponto a ponto.
 
 Essa propriedade, combinada ao fato de que o centroide minimiza a soma de quadrados para uma partição fixada, caracteriza a estrutura de otimização associada ao critério das $K$-médias.
 
 ### Geometria das regiões de alocação
 
-Para centroides fixados, a regra em @eq-alocacao-centroide-proximo divide o espaço em regiões formadas pelos pontos mais próximos de cada centroide.
+Para centroides fixados, a regra na @eq-alocacao-centroide-proximo divide o espaço em regiões formadas pelos pontos mais próximos de cada centroide.
 
 Para dois centroides $\mathbf c_k$ e $\mathbf c_\ell$, a fronteira entre suas regiões satisfaz
 
@@ -1011,7 +1011,7 @@ A fronteira é, portanto, um hiperplano.
 
 Os centroides determinam um diagrama de Voronoi: o espaço é coberto pelas regiões dos pontos para os quais cada centroide é um dos mais próximos. Essas regiões podem compartilhar fronteiras quando há empate; para obter uma partição rígida do espaço, é necessário adotar uma regra de desempate nessas fronteiras. Uma região de Voronoi pode não conter nenhuma das observações disponíveis para uma determinada configuração de centros; isso não altera sua definição geométrica.
 
-Essa geometria explica por que as $K$-médias favorecem grupos associados a regiões convexas em torno de centros.
+Para centroides fixados, cada região de Voronoi é determinada pela interseção das desigualdades que expressam que um centroide é pelo menos tão próximo quanto os demais; essas regiões são convexas. Assim, a regra de alocação das $K$-médias divide o espaço em regiões convexas, exceto pela arbitrariedade de atribuição nas fronteiras de empate.
 
 A @fig-kmedias-voronoi representa uma solução com três centroides. As regiões de fundo indicam qual centroide é o mais próximo em cada posição do plano, enquanto os símbolos maiores identificam os centroides da solução.
 
@@ -1184,7 +1184,6 @@ ggplot() +
   )
 ```
 
-A figura mostra duas propriedades da formulação. Cada grupo é representado por um centroide, e a alocação é determinada pela geometria euclidiana relativa a esses centros. A forma dos grupos obtidos pelo critério está vinculada a essa representação.
 
 ::: {#exm-comparacao-particoes-kmedias}
 ## Comparação de duas partições
@@ -1307,7 +1306,19 @@ J_2
 \end{aligned}
 $$
 
-O critério atribui valor menor à primeira partição porque as observações estão mais concentradas em torno dos respectivos centroides.
+Como
+
+$$
+J_2(\mathcal P_1)
+=
+1
+<
+49
+=
+J_2(\mathcal P_2),
+$$
+
+o critério atribui menor dispersão intragrupos a $\mathcal P_1$. A comparação utiliza a soma das distâncias quadráticas de cada observação ao centroide de seu grupo; distâncias entre pares de observações não entram isoladamente no critério das $K$-médias.
 
 A comparação entre as partições é determinada pela soma das dispersões quadráticas dentro dos grupos. Distâncias elevadas entre alguns pares de observações, isoladamente, não definem a solução.
 :::
@@ -1320,9 +1331,9 @@ A formulação por centroides caracteriza grupos pela concentração quadrática
 
 As $K$-médias procuram diretamente uma partição para um número $K$ previamente fixado de grupos. Os métodos hierárquicos produzem outro objeto: uma sequência de partições aninhadas, na qual a organização dos grupos é construída progressivamente [@everitt2011cluster].
 
-Os métodos hierárquicos podem ser aglomerativos ou divisivos. Nos procedimentos **aglomerativos**, grupos menores são sucessivamente reunidos; nos **divisivos**, grupos maiores são progressivamente subdivididos. O desenvolvimento deste capítulo será concentrado nos métodos aglomerativos.
+Os métodos hierárquicos podem ser aglomerativos ou divisivos. Nos procedimentos **aglomerativos**, grupos menores são sucessivamente reunidos; nos **divisivos**, grupos maiores são progressivamente subdivididos. As formulações de ligação e do método de Ward desenvolvidas neste capítulo referem-se aos procedimentos aglomerativos.
 
-A construção depende de dois elementos distintos: uma medida de dissimilaridade entre os objetos e uma **regra de ligação** que estende essa dissimilaridade para pares de grupos. É a regra de ligação que define matematicamente quais grupos são considerados mais próximos em cada etapa. O dendrograma registra a hierarquia produzida por essas fusões.
+A construção aglomerativa exige um critério para comparar os grupos disponíveis em cada etapa. Nas ligações simples, completa e média, esse critério é obtido a partir das dissimilaridades entre os objetos. No método de Ward, o critério é o aumento da dispersão quadrática intragrupos produzido por cada fusão. O dendrograma registra a hierarquia resultante.
 
 Em um procedimento aglomerativo, parte-se da partição formada por $n$ grupos unitários,
 
@@ -1361,7 +1372,6 @@ $$
 na qual $\mathcal P_{r-1}$ é obtida de $\mathcal P_r$ pela fusão de exatamente dois grupos.
 :::
 
-A construção da hierarquia exige uma regra para comparar grupos. A @def-distancia-euclidiana e a geometria de @def-norma-induzida definem proximidades entre observações; no agrupamento hierárquico, a regra de ligação estende essa informação a pares de grupos.
 
 Considere dois grupos não vazios
 
@@ -1387,7 +1397,6 @@ $$
 
 entre esses grupos. Não existe uma única extensão obrigatória da dissimilaridade entre objetos para a comparação entre conjuntos. Diferentes regras utilizam informações distintas sobre os elementos de $A$ e $B$ e, por isso, podem produzir hierarquias diferentes mesmo quando partem da mesma matriz $\boldsymbol{\Delta}$.
 
-A regra de ligação integra a definição matemática do método hierárquico. Alterá-la pode produzir outra hierarquia mesmo quando a matriz de dissimilaridades permanece a mesma.
 
 ### Ligações simples, completa e média
 
@@ -1505,13 +1514,13 @@ D_{\mathrm{media}}(A,B)
 5.
 $$
 
-Não há contradição entre os três resultados. Cada valor responde a uma definição diferente da proximidade entre grupos.
+Os três valores diferem porque cada regra define a dissimilaridade entre grupos por uma característica distinta dos pares formados entre $A$ e $B$.
 
 ### Método de Ward e dispersão intragrupos {#sec-agrupamentos-ward}
 
-O método de Ward utiliza um critério de fusão baseado na dispersão quadrática intragrupos. Na formulação desenvolvida neste capítulo, os objetos possuem coordenadas em um espaço euclidiano e, em cada etapa da hierarquia, são comparados os aumentos de dispersão produzidos pelas fusões possíveis [@ward1963; @johnson2002].
+O método de Ward utiliza um critério de fusão baseado na dispersão quadrática intragrupos. Para objetos representados por coordenadas em um espaço euclidiano, cada etapa compara os aumentos de dispersão produzidos pelas fusões admissíveis [@ward1963; @johnson2002].
 
-Essa interpretação utiliza a matriz $\mathbf T_{\mathrm{intra}}$ definida em @def-sscp-intragrupos e a decomposição estabelecida em @prp-decomposicao-dispersao-grupos.
+Essa interpretação utiliza a matriz $\mathbf T_{\mathrm{intra}}$ definida na @def-sscp-intragrupos e a decomposição estabelecida na @prp-decomposicao-dispersao-grupos.
 
 
 
@@ -1543,7 +1552,7 @@ $$
 \right).
 $$
 
-A expressão em @eq-incremento-ward combina a separação entre os centroides com os tamanhos dos grupos.
+A @eq-incremento-ward combina a distância euclidiana quadrática entre os centroides com os tamanhos dos dois grupos:
 
 Ward e $K$-médias utilizam a dispersão quadrática intragrupos, mas resolvem problemas diferentes.
 
@@ -1850,9 +1859,7 @@ A sequência produzida por um método hierárquico pode ser representada por um 
 Um **dendrograma** é uma representação gráfica de uma hierarquia de agrupamentos na qual as folhas representam os objetos e as alturas das junções registram os níveis associados às fusões entre grupos.
 :::
 
-O dendrograma representa a sequência de partições aninhadas produzida pelo método. Uma partição com determinado número de grupos pode ser associada a uma etapa da hierarquia e, quando os níveis de fusão permitem essa separação, representada por um corte horizontal.
-
-Um corte horizontal do dendrograma seleciona uma das partições contidas na hierarquia, mas não estabelece, por si só, que essa partição seja preferível às demais. O dendrograma representa a estrutura das fusões produzidas pelo método; a escolha de uma partição específica constitui uma decisão adicional.
+O dendrograma representa a sequência de partições aninhadas produzida pelo método. Quando os níveis de fusão permitem essa separação, um corte horizontal seleciona uma das partições contidas na hierarquia. Esse corte identifica uma partição da sequência, mas não estabelece que ela seja preferível às demais.
 
 A escolha do número de grupos e os critérios auxiliares utilizados nessa decisão são tratados na @sec-escolha-k-agrupamentos.
 
@@ -1970,9 +1977,7 @@ ggplot() +
   )
 ```
 
-O significado do eixo vertical do dendrograma depende da regra de ligação. Na ligação simples, a altura registra a dissimilaridade associada à fusão. No método de Ward, ela está associada ao aumento da dispersão intragrupos, e sua escala pode depender da convenção utilizada na implementação.
-
-Alturas de dendrogramas produzidos por critérios diferentes não precisam representar a mesma quantidade.
+O significado do eixo vertical do dendrograma depende do critério utilizado. Na ligação simples, a altura registra a dissimilaridade associada à fusão. No método de Ward, ela está associada ao aumento da dispersão intragrupos, embora a escala exibida possa depender da convenção utilizada na implementação. Assim, alturas de dendrogramas produzidos por critérios diferentes não precisam representar a mesma quantidade.
 
 ### Uma partição e uma hierarquia representam objetos diferentes
 
@@ -2000,8 +2005,6 @@ Essa diferença modifica o tipo de informação fornecida pela técnica e é sin
 
 : Estruturas produzidas por diferentes formulações de agrupamento. {#tbl-particao-hierarquia}
 
-A existência de diferentes critérios mostra que “grupo” não corresponde a um único objeto matemático.
-
 Nas $K$-médias, um grupo é representado por proximidade a um centroide. Na ligação simples, a formação de grupos depende da conectividade produzida por pares próximos. Na ligação completa, controla-se a maior dissimilaridade entre elementos de grupos candidatos à fusão. Na ligação média, considera-se conjuntamente o conjunto de dissimilaridades entre os dois grupos. Em Ward, a fusão é avaliada por seu efeito sobre a dispersão quadrática intragrupos.
 
 Além disso, uma partição selecionada de uma hierarquia não precisa coincidir com a solução obtida pela otimização direta de um critério para o mesmo número de grupos. A hierarquia conserva as fusões realizadas anteriormente e, portanto, restringe as partições que podem aparecer nas etapas posteriores.
@@ -2010,19 +2013,17 @@ Além dessas formulações geométricas, grupos também podem ser definidos prob
 
 ## Diferentes definições matemáticas de grupo {#sec-agrupamentos-definicoes-grupo}
 
-As formulações anteriores mostram que a expressão **grupo** não identifica um único objeto matemático. Nas $K$-médias, um grupo é organizado em torno de um centroide; nos métodos hierárquicos, sua formação depende de uma regra de ligação e da sequência de fusões.
-
 Uma formulação diferente define os grupos como componentes de uma distribuição probabilística [@everitt2011cluster]. Nesse caso, cada componente possui uma distribuição própria e um peso que representa sua participação na população. A associação de uma observação aos grupos pode ser expressa por probabilidades de pertencimento às diferentes componentes.
 
 Essa formulação difere de uma partição rígida. Nas $K$-médias e nas partições obtidas de uma hierarquia, cada observação pertence a um único grupo na solução considerada. Em um modelo de mistura, a mesma observação pode apresentar diferentes probabilidades de associação às componentes, embora uma classificação rígida possa ser construída posteriormente.
 
 A normalidade multivariada não é necessária para definir modelos de mistura em geral. Ela aparece quando as distribuições componentes são especificadas como normais multivariadas.
 
-A formulação probabilística dos modelos de mistura é desenvolvida na @sec-agrupamentos-modelos-mistura. Outras classes de métodos podem definir grupos por conectividade ou por regiões de elevada concentração; essas formulações não são desenvolvidas neste capítulo.
+A formulação probabilística dos modelos de mistura é desenvolvida na @sec-agrupamentos-modelos-mistura. Métodos baseados em conectividade ou em regiões de elevada concentração correspondem a outras definições matemáticas de grupo.
 
 ## Dependência da solução e limites da formulação
 
-A Análise de Agrupamentos não possui um conjunto único de pressupostos probabilísticos. As $K$-médias e os métodos hierárquicos desenvolvidos neste capítulo podem ser formulados geometricamente, sem hipótese de normalidade multivariada ou de um modelo probabilístico gerador. Quando um modelo de mistura é utilizado, as hipóteses das distribuições componentes passam a integrar a formulação.
+A Análise de Agrupamentos não possui um conjunto único de pressupostos probabilísticos. As $K$-médias e os métodos hierárquicos podem ser formulados geometricamente, sem hipótese de normalidade multivariada ou de um modelo probabilístico gerador. Quando um modelo de mistura é utilizado, as hipóteses das distribuições componentes passam a integrar a formulação.
 
 A solução depende das escolhas que definem o problema. A @tbl-dependencia-solucao-agrupamento resume essas dependências.
 
@@ -2031,9 +2032,9 @@ A solução depende das escolhas que definem o problema. A @tbl-dependencia-solu
 | conjunto de variáveis | representação dos objetos | proximidades e grupos podem mudar |
 | escala das variáveis | geometria do espaço | variáveis recebem pesos relativos diferentes |
 | métrica ou dissimilaridade | relação de proximidade | pares considerados próximos podem mudar |
-| número $K$ | conjunto de soluções consideradas | muda o problema formulado |
-| função objetivo | definição de homogeneidade | muda a estrutura procurada |
-| regra de ligação | proximidade entre grupos | muda a hierarquia |
+| número $K$ | conjunto de partições admissíveis | altera o conjunto sobre o qual o critério é otimizado |
+| função objetivo | critério de qualidade da partição | partições diferentes podem se tornar ótimas |
+| regra de ligação | critério de comparação entre grupos | pode alterar a sequência de fusões e a hierarquia |
 | modelo probabilístico | definição das componentes | muda a interpretação dos grupos |
 
 : Elementos dos quais depende uma solução de agrupamento. {#tbl-dependencia-solucao-agrupamento}
@@ -2068,7 +2069,7 @@ A Análise de Agrupamentos compartilha alguns objetos matemáticos com outras t�
 
 | Técnica relacionada | Estrutura compartilhada | Diferença principal |
 |---|---|---|
-| ACP | representação geométrica das observações | ACP constrói direções de variabilidade; Agrupamentos constrói grupos |
+| ACP | representação geométrica das observações | ACP constrói componentes como combinações lineares das variáveis; Agrupamentos constrói grupos |
 | Análise Discriminante | grupos, médias e dispersões | Agrupamentos constrói grupos; Discriminante utiliza grupos conhecidos |
 | MANOVA | dispersão dentro e entre grupos | Agrupamentos utiliza a dispersão para construir grupos; MANOVA utiliza grupos definidos pelo delineamento para testar efeitos |
 
@@ -2076,21 +2077,21 @@ A Análise de Agrupamentos compartilha alguns objetos matemáticos com outras t�
 
 ### Agrupamentos e ACP
 
-No @sec-acp, a ACP produz novas coordenadas para as observações. Quando todas as componentes de uma transformação ortogonal são mantidas, as distâncias euclidianas são preservadas por @prp-preservacao-geometria-transformacao-ortogonal.
+No @sec-acp, os escores das componentes principais fornecem uma nova representação das observações. Quando todas as componentes de uma transformação ortogonal são mantidas, as distâncias euclidianas são preservadas pela @prp-preservacao-geometria-transformacao-ortogonal.
 
-Quando apenas $k<p$ componentes são mantidas, as observações são projetadas sobre o subespaço principal de @def-subespaco-principal-acp. As distâncias passam, então, a ser calculadas na representação reduzida e podem diferir das distâncias no espaço original.
+Quando apenas $k<p$ componentes são mantidas, as observações são projetadas sobre o subespaço principal da @def-subespaco-principal-acp. As distâncias passam, então, a ser calculadas na representação reduzida e podem diferir das distâncias no espaço original.
 
 Assim, utilizar ACP antes de uma Análise de Agrupamentos modifica o problema sempre que ocorre redução efetiva de dimensão ou mudança prévia da representação dos dados.
 
 ### Agrupamentos e Análise Discriminante
 
-Na Análise de Agrupamentos, os grupos fazem parte da solução. No @sec-discriminante, os grupos são conhecidos previamente e fazem parte da informação utilizada para construir direções de separação ou regras de classificação.
+Na Análise de Agrupamentos, os grupos fazem parte da solução. Na Análise Discriminante formulada no @sec-discriminante, os grupos são conhecidos previamente e integram a informação utilizada para construir funções discriminantes ou regras de classificação.
 
 As duas técnicas podem utilizar médias, dispersões e distâncias, mas esses objetos possuem funções estatísticas distintas conforme o problema considerado.
 
 ### Agrupamentos e MANOVA
 
-A conexão com o @sec-manova aparece na decomposição
+A conexão com a MANOVA formulada no @sec-manova aparece na decomposição
 
 $$
 \mathbf T
@@ -2100,7 +2101,7 @@ $$
 \mathbf T_{\mathrm{entre}},
 $$
 
-estabelecida em @prp-decomposicao-dispersao-grupos.
+estabelecida na @prp-decomposicao-dispersao-grupos.
 
 Nas $K$-médias, a partição é desconhecida e procura-se reduzir
 
@@ -2125,7 +2126,7 @@ Esta parte desenvolve propriedades matemáticas das soluções de agrupamento. S
 
 ### O centroide como minimizador
 
-A propriedade que justifica a média como representante de cada grupo já foi estabelecida em @prp-centroide-media-amostral. Aplicando @eq-decomposicao-centroide-media às observações de um grupo não vazio $C_k$, seu centroide
+Aplicando a @eq-decomposicao-centroide-media e a @prp-centroide-media-amostral às observações de um grupo não vazio $C_k$, seu centroide
 
 $$
 \mathbf c_k
@@ -2188,7 +2189,7 @@ qualquer permutação desses mesmos conjuntos representa a mesma partição, emb
 
 ### Algoritmo alternante das $K$-médias e redução do critério {#sec-agrupamentos-algoritmo-kmedias}
 
-O problema que define uma solução global na @eq-solucao-global-kmedias consiste em minimizar $J_K(\mathcal P)$ sobre todas as partições admissíveis. Os algoritmos usuais de $K$-médias procuram uma solução para esse problema alternando dois subproblemas já estabelecidos no núcleo: atribuição aos centroides mais próximos e atualização dos centroides pelas médias dos grupos [@johnson2002].
+O problema que define uma solução global na @eq-solucao-global-kmedias consiste em minimizar $J_K(\mathcal P)$ sobre todas as partições admissíveis. Os algoritmos usuais de $K$-médias procuram reduzir esse critério alternando dois subproblemas já estabelecidos no núcleo: atribuição aos centroides mais próximos e atualização dos centroides pelas médias dos grupos [@johnson2002].
 
 ::: {#prp-kmedias-reducao-criterio}
 ## Redução do critério nas etapas alternadas das $K$-médias
@@ -2295,7 +2296,7 @@ J_K
 \right).
 $$
 
-Fixada agora a nova partição $\mathcal P^{(t+1)}$, seus centroides minimizam a soma de quadrados dentro dos grupos, conforme @prp-centroide-media-amostral. Portanto,
+Fixada agora a nova partição $\mathcal P^{(t+1)}$, seus centroides minimizam a soma de quadrados dentro dos grupos, conforme a @prp-centroide-media-amostral. Portanto,
 
 $$
 J_K
@@ -2330,9 +2331,9 @@ $$
 
 A proposição estabelece uma propriedade de descida do critério. Se uma etapa não modifica mais as atribuições, a partição é estável em relação às duas operações alternadas.
 
-Essa estabilidade não implica que a solução obtida seja uma solução global da @eq-solucao-global-kmedias. Diferentes inicializações podem conduzir a partições estáveis distintas e a valores diferentes de $J_K$ [@johnson2002].
+Essa estabilidade não implica que a solução obtida seja um minimizador global do problema definido na @eq-solucao-global-kmedias. Diferentes inicializações podem conduzir a partições estáveis distintas e a valores diferentes de $J_K$ [@johnson2002].
 
-Quando cada mudança efetiva de partição produz redução estrita do critério, o número finito de partições admissíveis impede uma sequência infinita de mudanças. Empates podem exigir regras adicionais de desempate na implementação.
+Quando cada mudança efetiva de partição produz redução estrita do critério, o número finito de partições admissíveis impede uma sequência infinita de mudanças. Na presença de empates, o critério pode não determinar univocamente a atribuição, sendo necessária uma regra de desempate para definir a sequência produzida pelo algoritmo.
 
 ### Transformações que preservam a solução das $K$-médias {#sec-agrupamentos-invariancias-kmedias}
 
@@ -2391,7 +2392,7 @@ c^2
 \end{aligned}
 $$
 
-pela preservação da norma por transformações ortogonais estabelecida em @prp-preservacao-geometria-transformacao-ortogonal.
+pela preservação da norma por transformações ortogonais estabelecida na @prp-preservacao-geometria-transformacao-ortogonal.
 
 Assim, para qualquer partição admissível,
 
@@ -2473,7 +2474,7 @@ $$
 J(A\cup B)-J(A)-J(B).
 $$ {#eq-incremento-ward-definicao}
 
-Aplicando @eq-decomposicao-centroide-media separadamente aos grupos $A$ e $B$, em torno do novo centroide $\mathbf c_C$, obtém-se
+Aplicando a @eq-decomposicao-centroide-media separadamente aos grupos $A$ e $B$, em torno do novo centroide $\mathbf c_C$, obtém-se
 
 $$
 \Delta_{\mathrm{Ward}}(A,B)
@@ -2489,7 +2490,7 @@ n_B
 \right\|^2.
 $$
 
-Substituindo @eq-centroide-fusao-ward,
+Substituindo a expressão da @eq-centroide-fusao-ward,
 
 $$
 \Delta_{\mathrm{Ward}}(A,B)
@@ -2546,19 +2547,7 @@ f_k
 \right),
 $$
 
-então, pela lei da probabilidade total,
-
-$$
-f(\mathbf x)
-=
-\sum_{k=1}^{K}
-\pi_k
-f_k
-\left(
-\mathbf x;
-\boldsymbol{\theta}_k
-\right).
-$$ {#eq-modelo-mistura-agrupamento}
+então, pela lei da probabilidade total, sua densidade marginal possui a forma definida a seguir.
 
 ::: {#def-modelo-mistura-agrupamento}
 ## Modelo de mistura para agrupamento
@@ -2575,7 +2564,7 @@ f_k
 \mathbf x;
 \boldsymbol{\theta}_k
 \right).
-$$
+$$ {#eq-modelo-mistura-agrupamento}
 :::
 
 Nessa formulação, o grupo é representado pela componente associada à variável latente categórica $\mathsf C$. O conceito de grupo é, portanto, diferente daquele definido por proximidade a centroides ou por regras de ligação.
@@ -2615,7 +2604,7 @@ f_\ell
 }.
 $$ {#eq-probabilidade-posterior-agrupamento}
 
-A diferença em relação a uma partição rígida aparece diretamente nessa expressão. Uma observação pode apresentar probabilidades positivas de associação a várias componentes. Uma classificação rígida pode ser obtida escolhendo
+Em contraste com uma partição rígida, uma observação pode apresentar probabilidades posteriores positivas de associação a várias componentes. Uma classificação rígida associada ao modelo pode ser obtida escolhendo
 
 $$
 \widehat C(\mathbf x)
@@ -2667,9 +2656,9 @@ Variáveis destinadas apenas à caracterização ou à validação externa dos g
 
 #### Escala e ponderação
 
-O efeito da escala foi desenvolvido na @sec-agrupamentos-escala. Na condução da análise, a decisão é determinar se diferenças de escala devem representar diferenças reais de importância entre as variáveis.
+O efeito da escala foi desenvolvido na @sec-agrupamentos-escala. Na condução da análise, deve-se decidir se diferenças nas unidades e amplitudes das variáveis devem produzir contribuições diferentes para as proximidades entre os objetos.
 
-Quando essa ponderação não é desejada, a padronização pode colocar as variáveis em escalas comparáveis. Quando as diferenças de escala representam diferenças que devem ser preservadas na análise, a padronização modifica essa relação e não deve ser adotada automaticamente.
+Quando essa ponderação não é desejada, a padronização pode colocar as variáveis em escalas comparáveis. Quando as diferenças de escala devem participar da definição de proximidade, a padronização modifica essa relação e não deve ser adotada automaticamente.
 
 #### Redundância entre variáveis
 
@@ -2677,7 +2666,7 @@ Variáveis fortemente relacionadas podem produzir uma forma de ponderação impl
 
 Assim, mesmo quando todas as variáveis recebem o mesmo peso explícito, um conjunto numeroso de variáveis redundantes pode dominar a geometria da análise.
 
-Esse problema difere da multicolinearidade em modelos de regressão. Na Análise de Agrupamentos, o efeito principal é a alteração da importância relativa das dimensões utilizadas para comparar os objetos [@hair2009].
+Esse problema difere da multicolinearidade em modelos de regressão. Na Análise de Agrupamentos, variáveis redundantes atribuem maior peso implícito às características que representam repetidamente no cálculo das proximidades [@hair2009].
 
 #### Observações atípicas e representatividade
 
@@ -2685,7 +2674,8 @@ Observações afastadas das demais podem exercer forte influência sobre distân
 
 Uma observação atípica pode representar:
 
-- erro ou registro incompatível com a população estudada;
+- erro de mensuração ou de registro;
+- uma unidade que não pertence à população definida para a análise;
 - uma unidade incomum, mas pertencente à população;
 - uma observação de um grupo pequeno que está sub-representado na amostra.
 
@@ -2697,7 +2687,7 @@ A generalização dos grupos também depende da relação entre a amostra e a po
 
 Na Análise de Agrupamentos, não há um tamanho amostral mínimo geral determinado por poder estatístico ou por uma distribuição de referência. A adequação do tamanho da amostra depende de sua capacidade de representar a heterogeneidade da população e, em particular, grupos de baixa frequência que sejam importantes para o objetivo da análise [@hair2009].
 
-Uma amostra pode não conter observações de um grupo raro existente na população. Nessa situação, especificar um número maior de grupos não recupera uma estrutura que não está representada nos dados [@johnson2002].
+Uma amostra pode não conter observações de um grupo raro existente na população. Nessa situação, especificar um número maior de grupos não recupera uma estrutura que não está representada nos dados [@hair2009].
 
 Também deve ser examinada a quantidade de observações disponível em cada grupo candidato. Grupos muito pequenos podem representar unidades atípicas, grupos raros ou instabilidade da solução. O tamanho do grupo, isoladamente, não determina sua exclusão; sua interpretação depende do objetivo da análise, da origem das observações e da possibilidade de caracterizar adequadamente o grupo.
 
@@ -2713,7 +2703,7 @@ Também deve ser examinada a quantidade de observações disponível em cada gru
 
 ### Dados mistos e dissimilaridade de Gower {#sec-agrupamentos-gower}
 
-A formulação das $K$-médias desenvolvida neste capítulo utiliza variáveis quantitativas representadas em um espaço euclidiano. Quando os objetos são descritos simultaneamente por variáveis quantitativas, ordinais e nominais, conforme a distinção apresentada na @sec-natureza-variaveis, a comparação entre observações exige uma representação que respeite a natureza de cada atributo.
+A formulação euclidiana das $K$-médias utiliza variáveis quantitativas representadas em um espaço euclidiano. Quando os objetos são descritos simultaneamente por variáveis quantitativas, ordinais e nominais, conforme a distinção apresentada na @sec-natureza-variaveis, a comparação entre observações exige uma representação que respeite a natureza de cada atributo.
 
 Uma possibilidade é a dissimilaridade derivada do coeficiente geral de similaridade proposto por Gower [@gower1971similarity]. Para dois objetos $i$ e $h$, sua forma geral pode ser escrita como
 
@@ -2752,21 +2742,19 @@ R_j
 },
 $$
 
-quando $R_j>0$. Para uma variável nominal, a dissimilaridade parcial pode assumir valor $0$ para categorias iguais e $1$ para categorias diferentes. O tratamento específico de variáveis ordinais exige uma regra para incorporar a ordenação das categorias ao cálculo da dissimilaridade e não será desenvolvido nesta formulação.
+quando $R_j>0$. Para uma variável nominal, a dissimilaridade parcial pode assumir valor $0$ para categorias iguais e $1$ para categorias diferentes. Para variáveis ordinais, é necessário definir uma codificação que preserve a ordenação das categorias antes de construir a contribuição parcial para a dissimilaridade. A regra adotada deve ser explicitada, pois modifica os valores de $d_{ijh}$.
 
 A combinação dessas contribuições produz uma medida comum para atributos de naturezas distintas. Essa possibilidade não transforma a formulação clássica das $K$-médias em um método baseado em distância de Gower. O critério das $K$-médias continua definido pela minimização de distâncias euclidianas quadráticas em torno de centroides.
 
 Procedimentos destinados a dados mistos podem utilizar outros representantes e outras funções objetivo. O método de $K$-prototypes combina critérios para as partes quantitativa e categórica da representação [@huang1998kprototypes]. O representante de um grupo deixa de ser descrito exclusivamente pelo vetor de médias utilizado nas $K$-médias.
 
-Na interpretação computacional, uma opção denominada “Gower” pode corresponder à mudança do procedimento de agrupamento, e não à simples substituição da distância dentro das $K$-médias. A função objetivo efetivamente utilizada deve ser identificada antes de interpretar o resultado como uma extensão de um método conhecido.
-
 ### Escolha da medida de proximidade e do procedimento {#sec-agrupamentos-escolha-metodo}
 
 A medida de proximidade e o procedimento de agrupamento devem ser escolhidos de forma compatível. A mesma matriz de dados pode produzir soluções diferentes quando muda a geometria utilizada para comparar os objetos ou o critério que define a formação dos grupos.
 
-A primeira decisão é determinar qual informação deve representar a proximidade entre os objetos. Para variáveis quantitativas, a distância euclidiana utiliza diretamente as diferenças entre suas coordenadas e é compatível com métodos baseados em centroides e dispersão quadrática. A distância de Mahalanobis incorpora a estrutura de covariâncias e modifica a geometria segundo a variabilidade e a associação entre as variáveis, conforme @def-distancia-mahalanobis.
+A primeira decisão é determinar qual informação deve representar a proximidade entre os objetos. Para variáveis quantitativas, a distância euclidiana utiliza diretamente as diferenças entre suas coordenadas e é compatível com métodos baseados em centroides e dispersão quadrática. A distância de Mahalanobis incorpora a estrutura de covariâncias e modifica a geometria segundo a variabilidade e a associação entre as variáveis, conforme a @def-distancia-mahalanobis.
 
-Essa escolha depende também de a comparação procurar proximidade entre os níveis das variáveis ou semelhança entre os padrões dos objetos. Medidas de distância comparam diretamente as posições dos objetos no espaço das variáveis. Quando o interesse está na semelhança do padrão apresentado pelas características, uma medida de similaridade baseada em correlação pode ser considerada [@hair2009]. Nesse caso, objetos com níveis diferentes podem apresentar padrões semelhantes. Essa representação deve ser utilizada apenas com procedimentos compatíveis com a medida de similaridade adotada.
+A medida de proximidade também depende do aspecto dos objetos que deve definir a semelhança. Medidas de distância comparam suas posições no espaço das variáveis. Medidas baseadas em correlação podem, quando pertinente ao objetivo da análise, comparar o padrão relativo das características [@hair2009]. Nesse caso, objetos com níveis distintos podem apresentar padrões semelhantes. O procedimento de agrupamento deve ser compatível com a medida adotada.
 
 Para dados de tipos diferentes, uma matriz de dissimilaridades construída pela medida de Gower pode fornecer uma representação comum, conforme a @sec-agrupamentos-gower. Nesse caso, o procedimento subsequente deve aceitar uma matriz de dissimilaridades ou utilizar uma função objetivo própria para dados mistos.
 
@@ -2792,7 +2780,7 @@ O método de Ward procura limitar o aumento da dispersão intragrupos a cada fus
 
 As $K$-médias utilizam uma partição com número de grupos previamente especificado e permitem a realocação das observações durante a busca computacional. Métodos hierárquicos produzem simultaneamente uma sequência de partições aninhadas e não desfazem fusões realizadas em etapas anteriores [@johnson2002].
 
-Quando o objetivo e os dados permitem mais de um procedimento, a comparação entre soluções pode fornecer informação sobre a dependência da estrutura em relação ao método. Johnson e Wichern recomendam examinar diferentes procedimentos e medidas de proximidade quando houver alternativas plausíveis; concordância aproximada entre soluções fornece evidência de maior estabilidade da estrutura encontrada [@johnson2002].
+Quando o objetivo e os dados permitem mais de um procedimento, a comparação entre soluções permite examinar a sensibilidade da estrutura às escolhas metodológicas. Se procedimentos e medidas de proximidade plausíveis conduzem a organizações semelhantes, a interpretação apresenta menor dependência de uma escolha específica [@johnson2002].
 
 Uma estratégia possível consiste em utilizar inicialmente um método hierárquico para examinar diferentes números de grupos e obter centroides candidatos, seguidos por $K$-médias com esses centroides como valores iniciais [@hair2009]. Essa combinação é uma estratégia computacional e não estabelece equivalência entre os dois critérios.
 
@@ -2807,7 +2795,7 @@ W_K
 J_K(\mathcal P),
 $$ {#eq-minimo-k-agrupamentos}
 
-em que $\mathcal A_K$ é o conjunto definido na @eq-solucao-global-kmedias.
+em que $\mathcal A_K$ é o conjunto das partições de $\{1,\ldots,n\}$ em exatamente $K$ grupos não vazios, utilizado na @eq-solucao-global-kmedias.
 
 Para $1\leq K<n$,
 
@@ -2825,9 +2813,39 @@ $$
 W_n=0.
 $$
 
-A redução de $W_K$ à medida que $K$ aumenta mostra que o menor valor da função objetivo não pode, isoladamente, determinar o número de grupos. A escolha exige avaliar se o ganho obtido ao aumentar $K$ justifica a maior complexidade da partição.
+Como
 
-O **gráfico do cotovelo** (*elbow plot*) examina a sequência de valores de dispersão intragrupos para diferentes valores de $K$. A interpretação procura uma região em que reduções adicionais de $W_K$ passam a ser relativamente pequenas. Essa mudança de comportamento pode fornecer uma indicação para a escolha de $K$, mas não constitui uma regra que determine um número verdadeiro de grupos.
+$$
+W_{K+1}
+\leq
+W_K
+$$
+
+e
+
+$$
+W_n=0,
+$$
+
+minimizar $W_K$ também em relação a $K$ levaria à solução trivial $K=n$. A escolha do número de grupos exige, portanto, informação adicional à dispersão intragrupos mínima.
+
+Na aplicação, a dispersão disponível para cada valor de $K$ corresponde à solução efetivamente obtida pelo procedimento de agrupamento. Denote essa quantidade por
+
+$$
+\widetilde W_K.
+$$
+
+Como $W_K$ é o mínimo global definido na @eq-minimo-k-agrupamentos,
+
+$$
+\widetilde W_K
+\geq
+W_K.
+$$
+
+A igualdade ocorre quando a solução obtida atinge o mínimo global. Diferentemente de $W_K$, a sequência de valores $\widetilde W_K$ não precisa ser monotônica quando o procedimento de busca produz soluções locais diferentes para cada valor de $K$.
+
+O **gráfico do cotovelo** (*elbow plot*) examina os valores de $\widetilde W_K$ obtidos para diferentes números de grupos. Procura-se uma região a partir da qual reduções adicionais da dispersão intragrupos se tornam relativamente pequenas. Essa mudança de comportamento pode auxiliar a escolha de $K$, mas não determina um número verdadeiro de grupos.
 
 Outro critério utiliza a **silhueta**, que compara a coesão de uma observação com seu próprio grupo e sua separação em relação aos demais [@kaufman1990groups]. Considere uma partição com pelo menos dois grupos e uma observação $i$ pertencente a um grupo com pelo menos duas observações. Seja $a(i)$ a dissimilaridade média entre $i$ e as demais observações de seu grupo e seja $b(i)$ a menor dissimilaridade média entre $i$ e as observações de qualquer outro grupo. Quando
 
@@ -2859,19 +2877,13 @@ $$
 
 Para uma observação que forma sozinha um grupo, adota-se usualmente $s(i)=0$. Para uma partição com apenas um grupo, a silhueta não está definida.
 
-Valores elevados indicam que a observação está relativamente próxima das observações de seu grupo e afastada dos grupos concorrentes. Valores próximos de zero indicam posições intermediárias, enquanto valores negativos indicam maior proximidade média com outro grupo. A média dos coeficientes fornece uma medida descritiva da coesão e da separação da partição.
+Valores elevados indicam que a observação apresenta menor dissimilaridade média em relação ao próprio grupo do que aos grupos concorrentes. Valores próximos de zero indicam valores semelhantes de $a(i)$ e $b(i)$, enquanto valores negativos indicam menor dissimilaridade média em relação a outro grupo. A média dos coeficientes fornece uma medida descritiva da coesão e da separação da partição em relação à dissimilaridade adotada. Alterar essa dissimilaridade pode modificar $a(i)$, $b(i)$ e, consequentemente, os coeficientes de silhueta mesmo quando a partição permanece fixa.
 
-A média deve ser examinada juntamente com os valores individuais. Uma partição com média elevada pode conter observações com $s(i)$ próximo de zero ou negativo. Esses casos identificam objetos localizados próximos às fronteiras entre grupos ou mais próximos, em média, de outro grupo.
+A média deve ser examinada juntamente com os valores individuais. Uma partição com média elevada pode conter observações com $s(i)$ próximo de zero ou negativo. Esses valores mostram que uma avaliação global favorável pode coexistir com observações cuja alocação apresenta baixa separação em relação aos grupos concorrentes segundo a dissimilaridade adotada.
 
-A **estatística gap** compara a dispersão intragrupos da solução observada com aquela obtida sob uma distribuição de referência utilizada como modelo nulo para a estrutura de agrupamento [@tibshirani2001gap].
+A **estatística gap** compara a dispersão intragrupos da solução observada com aquela obtida sob uma distribuição de referência escolhida para representar a ausência da estrutura de agrupamento procurada [@tibshirani2001gap].
 
-Para distinguir essa quantidade do mínimo global $W_K$ definido em @eq-minimo-k-agrupamentos, denote por
-
-$$
-\widetilde W_K
-$$
-
-a dispersão intragrupos da solução efetivamente obtida pelo procedimento de agrupamento para $K$ grupos. Então,
+Utilizando $\widetilde W_K$ definido anteriormente,
 
 $$
 \operatorname{Gap}(K)
@@ -2884,29 +2896,21 @@ E^*
 \log \widetilde W_K,
 $$ {#eq-gap-agrupamento}
 
-em que $\widetilde W_K^*$ é a dispersão obtida aplicando o mesmo procedimento a dados gerados pela distribuição de referência, e $E^*$ representa a média sob esse mecanismo de geração.
+em que $\widetilde W_K^*$ é a dispersão obtida em dados gerados pela distribuição de referência, e $E^*$ representa a média sob esse mecanismo de geração.
 
-Quando o procedimento utilizado não garante o mínimo global das $K$-médias,
-
-$$
-\widetilde W_K
-\geq
-W_K.
-$$
-
-A aplicação da estatística gap depende, portanto, da distribuição de referência e do procedimento utilizado para obter as soluções observadas e de referência.
+Para que a comparação mantenha o mesmo significado nos dados observados e de referência, $\widetilde W_K$ e $\widetilde W_K^*$ devem ser obtidos segundo o mesmo critério de agrupamento e procedimentos de busca comparáveis. A estatística gap depende, portanto, tanto da distribuição de referência quanto do procedimento utilizado para obter as soluções.
 
 O cotovelo, a silhueta e a estatística gap fornecem informações diferentes sobre as soluções obtidas para cada valor de $K$. Nenhum desses critérios estabelece, isoladamente, a existência de um número verdadeiro de grupos na população.
 
-A escolha de $K$ deve considerar conjuntamente o comportamento desses critérios, a estabilidade da partição e a possibilidade de caracterizar os grupos a partir das variáveis utilizadas e do objetivo da análise [@hair2009]. A estabilidade e a validação da solução são desenvolvidas na @sec-agrupamentos-validacao.
+A escolha de $K$ deve considerar conjuntamente as informações fornecidas pelos critérios examinados, a estabilidade da solução e a interpretabilidade dos perfis formados pelas variáveis de agrupamento [@hair2009]. Quando existirem variáveis externas pertinentes que não participaram da formação dos grupos, sua relação com a solução pode fornecer informação adicional na etapa de validação. A estabilidade e a validação são desenvolvidas na @sec-agrupamentos-validacao.
 
 #### Escolha de uma partição na hierarquia
 
-Um método hierárquico não produz diretamente uma única partição final com $K$ grupos. Ele fornece uma sequência aninhada de partições, representada pelo dendrograma. A escolha de $K$ corresponde a selecionar um nível dessa hierarquia.
+Um método hierárquico fornece uma sequência aninhada de partições, representada pelo dendrograma. Escolher $K$ significa selecionar, nessa sequência, uma partição com $K$ grupos. Quando os níveis de fusão permitem essa representação, a mesma partição pode ser identificada por um corte horizontal no dendrograma.
 
-Uma mudança acentuada no nível das fusões pode indicar que a próxima união reúne grupos que estavam relativamente mais separados segundo o critério adotado. Essa informação pode ser examinada pelo dendrograma ou pela sequência dos valores de fusão.
+Um aumento acentuado entre valores sucessivos de fusão indica que a etapa seguinte exige reunir grupos mais dissimilares segundo o critério adotado. Esse comportamento pode ser examinado no dendrograma ou diretamente na sequência dos valores de fusão.
 
-O tamanho do salto não deve ser interpretado como um teste estatístico da existência de grupos. Seu significado depende da medida de proximidade e da regra de ligação utilizadas.
+O tamanho desse aumento não constitui um teste estatístico da existência de grupos e depende da medida de proximidade e do critério de ligação utilizados.
 
 Uma partição candidata obtida por corte do dendrograma deve ser examinada quanto a:
 
@@ -2937,38 +2941,16 @@ $$
 
 indicam melhor atendimento ao critério das $K$-médias.
 
-A comparação não deve se limitar ao valor da função objetivo. Duas execuções podem produzir valores próximos de $J_K$ e ainda assim gerar composições diferentes dos grupos. Por isso, também devem ser examinados os tamanhos dos grupos, seus centroides e a permanência das observações em grupos correspondentes.
+A comparação não deve se limitar ao valor da função objetivo. Duas execuções podem produzir valores próximos de $J_K$ e ainda assim gerar partições diferentes. Por isso, também devem ser examinados os tamanhos dos grupos, seus centroides e a concordância das alocações depois de estabelecida a correspondência entre os rótulos dos grupos.
 
-Uma estratégia de inicialização pode utilizar centroides obtidos previamente por um método hierárquico. Outra possibilidade é utilizar diferentes conjuntos de pontos iniciais aleatórios. Hair et al. utilizam precisamente a repetição da análise não hierárquica com pontos-semente distintos como uma verificação de estabilidade da solução [@hair2009].
+Uma estratégia de inicialização pode utilizar centroides obtidos previamente por um método hierárquico. Outra possibilidade é utilizar diferentes conjuntos de pontos iniciais. Hair et al. destacam que métodos não hierárquicos podem produzir soluções finais distintas para diferentes conjuntos de pontos-semente e que essas alternativas devem ser examinadas e validadas [@hair2009].
 
 A estabilidade em relação à inicialização informa se a solução é sensível ao procedimento de busca. Ela não demonstra, por si só, que os grupos correspondam a uma estrutura populacional.
 
-### Convenções computacionais para o método de Ward {#sec-agrupamentos-ward-computacional}
-
-A formulação de Ward utilizada neste capítulo é definida pelo aumento da dispersão quadrática intragrupos. Algumas implementações utilizam convenções diferentes para representar computacionalmente esse critério.
-
-Algumas implementações distinguem as opções `Ward.D` e `Ward.D2`. Esses nomes não representam duas denominações equivalentes para o mesmo cálculo.
-
-A formulação desenvolvida neste capítulo utiliza diretamente o aumento da soma de quadrados intragrupos,
-
-$$
-\Delta_{\mathrm{Ward}}(A,B)
-=
-\frac{
-n_A n_B
-}{
-n_A+n_B
-}
-\left\|
-\mathbf c_A-\mathbf c_B
-\right\|^2.
-$$
-
-Em implementações baseadas na convenção do `hclust` do R, `Ward.D2` é a opção diretamente associada a essa formulação de mínima variância quando a análise parte das distâncias euclidianas. `Ward.D` corresponde a uma convenção histórica distinta. A interpretação do resultado deve considerar qual dessas formulações foi utilizada.
 
 ### Estabilidade, validação e perfil dos grupos {#sec-agrupamentos-validacao}
 
-Uma solução de agrupamento deve ser examinada além do valor do critério que a produziu. Como os grupos são construídos a partir dos próprios dados, é necessário avaliar sua estabilidade, sua interpretação e sua relação com informações que não participaram diretamente da formação da partição [@hair2009].
+Uma solução de agrupamento deve ser examinada além do valor do critério que a produziu. Como os grupos são construídos a partir dos próprios dados, sua avaliação pode considerar a estabilidade da partição, a interpretação dos perfis e, quando disponíveis e pertinentes ao objetivo da análise, variáveis externas que não participaram da formação dos grupos [@hair2009].
 
 #### Estabilidade da solução
 
@@ -2976,9 +2958,9 @@ A estabilidade examina se uma estrutura semelhante reaparece quando aspectos raz
 
 Nas $K$-médias, uma primeira avaliação consiste em repetir a análise com diferentes inicializações, conforme a @sec-agrupamentos-inicializacao-kmedias.
 
-Também podem ser comparadas soluções obtidas em subamostras, após pequenas perturbações dos dados ou por procedimentos de agrupamento compatíveis com o mesmo objetivo. Em uma estrutura bem definida, pequenas alterações na representação não deveriam produzir uma reorganização completa dos grupos. Nesses casos, a comparação deve considerar que os rótulos dos grupos são arbitrários. Antes de comparar dois agrupamentos, é necessário estabelecer a correspondência entre grupos com perfis semelhantes.
+Também podem ser comparadas soluções obtidas em subamostras, após pequenas perturbações dos dados ou por procedimentos de agrupamento compatíveis com o mesmo objetivo. Se a interpretação proposta for estável, pequenas alterações nos dados ou na representação não devem produzir mudanças substanciais na organização dos grupos. Como seus rótulos são arbitrários, a comparação entre partições exige estabelecer previamente a correspondência entre grupos com perfis semelhantes.
 
-A estabilidade não significa identidade exata entre partições. O objetivo é verificar se o número de grupos, seus perfis e a alocação das observações apresentam mudanças suficientemente pequenas para sustentar a interpretação proposta.
+A estabilidade não exige identidade exata entre partições. A comparação deve examinar quanto variam o número de grupos, seus perfis e as alocações das observações diante das perturbações consideradas. A conclusão sobre estabilidade depende da magnitude dessas mudanças e do objetivo da análise.
 
 #### Caracterização pelas variáveis de agrupamento
 
@@ -2990,30 +2972,30 @@ $$
 \mathbf c_1,\ldots,\mathbf c_K
 $$
 
-fornecem perfis médios diretamente relacionados à construção da solução. A comparação entre esses perfis permite identificar quais variáveis distinguem os grupos e quais apresentam pouca variação entre eles.
+fornecem perfis médios diretamente relacionados à construção da solução. A comparação entre esses perfis descreve como as variáveis utilizadas no agrupamento diferem entre os grupos e quais apresentam pouca variação entre eles.
 
-A caracterização não deve ser reduzida apenas aos centroides. Tamanho dos grupos, dispersão interna e presença de observações afastadas também ajudam a descrever a estrutura obtida.
+A caracterização não deve ser reduzida aos centroides. Tamanho dos grupos, dispersão interna e presença de observações afastadas também descrevem a estrutura obtida. Como essas informações derivam dos dados utilizados na construção dos grupos, elas caracterizam a solução, mas não constituem validação externa.
 
 #### Validade de critério com variáveis externas
 
 Variáveis que não participaram da formação dos grupos podem ser reservadas para avaliar a relação da solução com critérios externos.
 
-Quando existe, com base no problema de pesquisa, uma relação esperada entre uma variável externa e a estrutura procurada, diferenças coerentes entre os grupos fornecem evidência adicional para a interpretação da solução. Hair et al. tratam essa etapa como avaliação de validade de critério [@hair2009].
+Quando existe, com base no problema de pesquisa, uma relação esperada entre uma variável externa e a estrutura procurada, diferenças entre os grupos compatíveis com essa relação fornecem informação favorável à validade de critério da solução. Hair et al. tratam essa etapa como avaliação de validade de critério [@hair2009].
 
-Essa avaliação deve ser distinguida da própria formação dos grupos. A variável utilizada como critério externo não participa das proximidades ou da função objetivo empregada para construir a partição.
+Essa avaliação deve ser distinguida da própria formação dos grupos. A variável utilizada como critério externo não participa das proximidades ou da função objetivo empregada para construir a partição, e sua relação esperada com os grupos deve decorrer do problema de pesquisa, não da inspeção posterior da própria solução.
 
 #### Perfil dos grupos com variáveis externas
 
-Outras variáveis que não participaram da formação dos grupos podem ser utilizadas para caracterizar a solução depois que a partição foi escolhida. Nesse caso, sua função é descrever características dos grupos que auxiliem sua interpretação, e não avaliar necessariamente a validade de critério [@hair2009].
+Variáveis que não participaram da formação dos grupos também podem ser utilizadas para descrever os grupos depois que a partição foi escolhida. Quando não existe uma relação externa previamente especificada a ser examinada, sua função é construir o perfil dos grupos, e não avaliar validade de critério [@hair2009].
 
-Essas variáveis podem representar características demográficas, ambientais, comportamentais ou outras informações pertinentes ao problema estudado. Diferenças entre os grupos ajudam a construir seus perfis, mas não demonstram, isoladamente, que a partição corresponda a grupos existentes na população.
+Essas variáveis podem representar características demográficas, ambientais, comportamentais ou outras informações pertinentes ao problema estudado. A distribuição dessas características em cada grupo compõe seu perfil externo, mas diferenças observadas entre os grupos não demonstram, isoladamente, que a partição corresponda a grupos distintos na população.
 
-Tanto a validade de critério quanto o perfil externo devem ser interpretados considerando o delineamento amostral, a estabilidade da solução e a magnitude das diferenças encontradas.
+Tanto a validade de critério quanto o perfil externo devem ser interpretados considerando o delineamento amostral, a estabilidade da solução e a magnitude e o padrão das diferenças encontradas. Quando testes estatísticos forem utilizados para comparar grupos, seus $p$-valores não substituem a avaliação da magnitude das diferenças nem demonstram, por si só, a validade da solução.
 
 | Dimensão avaliada | Procedimento | Informação obtida |
 |---|---|---|
 | **sensibilidade à inicialização** | repetir $K$-médias com diferentes pontos iniciais | dependência do procedimento de busca |
-| **estabilidade amostral** | repetir a análise em subamostras ou reamostragens | reprodutibilidade dos grupos diante de mudanças nos dados |
+| **estabilidade amostral** | repetir a análise em subamostras ou reamostragens | sensibilidade da solução a mudanças na composição dos dados |
 | **estabilidade metodológica** | comparar procedimentos razoáveis para o mesmo objetivo | dependência da solução em relação ao método |
 | **caracterização pelas variáveis de agrupamento** | examinar centroides, dispersões e tamanhos dos grupos | características utilizadas para interpretar a própria solução |
 | **validade de critério** | comparar os grupos em variáveis externas para as quais exista uma relação esperada | relação da solução com critérios externos |
@@ -3021,7 +3003,7 @@ Tanto a validade de critério quanto o perfil externo devem ser interpretados co
 
 : Dimensões utilizadas para avaliar e interpretar uma solução de agrupamento. {#tbl-validacao-agrupamentos}
 
-Uma solução estável pode não responder ao objetivo da análise, enquanto uma solução de interpretação simples pode mudar com pequenas alterações nos dados ou na inicialização. A avaliação deve verificar, separadamente, a estabilidade da partição e sua relação com o problema que motivou o agrupamento.
+Estabilidade, interpretabilidade e relação com informações externas são propriedades distintas de uma solução de agrupamento. Uma solução pode ser estável sem responder adequadamente ao objetivo da análise, ou ser facilmente interpretável e ainda apresentar elevada sensibilidade aos dados ou à inicialização. Essas dimensões devem ser avaliadas separadamente.
 
 ### Correspondência com a implementação utilizada {#sec-agrupamentos-correspondencia-implementacao}
 
@@ -3029,21 +3011,21 @@ Nas atividades computacionais, a Análise de Agrupamentos será realizada pelo m
 
 | Elemento da implementação | Correspondência estatística | Desenvolvimento no capítulo |
 |---|---|---|
-| **K-means Clustering** | partição pela minimização da soma de quadrados intragrupos | @sec-agrupamentos-kmedias |
+| **K-means Clustering** | busca de uma partição segundo o critério de soma de quadrados intragrupos | @sec-agrupamentos-kmedias |
 | **Number of clusters** | número $K$ de grupos | @sec-escolha-k-agrupamentos |
 | **Standardize variables** | padronização das variáveis antes do cálculo das distâncias | @sec-agrupamentos-escala e @sec-agrupamentos-preparacao |
 | **Algorithm** | algoritmo utilizado para procurar uma solução do critério das $K$-médias | @sec-agrupamentos-algoritmo-kmedias |
 | **Number of random starting values** | número de inicializações utilizadas na busca | @sec-agrupamentos-inicializacao-kmedias |
 | **Centroids** | médias vetoriais dos grupos obtidos | @sec-agrupamentos-kmedias |
 | **Within-cluster, between-cluster e total sum of squares** | dispersões intragrupos, entre grupos e total | @sec-agrupamentos-dispersao |
-| **Elbow plot** | comportamento da dispersão intragrupos em função de $K$ | @sec-escolha-k-agrupamentos |
-| **Gap statistic plot** | comparação da dispersão observada com uma distribuição de referência | @sec-escolha-k-agrupamentos |
+| **Elbow plot** | comportamento de $\widetilde W_K$ para diferentes valores de $K$ | @sec-escolha-k-agrupamentos |
+| **Gap statistic plot** | comparação de $\widetilde W_K$ com a dispersão obtida sob uma distribuição de referência | @sec-escolha-k-agrupamentos |
 | **Gower distance** | agrupamento de dados mistos por procedimento baseado em dissimilaridade de Gower | @sec-agrupamentos-gower |
 | **Silhouette index** | medida de avaliação da separação e coesão dos grupos | @sec-escolha-k-agrupamentos |
 | **Silhouette plot** | na versão auditada, não corresponde ao gráfico de silhueta definido no capítulo | @sec-escolha-k-agrupamentos |
 | **Distance measure** | medida utilizada para construir as dissimilaridades no agrupamento hierárquico | @sec-agrupamentos-escolha-metodo |
-| **Clustering method** | regra de ligação utilizada na sequência de fusões | @sec-agrupamentos-hierarquicos e @sec-agrupamentos-escolha-metodo |
-| **Ward.D** e **Ward.D2** | convenções computacionais distintas associadas ao método de Ward | @sec-agrupamentos-ward-computacional |
+| **Clustering method** | critério utilizado para selecionar as fusões na construção hierárquica | @sec-agrupamentos-hierarquicos e @sec-agrupamentos-escolha-metodo |
+| **Ward.D** e **Ward.D2** | convenções computacionais distintas associadas ao método de Ward | @sec-agrupamentos-ward |
 | **Dendrogram** | representação da sequência hierárquica de fusões | @def-dendrograma |
 | **Variable clustering (PCA)** | agrupamento de variáveis em uma representação obtida por ACP | não corresponde ao agrupamento das observações desenvolvido no núcleo |
 | **With p-values** | agrupamento hierárquico de variáveis com avaliação por reamostragem | não corresponde à validação da partição das observações |
@@ -3052,13 +3034,13 @@ Nas atividades computacionais, a Análise de Agrupamentos será realizada pelo m
 
 Na análise de $K$-médias, a opção **Standardize variables** altera a representação utilizada no cálculo das distâncias e pode modificar a partição. Os centroides e as somas de quadrados apresentados na saída referem-se à escala efetivamente utilizada no ajuste. A configuração padrão da interface não substitui a decisão sobre a escala discutida na @sec-agrupamentos-preparacao.
 
-As opções **Algorithm** e **Number of random starting values** modificam a busca computacional por uma solução, mas não o critério $J_K$ que define as $K$-médias. O gráfico do cotovelo utiliza esse mesmo critério para diferentes valores de $K$. Na versão auditada, o cálculo da estatística gap não reproduz necessariamente todas as opções de algoritmo e inicialização selecionadas para a solução principal; essa diferença deve ser considerada quando os resultados são comparados.
+As opções **Algorithm** e **Number of random starting values** modificam a busca computacional por uma solução, mas não o critério $J_K$ que define as $K$-médias. O **Elbow plot** utiliza as dispersões $\widetilde W_K$ das soluções efetivamente obtidas para diferentes valores de $K$, que não devem ser identificadas automaticamente com os mínimos globais $W_K$. Na versão auditada, o cálculo da estatística gap não reproduz necessariamente todas as opções de algoritmo e inicialização selecionadas para a solução principal; essa diferença deve ser considerada na comparação dos resultados.
 
-A opção **Gower distance** segue uma formulação distinta da $K$-médias euclidiana e deve ser interpretada segundo a dissimilaridade para dados mistos desenvolvida na @sec-agrupamentos-gower. Na mesma rota, o **Silhouette index** pode ser utilizado como medida de avaliação. O **Silhouette plot**, entretanto, não utiliza na versão auditada a matriz de dissimilaridades entre observações exigida pela definição apresentada na @sec-escolha-k-agrupamentos e não deve ser interpretado como o gráfico de silhueta definido neste capítulo.
+A opção **Gower distance** segue uma formulação distinta das $K$-médias euclidianas e deve ser interpretada segundo a dissimilaridade para dados mistos desenvolvida na @sec-agrupamentos-gower. O **Silhouette index** pode ser utilizado para avaliar a coesão e a separação da solução segundo a dissimilaridade empregada. Na versão auditada, porém, o **Silhouette plot** não utiliza a matriz de dissimilaridades entre observações exigida pela definição apresentada na @sec-escolha-k-agrupamentos e, portanto, não corresponde ao gráfico de silhueta definido neste capítulo.
 
-No agrupamento hierárquico, a medida de distância e a regra de ligação são escolhas distintas. Para interpretar **Ward.D2** segundo o aumento da dispersão quadrática desenvolvido neste capítulo, a análise deve partir da distância euclidiana, conforme a @sec-agrupamentos-ward-computacional.
+No agrupamento hierárquico, a medida de distância e o critério de fusão são escolhas distintas. Na convenção do `hclust` do R utilizada por implementações que oferecem essas duas opções, **Ward.D2** é a opção diretamente associada ao critério de mínima variância desenvolvido na @sec-agrupamentos-ward quando a análise parte de distâncias euclidianas. **Ward.D** utiliza uma convenção histórica distinta e não deve ser tratado como uma denominação equivalente para o mesmo cálculo.
 
-As opções **Variable clustering (PCA)** e **With p-values** agrupam variáveis, e não as observações utilizadas na formulação principal do capítulo. A primeira utiliza uma representação por ACP; a segunda utiliza `pvclust` e fornece valores AU e BP para os nós da hierarquia de variáveis [@suzuki2006pvclust]. Esses resultados não constituem validação da partição de observações discutida na @sec-agrupamentos-validacao.
+As opções **Variable clustering (PCA)** e **With p-values** agrupam variáveis, e não as observações utilizadas na formulação principal do capítulo. A primeira utiliza uma representação por ACP; a segunda utiliza `pvclust` e associa aos grupos da hierarquia de variáveis os valores AU (*approximately unbiased*) e BP (*bootstrap probability*) obtidos por reamostragem [@suzuki2006pvclust]. Esses resultados não constituem validação da partição de observações discutida na @sec-agrupamentos-validacao.
 
 
 ## Síntese
@@ -3108,7 +3090,7 @@ J_K(\mathcal P)
 \right).
 $$
 
-Os centroides aparecem nessa formulação porque a média de cada grupo minimiza a soma das distâncias euclidianas quadráticas às observações que o compõem. Para $K$ fixado,
+Os centroides aparecem nessa formulação porque a média de cada grupo minimiza a soma das distâncias euclidianas quadráticas às observações que o compõem. Pela decomposição
 
 $$
 \mathbf T
@@ -3118,9 +3100,19 @@ $$
 \mathbf T_{\mathrm{entre}},
 $$
 
-de modo que a redução da dispersão intragrupos corresponde ao aumento da dispersão entre grupos em relação à dispersão total observada.
+tem-se
 
-Os métodos hierárquicos produzem outro tipo de objeto: uma sequência de partições aninhadas. As ligações simples, completa e média utilizam definições diferentes de proximidade entre grupos. O método de Ward seleciona, em cada etapa, a fusão que produz o menor aumento da dispersão intragrupos,
+$$
+\operatorname{tr}(\mathbf T)
+=
+\operatorname{tr}(\mathbf T_{\mathrm{intra}})
++
+\operatorname{tr}(\mathbf T_{\mathrm{entre}}).
+$$
+
+Como $\mathbf T$ é fixada pelos dados, minimizar a dispersão quadrática intragrupos equivale a maximizar a dispersão quadrática entre grupos.
+
+Os métodos hierárquicos produzem uma hierarquia, representada por uma sequência de partições aninhadas. As ligações simples, completa e média utilizam critérios diferentes para comparar grupos. O método de Ward seleciona, em cada etapa, a fusão que produz o menor aumento da dispersão quadrática intragrupos,
 
 $$
 \Delta_{\mathrm{Ward}}(A,B)
@@ -3149,6 +3141,6 @@ $$
 
 Nesse caso, a associação de uma observação aos grupos pode ser descrita por probabilidades posteriores de pertinência, em vez de ser necessariamente estabelecida por uma partição rígida.
 
-As $K$-médias, os métodos hierárquicos e os modelos de mistura atribuem significados diferentes ao conceito de grupo. A solução também depende das variáveis utilizadas, de suas escalas, da medida de proximidade, do número de grupos e do critério adotado. Uma solução matematicamente definida não demonstra, por si só, a existência de populações distintas nem sua correspondência com categorias externas ao procedimento de agrupamento.
+As $K$-médias, os métodos hierárquicos e os modelos de mistura definem grupos por estruturas matemáticas diferentes. A solução depende das variáveis utilizadas, de suas escalas, da medida de proximidade, do número de grupos e do critério adotado. Uma solução matematicamente definida não demonstra, por si só, a existência de populações distintas nem sua correspondência com categorias externas ao procedimento de agrupamento.
 
 No @sec-correspondencia, o objeto de análise passa a ser uma tabela de contingência. Perfis, massas, distância qui-quadrado, inércia e decomposição em valores singulares são utilizados para representar associações entre categorias.
