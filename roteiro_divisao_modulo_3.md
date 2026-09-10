@@ -790,7 +790,6 @@ Os quatro critérios devem permanecer no núcleo porque fazem parte da própria 
 - razão de verossimilhanças;
 - distribuição exata e aproximações;
 - invariância das raízes;
-- forma canônica;
 - demonstrações envolvendo o problema generalizado;
 - propriedades inferenciais dos critérios.
 
