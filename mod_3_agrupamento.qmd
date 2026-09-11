@@ -1535,33 +1535,20 @@ n_A+n_B
 $$ {#eq-incremento-ward}
 :::
 
-O método de Ward seleciona, em cada etapa, uma fusão que produz o menor aumento em
+O método de Ward seleciona, em cada etapa, entre todas as fusões possíveis, aquela que produz o menor valor de $D_{\mathrm{Ward}}$. Pela @eq-incremento-ward, esse incremento depende dos tamanhos dos dois grupos e da distância euclidiana quadrática entre seus centroides.
+
+Ward e $K$-médias utilizam a mesma medida de dispersão quadrática intragrupos, mas resolvem problemas diferentes.
+
+Nas $K$-médias, para $K$ fixado, procura-se uma partição que minimize globalmente
 
 $$
-\operatorname{tr}
+J_K
 \left(
-\mathbf T_{\mathrm{intra}}
+\mathcal P
 \right).
 $$
 
-A @eq-incremento-ward combina a distância euclidiana quadrática entre os centroides com os tamanhos dos dois grupos:
-
-Ward e $K$-médias utilizam a dispersão quadrática intragrupos, mas resolvem problemas diferentes.
-
-Nas $K$-médias, para $K$ fixado, a solução global é definida por
-
-$$
-\operatorname*{arg\,min}_{\mathcal P\in\mathcal A_K}
-\operatorname{tr}
-\left[
-\mathbf T_{\mathrm{intra}}
-\left(
-\mathcal P
-\right)
-\right].
-$$
-
-No método de Ward, a hierarquia é construída sequencialmente. Em cada etapa, entre as fusões disponíveis, são reunidos os dois grupos que produzem o menor aumento da dispersão intragrupos [@ward1963; @johnson2002].
+No método de Ward, a hierarquia é construída sequencialmente. Em cada etapa, são reunidos os dois grupos para os quais $D_{\mathrm{Ward}}$ é mínimo entre as fusões disponíveis [@ward1963; @johnson2002].
 
 Uma fusão realizada em uma etapa não é desfeita posteriormente. Por isso, cortar o dendrograma de Ward em $K$ grupos não equivale, em geral, a resolver o problema global das $K$-médias para esse mesmo valor de $K$.
 
@@ -2589,7 +2576,7 @@ Esse resultado reúne translações, rotações, reflexões e mudanças comuns d
 
 ### Derivação do incremento de Ward {#sec-agrupamentos-derivacao-ward}
 
-A @prp-incremento-ward expressa o efeito da fusão de dois grupos sobre a dispersão quadrática intragrupos. A seguir, deriva-se a expressão da @eq-incremento-ward a partir da diferença entre o critério antes e depois da fusão.
+A @prp-incremento-ward define o incremento de Ward como a diferença entre a dispersão intragrupos depois e antes da fusão. A seguir, deriva-se sua expressão em função dos tamanhos e dos centroides dos dois grupos.
 
 ::: {.callout-note collapse="true" appearance="simple" title="Demonstração"}
 
@@ -3462,7 +3449,7 @@ $$
 
 Como $\mathbf T$ é fixada pelos dados, minimizar a dispersão quadrática intragrupos equivale a maximizar a dispersão quadrática entre grupos.
 
-Os métodos hierárquicos produzem uma hierarquia, representada por uma sequência de partições aninhadas. As ligações simples, completa e média utilizam critérios diferentes para comparar grupos. O método de Ward seleciona, em cada etapa, a fusão que produz o menor aumento da dispersão quadrática intragrupos,
+Os métodos hierárquicos produzem uma hierarquia, representada por uma sequência de partições aninhadas. As ligações simples, completa e média utilizam critérios diferentes para comparar grupos. No método de Ward, a fusão de dois grupos $C_1$ e $C_2$ produz um incremento
 
 $$
 D_{\mathrm{Ward}}
@@ -3477,8 +3464,10 @@ n_1+n_2
 }
 \left\|
 \bar{\mathbf x}_1-\bar{\mathbf x}_2
-\right\|^2.
+\right\|^2,
 $$
+
+e, em cada etapa, é escolhida a fusão que produz o menor incremento.
 
 O dendrograma representa a hierarquia das fusões resultantes.
 
