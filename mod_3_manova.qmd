@@ -12,7 +12,7 @@ $$
 \boldsymbol{\mathcal E}.
 $$
 
-A MANOVA compara a matriz de somas de quadrados e produtos cruzados (SQPC) da hipótese, $\mathbf H$, com a SQPC residual, $\mathbf E$. Essa comparação conduz a um problema de autovalores generalizados cujas raízes são combinadas pelos critérios de Wilks, Pillai, Hotelling--Lawley e Roy [@johnson2002].
+A MANOVA compara a matriz de somas de quadrados e produtos cruzados (SQPC) da hipótese, $\mathbf H$, com a SQPC residual, $\mathbf E$. O problema de autovalores generalizados associado a essas matrizes produz as raízes utilizadas pela lambda de Wilks, pelo critério de Pillai, pelo traço de Hotelling e pela maior raiz característica de Roy [@johnson2002; @hair2009].
 
 A hipótese linear geral da @def-hipotese-linear-geral-multivariada, a SQPC da hipótese da @def-sscp-hipotese-linear e a SQPC residual da @def-sscp-residual-modelo-multivariado são utilizadas diretamente na formulação da MANOVA.
 
@@ -28,7 +28,7 @@ Os elementos da formulação são resumidos na @tbl-estrutura-manova.
 | SQPC residual | $\mathbf E$ | reúne somas de quadrados e produtos cruzados residuais |
 | comparação direcional | $\mathbf a^\top\mathbf H\mathbf a/\mathbf a^\top\mathbf E\mathbf a$ | compara hipótese e erro para uma combinação das respostas |
 | solução espectral | raízes e direções características | identifica as direções extremas da razão entre hipótese e erro e seus valores associados |
-| critérios de teste | Wilks, Pillai, Hotelling--Lawley e Roy | produzem estatísticas globais a partir das mesmas raízes características |
+| critérios de teste | lambda de Wilks, critério de Pillai, traço de Hotelling e maior raiz característica de Roy | combinam as mesmas raízes características por funções diferentes |
 
 : Elementos da formulação da MANOVA. {#tbl-estrutura-manova}
 
@@ -93,11 +93,11 @@ $$
 p>1,
 $$
 
-as diferenças entre os vetores de médias pertencem a $\mathbb R^p$ e podem ser examinadas por combinações lineares das respostas. Uma diferença pequena em cada resposta considerada isoladamente pode formar uma combinação linear com separação relevante, enquanto diferenças marginais aparentemente grandes podem refletir parcialmente a mesma estrutura de associação entre as respostas.
+as diferenças entre os vetores de médias pertencem a $\mathbb R^p$ e podem ser examinadas por combinações lineares das respostas. Uma combinação linear pode evidenciar diferenças entre grupos que são pequenas em cada resposta considerada isoladamente. Diferenças marginais observadas em várias respostas também devem ser interpretadas considerando as covariâncias residuais entre elas.
 
 A MANOVA avalia as diferenças entre os vetores de médias em relação à variabilidade residual de cada resposta e às covariâncias residuais entre as respostas.
 
-A comparação multivariada não é equivalente a realizar separadamente $p$ análises de variância, pois essas análises marginais não incorporam as covariâncias residuais entre as respostas. Na MANOVA, a estrutura conjunta é representada por matrizes de somas de quadrados e produtos cruzados.
+A comparação multivariada não é equivalente a realizar separadamente $p$ análises de variância, pois essas análises marginais não incorporam as covariâncias residuais entre as respostas. Na MANOVA, somas de quadrados e produtos cruzados da hipótese e do erro são organizados em matrizes que preservam essa informação conjunta.
 
 ## A hipótese no modelo linear multivariado
 
@@ -187,7 +187,7 @@ $$ {#eq-gl-hipotese-grupos-manova}
 
 A hipótese de igualdade dos vetores de médias da @eq-hipotese-medias-grupos-manova é um caso particular da hipótese linear geral da @def-hipotese-linear-geral-multivariada.
 
-### Matrizes de hipótese e erro
+### SQPC da hipótese e SQPC residual
 
 Para a hipótese da @eq-hipotese-manova-respostas-originais, a SQPC da hipótese definida na @def-sscp-hipotese-linear é denotada por
 
@@ -397,7 +397,7 @@ $$
 \mathbf a.
 $$ {#eq-autovalor-generalizado-manova}
 
-Esse problema corresponde à estrutura definida na @def-autovalor-generalizado.
+Esse é o problema de autovalor generalizado definido na @def-autovalor-generalizado.
 
 ::: {#def-raizes-caracteristicas-manova}
 ## Raízes características da MANOVA
@@ -455,6 +455,7 @@ Os pares
 $$
 (\lambda_j,\boldsymbol{\alpha}_j)
 $$
+
 satisfazem
 
 $$
@@ -465,6 +466,17 @@ $$
 \mathbf E
 \boldsymbol{\alpha}_j.
 $$
+
+Cada $\lambda_j$ é uma raiz característica, isto é, um autovalor generalizado do par $(\mathbf H,\mathbf E)$. O vetor $\boldsymbol{\alpha}_j$ é um autovetor generalizado normalizado, e a reta
+
+$$
+\operatorname{span}
+\left(
+\boldsymbol{\alpha}_j
+\right)
+$$
+
+define a direção característica correspondente.
 
 Se
 
@@ -477,7 +489,29 @@ r_H
 \right),
 $$
 
-então exatamente $r_H$ raízes são positivas.
+então exatamente $r_H$ raízes são positivas. Quando $r_H>0$,
+
+$$
+\lambda_1
+\geq
+\cdots
+\geq
+\lambda_{r_H}
+>
+0.
+$$
+
+Se $r_H<p$,
+
+$$
+\lambda_{r_H+1}
+=
+\cdots
+=
+\lambda_p
+=
+0.
+$$
 :::
 
 Como $\mathbf C_1$ possui posto $g$, a SQPC da hipótese satisfaz
@@ -879,7 +913,15 @@ ggplot() +
   )
 ```
 
-A @fig-manova-branqueamento não representa observações, médias de grupos ou regiões de probabilidade. O contorno representa o conjunto de combinações lineares normalizadas pela forma quadrática residual. O branqueamento também não elimina a variabilidade residual dos dados; ele reexpressa sua métrica de modo que
+A @fig-manova-branqueamento não representa observações, médias de grupos ou regiões de probabilidade. O contorno corresponde ao conjunto de combinações lineares normalizadas pela forma quadrática residual. A transformação
+
+$$
+\mathbf z
+=
+\mathbf E^{1/2}\mathbf a
+$$
+
+converte
 
 $$
 \mathbf a^\top
@@ -887,14 +929,12 @@ $$
 \mathbf a
 $$
 
-se torne a norma euclidiana
+em
 
 $$
 \mathbf z^\top
 \mathbf z.
 $$
-
-A @fig-manova-branqueamento não representa observações, médias de grupos ou regiões de probabilidade.
 
 Se uma direção característica for normalizada por
 
@@ -918,7 +958,19 @@ $$ {#eq-interpretacao-raiz-direcao-manova}
 
 Cada raiz $\lambda_j$ é a razão hipótese/erro na respectiva direção característica normalizada. A ordenação $\lambda_1\geq\cdots\geq\lambda_p$ ordena essas direções pela razão entre a soma de quadrados da hipótese e a soma de quadrados residual.
 
-O problema espectral representa a comparação entre $\mathbf H$ e $\mathbf E$ pela coleção ordenada de raízes características. Os quatro critérios clássicos da MANOVA combinam essas raízes de formas distintas.
+A solução do problema espectral produz as raízes características ordenadas
+
+$$
+\lambda_1
+\geq
+\cdots
+\geq
+\lambda_p
+\geq
+0.
+$$
+
+Os quatro critérios clássicos da MANOVA são funções dessas raízes.
 
 ## Critérios multivariados {#sec-manova-criterios}
 
@@ -950,31 +1002,13 @@ $$
 
 
 
-Os quatro critérios clássicos da MANOVA são funções das raízes $\lambda_1,\ldots,\lambda_p$. Para expressar cada raiz no intervalo $[0,1)$, utiliza-se a transformação
+Os quatro critérios clássicos da MANOVA são funções das raízes
 
 $$
-\theta_j
-=
-\frac{
-\lambda_j
-}{
-1+\lambda_j
-},
-\qquad
-j=1,\ldots,p.
-$$ {#eq-raizes-transformadas-manova}
-
-Como $\lambda_j\geq0$,
-
+\lambda_1,
+\ldots,
+\lambda_p.
 $$
-0
-\leq
-\theta_j
-<
-1,
-$$
-
-e a transformação preserva a ordenação das raízes.
 
 As formas espectrais dos critérios decorrem da matriz padronizada
 
@@ -1088,17 +1122,6 @@ $$
 \frac{1}{1+\lambda_j}.
 $$
 
-Com $\theta_j$ definido na @eq-raizes-transformadas-manova, a forma equivalente é
-
-$$
-\Lambda_{\mathrm W}
-=
-\prod_{j=1}^{p}
-\left(
-1-\theta_j
-\right).
-$$ {#eq-lambda-wilks-theta-manova}
-
 A lambda de Wilks satisfaz
 
 $$
@@ -1123,10 +1146,10 @@ $$
 
 Como cada fator $(1+\lambda_j)^{-1}$ decresce com $\lambda_j$, valores menores de $\Lambda_{\mathrm W}$ correspondem a raízes características maiores. Na @sec-manova-wilks-verossimilhanca, esse critério é relacionado à razão de verossimilhanças sob o modelo normal [@wilks1932].
 
-::: {#def-traco-pillai-manova}
-## Traço de Pillai
+::: {#def-criterio-pillai-manova}
+## Critério de Pillai
 
-O **traço de Pillai** é [@pillai1955]
+O **critério de Pillai** é [@pillai1955]
 
 $$
 V
@@ -1145,19 +1168,16 @@ V
 }{
 1+\lambda_j
 }.
-$$ {#eq-traco-pillai-manova}
+$$ {#eq-criterio-pillai-manova}
 :::
 
-Portanto,
+Cada raiz contribui pelo termo
 
 $$
-V
-=
-\sum_{j=1}^{p}
-\theta_j.
+\frac{\lambda_j}{1+\lambda_j},
 $$
 
-Cada raiz contribui pelo termo $\lambda_j/(1+\lambda_j)$, que pertence a $[0,1)$ e tende a $1$ quando $\lambda_j$ cresce.
+que pertence a $[0,1)$ e cresce monotonicamente com $\lambda_j$.
 
 Como
 
@@ -1245,10 +1265,10 @@ V
 \frac{\lambda_j}{1+\lambda_j}.
 $$
 
-::: {#def-traco-hotelling-lawley-manova}
-## Traço de Hotelling--Lawley
+::: {#def-traco-hotelling-manova}
+## Traço de Hotelling
 
-O **traço de Hotelling--Lawley** é
+O **traço de Hotelling** é
 
 $$
 U
@@ -1261,7 +1281,7 @@ U
 =
 \sum_{j=1}^{p}
 \lambda_j.
-$$ {#eq-traco-hotelling-lawley-manova}
+$$ {#eq-traco-hotelling-manova}
 :::
 
 
@@ -1312,22 +1332,20 @@ $$
 
 com igualdade se, e somente se, $\mathbf H=\mathbf0$.
 
-::: {#def-maior-raiz-roy-manova}
-## Maior raiz de Roy
+::: {#def-maior-raiz-caracteristica-roy-manova}
+## Maior raiz característica de Roy
 
-A **maior raiz de Roy** é
+A **maior raiz característica de Roy** é
 
 $$
-\Theta_{\mathrm R}
-=
 \lambda_1.
-$$ {#eq-maior-raiz-roy-manova}
+$$ {#eq-maior-raiz-caracteristica-roy-manova}
 :::
 
 Pela @eq-maximizacao-manova,
 
 $$
-\Theta_{\mathrm R}
+\lambda_1
 =
 \max_{\mathbf a\neq\mathbf0}
 \frac{
@@ -1341,17 +1359,17 @@ $$
 }.
 $$ {#eq-roy-rayleigh-manova}
 
-A maior raiz de Roy utiliza apenas $\lambda_1$, que corresponde ao máximo da razão hipótese/erro. Neste capítulo, o critério é expresso na escala não limitada $\lambda_1$. Algumas apresentações utilizam a escala limitada $\theta_1=\lambda_1/(1+\lambda_1)$, correspondente à maior raiz de $\mathbf H(\mathbf H+\mathbf E)^{-1}$. Como a transformação $\lambda_1\mapsto\lambda_1/(1+\lambda_1)$ é estritamente crescente, as duas escalas contêm a mesma informação sobre $\lambda_1$ e produzem regiões de rejeição equivalentes quando os valores críticos são expressos na escala correspondente [@johnson2002; @anderson2003].
+A maior raiz característica de Roy depende exclusivamente da direção que maximiza a razão entre a SQPC da hipótese e a SQPC residual. Valores maiores de $\lambda_1$ correspondem a maior separação entre hipótese e erro nessa direção [@hair2009].
 
 ## Quatro critérios como funções das raízes características
 
-Os quatro critérios são funções da mesma coleção de raízes características
+Os quatro critérios dependem das raízes características
 
 $$
 \lambda_1,\ldots,\lambda_p
 $$
 
-obtida do problema
+do problema
 
 $$
 \mathbf H
@@ -1362,26 +1380,61 @@ $$
 \mathbf a.
 $$
 
-As raízes nulas não alteram os critérios. A @tbl-criterios-manova compara as operações aplicadas às raízes características.
+Uma raiz nula contribui com o fator $1$ para a lambda de Wilks e com o termo $0$ para o critério de Pillai e para o traço de Hotelling. Portanto, as raízes
+
+$$
+\lambda_{r_H+1},
+\ldots,
+\lambda_p
+$$
+
+não alteram os valores desses critérios. A maior raiz característica de Roy depende apenas de $\lambda_1$.
+
+A @tbl-criterios-manova compara as operações aplicadas às raízes.
 
 | Critério | Expressão em função das raízes | Operação sobre as raízes | Evidência crescente contra $H_0$ |
 |---|---|---|---|
-| Wilks | $\displaystyle \prod_{j=1}^{p}(1+\lambda_j)^{-1}$ | produto | valores menores |
-| Pillai | $\displaystyle \sum_{j=1}^{p}\frac{\lambda_j}{1+\lambda_j}$ | soma limitada | valores maiores |
-| Hotelling--Lawley | $\displaystyle \sum_{j=1}^{p}\lambda_j$ | soma direta | valores maiores |
-| Roy | $\lambda_1$ | maior raiz | valores maiores |
+| Lambda de Wilks | $\displaystyle \prod_{j=1}^{p}(1+\lambda_j)^{-1}$ | produto | valores menores |
+| Critério de Pillai | $\displaystyle \sum_{j=1}^{p}\frac{\lambda_j}{1+\lambda_j}$ | soma dos termos transformados | valores maiores |
+| Traço de Hotelling | $\displaystyle \sum_{j=1}^{p}\lambda_j$ | soma das raízes | valores maiores |
+| Maior raiz característica de Roy | $\lambda_1$ | maior raiz | valores maiores |
 
 : Critérios clássicos da MANOVA como funções das mesmas raízes características. {#tbl-criterios-manova}
 
-Roy utiliza apenas a maior raiz; Hotelling--Lawley soma as raízes; Pillai soma as raízes transformadas $\lambda_j/(1+\lambda_j)$; e Wilks multiplica os fatores $(1+\lambda_j)^{-1}$.
+A maior raiz característica de Roy utiliza apenas $\lambda_1$. O traço de Hotelling soma as raízes, o critério de Pillai soma os termos $\lambda_j/(1+\lambda_j)$ e a lambda de Wilks multiplica os fatores $(1+\lambda_j)^{-1}$.
 
-Os critérios podem produzir valores relativos diferentes conforme as raízes características se concentrem em uma direção ou se distribuam entre várias direções, embora todos sejam funções da mesma coleção $\lambda_1,\ldots,\lambda_p$.
+Quando existe apenas uma raiz positiva, os quatro critérios são funções monotônicas dessa raiz. Com duas ou mais raízes positivas, as funções que definem os quatro critérios não são, em geral, transformações monotônicas entre si.
 
-O cálculo dos quatro critérios depende das matrizes observadas $\mathbf H$ e $\mathbf E$. Valores críticos e valores $p$ dependem também do número de respostas, dos graus de liberdade da hipótese e do erro e do modelo probabilístico utilizado. A calibração inferencial desses critérios é especificada na @sec-manova-calibracao-criterios.
+### Uso inferencial dos critérios {#sec-manova-uso-inferencial-criterios}
+
+Os valores observados da lambda de Wilks, do critério de Pillai, do traço de Hotelling e da maior raiz característica de Roy são funções de $\mathbf H$ e $\mathbf E$. Sua utilização como estatísticas de teste requer a distribuição de referência sob
+
+$$
+H_0:
+\mathbf C_1\mathbf B
+=
+\boldsymbol{\Theta}_0.
+$$
+
+Sob o modelo normal multivariado clássico, essa distribuição depende do número de respostas $p$, dos graus de liberdade da hipótese
+
+$$
+\nu_H
+=
+g,
+$$
+
+e dos graus de liberdade residuais $\nu_E$.
+
+Em configurações particulares, transformações dos critérios possuem distribuição $F$ exata. Quando existem várias raízes positivas, são utilizadas distribuições, transformações ou aproximações específicas para cada critério, determinadas por $p$, $g$ e $\nu_E$ [@johnson2002; @anderson2003].
+
+Fixado um nível de significância $\alpha$, rejeita-se $H_0$ quando o valor $p$ obtido pela distribuição de referência é menor ou igual a $\alpha$. Valores menores de $\Lambda_{\mathrm W}$ e valores maiores de $V$, $U$ e $\lambda_1$ correspondem a maior evidência contra $H_0$.
+
+Sob normalidade, a calibração decorre da distribuição conjunta de $\boldsymbol{\mathsf H}$ e $\boldsymbol{\mathsf E}_{\mathrm{res}}$ estabelecida na @sec-manova-base-probabilistica. Os casos exatos e as aproximações utilizadas para os critérios são especificados na @sec-manova-calibracao-criterios.
 
 ## Pressupostos e limites {#sec-manova-pressupostos}
 
-A MANOVA combina uma estrutura para as médias, uma comparação algébrica entre hipótese e erro e, na inferência clássica, um modelo probabilístico. A estimabilidade determina quais hipóteses podem ser formuladas no modelo, enquanto independência, estrutura de covariâncias, não singularidade e normalidade determinam as condições da formulação probabilística clássica.
+A formulação da MANOVA especifica a média das respostas, a comparação entre hipótese e erro e, para a inferência clássica, a distribuição dos erros. A estimabilidade determina quais hipóteses podem ser formuladas, enquanto independência entre unidades, covariância residual comum, não singularidade e normalidade multivariada sustentam a calibração inferencial clássica.
 
 ### Estrutura da média e estimabilidade
 
@@ -1431,7 +1484,7 @@ $$
 \boldsymbol{\mathsf e}_n.
 $$
 
-A dependência entre respostas medidas na mesma unidade é admitida e representada por $\boldsymbol{\Sigma}$. Em estudos com medidas repetidas, observações da mesma unidade não podem ser tratadas como unidades independentes; sua dependência deve ser incorporada à definição do vetor resposta ou à estrutura de covariâncias do modelo. Dependências temporais ou espaciais entre unidades também exigem uma estrutura que as represente.
+A dependência entre as respostas de uma mesma unidade é descrita por $\boldsymbol{\Sigma}$. Quando várias medidas da mesma unidade compõem um único vetor resposta, suas covariâncias integram essa matriz. Se unidades distintas também apresentam dependência temporal, espacial ou decorrente de agrupamentos, a hipótese de independência entre os vetores de erros deixa de valer. Nesse caso, o modelo deve especificar também as covariâncias entre erros de unidades distintas.
 
 ### Covariância residual comum {#sec-manova-covariancia-comum}
 
@@ -1450,9 +1503,9 @@ $$
 i=1,\ldots,n.
 $$
 
-No problema de comparação entre grupos, isso corresponde à utilização de uma matriz de covariâncias residual populacional comum.
+Na comparação entre grupos, a mesma matriz $\boldsymbol{\Sigma}$ descreve a covariância residual populacional em todos os grupos. A matriz $\mathbf E$ é a SQPC residual observada do modelo.
 
-Na formulação probabilística clássica, a mesma matriz $\boldsymbol{\Sigma}$ descreve a covariância dos erros em todas as unidades. A matriz $\mathbf E$ é a SQPC residual observada do modelo. Se a estrutura de covariâncias varia entre grupos ou unidades, os quatro critérios ainda podem ser calculados quando as operações matriciais necessárias estão definidas, mas suas distribuições de referência clássicas não decorrem do modelo normal com covariância comum.
+Se as matrizes de covariâncias residuais diferem entre grupos, os quatro critérios ainda podem ser calculados quando as operações matriciais necessárias estão definidas, mas suas distribuições de referência clássicas não decorrem do modelo normal com covariância comum.
 
 ### Não singularidade populacional e amostral {#sec-manova-nao-singularidade}
 
@@ -1466,7 +1519,17 @@ $$
 
 Pela @prp-singularidade-matriz-covariancias, $\boldsymbol{\Sigma}\succ\mathbf0$ implica que nenhuma combinação linear não nula das respostas residuais possui variância igual a zero.
 
-A formulação espectral adotada no capítulo exige
+A forma simétrica
+
+$$
+\mathbf M_{\mathrm{HE}}
+=
+\mathbf E^{-1/2}
+\mathbf H
+\mathbf E^{-1/2}
+$$
+
+exige
 
 $$
 \mathbf E
@@ -1517,7 +1580,7 @@ $$
 
 com probabilidade $1$ se, e somente se, $\nu_E\geq p$. A matriz observada $\mathbf E$ é uma realização de $\boldsymbol{\mathsf E}_{\mathrm{res}}$.
 
-Quando $\mathbf E$ é singular, sua raiz quadrada $\mathbf E^{1/2}$ existe, mas também é singular. Portanto, as matrizes
+Quando $\mathbf E$ é singular, sua raiz quadrada $\mathbf E^{1/2}$ existe, mas também é singular. Portanto,
 
 $$
 \mathbf E^{-1}
@@ -1525,7 +1588,7 @@ $$
 \mathbf E^{-1/2}
 $$
 
-não existem como inversas ordinárias, e a formulação espectral adotada neste capítulo não se aplica. Extensões baseadas em pseudoinversas, regularização ou métodos para situações de alta dimensão não são desenvolvidas neste capítulo.
+não existem como inversas ordinárias. A formulação espectral baseada em $\mathbf E^{-1/2}$ não está definida nesse caso.
 
 ### Normalidade multivariada {#sec-manova-normalidade}
 
@@ -1539,7 +1602,7 @@ $$
 
 as raízes características e os quatro critérios são definidos algebricamente sem exigir uma distribuição normal para os erros.
 
-Sob o modelo linear normal multivariado definido na @def-modelo-linear-normal-multivariado, a normalidade dos erros, a independência entre unidades e a matriz de covariâncias comum determinam a estrutura probabilística clássica. Sob $H_0$, essa estrutura conduz às distribuições Wishart centrais de $\boldsymbol{\mathsf H}$ e $\boldsymbol{\mathsf E}_{\mathrm{res}}$ e à independência entre essas matrizes.
+Sob o modelo linear normal multivariado definido na @def-modelo-linear-normal-multivariado, os erros são normais multivariados, independentes entre unidades e possuem matriz de covariâncias comum. Sob $H_0$, essas condições implicam distribuições Wishart centrais para $\boldsymbol{\mathsf H}$ e $\boldsymbol{\mathsf E}_{\mathrm{res}}$ e independência entre essas matrizes.
 
 A hipótese de normalidade refere-se aos vetores de erros do modelo, condicionada à matriz de delineamento $\mathbf Z$. Ela não exige que a distribuição marginal obtida ao reunir respostas de unidades com diferentes médias condicionais seja uma única normal multivariada.
 
@@ -1559,9 +1622,36 @@ $$
 
 com vetores de médias distintos entre os grupos. A distribuição marginal resultante da mistura desses grupos não precisa pertencer à família normal multivariada, mesmo quando o modelo normal condicional está corretamente especificado.
 
-Um diagnóstico aplicado às respostas agrupadas sem ajustar a estrutura de médias pode refletir diferenças entre grupos ou efeitos do modelo, e não falta de normalidade dos erros. O pressuposto de normalidade deve ser examinado nos resíduos obtidos após o ajuste da estrutura representada por $\mathbf Z\mathbf B$.
+Um diagnóstico aplicado às respostas agrupadas sem ajustar suas médias condicionais pode refletir diferenças entre grupos ou outros efeitos incluídos no modelo, e não falta de normalidade dos erros. O pressuposto de normalidade deve ser examinado nos resíduos obtidos após o ajuste da média
 
-A construção de $\mathbf H$, $\mathbf E$, das raízes e dos quatro critérios é algébrica. Sua interpretação por distribuições de referência clássicas depende do modelo probabilístico adotado. Quando independência entre unidades, covariância comum ou as condições distribucionais exigidas por essa calibração não descrevem os dados, os valores críticos e valores $p$ clássicos não são garantidos por esse modelo. Métodos alternativos exigem formulações específicas e não são desenvolvidos neste capítulo.
+$$
+E
+\left(
+\boldsymbol{\mathcal Y}
+\mid
+\mathbf Z
+\right)
+=
+\mathbf Z\mathbf B.
+$$
+
+Para $p=1$, os quatro critérios são funções monotônicas da única raiz
+
+$$
+\lambda
+=
+\frac{H}{E}.
+$$
+
+Como
+
+$$
+F
+=
+\frac{\nu_E}{\nu_H}\lambda,
+$$
+
+os quatro critérios produzem a mesma ordenação das amostras em relação à evidência contra $H_0$ e, quando calibrados em suas respectivas escalas, conduzem ao mesmo teste. Para $p>1$, $H$ e $E$ são substituídos pelas SQPCs $\mathbf H$ e $\mathbf E$.
 
 ### Associação residual, condicionamento e singularidade
 
@@ -1569,7 +1659,7 @@ Associação residual entre as respostas não invalida, por si só, a MANOVA. A 
 
 Relações lineares entre as respostas residuais muito próximas de uma dependência exata podem produzir uma matriz $\mathbf E$ mal condicionada, conforme a noção de condicionamento da @def-numero-condicao-svd. Nesse caso, $\mathbf E$ permanece invertível, mas pequenas perturbações nos dados podem produzir alterações relativamente grandes em sua inversa, nas raízes e nas direções características. Invertibilidade, portanto, não garante estabilidade numérica.
 
-Uma relação linear residual exata reduz o posto de $\mathbf E$ e pode torná-la singular, conforme a @sec-manova-nao-singularidade. Nesse caso, a formulação espectral adotada no capítulo não se aplica.
+Uma relação linear residual exata reduz o posto de $\mathbf E$ e pode torná-la singular, conforme a @sec-manova-nao-singularidade. Se $\mathbf E$ é singular, $\mathbf E^{-1/2}$ não existe como inversa ordinária e a matriz $\mathbf M_{\mathrm{HE}}$ não está definida pela @eq-matriz-hipotese-padronizada-manova.
 
 ## Relações com outras técnicas
 
@@ -1663,18 +1753,24 @@ n_1+n_2-2
 \lambda_1.
 $$
 
-Com dois grupos, existe no máximo uma raiz característica positiva e os quatro critérios dependem dessa única raiz. Quando
+Com dois grupos,
+
+$$
+g=1
+$$
+
+e
 
 $$
 \operatorname{posto}
 \left(
 \mathbf H
 \right)
->
-1,
+\leq
+1.
 $$
 
-mais de uma raiz é positiva e os critérios combinam essas raízes de formas distintas.
+Existe, portanto, no máximo uma raiz característica positiva. Quando $\lambda_1>0$, os quatro critérios dependem exclusivamente dessa raiz.
 
 ### Regressão multivariada
 
@@ -1696,11 +1792,21 @@ $$
 
 são avaliadas pelas mesmas SQPCs de hipótese e erro.
 
-### Análise Discriminante
+### Análise Discriminante {#sec-manova-relacao-discriminante}
 
-Na MANOVA de um fator que compara os vetores de médias de $K$ grupos, $\mathbf H$ corresponde à SQPC entre grupos e $\mathbf E$ à SQPC intragrupos. Essas mesmas duas estruturas são utilizadas na formulação amostral de Fisher da Análise Discriminante.
+Na MANOVA de um fator que compara os vetores de médias dos mesmos $K$ grupos utilizados na formulação de Fisher,
 
-Para essa comparação entre grupos, o problema
+$$
+\mathbf H
+=
+\mathbf T_{\mathrm{entre}}
+\qquad\text{e}\qquad
+\mathbf E
+=
+\mathbf T_{\mathrm{intra}}.
+$$
+
+Consequentemente, o problema
 
 $$
 \mathbf H\mathbf a
@@ -1720,16 +1826,18 @@ $$
 \boldsymbol{\alpha},
 $$
 
-utilizado na @sec-discriminante-fisher. Na MANOVA, as raízes características são combinadas pelos critérios de Wilks, Pillai, Hotelling--Lawley e Roy; em Fisher, os autovetores associados às raízes positivas definem as direções de separação entre os grupos.
+definido na @sec-discriminante-fisher.
 
-A coincidência do problema de autovalores generalizados não torna as técnicas equivalentes. Na MANOVA, grupos ou efeitos integram a estrutura explicativa e o objetivo é testar hipóteses sobre o vetor de respostas. Na formulação de Fisher, os rótulos conhecidos determinam as dispersões entre e dentro dos grupos, e os autovetores generalizados representam sua separação. Regras de classificação exigem uma formulação adicional.
+Na MANOVA, as raízes características são utilizadas pela lambda de Wilks, pelo critério de Pillai, pelo traço de Hotelling e pela maior raiz característica de Roy. Na formulação de Fisher, os autovetores associados às raízes positivas definem direções que maximizam a razão entre dispersão entre grupos e dispersão intragrupos.
+
+A coincidência do problema de autovalores generalizados não torna as técnicas equivalentes. Na MANOVA, os grupos são termos do modelo e o objetivo é testar hipóteses sobre os vetores de médias ou sobre funções estimáveis dos parâmetros. Na formulação de Fisher, os rótulos dos grupos são conhecidos e utilizados para construir as matrizes de dispersão entre e dentro dos grupos. A construção de uma regra de classificação requer uma formulação adicional.
 
 ## Aprofundamentos teóricos {#sec-manova-aprofundamentos-teoricos}
 
 ::: {.callout-note appearance="simple" icon=false}
 ## Leitura de aprofundamento
 
-Esta parte desenvolve propriedades algébricas e probabilísticas da MANOVA. São examinadas a estrutura normal--Wishart das matrizes de hipótese e erro, a relação entre a lambda de Wilks e a razão de verossimilhanças, a calibração inferencial dos critérios, a invariância sob transformações lineares não singulares das respostas e as propriedades de posto, sinal e não unicidade das direções características.
+Sob normalidade e $H_0$, as SQPCs de hipótese e erro possuem distribuições Wishart independentes. Essa formulação probabilística fundamenta as distribuições de referência dos critérios. A razão de verossimilhanças conduz à lambda de Wilks, enquanto a invariância e a forma canônica caracterizam o papel das raízes e das direções características.
 :::
 
 ### Distribuições Wishart de hipótese e erro sob $H_0$ {#sec-manova-base-probabilistica}
@@ -1829,69 +1937,59 @@ A distribuição residual da @eq-distribuicao-e-manova corresponde à @prp-distr
 
 Sob $H_0$, $\boldsymbol{\mathsf H}$ e $\boldsymbol{\mathsf E}_{\mathrm{res}}$ são matrizes Wishart independentes com a mesma matriz de escala $\boldsymbol{\Sigma}$ e graus de liberdade $g$ e $\nu_E$, respectivamente. As distribuições sob $H_0$ dos critérios clássicos decorrem dessa distribuição conjunta.
 
-Quando as matrizes de covariâncias populacionais diferem entre grupos, a distribuição conjunta da @eq-distribuicao-h-manova, da @eq-distribuicao-e-manova e da @eq-independencia-he-manova não se aplica, em geral, na forma apresentada. As consequências para a inferência clássica são discutidas na @sec-manova-covariancia-comum.
+Se as matrizes de covariâncias populacionais diferem entre os grupos, $\boldsymbol{\mathsf H}$ e $\boldsymbol{\mathsf E}_{\mathrm{res}}$ não possuem, em geral, a representação da @eq-distribuicao-h-manova, da @eq-distribuicao-e-manova e da @eq-independencia-he-manova com uma matriz de escala comum $\boldsymbol{\Sigma}$. A calibração clássica dos critérios baseada nessa representação deixa, portanto, de decorrer do modelo normal com covariância comum.
 
 #### Lambda de Wilks e razão de verossimilhanças {#sec-manova-wilks-verossimilhanca}
 
-Na comparação de modelos lineares normais multivariados encaixados, a razão de verossimilhanças é uma potência da lambda de Wilks. A forma determinantal resulta das SQPCs residuais dos modelos completo e reduzido, enquanto a forma espectral é expressa pelas raízes características do par $(\mathbf H,\mathbf E)$.
+Para a hipótese estimável
 
-Para modelos encaixados, @prp-decomposicao-modelos-encaixados fornece
+$$
+H_0:
+\mathbf C_1
+\mathbf B
+=
+\boldsymbol{\Theta}_0,
+$$
+
+denote por $\mathbf E_R$ a SQPC residual do ajuste sujeito a $H_0$ e por $\mathbf E$ a SQPC residual do ajuste irrestrito. A SQPC da hipótese corresponde ao aumento da SQPC residual imposto pela restrição, de modo que
 
 $$
 \mathbf E_R
 =
-\mathbf E_F
+\mathbf E
 +
-\mathbf H,
+\mathbf H.
 $$
 
-em que $\mathbf E_F$ e $\mathbf E_R$ são as SQPCs residuais dos modelos completo e reduzido.
+Quando $H_0$ é obtida pela comparação entre modelos lineares encaixados, essa decomposição coincide com a @prp-decomposicao-modelos-encaixados.
 
-A @eq-razao-verossimilhancas-modelos-encaixados-hipotese estabelece
+No modelo normal multivariado, a maximização da verossimilhança sob o modelo irrestrito e sob $H_0$ produz
 
 $$
 \Lambda_{\mathrm{RV}}
 =
 \left[
 \frac{
-|\mathbf E_F|
+|\mathbf E|
 }{
-|\mathbf E_F+\mathbf H|
+|\mathbf E+\mathbf H|
 }
-\right]^{n/2}.
-$$
-
-Na notação deste capítulo,
-
-$$
-\mathbf E_F
-=
-\mathbf E,
-\qquad
-\mathbf E_R
-=
-\mathbf E+\mathbf H.
-$$
-
-Pela @eq-lambda-wilks-modelos-encaixados, a razão de determinantes é $\Lambda_{\mathrm W}$. Portanto,
-
-$$
-\Lambda_{\mathrm{RV}}
+\right]^{n/2}
 =
 \Lambda_{\mathrm W}^{\,n/2}.
 $$ {#eq-relacao-rv-wilks-manova}
 
+Assim, rejeitar $H_0$ para valores pequenos da razão de verossimilhanças equivale a rejeitá-la para valores pequenos da lambda de Wilks [@anderson2003; @johnson2002].
+
 A @eq-lambda-wilks-manova reúne as duas formas da mesma estatística. A razão $|\mathbf E|/|\mathbf E+\mathbf H|$ compara as SQPCs residuais dos modelos completo e reduzido, enquanto o produto $\prod_{j=1}^{p}(1+\lambda_j)^{-1}$ expressa a lambda de Wilks em função das raízes características [@wilks1932].
 
-Sob o modelo normal, os critérios de Pillai, Hotelling--Lawley e Roy também são funções do par aleatório $(\boldsymbol{\mathsf H},\boldsymbol{\mathsf E}_{\mathrm{res}})$. Diferentemente da lambda de Wilks, porém, eles não são, em geral, o critério de razão de verossimilhanças para a hipótese linear.
+Sob o modelo normal, o critério de Pillai, o traço de Hotelling e a maior raiz característica de Roy também são funções do par aleatório $(\boldsymbol{\mathsf H},\boldsymbol{\mathsf E}_{\mathrm{res}})$. Esses três critérios não correspondem, em geral, ao critério da razão de verossimilhanças para a hipótese linear.
 
 As matrizes observadas $\mathbf H$ e $\mathbf E$, suas raízes características e os quatro critérios são definidos algebricamente. Sob o modelo normal, a distribuição conjunta de $\boldsymbol{\mathsf H}$ e $\boldsymbol{\mathsf E}_{\mathrm{res}}$ determina as distribuições de referência dos critérios sob $H_0$.
 
 ### Calibração inferencial dos critérios {#sec-manova-calibracao-criterios}
 
-Os valores observados de Wilks, Pillai, Hotelling--Lawley e Roy são funções algébricas de $\mathbf H$ e $\mathbf E$. Um valor $p$ exige, adicionalmente, uma distribuição de referência para o critério sob $H_0$.
-
-No modelo normal multivariado, a distribuição do critério sob $H_0$ decorre da @eq-distribuicao-h-manova, da @eq-distribuicao-e-manova e da independência expressa na @eq-independencia-he-manova. Ela depende de
+Pela @eq-distribuicao-h-manova, pela @eq-distribuicao-e-manova e pela @eq-independencia-he-manova, as distribuições de referência dos critérios sob $H_0$ são determinadas por
 
 $$
 p,
@@ -1901,11 +1999,53 @@ g
 \nu_E,
 $$
 
-isto é, do número $p$ de respostas, do posto $g$ de $\mathbf C_1$ e dos graus de liberdade residuais $\nu_E$.
+em que $p$ é o número de respostas, $g=\operatorname{posto}(\mathbf C_1)$ e $\nu_E$ é o número de graus de liberdade residuais.
 
-Em algumas configurações, uma transformação do critério possui distribuição $F$ exata. Em configurações gerais com várias raízes, Wilks, Pillai e Hotelling--Lawley utilizam transformações ou aproximações específicas, com graus de liberdade que dependem do critério e das dimensões do problema [@anderson2003].
+Algumas configurações admitem distribuições $F$ exatas. Se existe uma única resposta,
 
-Quando $r_H\leq1$, existe no máximo uma raiz não nula, e os critérios satisfazem
+$$
+p=1,
+$$
+
+então há no máximo uma raiz positiva e, sob $H_0$,
+
+$$
+\frac{\nu_E}{g}
+\lambda_1
+\sim
+F_{g,\nu_E}.
+$$ {#eq-f-exato-manova-p1}
+
+Se a hipótese possui um grau de liberdade,
+
+$$
+g=1,
+$$
+
+e $\nu_E\geq p$, então
+
+$$
+\frac{
+\nu_E-p+1
+}{
+p
+}
+\lambda_1
+\sim
+F_{p,\nu_E-p+1}.
+$$ {#eq-f-exato-manova-g1}
+
+Nessas duas situações, os quatro critérios são funções monotônicas da única raiz e conduzem ao mesmo teste global.
+
+Para $p>1$ e $g>1$, a distribuição da lambda de Wilks não se reduz, em geral, às distribuições $F$ exatas anteriores. Mantendo $p$ e $g$ fixos, uma aproximação assintótica de Bartlett, quando $\nu_E$ cresce, é
+
+$$
+-\left(\nu_E -\frac{p-g+1}{2}\right) \log \Lambda_{\mathrm W} \ \dot{\sim}\ \chi^2_{pg}.
+$$ {#eq-bartlett-wilks-manova}
+
+A aproximação é utilizada sob $H_0$ [@johnson2002; @anderson2003]. O critério de Pillai, o traço de Hotelling e a maior raiz característica de Roy possuem calibrações próprias, determinadas pelas respectivas distribuições de referência.
+
+Quando uma amostra apresenta $r_H\leq1$, os valores observados dos quatro critérios dependem de, no máximo, uma raiz positiva. Se $\lambda_1>0$,
 
 $$
 \Lambda_{\mathrm W}
@@ -1919,17 +2059,17 @@ V
 U
 =
 \lambda_1,
-\qquad
-\Theta_{\mathrm R}
-=
-\lambda_1.
 $$
 
-Pela @eq-numero-raizes-hipotese-manova, $p=1$ ou $g=1$ garante $r_H\leq1$, embora essa condição também possa ocorrer em outros casos de posto reduzido. Quando existe apenas uma raiz positiva, os quatro critérios são funções monotônicas biunívocas de $\lambda_1$ e contêm a mesma informação para o teste global.
+e a maior raiz característica de Roy é $\lambda_1$.
 
-Quando existem duas ou mais raízes positivas, os critérios combinam a coleção de raízes de formas diferentes. A lambda de Wilks multiplica os fatores $(1+\lambda_j)^{-1}$; Pillai soma os termos $\lambda_j/(1+\lambda_j)$; Hotelling--Lawley soma as raízes $\lambda_j$; e Roy utiliza apenas $\lambda_1$. As diferentes funções das raízes conduzem a estatísticas transformadas, graus de liberdade aproximados e valores $p$ que podem diferir.
+Se $p=1$ ou $g=1$, a @eq-numero-raizes-hipotese-manova garante $r_H\leq1$ para qualquer amostra. Nessas duas configurações, os quatro critérios são funções estritamente monotônicas da mesma raiz e conduzem a regiões de rejeição equivalentes quando cada critério é calibrado em sua escala correspondente.
 
-As distribuições de referência descritas nesta seção pressupõem $\mathbf E\succ\mathbf0$ e o modelo normal com independência entre unidades e matriz de covariâncias residual comum. Se $\mathbf E$ é singular ou essas condições probabilísticas não descrevem os dados, as distribuições e aproximações clássicas não justificam os valores críticos e valores $p$ correspondentes.
+Uma redução adicional de posto que produza $r_H\leq1$ apenas na amostra observada estabelece as identidades algébricas acima para essa amostra, mas não implica, por si só, equivalência entre as distribuições de referência dos quatro critérios.
+
+Quando existem duas ou mais raízes positivas, as distribuições de referência dos quatro critérios não são obtidas pela mesma transformação. As estatísticas transformadas e seus graus de liberdade dependem do critério, de $p$, de $g$ e de $\nu_E$ [@anderson2003].
+
+As distribuições de referência anteriores pressupõem normalidade multivariada dos erros, independência entre unidades, matriz de covariâncias residual comum e $\mathbf E\succ\mathbf0$. A violação dessas condições retira a justificativa, pelo modelo clássico, dos valores críticos e valores $p$ obtidos com essas distribuições ou aproximações. Se $\mathbf E$ é singular, também deixam de estar definidas as formulações dos critérios que exigem sua inversa ou seu determinante não nulo.
 
 ### Invariância a transformações lineares não singulares das respostas {#sec-manova-invariancia}
 
@@ -2048,7 +2188,52 @@ $$
 as duas equações características possuem os mesmos zeros, com as mesmas multiplicidades.
 :::
 
-Pela @prp-invariancia-raizes-manova, Wilks, Pillai, Hotelling--Lawley e Roy são invariantes a transformações lineares não singulares das respostas, pois os quatro critérios são funções das raízes características [@eaton2007multivariate].
+Para o par observado $(\mathbf H,\mathbf E)$, a decomposição espectral da matriz padronizada $\mathbf E^{-1/2}\mathbf H\mathbf E^{-1/2}$ determina uma forma canônica. Se
+
+$$
+\mathbf E^{-1/2}
+\mathbf H
+\mathbf E^{-1/2}
+=
+\mathbf Q
+\operatorname{diag}
+\left(
+\lambda_1,\ldots,\lambda_p
+\right)
+\mathbf Q^\top,
+$$
+
+com $\mathbf Q$ ortogonal, então a transformação das respostas definida por
+
+$$
+\mathbf A
+=
+\mathbf E^{-1/2}
+\mathbf Q
+$$
+
+produz
+
+$$
+\mathbf E^{*}
+=
+\mathbf I_p
+$$
+
+e
+
+$$
+\mathbf H^{*}
+=
+\operatorname{diag}
+\left(
+\lambda_1,\ldots,\lambda_p
+\right).
+$$
+
+Assim, para o par observado $(\mathbf H,\mathbf E)$, a transformação definida por $\mathbf A=\mathbf E^{-1/2}\mathbf Q$ reduz a SQPC residual à identidade e a SQPC da hipótese à matriz diagonal das raízes características [@anderson2003; @eaton2007multivariate].
+
+Consequentemente, a lambda de Wilks, o critério de Pillai, o traço de Hotelling e a maior raiz característica de Roy são invariantes a transformações lineares não singulares das respostas.
 
 Se $\boldsymbol{\alpha}_j$ é uma direção característica normalizada no sistema original, a direção correspondente no sistema transformado é
 
@@ -2166,7 +2351,7 @@ $$
 
 fornece outra base $\mathbf E$-ortonormal do mesmo subespaço. Portanto, uma raiz de multiplicidade $m>1$ determina o subespaço característico, mas não uma base $\mathbf E$-ortonormal única dentro dele.
 
-A escolha de uma base diferente dentro desse subespaço não altera Wilks, Pillai, Hotelling--Lawley ou Roy, pois os quatro critérios dependem apenas das raízes características.
+A escolha de outra base $\mathbf E$-ortonormal para esse subespaço não altera a lambda de Wilks, o critério de Pillai, o traço de Hotelling ou a maior raiz característica de Roy, pois os quatro critérios dependem apenas das raízes características.
 
 
 ## Aprofundamentos metodológicos e aplicados {#sec-manova-aprofundamentos-metodologicos}
@@ -2174,25 +2359,33 @@ A escolha de uma base diferente dentro desse subespaço não altera Wilks, Pilla
 ::: {.callout-note appearance="simple" icon=false}
 ## Leitura de aprofundamento
 
-Esta parte examina a condução e a interpretação da MANOVA. São considerados o tamanho e o balanceamento das células, a homogeneidade das matrizes de covariâncias, a escolha do critério multivariado, os procedimentos de acompanhamento do teste global, contrastes e comparações posteriores, MANOVA fatorial, MANCOVA, sensibilidade das conclusões e correspondência com a implementação utilizada.
+Esta parte trata das decisões de condução, interpretação e avaliação da MANOVA: tamanho das células, homogeneidade das matrizes de covariâncias, escolha do critério multivariado, análise posterior ao teste global, MANOVA fatorial, MANCOVA e validação dos resultados.
+
 :::
 
 ### Tamanho das células e balanceamento {#sec-manova-tamanho-balanceamento}
 
-Na MANOVA com fatores categóricos, o tamanho amostral deve ser examinado por célula do delineamento, além do número total de observações. A relação entre o número de respostas e os graus de liberdade residuais condiciona o posto que a SQPC residual pode atingir, enquanto os tamanhos das células afetam a estimação das médias e das matrizes de covariâncias e o poder dos testes [@hair2009].
+Na MANOVA com fatores categóricos, o tamanho amostral deve ser examinado em cada célula do delineamento. Células menores produzem estimativas menos precisas das médias e das covariâncias e reduzem o poder para detectar diferenças entre os vetores de médias [@hair2009].
 
-Para estimar separadamente uma matriz de covariâncias não singular em uma célula, é necessário que o número de observações dessa célula seja maior que o número de respostas, além de não existirem dependências lineares que reduzam o posto. Essa condição é necessária para procedimentos que utilizam separadamente as matrizes de covariâncias dos grupos, como o teste $M$ de Box. A formulação espectral adotada para a MANOVA exige, por sua vez, que a SQPC residual conjunta $\mathbf E$ seja positiva definida, conforme a @sec-manova-nao-singularidade; não exige que cada célula produza separadamente uma matriz de covariâncias positiva definida.
+Uma matriz de covariâncias amostral calculada separadamente na célula $k$ pode ter posto completo somente se
 
-Tamanhos desiguais entre células são admitidos pelo modelo linear. Quando o desbalanceamento ocorre juntamente com heterogeneidade das matrizes de covariâncias, a distribuição dos tamanhos amostrais entre os grupos pode afetar o comportamento dos testes multivariados [@hair2009].
+$$
+n_k-1
+\geq
+p,
+$$
 
-O desbalanceamento, isoladamente, não viola o modelo linear. Sua relevância para a inferência depende de sua combinação com a estrutura de covariâncias, os tamanhos das células e os graus de liberdade residuais.
+além da ausência de dependências lineares exatas entre as respostas. Essa condição é necessária para procedimentos que utilizam as matrizes de covariâncias de cada grupo separadamente, como o teste $M$ de Box. A MANOVA baseada na SQPC residual conjunta exige $\mathbf E\succ\mathbf0$, conforme a @sec-manova-nao-singularidade, mas não exige posto completo de cada matriz de covariâncias amostral de grupo.
+
+Tamanhos desiguais entre células são admitidos pelo modelo linear. Quando as matrizes de covariâncias populacionais diferem entre os grupos, células com tamanhos muito distintos aumentam a sensibilidade dos testes multivariados à violação da hipótese de covariância comum [@hair2009].
+
+Células com tamanhos semelhantes reduzem a sensibilidade dos testes à heterogeneidade das matrizes de covariâncias.
 
 ### Avaliação da homogeneidade das matrizes de covariâncias {#sec-manova-box-m}
 
-Na comparação entre $K$ grupos, a formulação clássica da MANOVA pressupõe uma matriz de covariâncias residual populacional comum, expressa pela hipótese
+Na comparação entre $K$ grupos, a MANOVA clássica assume
 
 $$
-H_0:
 \boldsymbol{\Sigma}_1
 =
 \boldsymbol{\Sigma}_2
@@ -2202,29 +2395,56 @@ H_0:
 \boldsymbol{\Sigma}_K.
 $$
 
-O teste $M$ de Box fornece uma avaliação inferencial dessa hipótese [@hair2009].
+O teste $M$ de Box avalia
 
-Na forma clássica, a estatística $M$ de Box é construída a partir dos determinantes das matrizes de covariâncias amostrais dos grupos e da matriz combinada, exigindo que essas matrizes sejam não singulares. A rejeição de $H_0$ fornece evidência contra a igualdade das matrizes de covariâncias populacionais [@hair2009].
+$$
+H_0:
+\boldsymbol{\Sigma}_1
+=
+\cdots
+=
+\boldsymbol{\Sigma}_K.
+$$
 
-A não rejeição de $H_0$ não demonstra que as matrizes populacionais sejam iguais. Além disso, o teste $M$ de Box é sensível a desvios da normalidade, que podem alterar seu comportamento inferencial [@hair2009]. Seu resultado deve ser interpretado considerando simultaneamente a hipótese de covariância comum e as condições utilizadas em sua distribuição de referência.
+Sua estatística utiliza os determinantes das matrizes de covariâncias amostrais dos grupos e da matriz de covariâncias combinada. O cálculo exige matrizes amostrais não singulares. A rejeição de $H_0$ fornece evidência contra a hipótese de covariância comum; a não rejeição não demonstra igualdade das matrizes populacionais.
 
-Em modelos com covariáveis, a condição de homogeneidade refere-se às matrizes de covariâncias dos erros após o ajuste da estrutura de médias. Um teste calculado a partir das respostas brutas agrupadas apenas pelos níveis dos fatores avalia matrizes de covariâncias não ajustadas e, em geral, não testa diretamente a igualdade das covariâncias residuais do modelo com covariáveis.
+O teste $M$ de Box é sensível a desvios da normalidade multivariada. Hair recomenda, por essa razão, níveis de significância como $0{,}01$ ou menores [@hair2009]. A rejeição do teste deve ser interpretada juntamente com a avaliação da normalidade, pois desvios da normalidade podem aumentar a frequência de rejeição da hipótese de covariância comum.
+
+Em modelos com covariáveis, a hipótese de homogeneidade refere-se às matrizes de covariâncias dos erros condicionais ao modelo ajustado. O teste calculado com as respostas brutas agrupadas pelos fatores compara matrizes não ajustadas e não testa diretamente a igualdade das covariâncias residuais da MANCOVA.
+
+### Observações atípicas e influência {#sec-manova-atipicas-influencia}
+
+Uma observação atípica apresenta valores incomuns em uma ou mais respostas ou em uma combinação dessas respostas. Como as médias podem variar entre os níveis do delineamento, a avaliação deve considerar os resíduos do modelo,
+
+$$
+\widehat{\boldsymbol e}_i
+=
+\boldsymbol y_i
+-
+\widehat{\boldsymbol\mu}_i,
+$$
+
+em que $\widehat{\boldsymbol\mu}_i$ é o vetor de médias ajustadas para a unidade $i$. Valores residuais extremos em uma resposta ou combinações residuais incomuns entre várias respostas identificam unidades que devem ser examinadas [@hair2009; @johnson2002].
+
+Uma observação é influente quando sua presença altera de forma apreciável os vetores de médias ajustadas, $\mathbf H$, $\mathbf E$, as raízes características ou os critérios multivariados. A comparação da análise com e sem a observação quantifica essa influência, mas não justifica sua exclusão.
+
+A exclusão requer evidência independente de erro de registro, erro de mensuração ou inadequação da unidade à população definida para o estudo. Uma observação extrema e válida deve ser mantida quando pertence à população analisada [@hair2009].
 
 ### Escolha e interpretação do critério multivariado {#sec-manova-escolha-criterio}
 
-Os quatro critérios utilizam as mesmas raízes características, mas não devem ser escolhidos depois de observar qual deles produz o menor valor $p$. A escolha deve considerar a estrutura do efeito e as condições da análise.
+Os quatro critérios são funções das mesmas raízes características. A escolha do critério deve considerar os tamanhos das células, a plausibilidade dos pressupostos e o número de raízes que caracterizam o efeito, e não o menor valor $p$ observado.
 
-Quando os tamanhos das células são semelhantes e as condições utilizadas na calibração clássica são plausíveis, Wilks e Pillai frequentemente conduzem à mesma conclusão. Diante de desbalanceamento ou heterogeneidade das matrizes de covariâncias, o critério de Pillai tende a apresentar maior robustez e pode ser adotado como referência nessas situações [@hair2009].
+Quando os tamanhos das células são semelhantes e os pressupostos de normalidade e covariância comum são plausíveis, Hair recomenda o critério de Pillai ou a lambda de Wilks [@hair2009]. Quando há células com tamanhos distintos ou evidência contra a hipótese de covariância comum, Hair recomenda o critério de Pillai por sua maior robustez nessas condições [@hair2009]. Johnson e Wichern também relatam maior robustez de Pillai diante de desvios da normalidade [@johnson2002].
 
-O traço de Hotelling--Lawley soma todas as raízes características. A maior raiz de Roy utiliza apenas $\lambda_1$, correspondente à maior razão hipótese/erro. Seu uso é mais coerente quando o problema sustenta previamente a expectativa de concentração do efeito em uma única direção; quando várias raízes são relevantes, o critério não incorpora diretamente as demais. Roy não deve ser escolhido depois da análise apenas por produzir o resultado mais favorável.
+A maior raiz característica de Roy utiliza apenas $\lambda_1$ e é indicada por Hair quando uma única dimensão domina o efeito e os pressupostos do modelo são plausíveis [@hair2009]. O traço de Hotelling, o critério de Pillai e a lambda de Wilks incorporam todas as raízes positivas.
 
-Quando os critérios conduzem à mesma decisão, essa concordância não representa quatro evidências independentes, pois todos são funções das mesmas raízes características. Quando as decisões divergem, a divergência deve ser relatada e examinada em relação à concentração das raízes, ao balanceamento e à homogeneidade das matrizes de covariâncias, sem escolher posteriormente o critério apenas pela decisão produzida.
-
-Um resultado inferencial deve identificar o critério utilizado e seu valor observado. Quando a implementação fornece uma transformação para uma estatística $F$, devem ser registrados também o valor de $F$, seus graus de liberdade e o valor $p$. Quando a distribuição de referência utilizada for aproximada ou assintótica, essa característica deve ser indicada.
+Resultados diferentes entre os quatro critérios decorrem das funções distintas aplicadas às mesmas raízes e não constituem evidências independentes. O relatório deve identificar o critério utilizado, seu valor observado, a estatística $F$ quando houver transformação correspondente, os graus de liberdade e o valor $p$.
 
 ### Avaliação das respostas após o teste global {#sec-manova-avaliacao-respostas}
 
-Quando $p>1$, a avaliação multivariada pode ser complementada pelo exame separado das respostas. Para a resposta $j$, os elementos diagonais
+A rejeição da hipótese multivariada fornece evidência de que a hipótese testada não se sustenta para o vetor de respostas. Essa rejeição não identifica quais respostas apresentam efeitos marginais. Os testes univariados podem ser utilizados para examinar separadamente cada componente do vetor resposta [@hair2009].
+
+Para a resposta $j$, os elementos diagonais
 
 $$
 H_{jj}
@@ -2232,7 +2452,7 @@ H_{jj}
 E_{jj}
 $$
 
-correspondem às somas de quadrados da hipótese e do erro associadas a essa variável, conduzindo à estatística
+são as somas de quadrados da hipótese e do erro correspondentes a essa resposta. A estatística univariada é
 
 $$
 F_j
@@ -2244,7 +2464,7 @@ E_{jj}/\nu_E
 }.
 $$ {#eq-f-univariado-pos-manova}
 
-Sob o modelo normal clássico, condicionalmente a $\mathbf Z$, e sob a hipótese nula marginal correspondente,
+Sob o modelo normal clássico e sob a hipótese nula marginal,
 
 $$
 F_j
@@ -2252,116 +2472,321 @@ F_j
 F_{\nu_H,\nu_E}.
 $$
 
-Esses testes respondem a perguntas marginais sobre cada componente do vetor resposta e não reproduzem a MANOVA. Cada $F_j$ utiliza apenas elementos diagonais de $\mathbf H$ e $\mathbf E$, enquanto os critérios multivariados utilizam as matrizes completas e incorporam também os produtos cruzados entre as respostas.
+O teste baseado em $F_j$ utiliza somente $H_{jj}$ e $E_{jj}$. Os critérios multivariados utilizam as matrizes completas $\mathbf H$ e $\mathbf E$ e, portanto, incorporam também os produtos cruzados entre as respostas. Um teste univariado não constitui uma decomposição do teste MANOVA.
 
-A rejeição do teste multivariado global não implica a rejeição das hipóteses marginais para todas as respostas. Quando os testes $F_j$ são utilizados para identificar quais componentes do vetor resposta apresentam evidência do efeito, as hipóteses marginais formam uma família de testes e o tratamento da multiplicidade deve ser definido de acordo com essa família. Esses testes complementam a MANOVA e não substituem o teste multivariado global.
+Quando as $p$ respostas são examinadas separadamente, as hipóteses marginais formam uma família de testes. A rejeição prévia da hipótese multivariada não controla a probabilidade de pelo menos uma rejeição incorreta nessa família. O ajuste de Bonferroni controla o erro familiar em nível $\alpha$ utilizando
+
+$$
+\frac{\alpha}{p}
+$$
+
+como nível de significância para cada uma das $p$ hipóteses marginais. Outros procedimentos de multiplicidade podem ser utilizados de acordo com a família de hipóteses que será interpretada.
+
+A rejeição da hipótese multivariada não exige que todas as hipóteses marginais sejam rejeitadas. A diferença entre grupos pode estar concentrada em algumas respostas ou em uma combinação linear das respostas [@hair2009; @johnson2002].
+
+Intervalos de confiança simultâneos podem ser construídos para componentes ou contrastes previamente especificados dos vetores de médias. Esses intervalos quantificam as diferenças estimadas e controlam conjuntamente o nível de confiança da família de afirmações considerada [@johnson2002].
 
 ### Contrastes e comparações posteriores {#sec-manova-contrastes-comparacoes}
 
-A rejeição de um teste multivariado global fornece evidência contra a hipótese formulada para o vetor de respostas, mas não identifica quais comparações entre níveis diferem nem quais componentes do vetor resposta apresentam efeitos marginais.
+A rejeição da hipótese multivariada não identifica quais níveis do fator diferem. Quando o fator possui três ou mais níveis, contrastes e comparações posteriores podem localizar essas diferenças.
 
-Comparações definidas antes da análise podem ser representadas diretamente por linhas de $\mathbf C_1$ na hipótese linear da @def-hipotese-linear-geral-multivariada. Para cada hipótese estimável assim formulada, constroem-se as SQPCs de hipótese e erro correspondentes.
+Um contraste planejado entre $K$ médias de grupos pode ser escrito como
 
-Contrastes planejados correspondem a comparações especificadas antes do exame dos resultados e justificadas pelo problema analisado. A escolha de novos contrastes a partir das diferenças observadas nas médias constitui uma análise posterior aos dados e amplia a família de comparações que deve ser considerada no controle da multiplicidade [@hair2009].
+$$
+L
+=
+c_1\boldsymbol{\mu}_1
++
+\cdots
++
+c_K\boldsymbol{\mu}_K,
+$$
 
-Quando um fator possui três ou mais níveis e não foram definidos contrastes previamente, comparações posteriores entre níveis podem ser utilizadas para localizar diferenças específicas. O ajuste para multiplicidade deve corresponder à família de comparações efetivamente realizada.
+com
 
-Os testes marginais por resposta e as comparações entre níveis respondem a hipóteses diferentes. Os primeiros avaliam componentes específicos do vetor resposta; as segundas comparam níveis ou combinações de níveis do fator. Ambos são procedimentos de acompanhamento do teste multivariado global e exigem interpretação compatível com as hipóteses efetivamente testadas.
+$$
+\sum_{k=1}^{K}c_k
+=
+0.
+$$
 
-Em procedimentos *stepdown*, cada resposta é testada condicionalmente às respostas que a precedem na sequência. Por isso, a hipótese examinada em cada etapa depende da ordenação adotada. A ordem das respostas deve ser definida a partir do problema analisado, e não dos resultados observados [@hair2009].
+Os coeficientes $c_1,\ldots,c_K$ definem a comparação entre os grupos. No modelo linear multivariado, contrastes estimáveis são incorporados à matriz $\mathbf C_1$ da hipótese linear definida na @def-hipotese-linear-geral-multivariada.
+
+Contrastes planejados devem ser especificados a partir da pergunta de pesquisa antes da inspeção das diferenças amostrais. Como o número de comparações planejadas costuma ser menor, eles podem apresentar maior poder para as comparações previamente definidas [@hair2009].
+
+Quando as comparações são escolhidas depois do exame das médias, elas pertencem a uma análise *post hoc*. O procedimento de multiplicidade deve considerar o conjunto de comparações efetivamente realizado. A realização de várias comparações sem ajuste aumenta a probabilidade de pelo menos uma rejeição incorreta [@hair2009].
+
+Testes por resposta e contrastes entre níveis avaliam hipóteses diferentes. O teste baseado em $F_j$ examina o efeito sobre uma resposta específica, enquanto um contraste compara níveis ou combinações de níveis do fator.
+
+Em uma análise *stepdown*, cada resposta é testada condicionalmente às respostas que a precedem. A ordem das respostas altera as hipóteses condicionais avaliadas e deve ser definida antes da análise com base no problema de pesquisa [@hair2009].
+
+Na MANOVA de um fator, as direções associadas às raízes características definem combinações lineares das respostas ordenadas pela razão entre a dispersão entre grupos e a dispersão intragrupos. A relação entre essas direções e as funções discriminantes de Fisher é estabelecida na @sec-manova-relacao-discriminante.
 
 ### MANOVA fatorial e MANCOVA {#sec-manova-extensoes-modelo}
 
-No modelo linear multivariado, fatores, interações e covariáveis são representados por termos da matriz de delineamento $\mathbf Z$. Para cada função estimável de interesse, a hipótese correspondente determina $\mathbf H$, enquanto $\mathbf E$ é obtida do ajuste do modelo utilizado.
+No modelo linear multivariado, fatores, interações e covariáveis determinam os termos da matriz de delineamento $\mathbf Z$. Cada hipótese linear estimável determina sua SQPC $\mathbf H$, enquanto a SQPC residual $\mathbf E$ é obtida do modelo ajustado.
 
 #### MANOVA fatorial
 
-Em um delineamento com dois ou mais fatores, efeitos principais e interações correspondem a hipóteses estimáveis distintas. Para cada uma dessas hipóteses, constrói-se a SQPC $\mathbf H$ correspondente; no mesmo modelo ajustado, a SQPC residual $\mathbf E$ é utilizada na obtenção das raízes e dos critérios multivariados.
+Em um delineamento com dois ou mais fatores, cada efeito principal e cada interação correspondem a uma hipótese linear distinta. Para cada hipótese constrói-se uma SQPC $\mathbf H$, enquanto a SQPC residual $\mathbf E$ é obtida do mesmo modelo ajustado.
 
-A interação deve ser considerada antes de interpretar os efeitos principais como resumos das diferenças entre os níveis dos fatores. Quando há interação, a diferença associada a um fator varia entre os níveis de outro fator; nesse caso, os efeitos principais correspondem a comparações marginais e podem não descrever as diferenças presentes em cada combinação de níveis. Contrastes ou efeitos simples podem ser utilizados para examinar essas diferenças específicas [@hair2009].
+A interação deve ser examinada antes da interpretação dos efeitos principais. Quando existe interação, a diferença associada a um fator depende do nível do outro fator. O efeito principal resume diferenças marginais e pode ocultar o padrão observado nas combinações específicas de níveis [@hair2009; @johnson2002].
 
-A rejeição da hipótese de ausência de interação não identifica quais combinações de níveis produzem as diferenças. As médias das células e contrastes que comparem efeitos simples podem ser examinados para localizar e descrever essas diferenças.
+Na inspeção de uma resposta específica, Hair distingue interações ordinais e desordinais. Em uma interação ordinal, a ordenação das médias entre os níveis de um fator permanece a mesma nos níveis do outro fator, embora as diferenças possam mudar de magnitude. Em uma interação desordinal, essa ordenação se inverte em pelo menos parte dos níveis examinados [@hair2009]. Essa classificação descreve o perfil da resposta considerada e não substitui o teste multivariado da interação.
+
+A rejeição da hipótese de ausência de interação não identifica quais combinações de níveis diferem. As médias das células, os efeitos simples e os contrastes entre combinações de níveis podem ser utilizados para localizar essas diferenças.
 
 #### MANCOVA
 
-Na MANCOVA, covariáveis quantitativas são incluídas como termos da matriz $\mathbf Z$. As hipóteses sobre os fatores comparam os vetores de médias condicionais das respostas após o ajuste dos termos associados às covariáveis.
+Na MANCOVA, covariáveis quantitativas são incluídas na matriz de delineamento $\mathbf Z$. As hipóteses sobre os fatores comparam vetores de médias das respostas condicionais aos valores das covariáveis.
 
-A inclusão de uma covariável deve decorrer do delineamento e do problema analisado. Quando a covariável explica parte da variação das respostas, seu ajuste pode reduzir a variabilidade residual da comparação. Se a distribuição da covariável difere entre os níveis dos fatores, as comparações condicionais obtidas pela MANCOVA podem diferir das comparações marginais obtidas sem o ajuste; essas duas comparações respondem a hipóteses distintas [@hair2009].
+Para uma covariável escalar $c$ e um fator com $K$ níveis, o modelo aditivo pode ser escrito como
 
-Um modelo aditivo de MANCOVA pressupõe que a relação linear entre cada covariável e o vetor de respostas seja a mesma nos diferentes níveis dos fatores. No modelo linear, diferenças nessas relações são representadas por termos de interação entre fator e covariável. Quando esses termos estão presentes, a comparação entre níveis do fator depende do valor da covariável e não pode ser resumida por uma única diferença ajustada comum aos grupos.
+$$
+E
+\left(
+\boldsymbol{\mathsf Y}
+\mid
+\mathsf G=k,\,
+c
+\right)
+=
+\boldsymbol{\mu}_k
++
+\boldsymbol{\gamma}c,
+\qquad
+k=1,\ldots,K,
+$$
 
-A inclusão de covariáveis modifica a hipótese interpretada para os termos dos fatores. A MANOVA sem covariáveis compara vetores de médias marginais definidos pelo modelo correspondente; a MANCOVA compara vetores de médias condicionais aos valores das covariáveis incluídas.
+em que $\boldsymbol{\gamma}\in\mathbb R^p$ contém os coeficientes associados à covariável. A mesma inclinação $\boldsymbol{\gamma}$ em todos os grupos expressa a **homogeneidade dos coeficientes de regressão** exigida pelo modelo aditivo de MANCOVA [@hair2009].
 
-### Sensibilidade das conclusões {#sec-manova-sensibilidade}
+Se os coeficientes associados à covariável diferem entre os grupos, o modelo pode ser escrito com coeficientes específicos,
 
-A análise de sensibilidade compara conclusões obtidas sob escolhas alternativas que sejam compatíveis com o delineamento e com as hipóteses do problema.
+$$
+E
+\left(
+\boldsymbol{\mathsf Y}
+\mid
+\mathsf G=k,\,
+c
+\right)
+=
+\boldsymbol{\mu}_k
++
+\boldsymbol{\gamma}_k c.
+$$
 
-Divergências entre os critérios multivariados devem ser examinadas em relação às raízes características, ao balanceamento e à estrutura de covariâncias, conforme a @sec-manova-escolha-criterio. Quando uma observação apresenta problema identificado de mensuração, registro ou adequação ao modelo, a comparação da análise com e sem essa observação pode quantificar sua influência sobre a conclusão. Especificações alternativas do modelo só devem ser comparadas quando ambas forem justificadas pelo delineamento e pelo problema analisado.
+A diferença entre os grupos $k$ e $\ell$ nesse caso é
 
-Quando houver outra amostra obtida sob condições comparáveis, a repetição da análise fornece evidência sobre a reprodução das diferenças estimadas e da conclusão do teste multivariado. Essa reprodução não corrige limitações do delineamento nem amplia a população à qual a inferência se refere.
+$$
+\left(
+\boldsymbol{\mu}_k
+-
+\boldsymbol{\mu}_\ell
+\right)
++
+\left(
+\boldsymbol{\gamma}_k
+-
+\boldsymbol{\gamma}_\ell
+\right)c.
+$$
+
+Portanto, quando
+
+$$
+\boldsymbol{\gamma}_k
+\neq
+\boldsymbol{\gamma}_\ell,
+$$
+
+a diferença entre os vetores de médias depende do valor da covariável. No modelo linear, essa situação corresponde a uma interação fator--covariável.
+
+Uma covariável associada às respostas pode reduzir a SQPC residual depois do ajuste e aumentar a precisão das comparações entre os níveis dos fatores. Hair recomenda selecionar covariáveis relacionadas às respostas e evitar covariáveis fortemente associadas aos fatores quando o objetivo é aumentar a precisão dos testes dos efeitos de grupo [@hair2009].
+
+A associação entre a covariável e o fator não viola, por si só, o modelo linear. A MANOVA sem covariáveis compara os vetores de médias definidos pelo modelo sem ajuste para a covariável, enquanto a MANCOVA compara vetores de médias condicionais aos valores da covariável. Diferenças entre esses dois resultados decorrem das hipóteses distintas formuladas pelos dois modelos.
+
+### Validação dos resultados {#sec-manova-sensibilidade}
+
+A repetição do estudo sob o mesmo delineamento constitui a principal forma de avaliar a reprodução dos resultados de uma MANOVA [@hair2009]. Em uma nova amostra da mesma população-alvo, devem ser comparadas as estimativas das diferenças entre os vetores de médias e as decisões obtidas para as mesmas hipóteses multivariadas.
+
+Diferenças entre as duas análises devem ser examinadas considerando os tamanhos amostrais, os tamanhos das células, as matrizes de covariâncias e as estimativas dos efeitos.
+
+Em estudos observacionais, a reprodução de uma associação em diferentes amostras não substitui a designação aleatória dos tratamentos. Quando os grupos são definidos por características observadas, a MANOVA compara os vetores de médias condicionais a esses grupos. Sem um delineamento ou uma estratégia de identificação causal que sustente essa interpretação, diferenças entre os vetores de médias não devem ser interpretadas como efeitos causais [@hair2009].
+
+A repetição da análise em outra amostra da mesma população-alvo avalia a reprodução dos resultados nessa população. A generalização para outras populações exige suporte do delineamento amostral e das condições sob as quais as amostras foram obtidas.
 
 ### Correspondência com a implementação utilizada {#sec-manova-correspondencia-implementacao}
 
-Nas atividades computacionais, a MANOVA será realizada pela análise `MANCOVA` do núcleo do [jamovi](https://www.jamovi.org/) [@jamovi2026]. A @tbl-correspondencia-implementacao-manova relaciona as principais opções e saídas dessa implementação aos objetos estatísticos utilizados no capítulo.
+A implementação utilizada é a análise `MANCOVA` do núcleo do [jamovi](https://www.jamovi.org/) [@jamovi2026]. A @tbl-correspondencia-implementacao-manova relaciona as opções e saídas da interface aos objetos estatísticos da MANOVA.
 
 | Elemento da implementação | Correspondência estatística | Desenvolvimento no capítulo |
 |---|---|---|
 | **Dependent Variables** | colunas da matriz de respostas $\boldsymbol{\mathcal Y}$ | @def-modelo-linear-multivariado |
-| **Factors** | termos categóricos da matriz de delineamento $\mathbf Z$ | @def-modelo-linear-multivariado e @sec-manova-extensoes-modelo |
-| **Covariates** | termos quantitativos acrescentados a $\mathbf Z$ | @sec-manova-extensoes-modelo |
-| **Pillai's Trace** | traço de Pillai | @sec-manova-criterios |
+| **Factors** | fatores categóricos que determinam termos da matriz de delineamento $\mathbf Z$ | @def-modelo-linear-multivariado e @sec-manova-extensoes-modelo |
+| **Covariates** | covariáveis quantitativas incluídas como termos de $\mathbf Z$ | @sec-manova-extensoes-modelo |
+| **Pillai's Trace** | critério de Pillai | @sec-manova-criterios |
 | **Wilks' Lambda** | lambda de Wilks | @sec-manova-criterios |
-| **Hotelling's Trace** | traço de Hotelling--Lawley | @sec-manova-criterios |
-| **Roy's Largest Root** | maior raiz de Roy | @sec-manova-criterios |
-| **Univariate Tests** | testes marginais para cada resposta e termo do modelo | @eq-f-univariado-pos-manova e @sec-manova-avaliacao-respostas |
+| **Hotelling's Trace** | traço de Hotelling | @sec-manova-criterios |
+| **Roy's Largest Root** | maior raiz característica de Roy | @sec-manova-criterios |
+| **Univariate Tests** | testes univariados de cada resposta para cada termo do modelo; a multiplicidade entre respostas deve ser tratada separadamente | @eq-f-univariado-pos-manova e @sec-manova-avaliacao-respostas |
 | **Box's M** | teste de igualdade das matrizes de covariâncias dos grupos formados pelos fatores | @sec-manova-box-m |
-| **Multivariate Shapiro--Wilk** | diagnóstico de normalidade aplicado às respostas observadas na implementação auditada | @sec-manova-normalidade |
-| **Q--Q plot** | comparação de distâncias de Mahalanobis das respostas observadas com quantis qui-quadrado | @sec-manova-normalidade |
-| **Missing values** | exclusão conjunta das unidades incompletas nas variáveis utilizadas pelo modelo | convenção da implementação; tratamento de dados ausentes não desenvolvido no capítulo |
+| **Multivariate Shapiro--Wilk** | teste de normalidade multivariada calculado pela implementação com os vetores de respostas observados; não utiliza os resíduos do modelo | @sec-manova-normalidade |
+| **Q--Q plot** | comparação das distâncias de Mahalanobis calculadas com os vetores de respostas observados com quantis qui-quadrado; não utiliza os resíduos do modelo | @sec-manova-normalidade |
+| **Missing values** | exclusão das unidades com valor ausente em alguma variável utilizada no modelo | convenção da implementação; tratamento estatístico de dados ausentes não desenvolvido no capítulo |
 
 : Correspondência entre elementos da implementação e os objetos estatísticos desenvolvidos no capítulo. {#tbl-correspondencia-implementacao-manova}
 
-Quando há dois ou mais fatores, a implementação inclui seus efeitos principais e as interações entre fatores. As covariáveis entram como termos aditivos e não geram automaticamente interações fator--covariável. Portanto, o modelo formado por esses termos representa uma relação comum entre cada covariável e as respostas nos diferentes níveis dos fatores.
+Quando há dois ou mais fatores, a implementação inclui seus efeitos principais e as interações entre fatores. As covariáveis entram como termos aditivos e não geram automaticamente interações fator--covariável. O modelo ajustado pela interface impõe, portanto, coeficientes comuns para cada covariável nos diferentes níveis dos fatores, conforme a condição descrita na @sec-manova-extensoes-modelo.
 
-A denominação **Hotelling's Trace** corresponde ao traço de Hotelling--Lawley desenvolvido no capítulo. Para cada termo do modelo, os quatro critérios são calculados a partir da mesma SQPC da hipótese e da mesma SQPC residual e são acompanhados da estatística $F$, dos graus de liberdade e do valor $p$. Eles diferem pelas funções aplicadas à coleção de raízes características.
+A denominação **Hotelling's Trace** corresponde ao traço de Hotelling. Para cada termo do modelo, os quatro critérios utilizam a mesma SQPC da hipótese e a mesma SQPC residual. As diferenças entre os critérios decorrem das funções aplicadas às raízes características. A implementação apresenta também a estatística $F$, os graus de liberdade e o valor $p$ associados a cada critério.
 
-Os testes univariados correspondem aos testes da @sec-manova-avaliacao-respostas: para cada termo do modelo, cada resposta é examinada separadamente por uma estatística baseada nos elementos diagonais de $\mathbf H$ e $\mathbf E$. Esses testes não incorporam os produtos cruzados entre respostas e não substituem o teste multivariado global.
+Os testes univariados correspondem aos testes da @sec-manova-avaliacao-respostas. Para cada termo do modelo, cada resposta é examinada separadamente por uma estatística baseada em $H_{jj}$ e $E_{jj}$. Esses testes não utilizam os produtos cruzados entre respostas e não reproduzem o teste multivariado.
+
+Quando várias respostas são examinadas, os valores $p$ univariados devem ser interpretados como uma família de testes. A rejeição prévia da hipótese multivariada não controla automaticamente o erro Tipo I dessa família; o procedimento de multiplicidade deve ser definido de acordo com as hipóteses marginais que serão interpretadas.
 
 O teste $M$ de Box utiliza as combinações dos níveis dos fatores para formar os grupos e compara as matrizes de covariâncias das respostas observadas. Em uma MANCOVA, as covariáveis não entram nesse cálculo; portanto, o teste não avalia diretamente a igualdade das matrizes de covariâncias residuais após o ajuste das covariáveis exigida pelo modelo.
 
-O teste multivariado de Shapiro--Wilk e o gráfico Q--Q disponibilizados pela implementação auditada utilizam as respostas observadas, e não os resíduos do modelo. Portanto, esses diagnósticos não avaliam diretamente a hipótese de normalidade dos erros condicionais à estrutura de médias formulada na @sec-manova-normalidade.
+A hipótese de normalidade da MANOVA refere-se aos vetores de erros condicionais à matriz de delineamento,
 
-A interface não fornece procedimentos específicos para os contrastes planejados e as comparações posteriores discutidos na @sec-manova-contrastes-comparacoes. Esses procedimentos pertencem ao acompanhamento do efeito depois da avaliação multivariada.
+$$
+\boldsymbol{\varepsilon}_i
+=
+\boldsymbol y_i
+-
+E
+\left(
+\boldsymbol{\mathsf Y}_i
+\mid
+\mathbf Z
+\right).
+$$
+
+O teste multivariado de Shapiro--Wilk e o gráfico Q--Q da implementação auditada são calculados com os vetores de respostas observados $\boldsymbol y_i$, e não com os resíduos do modelo ajustado.
+
+Quando os vetores de médias diferem entre os níveis dos fatores, as respostas reunidas não precisam seguir uma única distribuição normal multivariada, mesmo que os erros condicionais sejam normais. Na MANCOVA, a média condicional também varia com os valores das covariáveis. Portanto, a distribuição das respostas não ajustadas não coincide, em geral, com a distribuição dos erros do modelo.
+
+O teste multivariado de Shapiro--Wilk e o gráfico Q--Q da interface não testam diretamente a hipótese de normalidade formulada na @sec-manova-normalidade. A avaliação dessa hipótese deve utilizar os resíduos do modelo ajustado.
+
+Na MANOVA de um fator, os resíduos são os desvios das observações em relação ao vetor de médias do respectivo grupo. Em modelos fatoriais ou com covariáveis, os resíduos são obtidos após o ajuste de todos os termos incluídos no modelo.
+
+A exclusão das unidades com valores ausentes reduz a amostra analisada e pode alterar os tamanhos das células e os graus de liberdade residuais. A análise das observações completas não modela o mecanismo de ausência. Quando a ocorrência de valores ausentes depende das respostas ou de outras características das unidades, as estimativas obtidas com os casos completos podem diferir das estimativas que seriam obtidas com os dados completos [@johnson2002].
+
+A interface não fornece os contrastes planejados e as comparações posteriores discutidos na @sec-manova-contrastes-comparacoes. Quando essas análises são necessárias, elas devem ser realizadas por procedimentos adicionais após o teste multivariado global.
 
 ## Síntese
 
-A MANOVA formula a comparação conjunta de várias respostas no modelo linear multivariado. Para uma hipótese estimável, a SQPC da hipótese
+A MANOVA formula hipóteses sobre um vetor de respostas no modelo linear multivariado
 
 $$
-\mathbf H
+\boldsymbol{\mathcal Y}
+=
+\mathbf Z
+\mathbf B
++
+\boldsymbol{\mathcal E}.
 $$
 
-reúne as somas de quadrados e os produtos cruzados associados ao afastamento observado de $H_0$, enquanto a SQPC residual
+Para uma hipótese estimável
+
+$$
+H_0:
+\mathbf C_1
+\mathbf B
+=
+\boldsymbol{\Theta}_0,
+$$
+
+a SQPC da hipótese $\mathbf H$ quantifica a variação associada à hipótese testada, enquanto a SQPC residual $\mathbf E$ quantifica a variação não explicada pelo modelo.
+
+Quando
 
 $$
 \mathbf E
+\succ
+\mathbf0,
 $$
 
-reúne as somas de quadrados e os produtos cruzados residuais.
-
-Quando $\mathbf E\succ\mathbf0$, a comparação entre hipótese e erro é expressa pelo problema de autovalores generalizados
+a comparação entre hipótese e erro conduz ao problema
 
 $$
-\mathbf H\mathbf a
+\mathbf H
+\mathbf a
 =
 \lambda
-\mathbf E\mathbf a.
+\mathbf E
+\mathbf a.
 $$
 
-Cada raiz característica é a razão entre a soma de quadrados da hipótese e a soma de quadrados residual na direção característica correspondente. Wilks, Pillai, Hotelling--Lawley e Roy são funções da mesma coleção de raízes, mas combinam essa coleção de formas diferentes.
+As raízes características
 
-A construção de $\mathbf H$, $\mathbf E$, das raízes e dos quatro critérios é algébrica. Sob o modelo linear normal multivariado, independência entre unidades, matriz de covariâncias residual comum e normalidade dos erros determinam a estrutura normal--Wishart utilizada nas distribuições de referência clássicas. Tamanho e balanceamento das células, escolha do critério, testes marginais, contrastes e comparações posteriores pertencem à condução e à interpretação da análise e não modificam as definições algébricas de $\mathbf H$, $\mathbf E$ ou dos critérios.
+$$
+\lambda_1
+\geq
+\cdots
+\geq
+\lambda_p
+\geq
+0
+$$
 
-Para $p=1$, a MANOVA reduz-se à comparação entre as somas de quadrados da ANOVA. Com dois grupos, existe no máximo uma raiz positiva e sua relação com o $T^2$ de Hotelling é dada pela @eq-relacao-raiz-t2-manova. A regressão multivariada utiliza o mesmo modelo linear multivariado, com outros termos na matriz de delineamento e outras hipóteses sobre $\mathbf B$. Na comparação entre grupos, o problema de autovalores generalizados coincide com o utilizado na formulação de Fisher da Análise Discriminante, embora MANOVA e Fisher respondam a objetivos estatísticos diferentes.
+são os autovalores generalizados do par $(\mathbf H,\mathbf E)$. O número de raízes positivas é
 
-No @sec-discriminante, a atenção passa do teste de diferenças multivariadas para a separação entre grupos previamente conhecidos. A Análise Discriminante utiliza estruturas de dispersão entre e dentro dos grupos para construir direções discriminantes e, sob modelos probabilísticos específicos, regras de classificação.
+$$
+r_H
+=
+\operatorname{posto}
+\left(
+\mathbf H
+\right)
+\leq
+\min
+\left(
+p,g
+\right),
+$$
+
+em que $g=\operatorname{posto}(\mathbf C_1)$.
+
+Os quatro critérios clássicos são funções dessas raízes:
+
+$$
+\Lambda_{\mathrm W}
+=
+\prod_{j=1}^{p}
+\frac{1}{1+\lambda_j},
+\qquad
+V
+=
+\sum_{j=1}^{p}
+\frac{\lambda_j}{1+\lambda_j},
+$$
+
+$$
+U
+=
+\sum_{j=1}^{p}
+\lambda_j,
+\qquad
+\text{maior raiz característica de Roy}
+=
+\lambda_1.
+$$
+
+A lambda de Wilks diminui à medida que aumenta a evidência contra $H_0$; o critério de Pillai, o traço de Hotelling e a maior raiz característica de Roy aumentam. A calibração inferencial clássica pressupõe independência entre unidades, normalidade multivariada dos erros, matriz de covariâncias residual comum e as condições de posto necessárias às operações matriciais utilizadas.
+
+Para $p=1$, o problema reduz-se à ANOVA. Com dois grupos, há no máximo uma raiz positiva e
+
+$$
+\lambda_1
+=
+\frac{
+T^2
+}{
+n_1+n_2-2
+}.
+$$
+
+A regressão multivariada utiliza o mesmo modelo linear multivariado, com hipóteses distintas sobre $\mathbf B$. Na MANOVA de um fator, $\mathbf H$ e $\mathbf E$ coincidem, respectivamente, com as matrizes de dispersão entre e dentro dos grupos utilizadas na formulação de Fisher.
+
+A Análise Discriminante parte de grupos conhecidos e muda o objetivo da análise: em vez de testar hipóteses sobre vetores de médias, utiliza a separação entre e dentro dos grupos para construir direções discriminantes e, sob modelos probabilísticos específicos, regras de classificação.
