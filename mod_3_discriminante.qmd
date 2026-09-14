@@ -2,11 +2,11 @@
 
 A Análise Discriminante utiliza grupos previamente conhecidos para resolver dois problemas relacionados: representar a separação entre os grupos e construir regras para classificar novas observações [@johnson2002].
 
-O capítulo desenvolve duas formulações. Na formulação probabilística, as classes são descritas por distribuições condicionais e a classificação é tratada como um problema de decisão envolvendo probabilidades *a priori*, perdas e probabilidades posteriores. Na formulação geométrica de Fisher, procuram-se combinações lineares que maximizem a separação entre grupos relativamente à dispersão intragrupos.
+O capítulo desenvolve duas formulações. Na formulação probabilística, as classes são descritas por distribuições condicionais e a classificação é tratada como um problema de decisão envolvendo probabilidades *a priori*, perdas e probabilidades *a posteriori*. Na formulação geométrica de Fisher, procuram-se combinações lineares que maximizem a separação entre grupos relativamente à dispersão intragrupos.
 
 As duas formulações possuem objetivos distintos. A primeira produz regras de classificação; a segunda constrói direções que representam a separação entre grupos conhecidos. Sob condições específicas, suas soluções podem estar relacionadas.
 
-Parâmetros populacionais, estatísticas amostrais e regras estimadas são objetos distintos. O erro aparente, a validação cruzada, o conjunto de teste *holdout* e a amostra independente correspondem a regimes distintos de avaliação da regra estimada. As formulações consideradas são as versões clássicas, sem regularização ou seleção automática de variáveis.
+Parâmetros populacionais, estatísticas amostrais e regras estimadas são objetos distintos. As formulações consideradas são as versões clássicas, sem regularização ou seleção automática de variáveis.
 
 A @tbl-estrutura-discriminante resume as formulações utilizadas.
 
@@ -84,7 +84,7 @@ $$
 
 que associe uma nova observação $\mathbf x$ a uma das classes.
 
-A qualidade preditiva de uma regra estimada é avaliada por taxas de erro, matrizes de classificação, validação cruzada e outros procedimentos reunidos na @sec-discriminante-aprofundamentos-metodologicos. Essas medidas avaliam a regra estimada, mas não participam de sua definição.
+Taxas de erro, matrizes de classificação e validação cruzada avaliam a qualidade preditiva de uma regra estimada. Esses procedimentos pertencem à avaliação da regra, e não à sua definição, conforme detalhado na @sec-discriminante-aprofundamentos-metodologicos.
 
 ## Classificação como problema de decisão
 
@@ -110,10 +110,10 @@ $$
 
 A ação $a$ significa atribuir a observação à classe $a$. A decisão depende das probabilidades *a priori*, das distribuições condicionais das características e das perdas associadas às possíveis classificações.
 
-### Probabilidades a priori e posteriores
+### Probabilidades *a priori* e *a posteriori*
 
 ::: {#def-probabilidades-priori-discriminante}
-## Probabilidades a priori das classes
+## Probabilidades *a priori* das classes
 
 Seja
 
@@ -125,7 +125,7 @@ $$
 
 uma variável aleatória de classe.
 
-As **probabilidades a priori** são
+As **probabilidades _a priori_** são
 
 $$
 \pi_k
@@ -206,7 +206,7 @@ P
 }.
 $$ {#eq-posterior-classe-discriminante}
 
-A probabilidade posterior é determinada pelo produto entre a probabilidade *a priori* $\pi_k$ e o valor $f_k(\mathbf x)$ da densidade condicional na observação $\mathbf x$, normalizado pela soma desses produtos entre as classes.
+A probabilidade *a posteriori* é determinada pelo produto entre a probabilidade *a priori* $\pi_k$ e o valor $f_k(\mathbf x)$ da densidade condicional na observação $\mathbf x$, normalizado pela soma desses produtos entre as classes.
 
 ### Regra de Bayes sob perda zero--um
 
@@ -225,10 +225,52 @@ a=k,
 a\neq k.
 \end{cases}
 $$ {#eq-perda-zero-um-discriminante}
-
-Se a observação $\mathbf x$ for atribuída à classe $a$, a perda esperada posterior é
+Se a observação $\mathbf x$ for atribuída à classe $a$, a perda depende da verdadeira classe, que permanece desconhecida. Depois de observar $\mathbf x$, cada classe $k$ possui probabilidade *a posteriori*
 
 $$
+P
+\left(
+\mathsf C=k
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right).
+$$
+
+A perda esperada associada à decisão $a$ é obtida ponderando a perda correspondente a cada possível classe verdadeira por sua probabilidade *a posteriori*:
+
+$$
+\sum_{k=1}^{K}
+L(a,k)
+P
+\left(
+\mathsf C=k
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right).
+$$
+
+Sob a perda zero--um da @eq-perda-zero-um-discriminante, o termo correspondente a $k=a$ é nulo e todos os termos com $k\neq a$ recebem perda unitária. Assim,
+
+$$
+\begin{aligned}
+\sum_{k=1}^{K}
+L(a,k)
+P
+\left(
+\mathsf C=k
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right)
+&=
+\sum_{k\neq a}
+P
+\left(
+\mathsf C=k
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right)
+\\
+&=
 1
 -
 P
@@ -237,9 +279,16 @@ P
 \mid
 \boldsymbol{\mathsf X}=\mathbf x
 \right).
+\end{aligned}
 $$
 
-Minimizá-la equivale a maximizar a probabilidade posterior. Assim, a regra de Bayes sob perda zero--um atribui $\mathbf x$ a uma classe que satisfaça
+Portanto, a perda esperada de atribuir $\mathbf x$ à classe $a$ é a probabilidade *a posteriori* de que sua verdadeira classe seja diferente de $a$. Como
+
+$$
+1-u
+$$
+
+decresce quando $u$ aumenta, a menor perda esperada corresponde à maior probabilidade *a posteriori*. A regra de Bayes sob perda zero--um é, então,
 
 $$
 \psi_{\mathrm B}(\mathbf x)
@@ -258,7 +307,41 @@ P
 \right).
 $$
 
-Pela @eq-posterior-classe-discriminante, o denominador é comum a todas as classes. Portanto,
+Pela @eq-posterior-classe-discriminante,
+
+$$
+P
+\left(
+\mathsf C=k
+\mid
+\boldsymbol{\mathsf X}=\mathbf x
+\right)
+=
+\frac{
+\pi_k f_k(\mathbf x)
+}{
+\displaystyle
+\sum_{h=1}^{K}
+\pi_h f_h(\mathbf x)
+}.
+$$
+
+Para uma observação fixa $\mathbf x$, o denominador
+
+$$
+\sum_{h=1}^{K}
+\pi_h f_h(\mathbf x)
+$$
+
+é o mesmo na probabilidade *a posteriori* de todas as classes. A comparação entre as classes depende, portanto, apenas dos valores
+
+$$
+\pi_1f_1(\mathbf x),
+\ldots,
+\pi_Kf_K(\mathbf x).
+$$
+
+A regra de classificação pode ser escrita como
 
 $$
 \psi_{\mathrm B}(\mathbf x)
@@ -272,13 +355,44 @@ k\in\{1,\ldots,K\}
 \pi_k f_k(\mathbf x).
 $$ {#eq-regra-bayes-classificacao-discriminante}
 
-Quando
+Se
 
 $$
+\pi_k>0
+\qquad\text{e}\qquad
 f_k(\mathbf x)>0
 $$
 
-para todas as classes, a mesma comparação pode ser realizada pelo escore
+para todas as classes, a aplicação do logaritmo preserva a ordenação desses valores, pois o logaritmo é uma função estritamente crescente. Além disso,
+
+$$
+\log
+\left[
+\pi_k f_k(\mathbf x)
+\right]
+=
+\log\pi_k
++
+\log f_k(\mathbf x).
+$$
+
+Assim, para uma mesma observação $\mathbf x$, comparar
+
+$$
+\pi_1f_1(\mathbf x),
+\ldots,
+\pi_Kf_K(\mathbf x)
+$$
+
+é equivalente a comparar
+
+$$
+\log\pi_1+\log f_1(\mathbf x),
+\ldots,
+\log\pi_K+\log f_K(\mathbf x).
+$$
+
+A classe atribuída a $\mathbf x$ é aquela que apresenta o maior valor de
 
 $$
 \log\pi_k
@@ -286,14 +400,12 @@ $$
 \log f_k(\mathbf x).
 $$ {#eq-escore-log-bayes-discriminante}
 
-A @sec-discriminante-lda e a @sec-discriminante-qda especializam essa regra para populações normais multivariadas. As funções resultantes combinam a probabilidade *a priori* de cada classe com sua densidade condicional [@anderson2003].
+Sob normalidade multivariada, a forma de $f_k(\mathbf x)$ determina duas especializações dessa regra. Quando todas as classes compartilham a mesma matriz de covariâncias, obtém-se a **Análise Discriminante Linear** (*Linear Discriminant Analysis*, LDA). Quando cada classe possui sua própria matriz de covariâncias, obtém-se a **Análise Discriminante Quadrática** (*Quadratic Discriminant Analysis*, QDA) [@anderson2003].
 
-Quando diferentes erros de classificação possuem consequências distintas, a maior probabilidade posterior deixa de determinar, isoladamente, a decisão ótima. A formulação geral incorpora essas consequências por meio de uma função de perda.
+Quando as perdas dos diferentes erros de classificação não são iguais, a decisão ótima depende conjuntamente das probabilidades *a posteriori* e dos valores $L(a,k)$. Nesse caso, a classe de maior probabilidade *a posteriori* não precisa ser a decisão de menor perda esperada.
 
 
-Sob normalidade multivariada, uma matriz de covariâncias comum às classes conduz à LDA, enquanto matrizes de covariâncias específicas por classe conduzem à QDA.
-
-## Discriminação linear sob normalidade {#sec-discriminante-lda}
+## Discriminação linear sob normalidade (LDA) {#sec-discriminante-lda}
 
 Utilizando a distribuição Normal Multivariada definida na @def-normal-multivariada, considere a especialização probabilística
 
@@ -339,7 +451,7 @@ $$
 \sum_{k=1}^{K}\pi_k=1.
 $$
 
-A normalidade não é necessária para definir a regra de Bayes. Ela é utilizada aqui para especificar as distribuições condicionais das características.
+A normalidade não é necessária para definir a regra de Bayes. Na LDA normal, ela especifica as distribuições condicionais das características.
 
 Sob perda zero--um, a @eq-regra-bayes-classificacao-discriminante mostra que a classificação pode ser obtida comparando
 
@@ -559,7 +671,7 @@ $$
 
 Na regra definida na @sec-discriminante-regra-estimada, esses parâmetros populacionais são substituídos pelas quantidades correspondentes obtidas ou adotadas a partir da amostra de treinamento.
 
-## Discriminação quadrática {#sec-discriminante-qda}
+## Discriminação quadrática (QDA) {#sec-discriminante-qda}
 
 A linearidade da LDA decorre da utilização de uma matriz de covariâncias comum. Considere agora
 
@@ -1364,7 +1476,7 @@ A classificação probabilística produz regras para classificar novas observaç
 
 O problema admite uma formulação populacional e uma formulação amostral. A formulação populacional constrói as dispersões dentro e entre classes a partir dos momentos condicionais de $\boldsymbol{\mathsf X}\mid\mathsf C=k$; a formulação amostral utiliza as matrizes de dispersão calculadas a partir das observações com rótulos conhecidos.
 
-Na forma geométrica adotada neste capítulo, o critério de Fisher não exige normalidade multivariada nem igualdade das matrizes de covariâncias condicionais para ser definido. A hipótese de covariância comum torna-se necessária para estabelecer a correspondência direta com a LDA normal; apresentações clássicas de Fisher frequentemente incorporam essa condição ao desenvolvimento da técnica [@johnson2002].
+O critério geométrico de Fisher não exige normalidade multivariada nem igualdade das matrizes de covariâncias condicionais para ser definido. A hipótese de covariância comum é necessária para estabelecer sua correspondência direta com a LDA normal; apresentações clássicas de Fisher frequentemente incorporam essa condição à formulação [@johnson2002].
 
 ### Dispersões populacionais dentro e entre grupos
 
@@ -1491,7 +1603,7 @@ $$
 $$ {#eq-decomposicao-covariancia-fisher}
 :::
 
-A demonstração dessa decomposição, obtida pela lei da covariância total condicionada à variável de classe $\mathsf C$, é apresentada na @sec-discriminante-decomposicao-covariancia.
+A @eq-decomposicao-covariancia-fisher decorre da lei da covariância total condicionada à variável de classe $\mathsf C$; sua derivação está na @sec-discriminante-decomposicao-covariancia.
 
 A @eq-decomposicao-covariancia-fisher é a contraparte populacional da decomposição amostral
 
@@ -1601,7 +1713,7 @@ $$ {#eq-criterio-fisher-populacional-discriminante}
 
 O numerador é a dispersão, ponderada pelas probabilidades $\pi_k$, das médias condicionais projetadas em torno da média marginal projetada. O denominador é a média, também ponderada por $\pi_k$, das variâncias condicionais da projeção dentro das classes. O critério procura, portanto, direções em que a dispersão entre classes seja elevada relativamente à dispersão intragrupos.
 
-Essa formulação exige segundos momentos finitos e, na forma baseada em inversas desenvolvida aqui,
+O critério populacional de Fisher exige segundos momentos finitos. A solução baseada em $\boldsymbol{\Sigma}_W^{-1}$ exige adicionalmente
 
 $$
 \boldsymbol{\Sigma}_W
@@ -1639,7 +1751,7 @@ $$
 \boldsymbol{\Sigma}.
 $$
 
-Sob essa condição, para duas classes, a relação entre a direção de Fisher e o vetor normal da fronteira da LDA é desenvolvida na @sec-discriminante-fisher-lda-normal.
+Para duas classes com covariância comum, a direção de Fisher é paralela ao vetor normal da fronteira da LDA, conforme demonstrado na @sec-discriminante-fisher-lda-normal.
 
 ## Formulação amostral de Fisher
 
@@ -2208,7 +2320,7 @@ $$
 \delta_{j\ell}.
 $$ {#eq-ortogonalidade-fisher}
 
-Com essa convenção,
+Sob essa condição,
 
 $$
 \mathbf T_{\mathrm{entre}}
@@ -2272,11 +2384,9 @@ $$ {#eq-raiz-separacao-fisher}
 
 Cada raiz $\lambda_j$ é, portanto, a dispersão entre grupos na direção $\boldsymbol{\alpha}_j$ quando a dispersão intragrupos nessa direção é normalizada para $1$.
 
-Quando $r_F\geq1$, a participação relativa de cada raiz na soma das raízes discriminantes positivas pode ser expressa por
+Quando $r_F\geq1$, a participação relativa de cada raiz na soma das raízes discriminantes positivas é
 
 $$
-\rho_j
-=
 \frac{
 \lambda_j
 }{
@@ -2288,16 +2398,34 @@ $$
 j=1,\ldots,r_F.
 $$ {#eq-proporcao-raiz-discriminante}
 
-Consequentemente,
+Essas participações somam $1$:
 
 $$
 \sum_{j=1}^{r_F}
-\rho_j
+\frac{
+\lambda_j
+}{
+\displaystyle
+\sum_{\ell=1}^{r_F}
+\lambda_\ell
+}
 =
 1.
 $$
 
-A quantidade $\rho_j$ descreve a participação relativa da direção $j$ na soma das raízes discriminantes positivas. Ela não representa uma proporção da variância total das características, como ocorre na ACP. As raízes de Fisher quantificam separação entre grupos relativamente à dispersão intragrupos, de modo que sua interpretação permanece vinculada ao critério discriminante.
+A razão
+
+$$
+\frac{
+\lambda_j
+}{
+\displaystyle
+\sum_{\ell=1}^{r_F}
+\lambda_\ell
+}
+$$
+
+descreve a participação relativa da direção $j$ na soma das raízes discriminantes positivas. Ela não representa uma proporção da variância total das características, como ocorre na ACP. As raízes de Fisher quantificam separação entre grupos relativamente à dispersão intragrupos, de modo que sua interpretação permanece vinculada ao critério discriminante.
 
 Como $\mathbf T_{\mathrm{intra}}\succ\mathbf0$, ela induz o produto interno definido na @def-produto-interno-induzido. A ortogonalidade expressa pela @eq-ortogonalidade-fisher é, portanto, a ortogonalidade nessa geometria. Pela @prp-ortogonalidade-autovetores-generalizados, direções associadas a raízes distintas podem ser escolhidas ortogonais nessa métrica. Em geral,
 
@@ -2790,17 +2918,15 @@ A construção difere da ACP. No @sec-acp, as direções são escolhidas pela va
 
 ## Relação espectral com a MANOVA
 
-A formulação de Fisher coincide com o problema espectral da MANOVA quando as duas técnicas são aplicadas à mesma partição em grupos e a hipótese da MANOVA compara os respectivos vetores de médias.
-
-Nesse caso,
+Considere a MANOVA de um fator em que os $K$ níveis do fator correspondem aos mesmos $K$ grupos utilizados na formulação de Fisher e a hipótese nula é a igualdade dos vetores de médias desses grupos. Nessa configuração, a matriz de erro da MANOVA coincide com a dispersão intragrupos,
 
 $$
 \mathbf E
 =
-\mathbf T_{\mathrm{intra}}
+\mathbf T_{\mathrm{intra}},
 $$
 
-e
+e a matriz de hipótese coincide com a dispersão entre grupos,
 
 $$
 \mathbf H
@@ -3021,7 +3147,7 @@ $$
 \right).
 $$
 
-Essa direção é paralela ao vetor normal da fronteira da LDA dado pela @eq-normal-fronteira-lda. A correspondência refere-se à orientação da fronteira, e não à regra completa de classificação: sob perda zero--um, as probabilidades *a priori* também determinam sua posição; com perdas gerais, a regra ótima depende ainda da função de perda. A derivação completa dessa relação é apresentada na @sec-discriminante-fisher-lda-normal.
+A direção de Fisher é paralela ao vetor normal da fronteira da LDA dado pela @eq-normal-fronteira-lda. Essa correspondência envolve a orientação da fronteira, e não a regra completa de classificação: sob perda zero--um, as probabilidades *a priori* também determinam sua posição; com perdas gerais, a decisão ótima depende ainda da função de perda. A @sec-discriminante-fisher-lda-normal demonstra essa correspondência.
 
 ### Mais de dois grupos
 
@@ -3064,22 +3190,22 @@ As direções de Fisher fornecem uma representação supervisionada da separaç�
 
 ## Pressupostos e limites {#sec-discriminante-pressupostos}
 
-As formulações desenvolvidas neste capítulo possuem requisitos diferentes. O critério populacional de Fisher depende dos vetores de médias e das matrizes de covariâncias condicionais, enquanto sua versão amostral utiliza as dispersões calculadas a partir dos grupos observados. Nas formas baseadas em inversas desenvolvidas aqui, também são necessárias condições de não singularidade. LDA e QDA acrescentam hipóteses probabilísticas específicas para obter as funções discriminantes normais, e suas regras estimadas introduzem condições amostrais de posto.
+Fisher, LDA e QDA exigem condições diferentes. O critério populacional de Fisher depende dos vetores de médias e das matrizes de covariâncias condicionais, enquanto sua versão amostral utiliza as dispersões calculadas a partir dos grupos observados. As formulações baseadas em inversas exigem não singularidade das matrizes correspondentes. LDA e QDA acrescentam hipóteses probabilísticas para especificar as distribuições condicionais normais, e suas regras estimadas exigem condições amostrais de posto.
 
-A @tbl-pressupostos-discriminante reúne essas diferenças.
+A @tbl-pressupostos-discriminante reúne essas condições.
 
-| Condição | Fisher geométrico adotado | LDA normal | QDA normal |
+| Condição | Fisher geométrico | LDA normal | QDA normal |
 |---|---|---|---|
 | grupos previamente definidos | necessária | necessária | necessária |
 | segundos momentos finitos | necessários na formulação populacional | satisfeitos sob normalidade | satisfeitos sob normalidade |
-| normalidade multivariada | não necessária para definir o critério de Fisher | assumida na formulação normal apresentada | assumida na formulação normal apresentada |
-| covariância comum entre classes | não necessária para o critério geométrico adotado | assumida | não assumida |
+| normalidade multivariada | não necessária para definir o critério | assumida | assumida |
+| covariância comum entre classes | não necessária | assumida | não assumida |
 | não singularidade populacional | $\boldsymbol{\Sigma}_W\succ\mathbf0$ na forma baseada em inversas | $\boldsymbol{\Sigma}\succ\mathbf0$ | $\boldsymbol{\Sigma}_k\succ\mathbf0$ para cada classe |
 | não singularidade amostral | $\mathbf T_{\mathrm{intra}}\succ\mathbf0$ na forma baseada em inversas | $\mathbf S_p\succ\mathbf0$ | $\mathbf S_k\succ\mathbf0$ para cada classe |
-| probabilidades *a priori* | entram como pesos na formulação populacional; não entram como termo de decisão no critério amostral | entram na regra de decisão | entram na regra de decisão |
-| função de perda | não entra no critério | as funções apresentadas correspondem à perda zero--um | as funções apresentadas correspondem à perda zero--um |
+| probabilidades *a priori* | ponderam as dispersões populacionais | entram na regra de decisão | entram na regra de decisão |
+| função de perda | não entra no critério | perda zero--um na regra básica | perda zero--um na regra básica |
 
-: Condições associadas ao critério geométrico de Fisher adotado no capítulo e às formulações normais da LDA e da QDA. {#tbl-pressupostos-discriminante}
+: Condições das formulações de Fisher, LDA e QDA. {#tbl-pressupostos-discriminante}
 
 ### Grupos previamente definidos
 
@@ -3101,7 +3227,7 @@ $$
 \mathsf C=k.
 $$
 
-A técnica não constrói os grupos a partir dos dados. Se os rótulos utilizados não corresponderem às classes relevantes para o problema, a solução continuará descrevendo separação ou classificação relativamente aos grupos fornecidos.
+A técnica não constrói os grupos a partir dos dados. Se os rótulos utilizados não representarem as classes que se deseja discriminar ou classificar, a solução continuará descrevendo apenas os grupos fornecidos.
 
 ### Normalidade e estrutura das covariâncias
 
@@ -3117,7 +3243,7 @@ $$
 J_F(\mathbf a).
 $$
 
-Na formulação probabilística geral, a regra de Bayes também não exige normalidade. Essa hipótese foi introduzida especificamente para obter as formas LDA e QDA apresentadas neste capítulo.
+Na formulação probabilística geral, a regra de Bayes também não exige normalidade. A normalidade multivariada é introduzida na especialização da regra de Bayes que conduz à LDA e à QDA.
 
 Na LDA,
 
@@ -3153,9 +3279,9 @@ $$
 
 e as matrizes podem diferir entre classes. Quando as matrizes das classes comparadas são distintas, os termos quadráticos em $\mathbf x$ não se cancelam em geral, e a fronteira pode ser quadrática.
 
-A condição de covariância comum pertence, portanto, à formulação normal da LDA e não é necessária para definir o critério geométrico de Fisher utilizado neste capítulo.
+A condição de covariância comum pertence, portanto, à formulação normal da LDA e não é necessária para definir o critério geométrico de Fisher.
 
-Algumas apresentações clássicas de Fisher para várias populações adotam adicionalmente uma matriz de covariâncias comum e de posto completo [@johnson2002]. Essa hipótese permite relacionar diretamente a separação de Fisher ao modelo normal com covariância comum da LDA. Aqui, porém, o critério de Fisher é apresentado em sua forma geométrica mais geral, construída a partir da dispersão média intragrupos $\boldsymbol{\Sigma}_W$.
+Algumas apresentações clássicas de Fisher para várias populações adotam adicionalmente uma matriz de covariâncias comum e de posto completo [@johnson2002]. Sob essa condição, a separação de Fisher relaciona-se diretamente ao modelo normal com covariância comum da LDA. O critério geométrico definido pela @eq-criterio-fisher-populacional-discriminante utiliza, de forma mais geral, a dispersão média intragrupos $\boldsymbol{\Sigma}_W$.
 
 ### Não singularidade e dimensão
 
@@ -3294,7 +3420,7 @@ A não singularidade, entretanto, não garante estabilidade. O problema está re
 
 Esse problema deve ser distinguido da singularidade exata. Associação entre características é esperada em dados multivariados; quase dependência linear pode produzir mau condicionamento; dependência linear exata pode reduzir o posto das matrizes necessárias.
 
-Quando as matrizes são singulares, as formulações clássicas baseadas em inversas e raízes quadradas inversas não estão definidas diretamente. Pseudoinversas, regularização e redução preliminar de dimensão correspondem a formulações adicionais e não são desenvolvidas neste capítulo.
+Quando as matrizes são singulares, as formulações clássicas baseadas em inversas e raízes quadradas inversas não estão definidas diretamente. Pseudoinversas, regularização e redução preliminar de dimensão correspondem a extensões que modificam essas formulações.
 
 
 ### Independência das unidades de treinamento
@@ -3313,7 +3439,7 @@ podem ser calculadas a partir das observações sem exigir independência.
 
 Para interpretar probabilisticamente essas estatísticas sob o esquema amostral clássico, as unidades de treinamento são tratadas como independentes e, dentro de cada classe, como observações da distribuição condicional especificada para essa classe.
 
-Dependência temporal, espacial, longitudinal ou decorrente de agrupamentos introduz dependência entre as unidades de treinamento e pode exigir modelos que representem essa dependência. Essa questão pertence ao mecanismo probabilístico de geração dos dados e não ao problema algébrico de Fisher.
+Dependência temporal, espacial, longitudinal ou decorrente de agrupamentos viola a independência das unidades pressuposta pelo esquema amostral clássico e requer uma formulação probabilística que represente essa dependência. O critério algébrico de Fisher, isoladamente, não modela a dependência entre unidades.
 
 ### Probabilidades *a priori* e perdas
 
@@ -3333,7 +3459,7 @@ $$
 \log\pi_k.
 $$
 
-Na formulação populacional de Fisher adotada neste capítulo, as mesmas probabilidades aparecem como pesos na construção de
+Na formulação populacional de Fisher, as probabilidades $\pi_k$ aparecem como pesos na construção de
 
 $$
 \boldsymbol{\Sigma}_W
@@ -3341,7 +3467,7 @@ $$
 \boldsymbol{\Sigma}_B.
 $$
 
-Sua função, nesse caso, é ponderar as dispersões populacionais das classes, e não determinar diretamente uma ação de classificação.
+Nesse critério, elas ponderam as dispersões populacionais das classes e não determinam uma ação de classificação.
 
 Na formulação amostral de Fisher, o critério utiliza $\mathbf T_{\mathrm{intra}}$ e $\mathbf T_{\mathrm{entre}}$, cujos pesos decorrem dos tamanhos observados $n_k$. A razão $n_k/n$ coincide com a estimativa empírica de $\pi_k$ definida pela @eq-estimativa-priori-empirica-discriminante somente quando a amostra de treinamento representa a mistura populacional das classes.
 
@@ -3359,13 +3485,13 @@ Quando as distribuições das classes se sobrepõem, esse erro pode ser positivo
 
 O erro de Bayes deve ser distinguido do erro populacional da regra estimada, isto é, da probabilidade de classificação incorreta que a regra obtida da amostra de treinamento apresenta em novas unidades da população de aplicação. Sob perda zero--um, para uma regra estimada fixada, esse erro não pode ser inferior ao erro de Bayes; a diferença entre ambos é o excesso de erro em relação à regra de Bayes.
 
-A avaliação empírica de uma regra estimada por validação cruzada, conjunto de teste *holdout* ou amostra independente, juntamente com seu resumo por matrizes de classificação e medidas de desempenho, é tratada na @sec-discriminante-aprofundamentos-metodologicos.
+Validação cruzada, conjunto de teste *holdout* e amostra independente estimam o desempenho da regra em regimes que evitam, em graus diferentes, avaliar exclusivamente as observações utilizadas no ajuste. Matrizes de classificação e medidas de desempenho resumem os erros produzidos nesses regimes; ver @sec-discriminante-aprofundamentos-metodologicos.
 
 ## Relações com outras técnicas
 
 Quando a MANOVA compara os vetores de médias correspondentes à mesma partição em grupos utilizada por Fisher, a correspondência formalizada na @eq-correspondencia-manova-fisher faz com que as duas formulações conduzam ao mesmo problema de autovalores generalizados. A diferença está no objetivo estatístico: o @sec-manova utiliza as raízes para construir critérios de teste, enquanto Fisher utiliza os autovetores associados para representar a separação entre grupos.
 
-A comparação com @sec-acp e @sec-agrupamentos distingue a Análise Discriminante pela utilização de grupos previamente conhecidos e pelo critério empregado para construir a representação.
+A Análise Discriminante também se distingue da @sec-acp e do @sec-agrupamentos pelo papel dos grupos na formulação. Em Fisher, os grupos são conhecidos previamente e seus rótulos participam da construção das direções discriminantes.
 
 ### Análise de Componentes Principais
 
@@ -3410,14 +3536,14 @@ A Análise Discriminante e o @sec-agrupamentos utilizam objetos como centroides,
 
 Na Análise Discriminante, os grupos são conhecidos e seus rótulos participam da construção das regras de classificação ou das direções de Fisher. Na Análise de Agrupamentos, os grupos não são fornecidos previamente e devem ser construídos a partir de critérios de proximidade, dispersão ou modelagem probabilística.
 
-Assim, a presença ou ausência de rótulos conhecidos distingue uma representação supervisionada da separação entre grupos de um problema de formação de grupos.
+Na Análise Discriminante, os rótulos dos grupos fazem parte dos dados de entrada. Na Análise de Agrupamentos, os grupos são construídos pela própria análise.
 
 ## Aprofundamentos teóricos {#sec-discriminante-aprofundamentos-teoricos}
 
 ::: {.callout-note appearance="simple" icon=false}
 ## Leitura de aprofundamento
 
-Esta parte aprofunda a base decisória, algébrica e espectral da Análise Discriminante. São examinadas a formulação por perdas e risco, a forma explícita da fronteira quadrática, a decomposição populacional da covariância por grupos, as relações populacional e amostral entre Fisher e LDA e as condições de identificação das direções discriminantes.
+Esta parte aprofunda a base decisória, probabilística, algébrica e espectral da Análise Discriminante. São examinadas a formulação por perdas e risco, a relação entre separação de Mahalanobis e erro de classificação sob normalidade, a forma explícita da fronteira quadrática, a decomposição populacional da covariância por grupos, as relações populacional e amostral entre Fisher e LDA e as condições de identificação das direções discriminantes.
 :::
 
 
@@ -3605,6 +3731,314 @@ sempre que os riscos condicionais estejam definidos.
 Quando mais de uma ação minimiza o risco, uma regra de desempate pode ser especificada para produzir uma classificação única.
 
 A regra de Bayes depende conjuntamente das distribuições condicionais, das probabilidades *a priori* e da função de perda. Sob perda zero--um, minimizar o risco condicional equivale a maximizar a probabilidade posterior, conforme a @eq-regra-bayes-classificacao-discriminante. Com perdas assimétricas, a classe de maior probabilidade posterior não precisa ser a ação que minimiza o risco [@anderson2003].
+
+### Erro de classificação e separação de Mahalanobis {#sec-discriminante-erro-mahalanobis}
+
+Considere duas classes sob o modelo normal da LDA,
+
+$$
+\boldsymbol{\mathsf X}
+\mid
+(\mathsf C=k)
+\sim
+N_p
+\left(
+\boldsymbol{\mu}_k,
+\boldsymbol{\Sigma}
+\right),
+\qquad
+k=1,2,
+$$
+
+com
+
+$$
+\boldsymbol{\Sigma}
+\succ
+\mathbf0
+$$
+
+e
+
+$$
+\boldsymbol{\mu}_1
+\neq
+\boldsymbol{\mu}_2.
+$$
+
+A separação entre os vetores de médias na métrica definida pela matriz de covariâncias comum pode ser expressa por
+
+$$
+\Delta^2
+=
+\left(
+\boldsymbol{\mu}_1
+-
+\boldsymbol{\mu}_2
+\right)^\top
+\boldsymbol{\Sigma}^{-1}
+\left(
+\boldsymbol{\mu}_1
+-
+\boldsymbol{\mu}_2
+\right).
+$$ {#eq-separacao-mahalanobis-discriminante}
+
+Assim,
+
+$$
+\Delta
+=
+d_M
+\left(
+\boldsymbol{\mu}_1,
+\boldsymbol{\mu}_2;
+\boldsymbol{\Sigma}
+\right)
+$$
+
+é a distância de Mahalanobis entre os vetores de médias das duas classes.
+
+Sob perda zero--um, a comparação entre as classes pode ser realizada pela diferença entre as funções discriminantes da LDA,
+
+$$
+D(\mathbf x)
+=
+\delta_1(\mathbf x)
+-
+\delta_2(\mathbf x).
+$$
+
+Pelas funções discriminantes definidas na @eq-funcao-discriminante-linear, essa diferença pode ser escrita como
+
+$$
+D(\mathbf x)
+=
+\left(
+\boldsymbol{\mu}_1
+-
+\boldsymbol{\mu}_2
+\right)^\top
+\boldsymbol{\Sigma}^{-1}
+\left[
+\mathbf x
+-
+\frac{
+\boldsymbol{\mu}_1
++
+\boldsymbol{\mu}_2
+}{2}
+\right]
++
+\log
+\frac{\pi_1}{\pi_2}.
+$$ {#eq-diferenca-escores-lda-discriminante}
+
+A observação é atribuída à classe $1$ quando
+
+$$
+D(\mathbf x)>0
+$$
+
+e à classe $2$ quando
+
+$$
+D(\mathbf x)<0.
+$$
+
+Como $D(\boldsymbol{\mathsf X})$ é uma combinação linear de um vetor normal, sua distribuição condicional também é normal. Se a observação pertence à classe $1$,
+
+$$
+D(\boldsymbol{\mathsf X})
+\mid
+(\mathsf C=1)
+\sim
+N
+\left(
+\frac{\Delta^2}{2}
++
+\log\frac{\pi_1}{\pi_2},
+\Delta^2
+\right),
+$$
+
+enquanto, para a classe $2$,
+
+$$
+D(\boldsymbol{\mathsf X})
+\mid
+(\mathsf C=2)
+\sim
+N
+\left(
+-\frac{\Delta^2}{2}
++
+\log\frac{\pi_1}{\pi_2},
+\Delta^2
+\right).
+$$ {#eq-distribuicoes-escore-lda-discriminante}
+
+Se $\Phi$ denota a função de distribuição acumulada da normal padrão, a probabilidade condicional de classificar incorretamente uma observação da classe $1$ é
+
+$$
+P
+\left[
+\psi_{\mathrm B}
+\left(
+\boldsymbol{\mathsf X}
+\right)
+=
+2
+\mid
+\mathsf C=1
+\right]
+=
+\Phi
+\left(
+-\frac{\Delta}{2}
+-
+\frac{1}{\Delta}
+\log
+\frac{\pi_1}{\pi_2}
+\right),
+$$ {#eq-erro-classe1-lda-discriminante}
+
+e, para uma observação da classe $2$,
+
+$$
+P
+\left[
+\psi_{\mathrm B}
+\left(
+\boldsymbol{\mathsf X}
+\right)
+=
+1
+\mid
+\mathsf C=2
+\right]
+=
+\Phi
+\left(
+-\frac{\Delta}{2}
++
+\frac{1}{\Delta}
+\log
+\frac{\pi_1}{\pi_2}
+\right).
+$$ {#eq-erro-classe2-lda-discriminante}
+
+Sob perda zero--um, o erro global da regra de Bayes é, portanto,
+
+$$
+\begin{aligned}
+R_{\mathrm B}
+&=
+\pi_1
+\Phi
+\left(
+-\frac{\Delta}{2}
+-
+\frac{1}{\Delta}
+\log
+\frac{\pi_1}{\pi_2}
+\right)
+\\
+&\quad
++
+\pi_2
+\Phi
+\left(
+-\frac{\Delta}{2}
++
+\frac{1}{\Delta}
+\log
+\frac{\pi_1}{\pi_2}
+\right).
+\end{aligned}
+$$ {#eq-erro-bayes-duas-normais-discriminante}
+
+Quando as probabilidades *a priori* são iguais,
+
+$$
+\pi_1
+=
+\pi_2
+=
+\frac12,
+$$
+
+os dois tipos de erro possuem a mesma probabilidade,
+
+$$
+P
+\left[
+\psi_{\mathrm B}
+\left(
+\boldsymbol{\mathsf X}
+\right)
+=
+2
+\mid
+\mathsf C=1
+\right]
+=
+P
+\left[
+\psi_{\mathrm B}
+\left(
+\boldsymbol{\mathsf X}
+\right)
+=
+1
+\mid
+\mathsf C=2
+\right]
+=
+\Phi
+\left(
+-\frac{\Delta}{2}
+\right),
+$$
+
+e o erro de Bayes reduz-se a
+
+$$
+R_{\mathrm B}
+=
+\Phi
+\left(
+-\frac{\Delta}{2}
+\right).
+$$ {#eq-erro-bayes-mahalanobis-discriminante}
+
+Para probabilidades *a priori* iguais, a @eq-erro-bayes-mahalanobis-discriminante mostra que $R_{\mathrm B}$ é uma função estritamente decrescente de $\Delta$. Em particular,
+
+$$
+\Delta
+\longrightarrow
+0
+\quad\Longrightarrow\quad
+R_{\mathrm B}
+\longrightarrow
+\frac12,
+$$
+
+enquanto
+
+$$
+\Delta
+\longrightarrow
+\infty
+\quad\Longrightarrow\quad
+R_{\mathrm B}
+\longrightarrow
+0.
+$$
+
+Sob normalidade, covariância comum, perda zero--um e parâmetros populacionais conhecidos, maior distância de Mahalanobis entre os vetores de médias implica menor erro de Bayes. Com probabilidades *a priori* desiguais, as probabilidades condicionais de erro dependem também de $\log(\pi_1/\pi_2)$, que desloca a fronteira de classificação e pode produzir erros diferentes nas duas classes [@anderson2003; @johnson2002].
+
+O valor $R_{\mathrm B}$ é o menor erro populacional possível sob o modelo e a perda considerados. Quando $\boldsymbol{\mu}_1$, $\boldsymbol{\mu}_2$ e $\boldsymbol{\Sigma}$ são substituídos por estimativas, obtém-se uma regra amostral cujo erro populacional é, em geral, maior que $R_{\mathrm B}$.
 
 ### Forma explícita da fronteira quadrática
 
@@ -3921,7 +4355,16 @@ A regra estimada da LDA não se reduz a essa direção. Para duas classes, a dif
 
 ### Identificação das direções discriminantes {#sec-discriminante-identificacao-direcoes}
 
-As direções de Fisher apresentam as indeterminações de sinal e multiplicidade próprias do problema de autovalores generalizados, já discutidas na @sec-manova-identificacao-direcoes. Aqui, essas indeterminações são aplicadas ao subespaço discriminante definido por $\mathbf T_{\mathrm{entre}}$ e $\mathbf T_{\mathrm{intra}}$.
+As direções de Fisher apresentam as indeterminações de sinal e multiplicidade do problema de autovalores generalizados descritas na @sec-manova-identificacao-direcoes. Na Análise Discriminante, essas indeterminações referem-se aos autovetores generalizados de
+
+$$
+\left(
+\mathbf T_{\mathrm{entre}},
+\mathbf T_{\mathrm{intra}}
+\right)
+$$
+
+e ao subespaço discriminante que eles geram.
 
 Para uma raiz positiva simples,
 
@@ -3987,7 +4430,7 @@ Quando uma raiz positiva possui multiplicidade maior que $1$, as direções indi
 ::: {.callout-note appearance="simple" icon=false}
 ## Leitura de aprofundamento
 
-Esta parte reúne decisões utilizadas na interpretação e na avaliação da Análise Discriminante. São examinadas a definição das probabilidades *a priori*, as consequências dos diferentes erros de classificação, os coeficientes e cargas das funções discriminantes, o desempenho global e por classe, a avaliação em observações novas e a correspondência com a implementação utilizada.
+Esta parte trata das decisões de condução, interpretação e avaliação da Análise Discriminante: definição das probabilidades *a priori* e das perdas, avaliação das condições da análise, escolha entre LDA e QDA, interpretação das funções discriminantes e dos centroides, avaliação da classificação e correspondência com a implementação utilizada.
 :::
 
 ### Definição das probabilidades *a priori* e consequências dos erros {#sec-discriminante-priores-custos}
@@ -3999,6 +4442,160 @@ Quando as proporções populacionais das classes são conhecidas ou podem ser es
 Probabilidades iguais podem ser utilizadas quando se decide não incorporar à regra diferenças conhecidas nas frequências das classes ou quando as proporções populacionais não são conhecidas nem estimadas por dados externos. Essa escolha não implica que as classes sejam igualmente frequentes na população; ela atribui o mesmo peso *a priori* às classes na regra.
 
 Quando diferentes tipos de erro possuem consequências distintas, a avaliação da regra não deve se limitar à proporção total de classificações corretas. A função de perda definida na @def-perda-classificacao-discriminante representa essas diferenças por $L(a,k)$, a perda associada à ação $a$ quando $k$ é a classe verdadeira. Na condução da análise, as perdas devem ser definidas a partir do problema de decisão, e não escolhidas depois de observados os resultados da classificação.
+
+### Avaliação das condições da análise {#sec-discriminante-avaliacao-condicoes}
+
+Na LDA e na QDA normais, a hipótese de normalidade refere-se às distribuições das características condicionadas à classe. A avaliação deve, portanto, ser realizada separadamente dentro dos grupos. Observações atípicas podem alterar $\overline{\mathbf x}_k$, $\mathbf S_k$ e, na LDA, $\mathbf S_p$, modificando as funções e as fronteiras estimadas [@hair2009; @johnson2002].
+
+Na LDA, a igualdade das matrizes de covariâncias pode ser examinada pela comparação de $\mathbf S_1,\ldots,\mathbf S_K$ e pelo teste $M$ de Box. Nesse teste,
+
+$$
+H_0:
+\boldsymbol{\Sigma}_1
+=
+\cdots
+=
+\boldsymbol{\Sigma}_K.
+$$
+
+A rejeição de $H_0$ fornece evidência contra a matriz de covariâncias comum da LDA. A não rejeição não demonstra igualdade das matrizes. O teste $M$ de Box também é sensível a desvios da normalidade multivariada, de modo que sua interpretação pressupõe a avaliação prévia das distribuições condicionais [@hair2009; @johnson2002].
+
+As condições de posto da LDA e da QDA estão estabelecidas em @eq-condicao-dimensao-fisher e @eq-condicao-dimensao-qda. Mesmo com posto completo, autovalores muito pequenos de $\mathbf S_p$ ou de alguma $\mathbf S_k$ podem produzir inversões numericamente instáveis, conforme discutido em @def-numero-condicao-svd. A QDA exige essa avaliação separadamente em cada classe.
+
+A independência das unidades decorre do delineamento e do mecanismo de amostragem. Dependência temporal, espacial, longitudinal ou por agrupamentos não é diagnosticada pela matriz de classificação e exige uma formulação que represente essa dependência.
+
+### Escolha entre LDA e QDA {#sec-discriminante-escolha-lda-qda}
+
+A LDA estima uma única matriz de covariâncias, com
+
+$$
+\frac{p(p+1)}{2}
+$$
+
+parâmetros distintos de covariância. A QDA estima uma matriz para cada classe, totalizando
+
+$$
+K\frac{p(p+1)}{2}
+$$
+
+parâmetros de covariância.
+
+Sob covariância comum, a LDA utiliza as observações de todas as classes na estimação de $\mathbf S_p$. A QDA permite dispersões, correlações e orientações diferentes entre as classes, mas estima $\mathbf S_k$ separadamente para cada grupo. Essa diferença torna a QDA mais exigente em tamanho amostral e mais sensível à instabilidade das matrizes de covariâncias [@johnson2002].
+
+Sob normalidade multivariada, diferenças populacionais entre as matrizes de covariâncias favorecem a fronteira quadrática da QDA. A rejeição do teste $M$ de Box, entretanto, não determina automaticamente a escolha da QDA. A regra quadrática é particularmente sensível a desvios da normalidade, e diferenças entre matrizes amostrais também contêm variabilidade de estimação [@johnson2002].
+
+Quando LDA e QDA podem ser estimadas de forma estável, a comparação deve utilizar o desempenho em observações que não participaram do ajuste. As taxas de erro devem ser calculadas sob o mesmo esquema de validação, conforme @sec-discriminante-avaliacao-preditiva.
+
+### Importância e avaliação das funções discriminantes {#sec-discriminante-importancia-funcoes}
+
+A raiz $\lambda_j$ mede a separação entre os grupos na direção $\boldsymbol{\alpha}_j$ relativamente à dispersão intragrupos, conforme a @eq-raiz-separacao-fisher. A razão definida na @eq-proporcao-raiz-discriminante,
+
+$$
+\frac{
+\lambda_j
+}{
+\displaystyle
+\sum_{\ell=1}^{r_F}
+\lambda_\ell
+},
+$$
+
+expressa a participação da função $j$ na soma das raízes discriminantes positivas. Essa razão não corresponde à proporção da variância total das características.
+
+A **correlação canônica** associada à função $j$ pode ser relacionada diretamente às dispersões de Fisher. Pela normalização da @eq-normalizacao-fisher,
+
+$$
+\boldsymbol{\alpha}_j^\top
+\mathbf T_{\mathrm{intra}}
+\boldsymbol{\alpha}_j
+=
+1,
+$$
+
+e, pela @eq-raiz-separacao-fisher,
+
+$$
+\boldsymbol{\alpha}_j^\top
+\mathbf T_{\mathrm{entre}}
+\boldsymbol{\alpha}_j
+=
+\lambda_j.
+$$
+
+Como
+
+$$
+\mathbf T_{\mathrm{total}}
+=
+\mathbf T_{\mathrm{intra}}
++
+\mathbf T_{\mathrm{entre}},
+$$
+
+segue que
+
+$$
+\boldsymbol{\alpha}_j^\top
+\mathbf T_{\mathrm{total}}
+\boldsymbol{\alpha}_j
+=
+1+\lambda_j.
+$$
+
+A razão entre a dispersão entre grupos e a dispersão total na direção $\boldsymbol{\alpha}_j$ é, portanto,
+
+$$
+\frac{
+\lambda_j
+}{
+1+\lambda_j
+}.
+$$
+
+Essa razão é o quadrado da correlação canônica associada à função discriminante:
+
+$$
+\left[
+r_j^{(\mathrm{can})}
+\right]^2
+=
+\frac{
+\lambda_j
+}{
+1+\lambda_j
+},
+$$
+
+ou, equivalentemente,
+
+$$
+r_j^{(\mathrm{can})}
+=
+\sqrt{
+\frac{
+\lambda_j
+}{
+1+\lambda_j
+}
+}.
+$$ {#eq-correlacao-canonica-discriminante}
+
+Como a transformação é estritamente crescente em $\lambda_j$, a correlação canônica preserva a ordenação das raízes e expressa a mesma separação em uma escala limitada ao intervalo $(0,1)$. Ela não deve ser confundida com as cargas discriminantes, que são correlações entre características observadas e escores discriminantes.
+
+A separação remanescente depois das primeiras $j-1$ funções pode ser resumida pela lambda de Wilks sequencial,
+
+$$
+\Lambda_j
+=
+\prod_{\ell=j}^{r_F}
+\frac{1}{1+\lambda_\ell}.
+$$ {#eq-wilks-sequencial-discriminante}
+
+Para $j=1$, $\Lambda_1$ utiliza todas as raízes positivas. Para $j>1$, o produto utiliza somente as raízes das funções ainda não retiradas da sequência. O teste associado avalia se permanece separação populacional entre os grupos depois das primeiras $j-1$ funções. Valores menores de $\Lambda_j$ correspondem a maior separação nas funções incluídas no produto.
+
+A fórmula de $\Lambda_j$ não determina, isoladamente, seu valor $p$. A calibração depende do modelo, das dimensões e dos graus de liberdade. Na implementação utilizada neste capítulo, os testes sequenciais são calibrados por uma aproximação qui-quadrado de Bartlett.
+
+Raiz discriminante, participação relativa, correlação canônica, lambda de Wilks e erro de classificação descrevem propriedades distintas: separação em uma direção, participação dessa direção na soma das raízes, reescala da raiz, evidência inferencial de separação remanescente e desempenho preditivo, respectivamente.
 
 ### Coeficientes das funções discriminantes {#sec-discriminante-coeficientes}
 
@@ -4046,6 +4643,47 @@ A carga $r_{hj}^{(\mathrm{estrutura})}$ descreve a associação linear entre a c
 O coeficiente da direção e o coeficiente de estrutura possuem interpretações distintas. O primeiro participa diretamente da construção da combinação linear; o segundo descreve a associação linear entre uma característica e a coordenada resultante. Como as características originais podem estar correlacionadas, uma variável pode apresentar coeficiente relativamente pequeno na combinação linear e, ainda assim, correlação elevada com a função discriminante.
 
 Na interpretação, os coeficientes descrevem a combinação linear que define a direção, os coeficientes normalizados expressam essa mesma direção em outra escala e as cargas descrevem a associação das características com a função discriminante.
+
+### Centroides e interpretação dos grupos {#sec-discriminante-centroides-interpretacao}
+
+O centroide $\overline z_{kj}$ definido na @eq-centroide-discriminante é a média dos escores discriminantes do grupo $k$ na função $j$. Para uma função fixa, a comparação de
+
+$$
+\overline z_{1j},
+\ldots,
+\overline z_{Kj}
+$$
+
+mostra quais médias de grupos estão mais separadas ao longo da direção $\boldsymbol{\alpha}_j$ [@hair2009; @johnson2002].
+
+Como os escores foram centralizados pela média global,
+
+$$
+\sum_{k=1}^{K}
+n_k
+\overline z_{kj}
+=
+0,
+\qquad
+j=1,\ldots,r_F.
+$$ {#eq-centroides-media-ponderada-zero-discriminante}
+
+A origem corresponde, portanto, à média global no espaço discriminante.
+
+As cargas discriminantes e os centroides têm funções diferentes na interpretação. As cargas descrevem a associação entre cada característica e a função discriminante; os centroides localizam os grupos nessa função. O sinal de uma carga indica a direção da associação com o escore, mas não determina, isoladamente, a ordenação das médias dos grupos na característica original. Essa ordenação deve ser verificada diretamente em $\overline{\mathbf x}_1,\ldots,\overline{\mathbf x}_K$.
+
+O sinal de $\boldsymbol{\alpha}_j$ é arbitrário. A substituição
+
+$$
+\boldsymbol{\alpha}_j
+\longmapsto
+-
+\boldsymbol{\alpha}_j
+$$
+
+inverte os sinais dos escores, dos centroides e das cargas sem alterar as distâncias ou a separação representada. Por isso, a interpretação utiliza as posições relativas dos grupos e as associações entre características e funções, e não o sinal isolado de um centroide.
+
+Quando $r_F\geq2$, os centroides podem ser representados conjuntamente nas primeiras funções discriminantes. As distâncias nesse espaço descrevem a separação entre médias projetadas dos grupos; não representam, por si mesmas, probabilidades de classificação correta.
 
 ### Erro aparente e erro em novas observações {#sec-discriminante-avaliacao-preditiva}
 
@@ -4115,12 +4753,114 @@ A matriz de classificação cruza a classe observada com a classe atribuída pel
 
 A proporção global de acertos resume o desempenho da regra, mas pode ocultar diferenças entre as classes. As proporções de acerto calculadas dentro de cada classe medem a frequência com que observações daquela classe são classificadas corretamente e permitem identificar classes com desempenho particularmente baixo.
 
+A proporção global de acertos também deve ser interpretada em relação a regras de referência que não utilizam as características discriminantes. Considere um conjunto de avaliação com $m$ observações, das quais $m_k$ pertencem à classe $k$, e defina
+
+$$
+q_k
+=
+\frac{m_k}{m},
+\qquad
+k=1,\ldots,K.
+$$
+
+O **critério de chance máxima** corresponde à proporção de acertos obtida por uma regra que atribui todas as observações à classe mais frequente:
+
+$$
+A_{\mathrm{max}}
+=
+\max_{1\leq k\leq K}
+q_k.
+$$ {#eq-chance-maxima-discriminante}
+
+Esse critério mostra quanto seria possível acertar sem utilizar qualquer característica, apenas escolhendo sistematicamente a classe de maior frequência.
+
+O **critério de chance proporcional** considera uma classificação aleatória que atribui uma observação à classe $k$ com probabilidade $q_k$. A probabilidade de a classe atribuída coincidir com a classe verdadeira é
+
+$$
+A_{\mathrm{prop}}
+=
+\sum_{k=1}^{K}
+q_k^2.
+$$ {#eq-chance-proporcional-discriminante}
+
+Quando as $K$ classes possuem a mesma frequência,
+
+$$
+q_1
+=
+\cdots
+=
+q_K
+=
+\frac{1}{K},
+$$
+
+os dois critérios coincidem:
+
+$$
+A_{\mathrm{max}}
+=
+A_{\mathrm{prop}}
+=
+\frac{1}{K}.
+$$
+
+Com classes desbalanceadas, os dois valores podem diferir substancialmente. Em particular, uma proporção global de acertos aparentemente elevada pode representar pouco ganho classificatório se estiver próxima do desempenho obtido pela atribuição sistemática à classe majoritária [@hair2009].
+
+Os critérios de chance máxima e chance proporcional são referências descritivas para contextualizar a proporção de acertos. Eles não substituem a avaliação em observações que não participaram da estimação e não constituem, por si mesmos, testes de desempenho preditivo. A comparação principal deve utilizar o mesmo regime de avaliação da regra: validação cruzada, conjunto de teste *holdout* ou amostra independente, conforme distinguido na @sec-discriminante-avaliacao-preditiva.
+
 A matriz deve ser interpretada em conjunto com as probabilidades *a priori* e, quando pertinente, com as consequências dos diferentes erros discutidas na @sec-discriminante-priores-custos. Uma regra pode apresentar elevada proporção global de acertos e desempenho baixo em uma classe pouco frequente.
 
-Em problemas com duas classes, sensibilidade e especificidade devem ser interpretadas somente depois que uma das classes for explicitamente definida como positiva ou de interesse. Fora dessa configuração, essas denominações não serão utilizadas neste capítulo.
+Em problemas com duas classes, sensibilidade e especificidade exigem que uma das classes seja previamente definida como positiva ou de interesse. Essas medidas dependem dessa escolha e não se estendem de forma única a problemas com $K>2$ classes.
 
-Os casos classificados incorretamente também podem ser examinados individualmente. Sob perda zero--um, probabilidades posteriores próximas para as classes mais prováveis indicam pequena diferença entre as alternativas que competem pela classificação. Com perdas gerais, essa comparação deve ser feita pelos riscos condicionais das ações. Uma classificação incorreta, isoladamente, não constitui motivo para excluir a observação.
+### Casos classificados incorretamente {#sec-discriminante-casos-incorretos}
 
+Para uma observação de classe conhecida $c_i$, denote por
+
+$$
+\widehat c_i
+=
+\widehat{\psi}
+\left(
+\mathbf x_i
+\right)
+$$
+
+a classe atribuída pela regra. O erro ocorre quando
+
+$$
+\widehat c_i
+\neq
+c_i.
+$$
+
+O par $(c_i,\widehat c_i)$ identifica quais classes estão sendo confundidas. A concentração dos erros em determinados pares de classes complementa as frequências agregadas da matriz de classificação [@hair2009].
+
+Sob perda zero--um, podem ser comparadas as probabilidades *a posteriori* da classe verdadeira e da classe atribuída:
+
+$$
+P
+\left(
+\mathsf C=c_i
+\mid
+\boldsymbol{\mathsf X}=\mathbf x_i
+\right)
+\qquad\text{e}\qquad
+P
+\left(
+\mathsf C=\widehat c_i
+\mid
+\boldsymbol{\mathsf X}=\mathbf x_i
+\right).
+$$
+
+Uma pequena diferença entre essas probabilidades indica pouca separação entre as duas decisões segundo a regra ajustada. Quando elas são as duas maiores probabilidades *a posteriori*, valores próximos correspondem a uma observação próxima da fronteira entre essas classes. Com perdas gerais, a comparação deve utilizar os riscos condicionais da @eq-risco-condicional-classificacao-discriminante.
+
+Dentro de cada classe verdadeira, as características originais e os escores discriminantes podem ser comparados entre observações corretamente e incorretamente classificadas. Diferenças recorrentes localizam regiões do espaço das características em que os erros se concentram. Essas diferenças não identificam, por si mesmas, a causa dos erros [@hair2009].
+
+Uma classificação incorreta não constitui motivo para excluir a observação. A exclusão requer evidência independente de erro de mensuração, registro ou rótulo. A sobreposição entre as distribuições pode produzir erros mesmo sob a regra populacional de Bayes.
+
+Erros observados na amostra de treinamento pertencem ao erro aparente. Erros obtidos por validação cruzada, conjunto *holdout* ou amostra independente correspondem aos regimes definidos na @sec-discriminante-avaliacao-preditiva. A repetição do mesmo padrão de confusão fora da amostra de treinamento indica uma limitação persistente da regra, e não apenas ajuste excessivo às observações utilizadas na estimação.
 
 ### Correspondência com a implementação utilizada {#sec-discriminante-implementacao}
 
@@ -4136,11 +4876,11 @@ Nas atividades computacionais, a Análise Discriminante será realizada pelo mó
 | **Normalized loadings** | coeficientes das mesmas direções após normalização euclidiana | @eq-coeficientes-normalizados-discriminante |
 | **Structure coefficients** | correlações entre as características e os escores discriminantes | @sec-discriminante-coeficientes |
 | **Eigenvalue** | raiz discriminante $\lambda_j$ | @eq-autovalor-generalizado-fisher |
-| **Variance explained** | participação relativa $\rho_j$ da raiz discriminante | @eq-proporcao-raiz-discriminante |
-| **Canonical correlation** | transformação da raiz discriminante para uma medida limitada | @eq-correlacao-canonica-discriminante |
+| **Variance explained** | participação relativa da raiz discriminante na soma das raízes positivas | @eq-proporcao-raiz-discriminante |
+| **Canonical correlation** | transformação limitada da raiz discriminante | @eq-correlacao-canonica-discriminante |
 | **Training set** | matriz de classificação das observações utilizadas no ajuste | @sec-discriminante-matriz-classificacao |
 | **Test set** | matriz de classificação das observações separadas para teste | @sec-discriminante-avaliacao-preditiva |
-| **Wilks' Lambda tests** | testes sequenciais das funções discriminantes | @eq-lambda-wilks-manova e @eq-correspondencia-manova-fisher |
+| **Wilks' Lambda tests** | testes sequenciais das funções discriminantes remanescentes | @eq-wilks-sequencial-discriminante |
 
 : Correspondência entre elementos da implementação e os objetos estatísticos desenvolvidos no capítulo. {#tbl-correspondencia-implementacao-discriminante}
 
@@ -4150,7 +4890,18 @@ A opção **Training proportion** separa, de forma estratificada segundo a vari�
 
 Os **Coefficients of discriminants** correspondem às colunas da matriz `scaling` de `MASS::lda()`. Os **Normalized loadings** são obtidos pela normalização euclidiana dessas colunas. Os **Structure coefficients** são as correlações entre as características observadas e os escores discriminantes na amostra de treinamento. Esses três resultados correspondem aos objetos distinguidos na @sec-discriminante-coeficientes e não devem ser interpretados como medidas equivalentes.
 
-Se $d_j$ denota o $j$-ésimo valor de `MASS::lda()$svd`, $n$ é o tamanho da amostra de treinamento e $K$ é o número de classes, a implementação apresenta como **Eigenvalue**
+Na configuração auditada, `MASS::lda()` utiliza o método de momentos e probabilidades *a priori* iguais às proporções das classes na amostra de treinamento. Se $d_j$ denota o $j$-ésimo valor de `MASS::lda()$svd`, $n$ é o tamanho dessa amostra e $K$ é o número de classes, a raiz discriminante correspondente à formulação
+
+$$
+\mathbf T_{\mathrm{entre}}
+\boldsymbol{\alpha}_j
+=
+\lambda_j
+\mathbf T_{\mathrm{intra}}
+\boldsymbol{\alpha}_j
+$$
+
+é
 
 $$
 \lambda_j
@@ -4159,37 +4910,43 @@ d_j^2
 \frac{K-1}{n-K}.
 $$
 
-Esses valores correspondem às raízes discriminantes $\lambda_j$ da formulação amostral utilizada no capítulo. A saída **Variance explained** apresenta a participação relativa das raízes, $100\rho_j\%$, com $\rho_j$ definida na @eq-proporcao-raiz-discriminante. Ela não representa a proporção da variância total das características, como ocorre na ACP.
-
-A **Canonical correlation** associada à função discriminante $j$ é obtida da raiz $\lambda_j$ por
+A saída **Eigenvalue** apresenta essas raízes discriminantes. A saída **Variance explained** apresenta, em porcentagem, a participação relativa
 
 $$
-r_j^{(\mathrm{can})}
-=
-\sqrt{
-\frac{\lambda_j}{1+\lambda_j}
-}.
-$$ {#eq-correlacao-canonica-discriminante}
+100
+\frac{
+\lambda_j
+}{
+\displaystyle
+\sum_{\ell=1}^{r_F}
+\lambda_\ell
+}
+\%.
+$$
 
-Ela é uma transformação crescente da mesma raiz discriminante para uma escala limitada entre $0$ e $1$ e não constitui uma raiz adicional.
+Essa quantidade foi definida na @eq-proporcao-raiz-discriminante e não representa a proporção da variância total das características, como ocorre na ACP.
 
-Os **Wilks' Lambda tests** são testes sequenciais das funções discriminantes remanescentes. A implementação calcula a lambda de Wilks a partir das raízes discriminantes correspondentes, conforme a relação da @eq-lambda-wilks-manova, e utiliza uma aproximação qui-quadrado de Bartlett. Esses testes avaliam a evidência de separação associada às funções remanescentes e não constituem medidas de desempenho preditivo da classificação.
+A saída **Canonical correlation** apresenta a correlação canônica $r_j^{(\mathrm{can})}$ definida na @eq-correlacao-canonica-discriminante. Ela é uma transformação crescente da raiz discriminante para uma escala limitada entre $0$ e $1$.
+
+Os **Wilks' Lambda tests** correspondem aos testes sequenciais descritos na @eq-wilks-sequencial-discriminante. Sob normalidade multivariada dentro das classes, independência entre unidades e matriz de covariâncias comum, a implementação utiliza uma aproximação qui-quadrado de Bartlett para obter os valores $p$ desses testes.
+
+O teste iniciado na função $j$ avalia a hipótese de ausência de separação populacional nas funções $j,\ldots,r_F$, depois de retiradas as funções anteriores da sequência. Valores menores de $\Lambda_j$ indicam maior separação nas funções incluídas no produto. Esses testes avaliam separação entre os grupos e não desempenho preditivo da regra de classificação.
 
 ## Síntese
 
-A Análise Discriminante utiliza grupos previamente conhecidos para construir regras de classificação e representar a separação entre as classes.
+A Análise Discriminante considera grupos previamente conhecidos e desenvolve duas formulações relacionadas: uma regra probabilística de classificação e uma representação geométrica da separação entre os grupos.
 
-Na formulação probabilística, cada classe é caracterizada por uma probabilidade *a priori* $\pi_k$ e por uma distribuição condicional das características. Sob perda zero--um, a regra de Bayes atribui uma observação a uma classe que maximize
+Na formulação probabilística, cada classe possui probabilidade *a priori* $\pi_k$ e densidade condicional $f_k(\mathbf x)$. Sob perda zero--um, a regra de Bayes atribui $\mathbf x$ à classe que maximiza
 
 $$
 \pi_k f_k(\mathbf x),
 $$
 
-ou, equivalentemente, sua probabilidade posterior.
+equivalentemente, a classe de maior probabilidade *a posteriori*.
 
-Quando as distribuições condicionais são normais e compartilham uma matriz de covariâncias comum, obtém-se a LDA, cujas fronteiras de classificação são lineares. Quando as matrizes de covariâncias podem variar entre as classes, obtém-se a QDA, cujas fronteiras podem conter termos quadráticos. Na passagem para as regras estimadas, médias e matrizes de covariâncias desconhecidas são substituídas por estimativas. As probabilidades *a priori* utilizadas na classificação podem ser estimadas a partir da amostra, quando o mecanismo de amostragem sustenta essa interpretação, ou especificadas com base em informação externa e no problema de decisão.
+Sob normalidade multivariada e matriz de covariâncias comum às classes, a regra de Bayes conduz à LDA e a fronteiras lineares. Com matrizes de covariâncias específicas por classe, obtém-se a QDA e, em geral, fronteiras quadráticas. As regras amostrais substituem os parâmetros populacionais desconhecidos por estimativas.
 
-Na formulação geométrica de Fisher, a direção $\mathbf a$ é avaliada pela separação entre os grupos relativamente à dispersão intragrupos:
+Na formulação de Fisher, a separação produzida por uma direção $\mathbf a$ é medida relativamente à dispersão intragrupos por
 
 $$
 J_F(\mathbf a)
@@ -4213,7 +4970,7 @@ $$
 \mathbf0,
 $$
 
-as direções discriminantes são obtidas pelo problema de autovalores generalizados
+as direções discriminantes satisfazem
 
 $$
 \mathbf T_{\mathrm{entre}}
@@ -4221,10 +4978,10 @@ $$
 =
 \lambda_j
 \mathbf T_{\mathrm{intra}}
-\boldsymbol{\alpha}_j.
+\boldsymbol{\alpha}_j,
 $$
 
-O número de direções associadas a raízes positivas satisfaz
+e o número de direções associadas a raízes positivas obedece a
 
 $$
 r_F
@@ -4232,9 +4989,9 @@ r_F
 \min(p,K-1).
 $$
 
-As combinações lineares definidas por essas direções produzem coordenadas discriminantes que representam a separação entre os grupos relativamente à dispersão intragrupos.
+As coordenadas discriminantes são as projeções das observações nessas direções e representam a separação entre os grupos relativamente à dispersão intragrupos.
 
-Para duas classes, existe no máximo uma direção discriminante associada a uma raiz positiva. Sob normalidade e covariância comum, a direção populacional de Fisher é paralela ao vetor normal da fronteira da LDA,
+Para duas classes com normalidade multivariada e covariância comum, a direção populacional de Fisher é paralela ao vetor
 
 $$
 \boldsymbol{\Sigma}^{-1}
@@ -4242,17 +4999,13 @@ $$
 \boldsymbol{\mu}_1
 -
 \boldsymbol{\mu}_2
-\right).
+\right),
 $$
 
-Essa correspondência não torna as duas formulações equivalentes em objetivo: Fisher constrói uma direção de separação, enquanto a LDA estabelece uma regra probabilística de classificação. Sob perda zero--um, as probabilidades *a priori* também participam da posição da fronteira; com perdas gerais, a regra ótima depende ainda da função de perda.
+que também é normal à fronteira da LDA. Fisher determina uma direção de separação; a LDA determina uma regra de classificação. Na LDA, a posição da fronteira depende também das probabilidades *a priori* e, com perdas gerais, da função de perda.
 
-A normalidade das distribuições condicionais não é necessária para definir o critério geométrico de Fisher. Ela pertence às formulações normais da LDA e da QDA. A LDA assume covariância comum entre as classes, enquanto a QDA permite matrizes de covariâncias específicas. As formulações baseadas em inversas exigem ainda condições de não singularidade, e quase dependências lineares podem produzir mau condicionamento antes da perda efetiva de posto.
+A normalidade multivariada e a igualdade das matrizes de covariâncias não são necessárias para definir o critério geométrico de Fisher. Essas condições pertencem à formulação probabilística da LDA normal. A QDA mantém a normalidade multivariada, mas admite matrizes de covariâncias específicas por classe. As regras que utilizam inversas de matrizes de covariâncias exigem não singularidade e podem ser numericamente instáveis diante de quase dependências lineares.
 
-Mesmo com os parâmetros populacionais conhecidos, a sobreposição entre as distribuições condicionais pode produzir classificações incorretas. Sob perda zero--um, a probabilidade global mínima de classificação incorreta alcançada pela regra de Bayes é o erro de Bayes. O erro populacional de uma regra estimada deve ser distinguido desse limite e pode excedê-lo em razão das diferenças entre a regra estimada e a regra de Bayes.
+Mesmo com os parâmetros populacionais conhecidos, distribuições condicionais sobrepostas podem produzir classificações incorretas. Sob perda zero--um, o erro de Bayes é a menor probabilidade global de classificação incorreta alcançável pela regra populacional de Bayes.
 
-O desempenho observado nas próprias unidades utilizadas para construir a regra produz o erro aparente. A avaliação por validação cruzada, em um conjunto de teste *holdout* ou em uma amostra independente utiliza observações que não participaram do ajuste da regra responsável por classificá-las, mas esses procedimentos correspondem a regimes de avaliação distintos. A matriz de classificação mostra como os acertos e erros se distribuem entre as classes, evitando que o desempenho seja resumido apenas por uma proporção global.
-
-Quando a MANOVA compara os vetores de médias correspondentes à mesma partição em grupos utilizada por Fisher, a correspondência estabelecida na @eq-correspondencia-manova-fisher faz com que as duas técnicas conduzam ao mesmo problema espectral, embora utilizem sua solução para finalidades distintas. A ACP procura direções de elevada variabilidade total sem utilizar os rótulos das classes. A Análise de Agrupamentos também parte de um problema diferente, pois procura construir grupos que não são conhecidos previamente.
-
-A Análise Discriminante reúne duas construções supervisionadas com finalidades distintas: a formulação probabilística define uma regra de decisão para classificar novas observações, enquanto a formulação de Fisher define direções que representam a separação entre os grupos relativamente à dispersão intragrupos.
+A relação com a MANOVA decorre do mesmo problema de autovalores generalizados quando ambas utilizam a mesma partição em grupos. A MANOVA utiliza as raízes para testar diferenças entre vetores de médias; Fisher utiliza os autovetores para construir direções de separação. A ACP determina direções pela variabilidade total sem utilizar rótulos de classes, enquanto a Análise de Agrupamentos constrói grupos que não são conhecidos previamente.
