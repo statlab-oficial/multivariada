@@ -1,6 +1,6 @@
 # Formulação da Análise de Componentes Principais {#sec-acp}
 
-A Análise de Componentes Principais (ACP) representa a variabilidade de um conjunto de variáveis por meio de combinações lineares ordenadas segundo a variância que concentram [@johnson2002; @jolliffe2002pca]. Seu objetivo é construir uma representação de menor dimensão que preserve, segundo esse critério, a maior parcela possível da variabilidade original.
+A Análise de Componentes Principais (ACP) representa a variabilidade de um conjunto de variáveis por meio de combinações lineares ordenadas segundo a variância que concentram [@johnson2002]. Seu objetivo é construir uma representação de menor dimensão que preserve, segundo esse critério, a maior parcela possível da variabilidade original.
 
 A formulação utiliza o quociente de Rayleigh da @def-quociente-rayleigh, o @thm-teorema-espectral, a projeção ortogonal da @def-projecao-ortogonal e a SVD compacta da @def-svd-compacta. A construção é desenvolvida nas formulações populacional, amostral e por SVD e distingue a ACP baseada na matriz de covariâncias daquela baseada na matriz de correlações.
 
@@ -1892,7 +1892,7 @@ Quando são retidas menos dimensões do que o posto da matriz analisada, pelo me
 ::: {.callout-note appearance="simple" icon=false}
 ## Leitura de aprofundamento
 
-Esta parte reúne desenvolvimentos sobre o subespaço principal, a reconstrução por projeção, a aproximação de posto reduzido, as propriedades da solução e a estimação das componentes sob normalidade.
+Esta parte reúne desenvolvimentos sobre o subespaço principal, a reconstrução por projeção, a aproximação de posto reduzido, as propriedades da solução e a estimação e inferência das componentes sob normalidade.
 :::
 
 ### Formulação do subespaço principal e variabilidade máxima {#sec-acp-subespaco-variancia}
@@ -2795,455 +2795,6 @@ ggplot() +
 
 Os pontos azuis são as observações centralizadas, os pontos verdes são suas projeções sobre a primeira direção principal e os segmentos vermelhos representam os resíduos de reconstrução. Entre todas as retas que passam pela origem no espaço dos dados centralizados, a reta gerada pela primeira direção principal minimiza a soma dos quadrados das normas dos resíduos ortogonais. Essa mesma reta maximiza a variância dos pontos projetados.
 
-### Geometria da qualidade de representação {#sec-acp-geometria-representacao}
-
-A qualidade de representação pelas componentes principais pode ser expressa pela relação entre a norma quadrática da projeção e a norma quadrática do vetor representado. Para as observações, essa projeção ocorre em $\mathbb R^p$, sobre as direções principais. Para as variáveis, ocorre em $\mathbb R^n$, sobre as direções definidas pelos vetores de escores. As duas construções utilizam as relações entre produto interno, ângulo, norma e projeção desenvolvidas no Módulo I.
-
-#### Qualidade de representação das observações
-
-Defina o vetor da observação centralizada por
-
-$$
-\mathbf z_i
-=
-\mathbf x_i-\bar{\mathbf x}.
-$$
-
-A direção principal associada à componente $j$ é dada pelo autovetor unitário
-$\widehat{\boldsymbol{\alpha}}_j$, e o escore da observação $i$ nessa componente é
-
-$$
-\widehat y_{ij}
-=
-\widehat{\boldsymbol{\alpha}}_j^\top
-\mathbf z_i.
-$$
-
-::: {#prp-acp-cos2-observacoes}
-## Qualidade de representação das observações
-
-Considere $\mathbf z_i\neq\mathbf0$ e as direções principais ortonormais
-$\widehat{\boldsymbol{\alpha}}_1,\ldots,
-\widehat{\boldsymbol{\alpha}}_p$.
-
-Se $\theta_{ij}$ é o ângulo entre $\mathbf z_i$ e
-$\widehat{\boldsymbol{\alpha}}_j$, então
-
-$$
-\cos^{2\,(\mathrm{obs})}_{ij}
-=
-\cos^2\theta_{ij}
-=
-\frac{
-\widehat y_{ij}^2
-}{
-\|\mathbf z_i\|^2
-}.
-$$ {#eq-acp-cos2-observacao}
-
-Para o subespaço principal amostral
-
-$$
-\widehat{\mathcal S}_k
-=
-\operatorname{span}
-\left\{
-\widehat{\boldsymbol{\alpha}}_1,
-\ldots,
-\widehat{\boldsymbol{\alpha}}_k
-\right\},
-$$
-
-a qualidade de representação pelas primeiras $k$ componentes satisfaz
-
-$$
-\cos^{2\,(\mathrm{obs})}_{i,(1:k)}
-=
-\sum_{j=1}^{k}
-\cos^{2\,(\mathrm{obs})}_{ij}
-=
-\frac{
-\left\|
-\operatorname{proj}_{\widehat{\mathcal S}_k}(\mathbf z_i)\right\|^2
-}{
-\|\mathbf z_i\|^2
-}.
-$$ {#eq-acp-cos2-observacao-subespaco}
-
-Além disso,
-
-$$
-\cos^{2\,(\mathrm{obs})}_{i,(1:k)}
-=
-1-
-\frac{
-\left\|
-\mathbf z_i-
-\operatorname{proj}_{S_k}(\mathbf z_i)
-\right\|^2
-}{
-\|\mathbf z_i\|^2
-}.
-$$
-:::
-
-::: {.callout-note collapse="true" appearance="simple" icon=false title="Demonstração"}
-
-Pela definição de ângulo entre vetores na @def-angulo-vetores,
-
-$$
-\cos\theta_{ij}
-=
-\frac{
-\mathbf z_i^\top
-\widehat{\boldsymbol{\alpha}}_j
-}{
-\|\mathbf z_i\|
-\left\|
-\widehat{\boldsymbol{\alpha}}_j
-\right\|
-}.
-$$
-
-Como
-
-$$
-\left\|
-\widehat{\boldsymbol{\alpha}}_j
-\right\|
-=
-1
-$$
-
-e
-
-$$
-\widehat y_{ij}
-=
-\widehat{\boldsymbol{\alpha}}_j^\top
-\mathbf z_i,
-$$
-
-segue que
-
-$$
-\cos\theta_{ij}
-=
-\frac{
-\widehat y_{ij}
-}{
-\|\mathbf z_i\|
-}.
-$$
-
-Elevando ao quadrado,
-
-$$
-\cos^2\theta_{ij}
-=
-\frac{
-\widehat y_{ij}^2
-}{
-\|\mathbf z_i\|^2
-}.
-$$
-
-Pela @prp-projecao-direcao,
-
-$$
-\operatorname{proj}_{
-\operatorname{span}
-\{\widehat{\boldsymbol{\alpha}}_j\}
-}
-(\mathbf z_i)
-=
-\widehat y_{ij}
-\widehat{\boldsymbol{\alpha}}_j.
-$$
-
-Como as primeiras $k$ direções formam um conjunto ortonormal, a
-@prp-projecao-base-ortonormal fornece
-
-$$
-\operatorname{proj}_{S_k}(\mathbf z_i)
-=
-\sum_{j=1}^{k}
-\widehat y_{ij}
-\widehat{\boldsymbol{\alpha}}_j
-$$
-
-e
-
-$$
-\left\|
-\operatorname{proj}_{S_k}(\mathbf z_i)
-\right\|^2
-=
-\sum_{j=1}^{k}
-\widehat y_{ij}^2.
-$$
-
-Dividindo por $\|\mathbf z_i\|^2$, obtém-se a expressão para
-$\cos^{2\,(\mathrm{obs})}_{i,(1:k)}$.
-
-Pelo @thm-decomposicao-ortogonal,
-
-$$
-\|\mathbf z_i\|^2
-=
-\left\|
-\operatorname{proj}_{S_k}(\mathbf z_i)
-\right\|^2
-+
-\left\|
-\mathbf z_i-
-\operatorname{proj}_{S_k}(\mathbf z_i)
-\right\|^2.
-$$
-
-A divisão por $\|\mathbf z_i\|^2$ fornece a última identidade.
-
-:::
-
-Na ACP baseada em covariâncias,
-
-$$
-\|\mathbf z_i\|^2
-=
-\sum_{\ell=1}^{p}
-\widehat y_{i\ell}^2,
-$$
-
-pois a transformação completa para as coordenadas principais é ortogonal. Na ACP baseada em correlações, a mesma relação é aplicada ao vetor da observação no espaço das variáveis centralizadas e padronizadas.
-
-O numerador da @eq-acp-cos2-observacao-subespaco é a norma quadrática da projeção da observação centralizada sobre o subespaço retido, enquanto o denominador é sua distância quadrática ao centro. Valores próximos de $1$ correspondem a uma pequena distância quadrática entre a observação centralizada e sua projeção.
-
-#### Qualidade de representação das variáveis
-
-Considere o vetor centralizado da variável $X_i$ e o vetor de escores da componente $Y_j$. A qualidade de representação pode ser formulada diretamente pela correlação entre esses dois vetores.
-
-::: {#prp-acp-cos2-variaveis}
-## Qualidade de representação das variáveis
-
-Considere $s_{ii}>0$ e uma componente com
-$\widehat{\lambda}_j>0$. Se $\vartheta_{ij}$ é o ângulo entre o vetor centralizado da variável $X_i$ e o vetor de escores da componente $Y_j$, então
-
-$$
-r_{ij}
-=
-\widehat{\operatorname{Corr}}
-\left(
-X_i,Y_j
-\right)
-=
-\cos\vartheta_{ij},
-$$
-
-e
-
-$$
-\cos^{2\,(\mathrm{var})}_{ij}
-=
-r_{ij}^2
-=
-\frac{
-\widehat{\lambda}_j
-\widehat{\alpha}_{ij}^{\,2}
-}{
-s_{ii}
-}.
-$$ {#eq-acp-cos2-variavel}
-
-Se $\mathbf S$ possui posto $r$, então
-
-$$
-\sum_{j:\,\widehat{\lambda}_j>0}
-r_{ij}^2
-=
-1.
-$$
-
-Para $1\leq k\leq r$,
-
-$$
-\cos^{2\,(\mathrm{var})}_{i,(1:k)}
-=
-\sum_{j=1}^{k}
-r_{ij}^2.
-$$
-
-Essa quantidade é a norma quadrática da projeção do vetor centralizado e normalizado da variável sobre o subespaço gerado pelos primeiros $k$ vetores de escores normalizados.
-:::
-
-::: {.callout-note collapse="true" appearance="simple" icon=false title="Demonstração"}
-
-A interpretação da correlação como cosseno estabelecida em @eq-correlacao-cosseno-colunas fornece
-
-$$
-r_{ij}
-=
-\cos\vartheta_{ij}.
-$$
-
-Elevando ao quadrado,
-
-$$
-\cos^{2\,(\mathrm{var})}_{ij}
-=
-r_{ij}^2.
-$$
-
-A covariância amostral entre a variável $X_i$ e a componente $Y_j$ satisfaz
-
-$$
-\widehat{\operatorname{Cov}}
-\left(
-X_i,Y_j
-\right)
-=
-\mathbf e_i^\top
-\mathbf S
-\widehat{\boldsymbol{\alpha}}_j
-=
-\widehat{\lambda}_j
-\widehat{\alpha}_{ij},
-$$
-
-pois
-
-$$
-\mathbf S
-\widehat{\boldsymbol{\alpha}}_j
-=
-\widehat{\lambda}_j
-\widehat{\boldsymbol{\alpha}}_j.
-$$
-
-Como
-
-$$
-\widehat{\operatorname{Var}}(Y_j)
-=
-\widehat{\lambda}_j,
-$$
-
-segue que
-
-$$
-r_{ij}
-=
-\frac{
-\widehat{\lambda}_j
-\widehat{\alpha}_{ij}
-}{
-\sqrt{s_{ii}}
-\sqrt{\widehat{\lambda}_j}
-}
-=
-\frac{
-\sqrt{\widehat{\lambda}_j}
-\widehat{\alpha}_{ij}
-}{
-\sqrt{s_{ii}}
-}.
-$$
-
-Portanto,
-
-$$
-r_{ij}^2
-=
-\frac{
-\widehat{\lambda}_j
-\widehat{\alpha}_{ij}^{\,2}
-}{
-s_{ii}
-}.
-$$
-
-Se $\mathbf S$ possui posto $r$, sua decomposição espectral fornece
-
-$$
-s_{ii}
-=
-\sum_{j:\,\widehat{\lambda}_j>0}
-\widehat{\lambda}_j
-\widehat{\alpha}_{ij}^{\,2}.
-$$
-
-Consequentemente,
-
-$$
-\begin{aligned}
-\sum_{j:\,\widehat{\lambda}_j>0}
-r_{ij}^2
-&=
-\frac{1}{s_{ii}}
-\sum_{j:\,\widehat{\lambda}_j>0}
-\widehat{\lambda}_j
-\widehat{\alpha}_{ij}^{\,2}\\
-&=
-1.
-\end{aligned}
-$$
-
-Para explicitar a interpretação como projeção, seja $\mathbf x_{c,i}\in\mathbb R^n$ o vetor centralizado das observações da variável $X_i$ e defina
-
-$$
-\mathbf w_i
-=
-\frac{
-\mathbf x_{c,i}
-}{
-\|\mathbf x_{c,i}\|
-}.
-$$
-
-Para cada componente com $\widehat{\lambda}_j>0$, seja
-$\widehat{\mathbf y}_j\in\mathbb R^n$ o vetor formado pelos escores da componente $j$ e defina
-
-$$
-\mathbf u_j
-=
-\frac{
-\widehat{\mathbf y}_j
-}{
-\|\widehat{\mathbf y}_j\|
-}.
-$$
-
-Os vetores de escores de componentes distintas são ortogonais; portanto, os vetores $\mathbf u_j$ formam um conjunto ortonormal em $\mathbb R^n$. Além disso,
-
-$$
-\mathbf w_i^\top\mathbf u_j
-=
-r_{ij}.
-$$
-
-Pela @prp-projecao-base-ortonormal,
-
-$$
-\left\|
-\operatorname{proj}_{
-\operatorname{span}\{\mathbf u_1,\ldots,\mathbf u_k\}
-}
-(\mathbf w_i)
-\right\|^2
-=
-\sum_{j=1}^{k}
-r_{ij}^2
-=
-\cos^{2\,(\mathrm{var})}_{i,(1:k)}.
-$$
-
-Isso estabelece a interpretação da soma dos cossenos quadrados como norma quadrática da projeção da variável normalizada sobre o subespaço gerado pelos vetores de escores considerados.
-
-:::
-
-Assim, $\cos^{2\,(\mathrm{var})}_{i,(1:k)}$ mede a parcela da variância da variável $i$ representada pelo subespaço gerado pelos primeiros $k$ vetores de escores.
-
-As duas construções utilizam a mesma relação geométrica. Para as observações, o ângulo é definido em $\mathbb R^p$ entre o vetor centralizado e uma direção principal. Para as variáveis, o ângulo é definido em $\mathbb R^n$ entre o vetor centralizado da variável e o vetor de escores da componente. Em ambos os casos, o $\cos^2$ expressa uma proporção quadrática de representação.
-
 ### Aproximação de posto reduzido {#sec-acp-aproximacao-posto-reduzido}
 
 A SVD relaciona diretamente a redução de dimensionalidade ao problema de aproximação matricial.
@@ -3395,7 +2946,7 @@ A equivalência entre as formulações pode ser resumida pela @tbl-formulacoes-a
 
 : Formulações relacionadas da Análise de Componentes Principais. {#tbl-formulacoes-acp}
 
-As formulações da @tbl-formulacoes-acp descrevem a mesma solução sob três perspectivas relacionadas. Estatisticamente, a ACP maximiza a variância das combinações lineares sujeitas às restrições de normalização e ortogonalidade. Geometricamente, o subespaço principal maximiza a variância total da projeção e minimiza o erro quadrático de reconstrução. Matricialmente, a SVD truncada fornece uma aproximação de posto reduzido da matriz de dados centralizada [@eaton2007multivariate; @johnson2002]. Na formulação amostral, essas perspectivas conduzem ao mesmo subespaço principal estimado.
+As formulações da @tbl-formulacoes-acp descrevem a mesma solução sob três perspectivas relacionadas. Estatisticamente, a ACP maximiza a variância das combinações lineares sujeitas às restrições de normalização e ortogonalidade. Geometricamente, o subespaço principal maximiza a variância total da projeção e minimiza o erro quadrático de reconstrução [@johnson2002]. Matricialmente, a SVD truncada fornece a melhor aproximação de posto reduzido da matriz de dados centralizada, conforme o resultado geral desenvolvido a partir da SVD no Módulo 1 [@eaton2007multivariate]. Na formulação amostral da ACP, essas perspectivas conduzem ao mesmo subespaço principal estimado.
 
 ### Propriedades da solução {#sec-acp-propriedades}
 
@@ -3426,7 +2977,7 @@ Consequentemente, os autovalores e as direções principais não se alteram. A A
 
 #### Dependência da escala
 
-A ACP baseada em covariâncias não é, em geral, invariante a mudanças individuais de escala. Se
+A ACP baseada em covariâncias não é, em geral, invariante a mudanças individuais de escala. Como desenvolvido na @sec-acp-matriz-correlacoes, uma transformação
 
 $$
 \boldsymbol{\mathsf X}^{*}
@@ -3435,70 +2986,25 @@ $$
 \boldsymbol{\mathsf X},
 $$
 
-com $\mathbf D$ diagonal e positiva, então
+com $\mathbf D$ diagonal e positiva, produz
 
 $$
 \boldsymbol{\Sigma}^{*}
 =
 \mathbf D
 \boldsymbol{\Sigma}
-\mathbf D.
+\mathbf D,
 $$
 
-Os autovalores e autovetores de $\boldsymbol{\Sigma}^{*}$ podem diferir dos de $\boldsymbol{\Sigma}$. Portanto, mudanças de unidade podem alterar a solução da ACP por covariâncias. Essa propriedade explica a distinção entre a ACP baseada em covariâncias e a ACP baseada em correlações desenvolvida na @sec-acp-matriz-correlacoes.
-
-#### Indeterminação do sinal
-
-Se
-
-$$
-\boldsymbol{\Sigma}
-\boldsymbol{\alpha}_j
-=
-\lambda_j
-\boldsymbol{\alpha}_j,
-$$
-
-então
-
-$$
-\boldsymbol{\Sigma}
-(-\boldsymbol{\alpha}_j)
-=
-\lambda_j
-(-\boldsymbol{\alpha}_j).
-$$
-
-Portanto, $\boldsymbol{\alpha}_j$ e $-\boldsymbol{\alpha}_j$ representam a mesma direção principal.
-
-Se o sinal do vetor de coeficientes for invertido,
-
-$$
-Y_j
-=
-\boldsymbol{\alpha}_j^\top
-\boldsymbol{\mathsf X}_c
-$$
-
-passa a ser
-
-$$
-Y_j^{*}
-=
--Y_j.
-$$
-
-Os escores também mudam de sinal, mas a variância, o subespaço gerado e a qualidade da representação permanecem inalterados.
-
-A orientação positiva ou negativa de um eixo principal é, portanto, arbitrária.
-
-Ao comparar resultados produzidos por diferentes programas ou decomposições numéricas, sinais opostos não caracterizam soluções distintas. A inversão do sinal da direção principal inverte também os escores correspondentes, mas preserva o mesmo eixo, a mesma variância e a mesma qualidade de representação.
-
-A mudança de sinal não é a única situação em que as direções podem deixar de ser únicas. Quando há autovalores repetidos, a ACP identifica o autoespaço correspondente, mas não uma base única dentro dele. Além disso, quando a matriz analisada é singular, a variabilidade está restrita a um subespaço de dimensão inferior a $p$. Essas duas situações são desenvolvidas a seguir.
+cujos autovalores e autovetores podem diferir dos obtidos a partir de $\boldsymbol{\Sigma}$. Essa dependência da escala é a razão para distinguir a ACP baseada em covariâncias da ACP baseada em correlações.
 
 #### Unicidade, multiplicidade e dimensão efetiva {#sec-acp-multiplicidade-singularidade}
 
-Quando todos os autovalores são simples, cada direção principal é determinada até mudança de sinal. Autovalores repetidos e matrizes singulares exigem distinguir a unicidade das direções, a unicidade dos subespaços e a dimensão efetivamente ocupada pela variabilidade.
+Quando todos os autovalores são simples, cada direção principal é determinada até mudança de sinal. Se $\boldsymbol{\alpha}_j$ é um autovetor associado a $\lambda_j$, então $-\boldsymbol{\alpha}_j$ representa a mesma direção principal. A inversão do sinal modifica também o sinal dos escores correspondentes, mas preserva o mesmo eixo, sua variância e o subespaço gerado.
+
+Consequentemente, sinais opostos apresentados por diferentes programas ou decomposições numéricas não caracterizam soluções distintas.
+
+A mudança de sinal corresponde à não unicidade da orientação de uma direção individual. Autovalores repetidos e matrizes singulares introduzem questões adicionais: no primeiro caso, é necessário distinguir a direção individual do autoespaço associado; no segundo, a variabilidade pode estar restrita a um subespaço de dimensão inferior a $p$.
 
 ##### Multiplicidade de autovalores
 
@@ -3544,7 +3050,18 @@ $$
 
 o corte ocorre dentro de um autoespaço associado a um autovalor repetido. Nesse caso, existem diferentes subespaços de dimensão $k$ que atingem a mesma variância total máxima da projeção.
 
-Mesmo sem igualdade exata, uma pequena separação entre autovalores adjacentes pode tornar os autovetores individuais sensíveis a pequenas perturbações da matriz analisada. Nessa situação, o subespaço gerado conjuntamente pelos autovetores associados aos autovalores próximos pode ser mais estável do que cada direção considerada isoladamente.
+Mesmo sem igualdade exata, uma pequena separação entre autovalores adjacentes pode tornar os autovetores individuais sensíveis a pequenas variações da matriz analisada. Essa relação é formalizada na @sec-acp-estimacao-inferencia-normal: sob as condições ali apresentadas, a variância assintótica da direção estimada envolve termos da forma
+
+$$
+\frac{1}{
+\left(
+\lambda_j-\lambda_\ell
+\right)^2
+}.
+$$
+
+Assim, direções associadas a autovalores muito próximos podem apresentar maior incerteza amostral [@anderson2003; @johnson2002].
+
 
 ##### Singularidade e dimensão efetiva
 
@@ -3796,7 +3313,7 @@ Os resultados assintóticos acima pressupõem autovalores populacionais distinto
 ::: {.callout-note appearance="simple" icon=false}
 ## Leitura de aprofundamento
 
-Esta parte reúne critérios e objetos utilizados na condução e na interpretação da ACP, incluindo a escolha do número de componentes, a relação das variáveis com as componentes, a representação das observações e das variáveis e a utilização de elementos suplementares.
+Esta parte reúne critérios e objetos utilizados na condução e na interpretação da ACP, incluindo a escolha do número de componentes, a relação das variáveis com as componentes, a representação das observações e das variáveis, a utilização de elementos suplementares e a avaliação da estabilidade da solução amostral.
 :::
 
 ### Escolha do número de componentes {#sec-acp-escolha-componentes}
@@ -3829,7 +3346,7 @@ $$
 
 Essa quantidade descreve a parcela da variabilidade observada representada pelas primeiras $k$ componentes. Quanto mais próximo de $1$ estiver $\widehat{\Pi}_k$ para um valor pequeno de $k$, maior será a parcela da variabilidade representada por poucas componentes. Não existe, entretanto, uma proporção mínima universal que determine, por si só, quantas componentes devem ser retidas.
 
-Outra informação é fornecida pelo gráfico dos autovalores, usualmente denominado **gráfico de declive** (*scree plot*). Os autovalores são apresentados em ordem decrescente e procura-se identificar uma mudança de inclinação que separe o trecho de quedas mais acentuadas daquele em que os autovalores se tornam relativamente pequenos e semelhantes. As componentes anteriores a essa estabilização constituem candidatas à retenção.
+Outra informação é fornecida pelo gráfico dos autovalores, usualmente denominado **gráfico de declive** (*scree plot*). Os autovalores são apresentados em ordem decrescente e procura-se identificar uma mudança de inclinação que separe o trecho de quedas mais acentuadas daquele em que os autovalores se tornam relativamente pequenos e semelhantes. As componentes anteriores ao trecho de estabilização constituem candidatas à retenção [@johnson2002].
 
 A @fig-acp-scree ilustra esse comportamento. A linha horizontal também permite comparar, no mesmo exemplo, o gráfico de declive com a referência $\lambda=1$ utilizada na ACP baseada em correlações.
 
@@ -3918,15 +3435,17 @@ $$
 p,
 $$
 
-a média dos $p$ autovalores é igual a $1$. Nesse contexto, o critério de reter componentes com
+a média dos $p$ autovalores é igual a $1$. O **critério da raiz latente** utiliza essa referência e propõe reter componentes com
 
 $$
-\widehat{\lambda}_{Rj}>1
+\widehat{\lambda}_{Rj}>1.
 $$
 
-pode ser interpretado como a retenção de componentes cuja variância excede a variância de uma variável original padronizada. Esse critério é uma regra heurística e sua justificativa não se transfere diretamente para a ACP baseada em uma matriz de covariâncias, cujas variâncias dependem das escalas das variáveis.
+Nesse contexto, cada variável padronizada possui variância unitária, de modo que uma componente com autovalor maior que $1$ apresenta variância superior à de uma variável original padronizada [@hair2009].
 
-A escolha de $k$ deve considerar conjuntamente a proporção acumulada de variância, o padrão dos autovalores no gráfico de declive e a interpretação da representação obtida. Esses critérios podem ser utilizados tanto na ACP baseada em covariâncias quanto na baseada em correlações. O critério do autovalor maior que $1$, por sua vez, possui justificativa específica para a matriz de correlações e não constitui uma condição necessária para retenção. Diferentes critérios podem sugerir dimensões distintas, e a decisão deve permanecer vinculada ao objetivo da análise [@jolliffe2002pca; @johnson2002].
+Esse critério constitui uma regra heurística de retenção e não uma condição matemática necessária da ACP. Sua justificativa também não se transfere diretamente para a ACP baseada em uma matriz de covariâncias, cujas variâncias dependem das escalas das variáveis.
+
+A escolha de $k$ deve considerar conjuntamente a proporção acumulada de variância, o padrão dos autovalores no gráfico de declive e a interpretação das componentes em termos das variáveis originais e do problema em estudo. Esses critérios podem ser utilizados tanto na ACP baseada em covariâncias quanto na baseada em correlações. O critério da raiz latente, por sua vez, possui justificativa específica para a ACP baseada em correlações e não constitui uma condição necessária para retenção. Diferentes critérios podem sugerir dimensões distintas, e a decisão não é determinada por um único critério [@johnson2002].
 
 Os autovalores pequenos também possuem informação diagnóstica. Valores muito próximos de zero, especialmente entre as últimas componentes, podem indicar dependências lineares ou quase lineares entre as variáveis. Assim, mesmo quando essas componentes não são mantidas na representação reduzida, os autovalores correspondentes devem ser examinados quanto à possível presença dessas dependências [@johnson2002].
 
@@ -4059,73 +3578,7 @@ X_i,Y_j
 }.
 $$
 
-::: {#prp-correlacao-variavel-componente}
-## Correlação entre uma variável e uma componente principal
-
-Considere a ACP populacional baseada na matriz de covariâncias $\boldsymbol{\Sigma}$. Para uma variável $X_i$ com
-
-$$
-\sigma_{ii}>0
-$$
-
-e uma componente principal
-
-$$
-Y_j
-=
-\boldsymbol{\alpha}_j^\top
-\left(
-\boldsymbol{\mathsf X}
--
-\boldsymbol{\mu}
-\right)
-$$
-
-associada a um autovalor
-
-$$
-\lambda_j>0,
-$$
-
-tem-se
-
-$$
-\operatorname{Corr}
-\left(
-X_i,Y_j
-\right)
-=
-\frac{
-\sqrt{\lambda_j}\,\alpha_{ij}
-}{
-\sqrt{\sigma_{ii}}
-}.
-$$
-
-Na ACP populacional baseada na matriz de correlações $\boldsymbol{\mathcal R}$, suponha que as variâncias marginais sejam positivas, como exigido na @def-matriz-correlacoes-populacional. Considere a variável padronizada $X_{i,\mathrm{pad}}$ e uma componente
-
-$$
-Y_{Rj}
-$$
-
-construída a partir do autovetor $\boldsymbol{\alpha}_{Rj}$ associado a
-
-$$
-\lambda_{Rj}>0.
-$$
-
-Como
-
-$$
-\operatorname{Var}
-\left(
-X_{i,\mathrm{pad}}
-\right)
-=
-1,
-$$
-
-tem-se
+Na ACP baseada na matriz de correlações $\boldsymbol{\mathcal R}$, suponha que as variâncias marginais sejam positivas, como exigido na @def-matriz-correlacoes-populacional. Para a variável padronizada $X_{i,\mathrm{pad}}$ e a componente $Y_{Rj}$ associada a um autovalor $\lambda_{Rj}>0$,
 
 $$
 \operatorname{Corr}
@@ -4137,7 +3590,17 @@ Y_{Rj}
 \sqrt{\lambda_{Rj}}\,
 \alpha_{R,ij}.
 $$
-:::
+
+Isso ocorre porque
+
+$$
+\operatorname{Var}
+\left(
+X_{i,\mathrm{pad}}
+\right)
+=
+1.
+$$
 
 A condição $\lambda_j>0$ é necessária porque a correlação exige variância positiva para a componente. Se
 
@@ -4153,7 +3616,7 @@ $$
 
 e a correlação entre $Y_j$ e qualquer variável não está definida.
 
-A expressão mostra que o coeficiente $\alpha_{ij}$ e a correlação entre $X_i$ e $Y_j$ representam objetos diferentes.
+A expressão mostra que o coeficiente $\alpha_{ij}$ e a correlação entre $X_i$ e $Y_j$ representam objetos diferentes. O coeficiente é uma coordenada da direção principal e participa diretamente da definição da combinação linear; a correlação é uma medida padronizada da associação linear entre uma variável original e a componente já construída [@johnson2002].
 
 A diferença entre os coeficientes da componente e as correlações com as variáveis pode ser visualizada na @fig-acp-coeficientes-correlacoes. O exemplo utiliza uma matriz de covariâncias com variâncias marginais diferentes.
 
@@ -4258,11 +3721,11 @@ ggplot(
   )
 ```
 
-Os coeficientes pertencem ao vetor unitário que define a direção principal. As correlações dependem também da variância da componente e da variância de cada variável. Por isso, as duas medidas não são intercambiáveis.
+Os coeficientes são as coordenadas do vetor unitário que define a direção principal e, conjuntamente, determinam a combinação linear da componente. As correlações descrevem separadamente a associação linear de cada variável com a componente já construída. Na ACP baseada em covariâncias, elas dependem do coeficiente correspondente, da variância da componente e da variância marginal da variável. Portanto, coeficientes e correlações não são medidas intercambiáveis [@johnson2002].
 
-Os coeficientes são as coordenadas do vetor unitário que define a direção principal e determinam a combinação linear da componente. As correlações descrevem a associação linear bivariada de cada variável com a componente. Na ACP baseada em covariâncias, seus valores dependem também das variâncias marginais das variáveis. Assim, coeficientes e correlações possuem interpretações distintas [@johnson2002].
+A distinção também afeta a interpretação. A correlação examina a relação bivariada entre uma variável e uma componente, enquanto os coeficientes pertencem à definição multivariada da componente. Por essa razão, a interpretação pode considerar os dois objetos, sem atribuir à correlação o papel de coeficiente da combinação linear [@johnson2002].
 
-No @sec-fatorial, as cargas fatoriais pertencem ao próprio modelo de covariâncias e têm interpretação diferente dos coeficientes de uma componente principal.
+No @sec-fatorial, as cargas fatoriais pertencem à parametrização do modelo de fatores comuns. Na ACP, em contraste, os coeficientes $\alpha_{ij}$ pertencem aos autovetores que definem as combinações lineares das variáveis observadas. Portanto, cargas fatoriais e coeficientes de componentes principais não devem ser identificados como o mesmo objeto.
 
 Na formulação amostral baseada em $\mathbf S$, se
 
@@ -4341,7 +3804,28 @@ $$
 
 O escore é a coordenada da observação na direção principal. Fixada a orientação de $\widehat{\boldsymbol{\alpha}}_j$, seu sinal indica de que lado da origem está a projeção, e seu módulo fornece a distância dessa projeção à origem ao longo do eixo.
 
-A @prp-acp-cos2-observacoes estabelece a interpretação geométrica do $\cos^2$ das observações. Pela @eq-acp-cos2-observacao, para a componente $j$,
+Para uma observação com
+
+$$
+\left\|
+\mathbf x_i-\bar{\mathbf x}
+\right\|
+>
+0,
+$$
+
+a qualidade de representação pode ser descrita pelo quadrado do cosseno do ângulo entre o vetor da observação centralizada e uma direção principal. Como $\widehat{\boldsymbol{\alpha}}_j$ possui norma unitária e
+
+$$
+\widehat y_{ij}
+=
+\widehat{\boldsymbol{\alpha}}_j^\top
+\left(
+\mathbf x_i-\bar{\mathbf x}
+\right),
+$$
+
+tem-se
 
 $$
 \cos^{2\,(\mathrm{obs})}_{ij}
@@ -4349,10 +3833,18 @@ $$
 \frac{
 \widehat y_{ij}^2
 }{
+\left\|
+\mathbf x_i-\bar{\mathbf x}
+\right\|^2
+}
+=
+\frac{
+\widehat y_{ij}^2
+}{
 \sum_{\ell=1}^{p}
 \widehat y_{i\ell}^2
 }.
-$$
+$$ {#eq-acp-cos2-observacao}
 
 Para as primeiras $k$ componentes,
 
@@ -4360,12 +3852,22 @@ $$
 \cos^{2\,(\mathrm{obs})}_{i,(1:k)}
 =
 \sum_{j=1}^{k}
-\cos^{2\,(\mathrm{obs})}_{ij}.
+\cos^{2\,(\mathrm{obs})}_{ij}
+=
+\frac{
+\sum_{j=1}^{k}
+\widehat y_{ij}^2
+}{
+\sum_{\ell=1}^{p}
+\widehat y_{i\ell}^2
+}.
 $$
 
-Valores próximos de $1$ indicam que grande parcela da distância quadrática da observação ao centro é preservada pela projeção no subespaço retido.
+Essa razão compara a norma quadrática da projeção da observação no subespaço retido com sua distância quadrática total ao centro. Valores próximos de $1$ indicam que grande parcela dessa distância é preservada na representação de menor dimensão.
 
-Na formulação clássica adotada neste capítulo, para uma componente com $\widehat{\lambda}_j>0$, a **contribuição** da observação $i$ para a componente $j$ é
+Se $\mathbf x_i=\bar{\mathbf x}$, a observação coincide com o centro da nuvem, todos os seus escores são nulos e o $\cos^2$ não é definido, pois sua distância quadrática ao centro é zero.
+
+Como medida descritiva de participação relativa, adota-se neste capítulo, para uma componente com $\widehat{\lambda}_j>0$, a **contribuição** da observação $i$ para a componente $j$ definida por
 
 $$
 \operatorname{ctr}^{(\mathrm{obs})}_{ij}
@@ -4377,7 +3879,7 @@ $$
 }.
 $$ {#eq-acp-contribuicao-observacao}
 
-Portanto,
+Por essa normalização,
 
 $$
 \sum_{i=1}^{n}
@@ -4386,7 +3888,7 @@ $$
 1.
 $$
 
-Na convenção amostral utilizada neste capítulo,
+Como, na convenção amostral utilizada neste capítulo,
 
 $$
 \sum_{h=1}^{n}
@@ -4395,7 +3897,7 @@ $$
 (n-1)\widehat{\lambda}_j,
 $$
 
-e
+a contribuição também pode ser escrita como
 
 $$
 \operatorname{ctr}^{(\mathrm{obs})}_{ij}
@@ -4407,9 +3909,9 @@ $$
 }.
 $$
 
-Quanto maior $\operatorname{ctr}^{(\mathrm{obs})}_{ij}$, maior a parcela da soma de quadrados dos escores da componente $j$ correspondente à observação $i$.
+Assim, $\operatorname{ctr}^{(\mathrm{obs})}_{ij}$ expressa a parcela da soma de quadrados dos escores da componente $j$ associada à observação $i$. Quanto maior seu valor, maior a participação relativa dessa observação na componente segundo essa convenção.
 
-O $\cos^2$ e a contribuição utilizam o mesmo escore quadrático, mas normalizações diferentes. O $\cos^2$ o divide pela distância quadrática total da observação ao centro; a contribuição o divide pela soma de quadrados dos escores de todas as observações na componente.
+O $\cos^2$ e a contribuição utilizam o mesmo escore quadrático, mas respondem a perguntas diferentes e empregam normalizações distintas. O $\cos^2$ compara o escore quadrático com a distância quadrática total da própria observação ao centro e descreve sua qualidade de representação. A contribuição compara esse mesmo escore quadrático com a soma de quadrados dos escores de todas as observações na componente e descreve, na convenção adotada, sua participação relativa nessa componente.
 
 #### Variáveis: coordenadas, qualidade de representação e contribuição
 
@@ -4423,6 +3925,32 @@ c_{ij}
 \sqrt{\widehat{\lambda}_j}\,
 \widehat{\alpha}_{ij}.
 $$
+
+Essa coordenada deve ser distinguida tanto do coeficiente $\widehat{\alpha}_{ij}$ quanto da covariância entre a variável e a componente. Como
+
+$$
+\widehat{\operatorname{Cov}}
+\left(
+X_i,Y_j
+\right)
+=
+\widehat{\lambda}_j
+\widehat{\alpha}_{ij},
+$$
+
+tem-se
+
+$$
+\widehat{\operatorname{Cov}}
+\left(
+X_i,Y_j
+\right)
+=
+\sqrt{\widehat{\lambda}_j}\,
+c_{ij}.
+$$
+
+Portanto, coeficiente, coordenada e covariância são, em geral, quantidades distintas.
 
 Pela relação desenvolvida na @sec-acp-coeficientes-correlacoes,
 
@@ -4461,13 +3989,20 @@ c_{R,ij}
 =
 r_{R,ij}.
 $$
-A @prp-acp-cos2-variaveis estabelece a interpretação geométrica do $\cos^2$ das variáveis. Pela @eq-acp-cos2-variavel, para uma componente com $\widehat{\lambda}_j>0$,
+Para as variáveis, a qualidade de representação pode ser descrita a partir das correlações entre cada variável e as componentes. Como a correlação entre dois vetores centralizados corresponde ao cosseno do ângulo entre eles, define-se, para $s_{ii}>0$ e uma componente com $\widehat{\lambda}_j>0$,
 
 $$
 \cos^{2\,(\mathrm{var})}_{ij}
 =
-r_{ij}^2.
-$$
+r_{ij}^2
+=
+\frac{
+\widehat{\lambda}_j
+\widehat{\alpha}_{ij}^{\,2}
+}{
+s_{ii}
+}.
+$$ {#eq-acp-cos2-variavel}
 
 Para as primeiras $k$ componentes,
 
@@ -4478,10 +4013,10 @@ $$
 r_{ij}^2.
 $$
 
-Valores próximos de $1$ indicam que grande parcela da variância da variável é representada pelo subespaço gerado pelos primeiros $k$ vetores de escores.
+Essa quantidade corresponde à parcela da variância da variável representada pelo subespaço gerado pelas componentes consideradas. Valores próximos de $1$ indicam boa representação da variável nesse subespaço.
 
 
-Para uma componente com $\widehat{\lambda}_j>0$, a contribuição da variável $i$ para a componente $j$ pode ser escrita como
+Na mesma convenção de participação relativa, para uma componente com $\widehat{\lambda}_j>0$, define-se a contribuição da variável $i$ para a componente $j$ por
 
 $$
 \operatorname{ctr}^{(\mathrm{var})}_{ij}
@@ -4502,7 +4037,7 @@ c_{ij}
 \widehat{\alpha}_{ij},
 $$
 
-segue que
+essa quantidade reduz-se a
 
 $$
 \operatorname{ctr}^{(\mathrm{var})}_{ij}
@@ -4510,7 +4045,16 @@ $$
 \widehat{\alpha}_{ij}^{\,2}.
 $$
 
-Portanto,
+Como os coeficientes da direção principal satisfazem
+
+$$
+\sum_{i=1}^{p}
+\widehat{\alpha}_{ij}^{\,2}
+=
+1,
+$$
+
+tem-se
 
 $$
 \sum_{i=1}^{p}
@@ -4518,6 +4062,8 @@ $$
 =
 1.
 $$
+
+Assim, essa contribuição reparte entre as variáveis a norma quadrática unitária do autovetor associado à componente $j$.
 
 Na ACP baseada em correlações, para uma componente com
 $\widehat{\lambda}_{Rj}>0$,
@@ -4528,7 +4074,7 @@ c_{R,ij}
 r_{R,ij},
 $$
 
-e a contribuição também pode ser escrita como
+de modo que, na convenção adotada, a contribuição também pode ser escrita como
 
 $$
 \operatorname{ctr}^{(\mathrm{var})}_{ij}
@@ -4540,57 +4086,196 @@ r_{R,ij}^2
 }.
 $$
 
-A coordenada localiza a variável na geometria associada às componentes. O $\cos^2$ mede sua qualidade de representação. A contribuição mede sua participação na construção da componente.
+A coordenada localiza a variável na geometria associada às componentes. O $\cos^2$ descreve sua qualidade de representação. Na convenção adotada, a contribuição descreve sua participação relativa na componente.
 
-#### Duas representações complementares
+#### Mapas das observações e das variáveis
 
-A interpretação gráfica da ACP distingue o mapa das observações do mapa das variáveis. Os $\cos^2$ desenvolvidos na @sec-acp-geometria-representacao quantificam a qualidade de representação desses elementos nas dimensões retidas.
+A interpretação gráfica da ACP distingue o **mapa das observações** do **mapa das variáveis**. Embora os dois utilizem os mesmos eixos principais, eles representam objetos diferentes e suas coordenadas possuem significados distintos.
 
-No **mapa das observações**, os pontos são posicionados pelos escores nas componentes retidas. A distância euclidiana entre dois pontos é a distância entre as projeções das observações no subespaço representado. Na ACP baseada em covariâncias, essa geometria é determinada pelos dados centralizados em suas escalas originais; na ACP baseada em correlações, pelos dados centralizados e padronizados. Quando nem todas as componentes são mantidas, as distâncias no mapa não reproduzem necessariamente as distâncias euclidianas no espaço completo. A qualidade da representação de cada observação é avaliada pelos respectivos $\cos^2$.
+No **mapa das observações**, os pontos são posicionados pelos escores nas componentes retidas. Para as primeiras $k$ componentes, a distância quadrática entre as representações das observações $i$ e $h$ é
 
-No **mapa das variáveis**, duas representações devem ser distinguidas. As coordenadas $c_{ij}$ descrevem a posição das variáveis na geometria associada às componentes. As correlações $r_{ij}$ expressam a associação linear entre cada variável e cada componente na escala comum $[-1,1]$.
+$$
+d_{ih,(k)}^2
+=
+\sum_{j=1}^{k}
+\left(
+\widehat y_{ij}
+-
+\widehat y_{hj}
+\right)^2.
+$$
 
-Quando o mapa é construído pelas correlações, os pontos
+Se
+
+$$
+\widehat{\mathbf A}_k
+=
+\begin{bmatrix}
+\widehat{\boldsymbol{\alpha}}_1
+&
+\cdots
+&
+\widehat{\boldsymbol{\alpha}}_k
+\end{bmatrix},
+$$
+
+então
+
+$$
+d_{ih,(k)}^2
+=
+\left\|
+\widehat{\mathbf A}_k
+\widehat{\mathbf A}_k^\top
+\left(
+\mathbf x_i-\mathbf x_h
+\right)
+\right\|^2
+\leq
+\left\|
+\mathbf x_i-\mathbf x_h
+\right\|^2
+$$
+
+na ACP baseada em covariâncias. Na ACP baseada em correlações, a mesma relação é aplicada aos vetores das observações depois da padronização.
+
+Assim, a distância entre dois pontos no mapa corresponde à distância entre suas **projeções no subespaço retido**. Quando todas as componentes são consideradas, a transformação ortogonal preserva exatamente as distâncias euclidianas no espaço em que a ACP foi construída: nas escalas originais para a ACP baseada em covariâncias e nas escalas padronizadas para a ACP baseada em correlações. Quando apenas $k<p$ componentes são mantidas, parte da separação entre duas observações pode estar nas dimensões omitidas.
+
+Consequentemente, duas observações próximas no mapa possuem projeções próximas nas componentes representadas, mas não precisam ser próximas no espaço completo. A interpretação dessa proximidade deve considerar também a qualidade de representação das observações no subespaço, descrita pelos respectivos $\cos^2$.
+
+Da mesma forma, uma observação localizada próxima da origem possui escores pequenos nas componentes representadas. Isso não implica necessariamente pequena distância ao centro no espaço completo, pois a observação pode possuir escores importantes em componentes não representadas.
+
+No **mapa das variáveis**, é necessário distinguir as coordenadas
+
+$$
+c_{ij}
+=
+\sqrt{\widehat{\lambda}_j}\,
+\widehat{\alpha}_{ij}
+$$
+
+das correlações
+
+$$
+r_{ij}
+=
+\widehat{\operatorname{Corr}}
+\left(
+X_i,Y_j
+\right).
+$$
+
+As coordenadas $c_{ij}$ descrevem a posição das variáveis na geometria associada às componentes. As correlações $r_{ij}$ descrevem, em uma escala comum entre $-1$ e $1$, a intensidade e o sentido da associação linear entre cada variável e cada componente.
+
+Quando a representação utiliza as correlações, a variável $i$ é localizada, nas duas primeiras componentes, pelo ponto
 
 $$
 \left(
 r_{i1},
 r_{i2}
-\right)
+\right).
 $$
 
-estão contidos no círculo unitário, pois
+Como
 
 $$
 r_{i1}^2+r_{i2}^2
 \leq
-1.
+1,
 $$
 
-Na ACP baseada em correlações, as coordenadas $c_{R,ij}$ coincidem com as correlações $r_{R,ij}$. Nesse caso, o mapa das variáveis e o círculo de correlações utilizam as mesmas coordenadas.
+esses pontos estão contidos no círculo unitário. Além disso,
 
-No círculo de correlações, o módulo de $r_{ij}$ quantifica a intensidade da associação linear da variável $i$ com a componente $j$, enquanto $r_{i1}^2+r_{i2}^2$ quantifica a parcela de sua variância representada pelo plano das duas primeiras componentes. Pontos próximos da circunferência possuem $\cos^2$ acumulado próximo de $1$ nesse plano.
+$$
+r_{i1}^2+r_{i2}^2
+=
+\cos^{2\,(\mathrm{var})}_{i,(1:2)},
+$$
 
-Coordenada, $\cos^2$ e contribuição descrevem aspectos distintos da representação:
+de modo que a distância radial da variável à origem está diretamente relacionada à sua qualidade de representação no plano. Variáveis próximas da circunferência estão bem representadas pelas duas componentes consideradas. Uma variável próxima da origem apresenta correlações pequenas com essas componentes, mas pode estar associada a componentes posteriores; portanto, proximidade da origem não significa, por si só, pouca importância da variável no conjunto completo.
 
-- a **coordenada** determina a posição da observação ou da variável na representação;
-- o **$\cos^2$** quantifica a parcela de sua norma quadrática ou de sua variância representada pela dimensão ou pelo subespaço;
-- a **contribuição** quantifica a participação relativa na componente: para observações, pela parcela da soma de quadrados dos escores; para variáveis, pela parcela associada ao coeficiente quadrático $\widehat{\alpha}_{ij}^2$.
+Na ACP baseada em correlações,
 
-Os autovalores quantificam a variância das componentes, enquanto coordenadas, $\cos^2$ e contribuições descrevem, respectivamente, a posição, a qualidade de representação e a participação relativa das observações e das variáveis.
+$$
+c_{R,ij}
+=
+r_{R,ij},
+$$
 
+e, portanto, o mapa definido pelas coordenadas das variáveis coincide com o círculo de correlações. Na ACP baseada em covariâncias, esses dois objetos não coincidem em geral, pois
 
-### Elementos ativos e suplementares na ACP {#sec-acp-elementos-suplementares}
+$$
+r_{ij}
+=
+\frac{c_{ij}}{\sqrt{s_{ii}}}.
+$$
 
-Na formulação amostral, as observações e as variáveis utilizadas na construção da solução são denominadas **ativas**. As observações ativas participam do cálculo das médias, dos desvios-padrão quando há padronização e da matriz de covariâncias ou de correlações; as variáveis ativas determinam quais coordenadas são consideradas nessa matriz. A partir desses elementos são obtidos os autovalores, as direções principais e os escores das observações ativas.
+O círculo de correlações também permite examinar relações entre variáveis. Considerando todas as componentes com variância positiva,
 
-Elementos que não participam dessa construção são denominados **suplementares**. Depois que a solução é determinada, observações suplementares podem ser projetadas nas direções principais, variáveis quantitativas suplementares podem ser relacionadas às componentes por correlações e categorias suplementares podem ser posicionadas pelos baricentros dos escores.
+$$
+\widehat{\operatorname{Corr}}
+\left(
+X_i,X_h
+\right)
+=
+\sum_{j}
+r_{ij}r_{hj}.
+$$
 
-Assim, os elementos suplementares são descritos em relação a uma solução já construída e não participam da determinação dos autovalores nem das direções principais.
+Assim, no plano formado pelas duas primeiras componentes,
+
+$$
+r_{i1}r_{h1}
++
+r_{i2}r_{h2}
+$$
+
+é a parcela dessa relação reconstruída pelas dimensões representadas. Se $\theta_{ih}$ é o ângulo entre os vetores das duas variáveis nesse plano, então
+
+$$
+r_{i1}r_{h1}
++
+r_{i2}r_{h2}
+=
+\sqrt{
+r_{i1}^2+r_{i2}^2
+}
+\sqrt{
+r_{h1}^2+r_{h2}^2
+}
+\cos
+\left(
+\theta_{ih}
+\right).
+$$
+
+Quando ambas as variáveis estão bem representadas no plano, seus comprimentos estão próximos de $1$ e o cosseno do ângulo fornece uma aproximação mais direta de sua correlação: ângulos pequenos estão associados a relações positivas, ângulos próximos de $\pi$ a relações negativas e ângulos próximos de $\pi/2$ a relações próximas de zero nas dimensões representadas. Quando uma ou ambas as variáveis apresentam baixa qualidade de representação, o ângulo isoladamente deve ser interpretado com cautela.
+
+Coordenada, $\cos^2$ e contribuição respondem, portanto, a perguntas diferentes:
+
+- a **coordenada** determina a posição do elemento na representação;
+- o **$\cos^2$** descreve quanto da observação ou da variância da variável é representado pela dimensão ou pelo subespaço considerado;
+- a **contribuição**, segundo a convenção adotada, descreve a participação relativa do elemento em uma componente.
+
+Os mapas das observações e das variáveis são complementares, mas não devem ser tratados como se utilizassem necessariamente a mesma métrica. Em particular, a distância entre um ponto que representa uma observação e um ponto que representa uma variável não possui interpretação direta nos dois mapas separados. A representação conjunta desses dois tipos de elementos exige a definição de uma escala específica de *biplot* [@johnson2002].
+
+Os autovalores descrevem a variância das componentes; os mapas descrevem como observações e variáveis se relacionam com as dimensões retidas. A interpretação gráfica deve, portanto, combinar a posição dos elementos com sua qualidade de representação e com a parcela de variabilidade preservada pelo subespaço escolhido.
+
+### Elementos ativos e suplementares na interpretação da ACP {#sec-acp-elementos-suplementares}
+
+Para organizar a interpretação dos resultados e a correspondência com a implementação utilizada, distinguiremos **elementos ativos** e **elementos suplementares**. Essa distinção é operacional e não modifica a definição matemática da ACP.
+
+As observações e as variáveis ativas são aquelas utilizadas na construção da solução. As observações ativas participam do cálculo das médias, dos desvios-padrão quando há padronização e da matriz de covariâncias ou de correlações. As variáveis ativas formam as coordenadas do vetor analisado e, portanto, determinam a matriz sobre a qual são calculados os autovalores e as direções principais.
+
+Os elementos suplementares não participam dessa construção. Depois que a solução é determinada, uma nova observação pode ser projetada nas direções principais já estimadas; uma variável quantitativa adicional pode ser relacionada às componentes por correlações; e uma variável categórica pode ser descrita a partir da posição das observações pertencentes a cada categoria no espaço das componentes.
+
+Em todos esses casos, o elemento suplementar é relacionado a uma solução previamente construída e não modifica seus autovalores nem suas direções principais.
 
 #### Observações suplementares
 
-Considere uma nova observação
+Depois que as direções principais são estimadas, uma nova observação pode ser representada no mesmo sistema de coordenadas sem que a ACP seja recalculada [@johnson2002].
+
+Considere
 
 $$
 \mathbf x_*
@@ -4598,7 +4283,7 @@ $$
 \mathbb R^p
 $$
 
-que não tenha participado da construção da solução. Mantendo a média e as direções principais estimadas a partir dos elementos ativos, seu escore na componente $j$ é
+uma observação que não participou da construção da solução. Mantendo a média e as direções principais estimadas a partir das observações ativas, seu escore na componente $j$ é
 
 $$
 \widehat y_{*j}
@@ -4609,7 +4294,7 @@ $$
 \right).
 $$ {#eq-acp-observacao-suplementar}
 
-A observação é, portanto, projetada sobre direções já determinadas. Ela recebe escores nas componentes da solução, mas não modifica
+A nova observação é, portanto, projetada sobre direções já determinadas. Ela recebe coordenadas no espaço das componentes, mas não modifica
 
 $$
 \widehat{\lambda}_j
@@ -4617,13 +4302,13 @@ $$
 \widehat{\boldsymbol{\alpha}}_j.
 $$
 
-Quando a ACP é realizada sobre variáveis padronizadas, a observação suplementar deve ser centralizada e padronizada utilizando as médias e os desvios-padrão empregados na construção da solução, sem recalculá-los após sua inclusão.
+Quando a ACP é realizada sobre variáveis padronizadas, a nova observação deve ser centralizada e padronizada utilizando as mesmas médias e os mesmos desvios-padrão empregados na construção da solução. Esses valores não são recalculados com a inclusão da nova observação.
 
 Essa construção utiliza a projeção sobre um subespaço com base ortonormal desenvolvida na @prp-projecao-base-ortonormal. Uma vez definida a base do espaço principal, outros vetores podem ser representados nessa base sem que ela precise ser novamente estimada.
 
 #### Variáveis quantitativas suplementares
 
-Uma variável quantitativa suplementar não participa da matriz utilizada para determinar as componentes principais. Depois que os escores das observações ativas são obtidos, sua relação com cada componente pode ser avaliada pela correlação
+Uma variável quantitativa que não participou da determinação dos eixos pode ser relacionada posteriormente às componentes já obtidas. Depois que os escores das observações ativas são calculados, essa relação pode ser descrita pela correlação
 
 $$
 r_{*j}
@@ -4635,23 +4320,26 @@ Y_j
 \right),
 $$
 
-desde que a variável suplementar apresente variância observada positiva.
+desde que a variável apresente variância observada positiva.
 
-O valor $r_{*j}$ descreve a associação linear da variável suplementar com a componente $j$. Seu quadrado,
+Essa operação utiliza a mesma relação entre variáveis e componentes empregada na interpretação das variáveis ativas [@johnson2002]. A diferença é que $X_*$ não participou da matriz utilizada para determinar as direções principais.
+
+O valor $r_{*j}$ descreve a intensidade e o sentido da associação linear entre a variável e a componente $j$. Seu quadrado,
 
 $$
 r_{*j}^2,
 $$
 
-mede a qualidade de representação da variável suplementar nessa dimensão.
+pode ser utilizado como medida descritiva da parcela da variância da variável associada linearmente a essa componente.
 
-Quanto maior $|r_{*j}|$, maior a intensidade da associação linear da variável suplementar com a componente $j$. Essa correlação possui função descritiva e não atribui à variável suplementar participação na determinação da direção principal, que permanece definida pela matriz construída a partir das observações e variáveis ativas.
+Como essa relação é calculada depois da obtenção da solução, a variável suplementar não participa da determinação de
+$\widehat{\lambda}_j$ nem de $\widehat{\boldsymbol{\alpha}}_j$.
 
 #### Variáveis categóricas suplementares
 
-Uma variável categórica não integra diretamente a matriz de covariâncias ou de correlações da ACP clássica desenvolvida neste capítulo. Depois que as componentes são obtidas, suas categorias podem ser relacionadas à posição das observações no espaço principal.
+Uma variável categórica não integra diretamente a matriz de covariâncias ou de correlações utilizada na ACP desenvolvida neste capítulo. Depois que os eixos são obtidos, entretanto, suas categorias podem ser descritas a partir das posições das observações no espaço das componentes.
 
-Considere uma categoria $g$ formada pelo conjunto $I_g$ de $n_g$ observações ativas. Com pesos iguais, sua coordenada na componente $j$ é o baricentro dos escores das observações pertencentes à categoria,
+Uma possibilidade descritiva é representar cada categoria pelo centro dos escores das observações que a compõem. Considere uma categoria $g$ formada pelo conjunto $I_g$ de $n_g$ observações. Com pesos iguais, sua coordenada na componente $j$ é
 
 $$
 \bar y_{gj}
@@ -4661,7 +4349,7 @@ $$
 \widehat y_{ij}.
 $$
 
-Em uma representação pelas duas primeiras componentes, a categoria é localizada pelo ponto
+Essa quantidade é o baricentro dos escores das observações pertencentes à categoria. Em uma representação pelas duas primeiras componentes, a categoria pode ser localizada pelo ponto
 
 $$
 \left(
@@ -4670,102 +4358,224 @@ $$
 \right).
 $$
 
-Essa posição é determinada pelos escores médios das observações pertencentes à categoria nas dimensões representadas. Diferenças entre os baricentros descrevem diferenças entre esses escores médios; constituem um resumo descritivo e não, por si sós, um teste de diferenças entre categorias.
+O baricentro resume a posição média das observações da categoria nas dimensões representadas. Diferenças entre baricentros descrevem diferenças entre esses escores médios, mas não constituem, por si mesmas, um teste estatístico de diferenças entre categorias.
 
-As coordenadas das categorias são calculadas depois da construção dos eixos. Elas não alteram os autovalores, os autovetores ou os escores das observações ativas.
+Essa representação é calculada depois da construção dos eixos. Portanto, a variável categórica e seus baricentros não alteram os autovalores, os autovetores ou os escores das observações utilizadas na construção da ACP.
 
-Em todos os casos, os elementos suplementares são relacionados à solução após sua construção e não participam da determinação dos eixos principais.
+Em todos esses procedimentos, a solução da ACP é mantida fixa. A projeção de uma nova observação decorre diretamente da geometria das componentes principais; as relações com variáveis quantitativas e os baricentros de categorias constituem descrições calculadas posteriormente sobre os escores já obtidos.
+
+### Estabilidade da solução amostral {#sec-acp-estabilidade}
+
+A ACP obtida de uma matriz amostral de covariâncias ou de correlações depende da amostra observada. Como $\mathbf S$ e $\mathbf R$ variam entre amostras, seus autovalores e autovetores também estão sujeitos à variação amostral [@johnson2002]. Quando a interpretação das componentes pretende ser estendida além da amostra utilizada na estimação, interessa examinar a estabilidade desses objetos.
+
+Uma forma de avaliação empírica consiste em recalcular a ACP em subamostras obtidas da mesma população de interesse ou em uma nova amostra. Essa estratégia aplica à ACP o princípio de reestimação em subamostras ou novas amostras utilizado por Hair na avaliação de estabilidade de soluções fatoriais [@hair2009].
+
+A comparação entre as soluções pode examinar:
+
+- os autovalores e as proporções de variância representada pelas primeiras componentes;
+- o número de componentes sugerido pelos mesmos critérios de retenção;
+- as direções principais, depois de considerada a indeterminação de sinal;
+- as correlações entre as variáveis originais e as componentes;
+- a interpretação atribuída às componentes a partir dessas relações.
+
+Vetores de coeficientes com sinais globalmente opostos representam a mesma direção principal e não caracterizam soluções diferentes, conforme discutido na @sec-acp-multiplicidade-singularidade.
+
+A separação entre autovalores também afeta essa comparação. Quando autovalores adjacentes são muito próximos, as direções individuais apresentam maior incerteza amostral, como formalizado na @sec-acp-estimacao-inferencia-normal. Nessa situação, diferenças entre autovetores obtidos em duas amostras não constituem, isoladamente, evidência de estruturas distintas; deve-se considerar também o subespaço gerado pelas componentes associadas.
+
+O particionamento reduz o número de observações utilizado em cada ACP e, consequentemente, pode aumentar a variabilidade amostral dos autovalores e dos autovetores. Assim, diferenças maiores entre soluções obtidas após a divisão da amostra podem resultar tanto de instabilidade quanto da menor informação disponível em cada subconjunto.
+
+A concordância dos autovalores, das proporções de variância, das direções principais e das relações entre variáveis e componentes fornece evidência empírica de estabilidade. Essa estabilidade se refere à repetibilidade da representação descritiva obtida pela ACP; ela não transforma a técnica em um modelo confirmatório nem estabelece relações causais ou construtos latentes.
 
 ### Correspondência com a implementação utilizada {#sec-acp-correspondencia-implementacao}
 
-Nas atividades computacionais, a ACP será realizada pelo módulo [`MEDA`](https://sebastien-le.github.io/medasite/) [@meda2026] do [jamovi](https://www.jamovi.org/) [@jamovi2026]. O `MEDA` utiliza procedimentos do pacote `FactoMineR` [@le2008factominer]. As opções e os resultados apresentados pela implementação correspondem a objetos estatísticos distintos desenvolvidos no capítulo.
+Nas atividades computacionais, a ACP será realizada pelo módulo [`MEDA`](https://sebastien-le.github.io/medasite/) [@meda2026] do [jamovi](https://www.jamovi.org/) [@jamovi2026]. O `MEDA` utiliza o pacote `FactoMineR` [@factominer2026]. As opções e os resultados apresentados pela implementação correspondem a objetos estatísticos distintos desenvolvidos no capítulo.
 
 | Elemento da implementação | Correspondência estatística | Desenvolvimento no capítulo |
 |---|---|---|
-| **Scale to unit variance** | escolha entre a ACP sobre variáveis padronizadas e a ACP que preserva as escalas observadas | @sec-acp-matriz-correlacoes |
-| **Variáveis quantitativas ativas** | variáveis que participam da determinação dos eixos principais | @sec-acp-elementos-suplementares |
-| **Variáveis quantitativas suplementares** | variáveis relacionadas às componentes depois da construção dos eixos | @sec-acp-elementos-suplementares |
-| **Variáveis categóricas suplementares** | categorias representadas pelos baricentros dos escores das observações correspondentes | @sec-acp-elementos-suplementares |
-| **Coordenadas das observações** | escores $\widehat y_{ij}$ das componentes principais | @sec-acp-representacao |
-| **Coordenadas das variáveis** | coordenadas $c_{ij}$ associadas aos eixos principais | @sec-acp-representacao |
-| **$\cos^2$** | qualidade de representação das observações ou das variáveis | @sec-acp-geometria-representacao e @sec-acp-representacao |
-| **Contribuições** | participação relativa das observações na soma de quadrados da componente e das variáveis na direção principal | @sec-acp-representacao |
+| **Scale to unit variance** | padronização ou não das variáveis quantitativas ativas antes da construção da ACP | @sec-acp-matriz-correlacoes |
+| **Variáveis quantitativas ativas** | variáveis utilizadas na determinação dos eixos principais | @sec-acp-elementos-suplementares |
+| **Variáveis quantitativas suplementares** | variáveis relacionadas posteriormente às componentes por coordenadas, correlações e $\cos^2$ | @sec-acp-elementos-suplementares |
+| **Variáveis categóricas suplementares** | categorias descritas posteriormente por suas posições baricêntricas no espaço das componentes | @sec-acp-elementos-suplementares |
+| **Coordenadas das observações** | escores nas componentes principais; sua escala numérica depende da convenção de padronização descrita abaixo | @sec-acp-representacao |
+| **Coordenadas das variáveis ativas** | coordenadas $c_{ij}$ associadas aos eixos principais | @sec-acp-representacao |
+| **$\cos^2$** | medida descritiva da qualidade de representação nas dimensões consideradas | @sec-acp-representacao |
+| **Contribuições** | medidas normalizadas da participação relativa das observações e das variáveis ativas em cada componente | @sec-acp-representacao |
 
 : Correspondência entre elementos da implementação e os objetos estatísticos desenvolvidos no capítulo. {#tbl-correspondencia-implementacao-acp}
 
-A opção *Scale to unit variance* controla a padronização das variáveis quantitativas ativas. Quando ela está ativada, a solução corresponde à ACP baseada na matriz de correlações desenvolvida na @sec-acp-matriz-correlacoes. Quando está desativada, as diferenças de escala entre as variáveis permanecem na análise e as direções principais coincidem com as obtidas pela ACP baseada em covariâncias; a diferença de convenção na escala dos autovalores é descrita a seguir.
+A opção **Scale to unit variance** controla a padronização das variáveis quantitativas ativas antes da construção da ACP. Quando ela está ativada, as variáveis são centralizadas e divididas por seus desvios-padrão, de modo que a solução corresponde à ACP baseada em correlações desenvolvida na @sec-acp-matriz-correlacoes. Quando está desativada, as variáveis permanecem em suas escalas observadas após a centralização e a solução corresponde à ACP baseada em covariâncias, ressalvada a convenção de normalização descrita a seguir.
 
-Há uma diferença de convenção na ACP sem padronização. Neste capítulo,
+Na ACP sem padronização, a mudança do divisor $n-1$ para $n$ multiplica todos os autovalores por $(n-1)/n$, mas preserva os autovetores, os escores das observações e as proporções de variância representada. As coordenadas das variáveis, que dependem de $\sqrt{\widehat{\lambda}_j}$, são multiplicadas por $\sqrt{(n-1)/n}$, enquanto correlações, $\cos^2$ e contribuições permanecem invariantes.
+
+Quando **Scale to unit variance** está ativada, há uma diferença adicional na escala utilizada para padronizar as observações. Neste capítulo,
 
 $$
-\mathbf S
+s_{jj}
 =
 \frac{1}{n-1}
-\mathbf X_c^\top
-\mathbf X_c.
+\sum_{i=1}^{n}
+\left(
+x_{ij}-\bar x_j
+\right)^2.
 $$
 
-Com pesos iguais para as observações, o `FactoMineR` utiliza a matriz
+Com pesos iguais, o `FactoMineR` utiliza
 
 $$
-\mathbf S_{\mathrm{FM}}
+s_{j,\mathrm{FM}}^2
 =
 \frac{1}{n}
-\mathbf X_c^\top
-\mathbf X_c.
-$$
-
-Assim,
-
-$$
-\mathbf S_{\mathrm{FM}}
+\sum_{i=1}^{n}
+\left(
+x_{ij}-\bar x_j
+\right)^2
 =
 \frac{n-1}{n}
-\mathbf S
+s_{jj}.
 $$
 
-e seus autovalores satisfazem
+Consequentemente,
 
 $$
-\widehat{\lambda}_{j,\mathrm{FM}}
+\mathbf X_{\mathrm{FM,pad}}
 =
-\frac{n-1}{n}
-\widehat{\lambda}_j.
+\sqrt{
+\frac{n}{n-1}
+}
+\mathbf X_{\mathrm{pad}}.
 $$
 
-Essa mudança de escala não altera os autovetores, os escores das observações nem as proporções de variância. As coordenadas das variáveis que dependem de $\sqrt{\widehat{\lambda}_j}$ são multiplicadas por $\sqrt{(n-1)/n}$, enquanto correlações, $\cos^2$ e contribuições permanecem invariantes. Na ACP padronizada, a normalização conduz à mesma matriz de correlações $\mathbf R$ definida neste capítulo.
+Entretanto,
 
-As contribuições são expressas neste capítulo como proporções que somam $1$ em cada componente; a implementação apresenta as mesmas quantidades em porcentagem, multiplicadas por $100$.
+$$
+\frac{1}{n}
+\mathbf X_{\mathrm{FM,pad}}^\top
+\mathbf X_{\mathrm{FM,pad}}
+=
+\mathbf R.
+$$
 
-Para as variáveis ativas, as coordenadas $c_{ij}$ e as correlações $r_{ij}$ com as componentes são objetos distintos na ACP sem padronização. Quando *Scale to unit variance* está ativada, esses dois objetos coincidem, conforme discutido na @sec-acp-representacao.
+Assim, a ACP padronizada do `FactoMineR` produz a mesma matriz de correlações, os mesmos autovalores e as mesmas direções principais definidas neste capítulo. As coordenadas das observações diferem apenas pelo fator
 
-A padronização para variância unitária é a configuração inicial do `MEDA`, mas essa configuração não constitui um critério estatístico para escolher entre a ACP baseada em correlações e a ACP baseada em covariâncias. A escolha depende das escalas das variáveis e do objetivo da análise.
+$$
+\widehat y_{ij,\mathrm{FM}}
+=
+\sqrt{
+\frac{n}{n-1}
+}
+\widehat y_{R,ij}.
+$$
+
+Essa mudança de escala não altera os $\cos^2$, as contribuições nem as relações geométricas baseadas em razões de normas.
+
+Neste capítulo, as contribuições são expressas como proporções que somam $1$ em cada componente. O `FactoMineR` apresenta essas mesmas medidas em porcentagem, multiplicando-as por $100$.
 
 ## Síntese
 
-A Análise de Componentes Principais constrói componentes como combinações lineares de $\boldsymbol{\mathsf X}_c$, ordenadas segundo suas variâncias. Os vetores de coeficientes dessas combinações definem as direções principais, que podem ser escolhidas ortonormais. Para o vetor centralizado $\boldsymbol{\mathsf X}_c$,
+A Análise de Componentes Principais constrói novas variáveis como combinações lineares das variáveis observadas centralizadas. Para
+
+$$
+\boldsymbol{\mathsf X}_c
+=
+\boldsymbol{\mathsf X}
+-
+\boldsymbol{\mu},
+$$
+
+a $j$-ésima componente principal é
 
 $$
 Y_j
 =
 \boldsymbol{\alpha}_j^\top
 \boldsymbol{\mathsf X}_c,
-\qquad
-\operatorname{Var}(Y_j)
-=
-\lambda_j,
 $$
 
-em que $\boldsymbol{\alpha}_j$ é um autovetor unitário de $\boldsymbol{\Sigma}$ associado ao autovalor $\lambda_j$. Como as direções principais são definidas por autovetores de $\boldsymbol{\Sigma}$ escolhidos ortonormais, a matriz de covariâncias das componentes é diagonal e componentes principais distintas são não correlacionadas.
+em que $\boldsymbol{\alpha}_j$ é uma direção unitária escolhida de modo que as componentes sejam ordenadas segundo suas variâncias.
 
-A redução de dimensionalidade retém as primeiras $k$ componentes e representa as realizações no subespaço gerado pelas direções principais correspondentes. Entre todos os subespaços de dimensão $k$, esse subespaço maximiza a variância total da projeção e minimiza o erro quadrático de reconstrução. Na formulação amostral, para as componentes de variância positiva, os vetores singulares à direita de $\mathbf X_c$ geram os mesmos subespaços que os autovetores correspondentes de $\mathbf S$, e os escores são obtidos por $\mathbf U_k\mathbf D_k$.
+A primeira componente maximiza
 
-A matriz utilizada define a geometria da análise. A ACP baseada em $\mathbf S$ preserva as escalas e variâncias originais. A ACP baseada em $\mathbf R$ utiliza variáveis padronizadas e atribui variância unitária a cada uma delas.
+$$
+\operatorname{Var}
+\left(
+\boldsymbol{\alpha}^{\top}
+\boldsymbol{\mathsf X}_c
+\right)
+$$
 
-A escolha do número de componentes não é determinada por um único critério. Autovalores, proporção acumulada de variância, gráfico de declive e interpretação das componentes fornecem informações complementares para decidir a dimensão da representação.
+sob a restrição
 
-Os escores fornecem as coordenadas das observações nas componentes principais. Para as variáveis, os coeficientes definem as direções, as coordenadas determinam sua posição na representação e as correlações quantificam sua associação linear com as componentes. Os $\cos^2$ quantificam a qualidade de representação. As contribuições das observações correspondem à participação relativa na soma de quadrados dos escores de uma componente, enquanto as contribuições das variáveis correspondem, na convenção adotada, aos coeficientes quadráticos $\widehat{\alpha}_{ij}^2$. Os elementos suplementares são relacionados à solução depois da determinação dos eixos e não participam dessa determinação.
+$$
+\boldsymbol{\alpha}^{\top}
+\boldsymbol{\alpha}
+=
+1.
+$$
 
-A formulação descritiva parte da matriz de dados observada e não exige normalidade multivariada. A formulação populacional baseada em covariâncias requer momentos de segunda ordem finitos; a formulação baseada em correlações requer também variâncias marginais positivas. Sob normalidade multivariada, autovalores e direções principais podem ser tratados por métodos de estimação e inferência; resultados para direções individuais requerem condições adicionais, como autovalores populacionais distintos.
+As componentes seguintes maximizam o mesmo critério sujeitas adicionalmente à ortogonalidade em relação às direções anteriormente obtidas. Pela decomposição espectral,
 
-Em contraste, no @sec-fatorial, a Análise Fatorial procura representar a estrutura comum de covariâncias por meio de fatores latentes e separa essa parcela da variabilidade específica de cada variável.
+$$
+\boldsymbol{\Sigma}
+\boldsymbol{\alpha}_j
+=
+\lambda_j
+\boldsymbol{\alpha}_j,
+$$
+
+com
+
+$$
+\lambda_1
+\geq
+\lambda_2
+\geq
+\cdots
+\geq
+\lambda_p
+\geq
+0,
+$$
+
+de modo que
+
+$$
+\operatorname{Var}(Y_j)
+=
+\lambda_j.
+$$
+
+Como os autovetores de uma matriz de covariâncias simétrica podem ser escolhidos ortonormais, componentes principais distintas são não correlacionadas. Para um autovalor simples, a direção principal é determinada até mudança de sinal; quando há multiplicidade, o autoespaço associado é determinado, mas uma base individual dentro dele não é única. Além disso,
+
+$$
+\sum_{j=1}^{p}
+\lambda_j
+=
+\operatorname{tr}
+\left(
+\boldsymbol{\Sigma}
+\right),
+$$
+
+de modo que os autovalores decompõem a variabilidade total da matriz analisada entre as componentes principais.
+
+A redução de dimensionalidade utiliza as primeiras $k<p$ componentes para representar as observações em um subespaço de menor dimensão. O subespaço gerado pelas primeiras direções principais preserva a maior quantidade possível de variância entre todos os subespaços lineares de dimensão $k$ e, de forma equivalente, produz o menor erro quadrático de reconstrução. Quando componentes associadas a autovalores positivos são descartadas, parte da variabilidade original deixa de ser representada.
+
+No nível amostral, a ACP é obtida a partir da matriz de covariâncias $\mathbf S$ ou da matriz de correlações $\mathbf R$. Os autovetores estimados determinam as direções principais e os escores fornecem as coordenadas das observações nessas direções. Se $\mathbf X_c$ é a matriz de dados centralizada e
+
+$$
+\mathbf X_c
+=
+\mathbf U
+\mathbf D
+\mathbf V^\top
+$$
+
+é sua decomposição em valores singulares, os vetores singulares à direita correspondentes aos valores singulares positivos determinam as mesmas direções principais obtidas pela decomposição espectral de $\mathbf S$. Os escores correspondentes podem ser escritos em termos de $\mathbf U\mathbf D$.
+
+A escolha entre a ACP baseada em covariâncias e a ACP baseada em correlações define a geometria da análise. A primeira preserva as escalas e variâncias originais das variáveis. A segunda utiliza variáveis padronizadas e atribui variância unitária a cada uma delas. Por isso, mudanças de unidade podem modificar a solução baseada em covariâncias, enquanto a ACP baseada em correlações elimina esse efeito de escala marginal.
+
+A ACP pode ser utilizada de forma descritiva diretamente sobre uma matriz de dados observada, sem exigir normalidade multivariada. Em uma formulação populacional baseada em covariâncias, são necessários momentos de segunda ordem finitos; quando a análise é baseada em correlações, também são necessárias variâncias marginais positivas. A normalidade multivariada constitui uma hipótese adicional para os resultados específicos de máxima verossimilhança e de inferência apresentados no aprofundamento teórico; ela não é necessária para calcular autovalores, autovetores ou escores amostrais.
+
+A ACP representa a variabilidade segundo um critério específico: componentes são ordenadas pela variância. Sua solução depende do conjunto de variáveis, de suas escalas e da matriz utilizada. Além disso, a representação é linear e pode exigir várias componentes quando a variabilidade dos dados não se concentra próxima de um subespaço linear de baixa dimensão. Valores extremos também podem modificar a matriz de entrada e, consequentemente, os autovalores e as direções principais.
+
+A ACP não introduz fatores latentes nem separa a variabilidade observada em parcelas comum e específica. No @sec-fatorial, o problema passa a ser outro: a Análise Fatorial especifica um modelo no qual a estrutura comum de covariâncias é representada por fatores latentes, enquanto a variabilidade específica de cada variável é modelada separadamente.
