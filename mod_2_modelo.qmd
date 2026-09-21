@@ -1,6 +1,6 @@
 # Modelo Linear Multivariado e Hipóteses Lineares {#sec-modelo-linear}
 
-O Capítulo 10 desenvolveu a estimação do vetor de médias e da matriz de covariâncias a partir de uma amostra aleatória multivariada. O vetor de médias amostrais e suas propriedades foram estabelecidos em @prp-media-amostral-momentos, enquanto a matriz de covariâncias amostral foi definida em @def-matriz-covariancias-amostral-aleatoria e seu não viesamento foi estabelecido em @prp-nao-viesamento-covariancia-amostral. Nesse contexto, todas as unidades compartilhavam o mesmo vetor de médias populacional.
+O @sec-amostrais desenvolveu a estimação do vetor de médias e da matriz de covariâncias a partir de uma amostra aleatória multivariada. O vetor de médias amostrais e suas propriedades foram estabelecidos em @prp-media-amostral-momentos, enquanto a matriz de covariâncias amostral foi definida em @def-matriz-covariancias-amostral-aleatoria e seu não viesamento foi estabelecido em @prp-nao-viesamento-covariancia-amostral. Nesse contexto, todas as unidades compartilhavam o mesmo vetor de médias populacional.
 
 O modelo linear multivariado substitui essa média comum por uma estrutura de médias que pode variar entre as unidades segundo características conhecidas. Essa formulação permite representar, em um mesmo modelo, regressões com várias respostas, comparações entre grupos e estruturas de médias determinadas por fatores e covariáveis.
 
@@ -349,7 +349,7 @@ E
 \mathbf B^\top\mathbf z_i.
 $$
 
-A condição seguinte descreve a dependência entre as respostas de uma mesma unidade e entre unidades distintas.
+A dependência entre as respostas de uma mesma unidade e entre unidades distintas é especificada pela estrutura de covariâncias dos erros.
 
 ::: {#def-estrutura-covariancia-erros-modelo-multivariado}
 ## Estrutura de covariâncias dos erros
@@ -587,7 +587,7 @@ em que $\mathbf y_{\cdot j}$ é a coluna $j$ de $\mathbf Y$ e $\mathbf b_j^\ast$
 
 Portanto, minimizar $Q(\mathbf B^\ast)$ equivale a minimizar separadamente a soma de quadrados residual de cada uma das $p$ respostas.
 
-Por essa razão, as covariâncias fora da diagonal de $\boldsymbol{\Sigma}$ não alteram o estimador de mínimos quadrados de $\mathbf B$ quando todas as respostas utilizam a mesma matriz $\mathbf Z$. Elas aparecem, porém, na covariância conjunta dos estimadores e na estrutura residual entre as respostas.
+Por essa razão, as covariâncias fora da diagonal de $\boldsymbol{\Sigma}$ não alteram o estimador de mínimos quadrados de $\mathbf B$ quando todas as respostas utilizam a mesma matriz $\mathbf Z$. Elas permanecem, porém, na estrutura de covariâncias dos erros e nos produtos cruzados residuais entre respostas.
 
 As equações normais e sua derivação por cálculo matricial foram estabelecidas em @def-equacoes-normais e @prp-equacoes-normais-calculo. Aplicadas ao modelo atual, elas assumem a forma
 
@@ -1838,7 +1838,7 @@ p,n-1
 \right).
 $$
 
-Questões de condicionamento, pseudoinversa e regularização continuam pertinentes às matrizes residuais, mas não serão novamente desenvolvidas aqui. O condicionamento foi discutido em @eq-numero-condicao-covariancia, a pseudoinversa em @eq-pseudoinversa-covariancia-amostral e a regularização por contração em @def-estimador-contracao-covariancia.
+O condicionamento, a pseudoinversa e a regularização de matrizes de covariâncias foram tratados, respectivamente, em @eq-numero-condicao-covariancia, @eq-pseudoinversa-covariancia-amostral e @def-estimador-contracao-covariancia.
 
 ## Decomposição da variação multivariada
 
@@ -2326,6 +2326,16 @@ $$
 $$ {#eq-correspondencia-sscp-residual-intragrupos}
 
 Assim, a SQPC residual do modelo de grupos mede exatamente a dispersão das observações em torno das médias de seus respectivos grupos.
+
+Como $r=K$, quando $n>K$ o estimador residual de covariância satisfaz
+
+$$
+\widehat{\boldsymbol{\Sigma}}_{\mathrm{obs}}
+=
+\frac{\mathbf E}{n-K}
+=
+\frac{\mathbf T_{\mathrm{intra}}}{n-K}.
+$$
 
 A parcela associada ao modelo é
 
@@ -3129,6 +3139,37 @@ $$
 \mathbf C_1^\top.
 $$ {#eq-matriz-covariancia-contrastes}
 
+Para qualquer combinação das respostas definida por
+
+$$
+\mathbf c_2
+\in
+\mathbb R^p,
+$$
+
+a estrutura de covariâncias dos erros implica
+
+$$
+\operatorname{Cov}
+\left(
+\mathbf C_1
+\mathbf Z^+
+\boldsymbol{\mathcal Y}
+\mathbf c_2
+\mid
+\mathbf Z
+\right)
+=
+\left(
+\mathbf c_2^\top
+\boldsymbol{\Sigma}
+\mathbf c_2
+\right)
+\mathbf V_{C_1}.
+$$
+
+Assim, $\mathbf V_{C_1}$ representa a contribuição do delineamento para a covariância das funções especificadas por $\mathbf C_1$.
+
 Quando $\mathbf Z$ possui posto coluna completo,
 
 $$
@@ -3143,7 +3184,7 @@ $$
 $$ {#eq-matriz-covariancia-contrastes-posto-completo}
 
 
-Para as construções seguintes, $\mathbf C_1$ será considerada sem linhas redundantes. Assim,
+Considere $\mathbf C_1$ sem linhas redundantes, de modo que
 
 $$
 \operatorname{posto}
@@ -3316,14 +3357,33 @@ $$
 \mathbf0.
 $$
 
-Para as mesmas combinações de respostas, a SQPC residual é
+Para as mesmas combinações de respostas, a matriz de resíduos é
 
 $$
-\mathbf E_{C_2}
+\widehat{\mathbf U}_{C_2}
 =
+\mathbf M_Z
+\mathbf Y
+\mathbf C_2
+=
+\widehat{\mathbf U}
+\mathbf C_2.
+$$
+
+Consequentemente, a SQPC residual correspondente é
+
+$$
+\begin{aligned}
+\mathbf E_{C_2}
+&=
+\widehat{\mathbf U}_{C_2}^{\top}
+\widehat{\mathbf U}_{C_2}
+\\
+&=
 \mathbf C_2^\top
 \mathbf E
 \mathbf C_2.
+\end{aligned}
 $$ {#eq-sscp-residual-respostas-hipotese}
 
 Portanto, a hipótese produz o par
@@ -3399,7 +3459,84 @@ H_0:
 \boldsymbol{\mu}_2.
 $$ {#eq-hipotese-igualdade-medias-dois-grupos}
 
-Várias linhas em $\mathbf C_1$ permitem representar simultaneamente diferentes contrastes entre grupos. Na MANOVA de grupos, essas linhas especificam as comparações entre vetores de médias examinadas conjuntamente.
+Várias linhas em $\mathbf C_1$ permitem representar simultaneamente diferentes contrastes entre grupos.
+
+#### Igualdade global dos vetores de médias dos grupos
+
+No modelo de $K$ grupos, considere
+
+$$
+\mathbf C_G
+\in
+\mathbb R^{(K-1)\times K},
+$$
+
+com
+
+$$
+\operatorname{posto}
+\left(
+\mathbf C_G
+\right)
+=
+K-1
+$$
+
+e
+
+$$
+\mathbf C_G
+\mathbf1_K
+=
+\mathbf0.
+$$
+
+A hipótese
+
+$$
+H_0:
+\mathbf C_G
+\mathbf B
+=
+\mathbf0
+$$
+
+é equivalente a
+
+$$
+H_0:
+\boldsymbol{\mu}_1
+=
+\cdots
+=
+\boldsymbol{\mu}_K.
+$$
+
+Nesse caso,
+
+$$
+\nu_H
+=
+K-1
+$$
+
+e, para $\mathbf C_2=\mathbf I_p$,
+
+$$
+\mathbf H
+=
+\mathbf T_{\mathrm{mod}}
+=
+\mathbf T_{\mathrm{entre}}.
+$$ {#eq-correspondencia-sscp-hipotese-entregrupos}
+
+Juntamente com @eq-correspondencia-sscp-residual-intragrupos,
+
+$$
+\mathbf E
+=
+\mathbf T_{\mathrm{intra}}.
+$$
 
 #### Coeficientes associados a uma coluna do delineamento em todas as respostas
 
@@ -3432,7 +3569,7 @@ $$ {#eq-hipotese-ausencia-efeito-termo}
 afirma que os coeficientes associados à coluna $h$ do delineamento são nulos para todas as respostas.
 
 
-Os casos particulares anteriores preservam a mesma construção: $\mathbf C_1$ especifica funções dos coeficientes, $\mathbf C_2$ seleciona ou combina respostas e o afastamento da hipótese é representado por $\mathbf H$ em relação à SQPC residual correspondente.
+As matrizes $\mathbf H$ e $\mathbf E_{C_2}$ referem-se às mesmas $s$ combinações de respostas definidas por $\mathbf C_2$. Quando $\mathbf C_2=\mathbf I_p$, ambas são expressas nas $p$ respostas originais.
 
 ## Aprofundamento teórico {#sec-modelo-aprofundamento-teorico}
 
@@ -4137,7 +4274,7 @@ Assim, estimadores associados a respostas diferentes são correlacionados sempre
 
 ### Mínimos quadrados e máxima verossimilhança
 
-Sob o modelo linear normal multivariado, a log-verossimilhança para uma matriz observada de respostas $\mathbf Y$, a menos de termos que não dependem dos parâmetros, $\operatorname{const}$ é
+Sob o modelo linear normal multivariado, a log-verossimilhança para uma matriz observada de respostas $\mathbf Y$ pode ser escrita, com $\operatorname{const}$ independente de $\mathbf B$ e $\boldsymbol{\Sigma}$, como
 
 $$
 \begin{aligned}
@@ -4335,7 +4472,7 @@ $$
 
 recuperando diretamente @eq-covariancia-media-amostral.
 
-O modelo contendo somente intercepto é, assim, um caso particular do problema de estimação desenvolvido no Capítulo 10. No modelo linear multivariado geral, a única média comum é substituída por vetores de médias que podem variar entre as unidades de acordo com os respectivos vetores de delineamento $\mathbf z_i$.
+O modelo contendo somente intercepto é, assim, um caso particular do problema de estimação desenvolvido no @sec-amostrais. No modelo linear multivariado geral, a única média comum é substituída por vetores de médias que podem variar entre as unidades de acordo com os respectivos vetores de delineamento $\mathbf z_i$.
 
 #### SQPC residual e covariância
 
@@ -4705,17 +4842,7 @@ $$
 \right),
 $$
 
-a decomposição corrigida
-
-$$
-\mathbf T
-=
-\mathbf T_{\mathrm{mod}}
-+
-\mathbf E
-$$
-
-não se aplica na forma anterior, porque $\mathbf P_Z-\mathbf P_1$ não é, em geral, um projetor.
+a SQPC do modelo definida em @def-sscp-modelo-corrigida não possui a interpretação projetiva utilizada em @prp-decomposicao-sscp-modelo-multivariado, porque $\mathbf P_Z-\mathbf P_1$ não é, em geral, um projetor.
 
 Permanece válida a decomposição em relação à origem,
 
@@ -4768,7 +4895,7 @@ $$ {#eq-definicao-equivalencia-parametros}
 
 :::
 
-A caracterização também pode ser expressa diretamente em termos das parametrizações equivalentes.
+A caracterização da estimabilidade em @prp-caracterizacao-estimabilidade-modelo-multivariado também pode ser expressa em termos de matrizes de parâmetros equivalentes.
 
 Se
 
@@ -5057,7 +5184,15 @@ A formulação por $\mathbf C_1\mathbf B\mathbf C_2$ identifica a função param
 
 ### Modelos encaixados para combinações de respostas
 
-Para combinações de respostas definidas por $\mathbf C_2$,
+Para combinações de respostas definidas por $\mathbf C_2$, defina
+
+$$
+\mathbf E_{R,C_2}
+=
+\mathbf C_2^\top
+\mathbf E_R
+\mathbf C_2,
+$$
 
 $$
 \mathbf H_{C_2}
@@ -5077,15 +5212,35 @@ $$
 \mathbf C_2.
 $$ {#eq-sscp-modelos-encaixados-respostas-transformadas}
 
+Aplicando a transformação por $\mathbf C_2$ a @eq-decomposicao-sscp-modelos-encaixados, obtém-se
+
+$$
+\mathbf E_{R,C_2}
+=
+\mathbf H_{C_2}
++
+\mathbf E_{F,C_2}.
+$$
+
+Assim, a decomposição entre a SQPC adicional e a SQPC residual do modelo completo é preservada para as mesmas combinações de respostas.
+
 ### SQPC residual de combinações das respostas
 
-A forma quadrática corresponde à soma de quadrados residual da combinação linear das respostas
+Para
+
+$$
+\mathbf a
+\in
+\mathbb R^p,
+$$
+
+considere a combinação linear das respostas
 
 $$
 \mathbf Y\mathbf a.
 $$
 
-De fato,
+Seu vetor de resíduos é
 
 $$
 \widehat{\mathbf u}_{\mathbf a}
@@ -5270,7 +5425,7 @@ $$
 
 ### Formas equivalentes da decomposição da variação
 
-Equivalentemente,
+A decomposição de @eq-decomposicao-sscp-total-modelo-residuo admite representações equivalentes em termos das observações e dos valores ajustados. A SQPC total pode ser escrita como
 
 $$
 \mathbf T
@@ -5438,7 +5593,7 @@ A identidade mostra que a decomposição matricial contém simultaneamente as de
 
 ### Postos das matrizes na decomposição da variação
 
-Em particular,
+Os postos das matrizes da decomposição em @eq-decomposicao-sscp-total-modelo-residuo são limitados pelos postos dos projetores correspondentes:
 
 $$
 \operatorname{posto}
@@ -5616,7 +5771,7 @@ ggplot2::ggplot(
 
 Os segmentos verticais representam os resíduos de cada resposta. O mesmo projetor $\mathbf P_Z$ determina as posições ajustadas nas duas colunas, enquanto a associação residual entre as respostas não é representada diretamente nos painéis.
 
-Essa associação será resumida pela SQPC residual.
+A associação residual entre as respostas aparece nos elementos fora da diagonal de $\mathbf E$ e, após a divisão por $n-r$, de $\widehat{\boldsymbol{\Sigma}}_{\mathrm{obs}}$.
 
 ### Interpretação da covariância residual estimada
 
@@ -5651,19 +5806,42 @@ $$
 
 estima a covariância residual entre as respostas $j$ e $k$.
 
-A matriz de correlações residuais pode ser obtida pela mesma padronização utilizada nos Capítulos 8 e 10, desde que as variâncias residuais estimadas sejam positivas. Não é necessário introduzir uma nova construção: aplica-se
+Se as variâncias residuais estimadas são positivas, defina
 
 $$
+\mathbf D
+=
+\operatorname{diag}
+\left(
+\widehat{\sigma}_{11,\mathrm{obs}},
+\ldots,
+\widehat{\sigma}_{pp,\mathrm{obs}}
+\right).
+$$
+
+A matriz de correlações residuais estimada é
+
+$$
+\widehat{\mathbf R}_{\mathrm{res}}
+=
 \mathbf D^{-1/2}
 \widehat{\boldsymbol{\Sigma}}_{\mathrm{obs}}
-\mathbf D^{-1/2}
+\mathbf D^{-1/2}.
 $$
-
-com a matriz diagonal correspondente às variâncias residuais estimadas.
 
 ### Representação geométrica da decomposição no modelo de grupos
 
-A @fig-decomposicao-grupos-modelo representa geometricamente as duas parcelas dessa decomposição. Os segmentos que ligam cada observação à média de seu grupo representam desvios intragrupos, enquanto os segmentos tracejados que ligam as médias dos grupos à média geral representam os deslocamentos responsáveis pela dispersão entre grupos.
+A @fig-decomposicao-grupos-modelo representa geometricamente a decomposição
+
+$$
+\mathbf T
+=
+\mathbf T_{\mathrm{entre}}
++
+\mathbf T_{\mathrm{intra}}
+$$
+
+de @eq-decomposicao-total-entre-dentro-grupos. Os segmentos que ligam cada observação à média de seu grupo representam os desvios intragrupos, enquanto os segmentos tracejados que ligam as médias dos grupos à média geral representam os deslocamentos associados à dispersão entre grupos.
 
 ```{r}
 #| label: fig-decomposicao-grupos-modelo
@@ -5852,7 +6030,17 @@ $$
 \mathbb R^p,
 $$
 
-a hipótese
+suponha que
+
+$$
+\mathbf c_1^\top
+=
+\mathbf c_1^\top
+\mathbf Z^+
+\mathbf Z,
+$$
+
+de modo que $\mathbf c_1^\top\mathbf B$ seja estimável. A hipótese
 
 $$
 H_0:
@@ -6201,7 +6389,7 @@ ggplot2::ggplot(
   )
 ```
 
-A figura evidencia as inclinações em sentidos opostos das duas respostas. Os segmentos tracejados ligam cada observação ao valor ajustado correspondente e representam graficamente os resíduos que serão reunidos na matriz $\widehat{\mathbf U}$.
+A figura evidencia as inclinações em sentidos opostos das duas respostas. Os segmentos tracejados ligam cada observação ao valor ajustado correspondente e representam os resíduos que compõem a matriz $\widehat{\mathbf U}$.
 
 
 A matriz de valores ajustados é
@@ -6716,26 +6904,15 @@ $$
 \widehat{\boldsymbol{\Sigma}}_{\mathrm{obs}}
 $$
 
-e as matrizes associadas às hipóteses examinadas. No modelo de grupos desenvolvido anteriormente, a mesma estrutura produz
+e as matrizes associadas às hipóteses examinadas. No modelo de grupos, @eq-correspondencia-sscp-residual-intragrupos estabelece
 
 $$
 \mathbf E
 =
-\mathbf T_{\mathrm{intra}}
+\mathbf T_{\mathrm{intra}},
 $$
 
-e, para a hipótese global
-
-$$
-H_0:
-\boldsymbol{\mu}_1
-=
-\cdots
-=
-\boldsymbol{\mu}_K,
-$$
-
-a SQPC da hipótese satisfaz
+enquanto, para a hipótese global de igualdade dos vetores de médias, @eq-correspondencia-sscp-hipotese-entregrupos fornece
 
 $$
 \mathbf H
