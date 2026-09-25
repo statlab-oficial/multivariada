@@ -3316,6 +3316,38 @@ Os resultados assintóticos acima pressupõem autovalores populacionais distinto
 Esta parte reúne critérios e objetos utilizados na condução e na interpretação da ACP, incluindo a escolha do número de componentes, a relação das variáveis com as componentes, a representação das observações e das variáveis, a utilização de elementos suplementares e a avaliação da estabilidade da solução amostral.
 :::
 
+### Preparação dos dados para a ACP {#sec-acp-preparacao}
+
+A solução da ACP é determinada pela matriz de covariâncias ou de correlações calculada a partir das variáveis ativas. A definição dessas variáveis, o tratamento das escalas, os dados ausentes e as observações atípicas podem modificar essa matriz e, consequentemente, os autovalores e as direções principais.
+
+#### Variáveis ativas
+
+As variáveis ativas devem ser escolhidas de acordo com o problema de redução de dimensionalidade. Incluir uma variável significa permitir que sua variabilidade e suas relações com as demais participem da determinação dos eixos principais. Retirar uma variável modifica a matriz analisada e pode modificar todas as componentes.
+
+Variáveis destinadas apenas à caracterização posterior da solução podem permanecer fora da construção dos eixos e ser incorporadas como elementos suplementares, conforme a @sec-acp-elementos-suplementares.
+
+A presença de variáveis fortemente redundantes também deve ser examinada. Autovalores muito próximos de zero podem revelar dependências lineares ou quase lineares, conforme discutido na @sec-acp-escolha-componentes. A redundância não constitui, por si só, razão para retirar uma variável: a decisão depende de seu papel no problema e da informação que se pretende preservar.
+
+#### Escala das variáveis
+
+A escolha entre a matriz de covariâncias e a matriz de correlações deve ser definida antes da interpretação das componentes. Quando as unidades ou dispersões das variáveis diferem e essas diferenças não devem determinar sua influência relativa, a padronização evita que a ACP seja dominada apenas pelas escalas numéricas. Quando as diferenças de escala possuem interpretação pertinente ao problema, a padronização modifica essa informação.
+
+Essa decisão corresponde às duas formulações desenvolvidas na @sec-acp-matriz-correlacoes e não deve ser tomada apenas por conveniência computacional.
+
+#### Dados ausentes
+
+O tratamento de dados ausentes deve preceder a construção da matriz utilizada na ACP. A exclusão de observações altera a amostra analisada; procedimentos de imputação alteram os valores a partir dos quais são calculadas covariâncias e correlações.
+
+Também é necessário cuidado com matrizes de correlações calculadas utilizando conjuntos diferentes de observações para cada par de variáveis. Nesse procedimento, cada correlação pode utilizar um subconjunto distinto da amostra, e a coleção resultante de correlações pode não apresentar a mesma coerência matricial de uma matriz calculada a partir de uma única matriz de dados completa [@hair2019multivariate].
+
+A estratégia adotada para os dados ausentes deve ser registrada antes da interpretação dos autovalores, das componentes e das representações gráficas.
+
+#### Observações atípicas e influência
+
+Observações atípicas podem modificar médias, variâncias, covariâncias e correlações e, por essa via, alterar os autovalores e as direções principais. Esse efeito é especialmente relevante quando poucas observações respondem por parcela importante da variabilidade em determinada direção [@hair2019multivariate].
+
+A identificação de uma observação atípica não implica sua retirada. Devem ser examinadas sua origem, a possibilidade de erro de registro ou mensuração e sua influência sobre a solução. Quando a observação é legítima, a comparação entre a ACP obtida com e sem o caso pode ser utilizada como análise de sensibilidade, sem substituir a solução correspondente à amostra efetivamente definida para o estudo.
+
 ### Escolha do número de componentes {#sec-acp-escolha-componentes}
 
 Tanto na ACP baseada em covariâncias quanto na baseada em correlações, a decomposição espectral produz $p$ componentes, embora aquelas associadas a autovalores nulos tenham variância zero. A redução de dimensionalidade exige decidir quantas das primeiras componentes serão mantidas. Essa decisão não é determinada pela solução matemática da ACP e deve considerar o objetivo da representação, a parcela de variabilidade preservada, os tamanhos relativos dos autovalores e a interpretação das componentes [@johnson2002].
@@ -3445,7 +3477,9 @@ Nesse contexto, cada variável padronizada possui variância unitária, de modo 
 
 Esse critério constitui uma regra heurística de retenção e não uma condição matemática necessária da ACP. Sua justificativa também não se transfere diretamente para a ACP baseada em uma matriz de covariâncias, cujas variâncias dependem das escalas das variáveis.
 
-A escolha de $k$ deve considerar conjuntamente a proporção acumulada de variância, o padrão dos autovalores no gráfico de declive e a interpretação das componentes em termos das variáveis originais e do problema em estudo. Esses critérios podem ser utilizados tanto na ACP baseada em covariâncias quanto na baseada em correlações. O critério da raiz latente, por sua vez, possui justificativa específica para a ACP baseada em correlações e não constitui uma condição necessária para retenção. Diferentes critérios podem sugerir dimensões distintas, e a decisão não é determinada por um único critério [@johnson2002].
+Na ACP baseada na matriz de correlações, a **análise paralela** fornece uma referência amostral adicional para a escolha do número de componentes. O procedimento compara os autovalores observados com autovalores obtidos de dados simulados sem associação entre as variáveis, mantendo o mesmo número de observações e de variáveis. Para cada posição, a retenção é considerada enquanto o autovalor observado excede a referência simulada correspondente. Essa referência pode ser definida pela média ou por um quantil dos autovalores simulados, e o critério empregado deve ser informado. A análise paralela é um critério de retenção e não substitui a interpretação das componentes nem a avaliação da variância representada.
+
+A escolha de $k$ deve considerar conjuntamente a proporção acumulada de variância, o padrão dos autovalores no gráfico de declive e a interpretação das componentes em termos das variáveis originais e do problema em estudo. Esses elementos podem ser examinados tanto na ACP baseada em covariâncias quanto na baseada em correlações. O critério da raiz latente e a forma de análise paralela descrita acima referem-se à ACP baseada na matriz de correlações. Diferentes critérios podem sugerir dimensões distintas, e a decisão não é determinada por um único critério [@johnson2002].
 
 Os autovalores pequenos também possuem informação diagnóstica. Valores muito próximos de zero, especialmente entre as últimas componentes, podem indicar dependências lineares ou quase lineares entre as variáveis. Assim, mesmo quando essas componentes não são mantidas na representação reduzida, os autovalores correspondentes devem ser examinados quanto à possível presença dessas dependências [@johnson2002].
 
@@ -3774,7 +3808,13 @@ Y_{Rj}
 \,\widehat \alpha_{R,ij}.
 $$
 
+### Interpretação das componentes {#sec-acp-interpretacao-componentes}
 
+A interpretação substantiva de uma componente pode ser apoiada nas correlações entre cada variável original e a componente, desenvolvidas na @sec-acp-coeficientes-correlacoes. Correlações de maior módulo indicam as variáveis mais fortemente associadas linearmente à componente, enquanto o sinal indica o sentido dessa associação.
+
+Os sinais devem ser interpretados de forma relativa dentro de cada componente. Se $\boldsymbol{\alpha}_j$ for substituído por $-\boldsymbol{\alpha}_j$, os coeficientes, os escores e as correlações associados à componente mudam simultaneamente de sinal, sem alterar a direção principal representada. Assim, o contraste entre variáveis com sinais opostos pode ser interpretado, mas a escolha global de qual polo recebe sinal positivo é arbitrária.
+
+Uma componente principal é uma variável calculada como combinação linear das variáveis observadas. Um rótulo descritivo pode resumir o padrão das correlações entre a componente e essas variáveis, mas não transforma a componente em um fator latente nem introduz um modelo causal.
 
 ### Representação das observações e das variáveis {#sec-acp-representacao}
 
@@ -4368,7 +4408,7 @@ Em todos esses procedimentos, a solução da ACP é mantida fixa. A projeção d
 
 A ACP obtida de uma matriz amostral de covariâncias ou de correlações depende da amostra observada. Como $\mathbf S$ e $\mathbf R$ variam entre amostras, seus autovalores e autovetores também estão sujeitos à variação amostral [@johnson2002]. Quando a interpretação das componentes pretende ser estendida além da amostra utilizada na estimação, interessa examinar a estabilidade desses objetos.
 
-Uma forma de avaliação empírica consiste em recalcular a ACP em subamostras obtidas da mesma população de interesse ou em uma nova amostra. Essa estratégia aplica à ACP o princípio de reestimação em subamostras ou novas amostras utilizado por Hair na avaliação de estabilidade de soluções fatoriais [@hair2009].
+A estabilidade pode ser examinada recalculando a ACP em uma nova amostra, em subamostras ou em amostras obtidas por reamostragem. A comparação deve utilizar a mesma definição das variáveis, a mesma decisão sobre padronização e os mesmos critérios de retenção. Hair et al. utilizam a replicação em novas amostras ou subamostras como estratégia para avaliar a estabilidade de soluções exploratórias [@hair2019multivariate].
 
 A comparação entre as soluções pode examinar:
 
@@ -4393,6 +4433,7 @@ Nas atividades computacionais, a ACP será realizada pelo módulo [`MEDA`](https
 | Elemento da implementação | Correspondência estatística | Desenvolvimento no capítulo |
 |---|---|---|
 | **Scale to unit variance** | padronização ou não das variáveis quantitativas ativas antes da construção da ACP | @sec-acp-matriz-correlacoes |
+| **Number of factors** | número de dimensões incluídas nas descrições e tabelas da implementação; não constitui, por si só, um critério para escolher a dimensionalidade | @sec-acp-escolha-componentes |
 | **Variáveis quantitativas ativas** | variáveis utilizadas na determinação dos eixos principais | @sec-acp-elementos-suplementares |
 | **Variáveis quantitativas suplementares** | variáveis relacionadas posteriormente às componentes por coordenadas, correlações e $\cos^2$ | @sec-acp-elementos-suplementares |
 | **Variáveis categóricas suplementares** | categorias descritas posteriormente por suas posições baricêntricas no espaço das componentes | @sec-acp-elementos-suplementares |
@@ -4469,6 +4510,28 @@ $$
 Essa mudança de escala não altera os $\cos^2$, as contribuições nem as relações geométricas baseadas em razões de normas.
 
 Neste capítulo, as contribuições são expressas como proporções que somam $1$ em cada componente. O `FactoMineR` apresenta essas mesmas medidas em porcentagem, multiplicando-as por $100$.
+
+#### Correspondência direta com `stats::prcomp()`
+
+Para uma matriz de dados completa, a decomposição também pode ser examinada diretamente com `stats::prcomp()`. Com `scale. = FALSE`, a ACP é realizada nas escalas originais após a centralização; com `scale. = TRUE`, as variáveis são padronizadas antes da decomposição.
+
+<pre>
+```{r}
+#| eval: false
+
+ajuste <- stats::prcomp(
+  dados,
+  center = TRUE,
+  scale. = TRUE
+)
+
+ajuste$sdev^2
+ajuste$rotation
+ajuste$x
+```
+</pre>
+
+O vetor `ajuste$sdev^2` contém as variâncias das componentes, `ajuste$rotation` contém as direções principais e `ajuste$x` contém os escores das observações. A função utiliza o divisor $n-1$ no cálculo das variâncias, de modo que sua convenção coincide com a formulação amostral adotada neste capítulo. Diferenças globais de sinal entre as direções retornadas por implementações distintas não representam diferenças entre as componentes correspondentes.
 
 ## Síntese
 

@@ -2963,7 +2963,7 @@ coincide com o problema de autovalores generalizados desenvolvido no @sec-manova
 
 As raízes positivas e os autoespaços generalizados associados são, portanto, os mesmos quando as matrizes de hipótese e erro da MANOVA correspondem, respectivamente, às dispersões entre e dentro dos grupos.
 
-O significado estatístico da solução depende da técnica. Na MANOVA, Wilks, Pillai e Hotelling--Lawley combinam a coleção de raízes de formas distintas, enquanto Roy utiliza a maior raiz para avaliar a hipótese multivariada. Na formulação de Fisher, os autovetores generalizados associados às raízes positivas definem direções utilizadas para representar a separação entre os grupos.
+Na MANOVA, Wilks, Pillai e Hotelling--Lawley combinam as raízes características de formas distintas, enquanto Roy utiliza a maior raiz para testar a hipótese multivariada. Na formulação de Fisher, os autovetores generalizados associados às raízes positivas definem as direções utilizadas para representar a separação entre os grupos.
 
 A coincidência algébrica não implica coincidência de objetivos: a MANOVA utiliza as raízes para construir critérios de teste de hipóteses sobre os vetores de médias, enquanto Fisher utiliza os autovetores generalizados para construir direções discriminantes.
 
@@ -4476,6 +4476,16 @@ As condições de posto da LDA e da QDA estão estabelecidas em @eq-condicao-dim
 
 A independência das unidades decorre do delineamento e do mecanismo de amostragem. Dependência temporal, espacial, longitudinal ou por agrupamentos não é diagnosticada pela matriz de classificação e exige uma formulação que represente essa dependência.
 
+### Tamanho amostral e estabilidade das estimativas {#sec-discriminante-tamanho-amostral}
+
+As condições de posto estabelecem requisitos algébricos mínimos para que as matrizes utilizadas pela LDA, pela QDA e pelo critério de Fisher possam ser invertidas. Elas não constituem regras gerais de tamanho amostral.
+
+A estabilidade das médias, das covariâncias, das direções discriminantes e das probabilidades de classificação depende também da quantidade de observações disponível em relação ao número de características. Essa avaliação deve ser realizada por classe, pois $\overline{\mathbf x}_k$ e $\mathbf S_k$ são estimados a partir das observações pertencentes ao grupo $k$. A classe menos numerosa pode, portanto, limitar a precisão da análise mesmo quando o tamanho amostral total é elevado.
+
+A QDA é mais exigente nesse aspecto porque estima uma matriz de covariâncias distinta para cada classe, enquanto a LDA reúne a informação intragrupos na estimação de $\mathbf S_p$ [@johnson2002]. As razões entre número de observações e número de características e os tamanhos mínimos por classe apresentados como orientações práticas não devem ser tratados como condições universais. A avaliação deve considerar conjuntamente os tamanhos das classes, $p$, o condicionamento de $\mathbf S_p$ ou das matrizes $\mathbf S_k$ e a estabilidade das classificações e das direções discriminantes.
+
+Quando a amostra é dividida em conjuntos de treinamento e teste, as condições necessárias à estimação devem ser avaliadas no conjunto de treinamento, e não apenas na amostra original. O conjunto de teste também deve conter observações suficientes em cada classe para que as proporções de classificação correta por classe sejam interpretáveis.
+
 ### Escolha entre LDA e QDA {#sec-discriminante-escolha-lda-qda}
 
 A LDA estima uma única matriz de covariâncias, com
@@ -4655,23 +4665,33 @@ Esse reescalonamento modifica a escala dos coeficientes, mas não a direção di
 
 Os **coeficientes normalizados** correspondem, portanto, a outra normalização da mesma direção discriminante. Eles não constituem uma medida de associação entre cada característica e a função discriminante e não devem ser confundidos com as cargas discriminantes.
 
-As **cargas discriminantes**, também denominadas **correlações de estrutura**, são as correlações amostrais entre as características observadas e os escores discriminantes. Para a característica $h$ e a função de Fisher $j$, define-se
+As **cargas discriminantes**, também denominadas **correlações de estrutura**, são definidas, na formulação clássica, pelas correlações intragrupos agrupadas entre cada característica e a função discriminante.
+
+Se $\mathbf e_h$ é o vetor canônico associado à característica $h$ e $\mathbf S_p$ é a matriz de covariâncias intragrupos agrupada, então
 
 $$
 r_{hj}^{(\mathrm{estrutura})}
 =
-\operatorname{Cor}
-\left(
-X_h,
-z_j
-\right).
+\frac{
+\mathbf e_h^\top
+\mathbf S_p
+\boldsymbol{\alpha}_j
+}{
+\sqrt{
+(\mathbf S_p)_{hh}
+\,
+\boldsymbol{\alpha}_j^\top
+\mathbf S_p
+\boldsymbol{\alpha}_j
+}
+}.
 $$ {#eq-carga-discriminante}
 
-A quantidade $r_{hj}^{(\mathrm{estrutura})}$ mede a associação linear entre a característica $h$ e o escore discriminante $j$.
+Essa quantidade é a correlação entre a característica $X_h$ e o escore discriminante $z_j$ calculada a partir da covariância intragrupos agrupada. Dessa forma, ela descreve a associação da característica com a função discriminante sem incorporar a covariação decorrente apenas das diferenças entre os centroides dos grupos.
 
-Os coeficientes da direção e as cargas discriminantes possuem interpretações distintas. Os elementos de $\boldsymbol{\alpha}_j$ determinam a combinação linear que produz $z_j(\mathbf x)$; as cargas medem a correlação de cada característica com os escores obtidos nessa função. Como as características podem ser correlacionadas, um coeficiente de pequena magnitude pode coexistir com uma carga elevada.
+Os coeficientes da direção e as cargas discriminantes possuem interpretações distintas. Os elementos de $\boldsymbol{\alpha}_j$ determinam a combinação linear que produz $z_j(\mathbf x)$; as cargas discriminantes medem a associação intragrupos de cada característica com essa função. Como as características podem ser correlacionadas, um coeficiente de pequena magnitude pode coexistir com uma carga elevada.
 
-Os coeficientes normalizados representam a mesma direção em outra escala. Eles não alteram o subespaço discriminante nem substituem as cargas como medidas de associação entre características e escores.
+Os coeficientes normalizados representam a mesma direção em outra escala. Eles não alteram o subespaço discriminante nem substituem as cargas discriminantes como medidas de associação intragrupos entre características e funções.
 
 ### Centroides e interpretação dos grupos {#sec-discriminante-centroides-interpretacao}
 
@@ -4834,7 +4854,7 @@ A_{\mathrm{prop}}
 \frac{1}{K}.
 $$
 
-Com classes desbalanceadas, os dois valores podem diferir substancialmente. Em particular, uma proporção global de acertos aparentemente elevada pode representar pouco ganho classificatório se estiver próxima do desempenho obtido pela atribuição sistemática à classe majoritária [@hair2009].
+Com classes desbalanceadas, os dois valores podem diferir. Em particular, uma proporção global de acertos aparentemente elevada pode representar pouco ganho classificatório se estiver próxima do desempenho obtido pela atribuição sistemática à classe majoritária [@hair2009].
 
 Os critérios de chance máxima e chance proporcional são referências descritivas para contextualizar a proporção de acertos. Eles não substituem a avaliação em observações que não participaram da estimação e não constituem, por si mesmos, testes de desempenho preditivo. A comparação principal deve utilizar o mesmo regime de avaliação da regra: validação cruzada, conjunto de teste *holdout* ou amostra independente, conforme distinguido na @sec-discriminante-avaliacao-preditiva.
 
@@ -4903,7 +4923,7 @@ Nas atividades computacionais, a Análise Discriminante será realizada pelo mó
 | **Prior probability** | probabilidades *a priori* utilizadas pela LDA | @sec-discriminante-priores-custos |
 | **Coefficients of discriminants** | coeficientes das direções discriminantes de Fisher | @sec-discriminante-coeficientes |
 | **Normalized loadings** | coeficientes das mesmas direções após normalização euclidiana | @eq-coeficientes-normalizados-discriminante |
-| **Structure coefficients** | correlações entre as características e os escores discriminantes | @eq-carga-discriminante |
+| **Structure coefficients** | na versão auditada, correlações amostrais totais entre as características e os escores discriminantes na amostra de treinamento; não coincidem, em geral, com as correlações de estrutura intragrupos da formulação clássica | correspondência computacional |
 | **Eigenvalue** | raiz discriminante de Fisher $\lambda_j$ | @eq-autovalor-generalizado-fisher |
 | **Variance explained** | participação relativa da raiz discriminante na soma das raízes positivas | @eq-proporcao-raiz-discriminante |
 | **Canonical correlation** | correlação canônica associada à função de Fisher | @eq-correlacao-canonica-discriminante |
@@ -4915,9 +4935,17 @@ Nas atividades computacionais, a Análise Discriminante será realizada pelo mó
 
 A rotina utilizada pela implementação é baseada em `MASS::lda()` [@ripley2002mass]. Na configuração auditada, as probabilidades *a priori* correspondem às proporções das classes na amostra de treinamento. O item **Prior probability** apresenta esses valores como saída; a interface utilizada não permite substituí-los por probabilidades especificadas pelo usuário.
 
-A opção **Training proportion** separa, de forma estratificada segundo a variável de classe, as observações utilizadas no ajuste daquelas reservadas para teste. Quando seu valor é $1$, todas as observações são utilizadas no treinamento e não existe conjunto de teste separado. A tabela **Training set** corresponde, portanto, à avaliação aparente da regra. A tabela **Test set**, quando disponível, fornece uma avaliação *holdout*. Essa divisão não constitui validação cruzada.
+A opção **Training proportion** define uma única divisão estratificada da amostra segundo a variável de classe por `caret::createDataPartition()`. Na versão auditada, o módulo fixa `set.seed(1234)`, de modo que, para os mesmos dados e a mesma proporção, a divisão é reproduzida em novas execuções. Quando **Training proportion** é igual a $1$, todas as observações completas são utilizadas no treinamento e não existe conjunto de teste separado.
 
-Os **Coefficients of discriminants** correspondem às colunas da matriz `scaling` de `MASS::lda()`. Os **Normalized loadings** são obtidos pela normalização euclidiana dessas colunas. Os **Structure coefficients** são as correlações entre as características observadas e os escores discriminantes na amostra de treinamento. Esses três resultados correspondem aos objetos distinguidos na @sec-discriminante-coeficientes e não devem ser interpretados como medidas equivalentes.
+A tabela **Training set** corresponde à avaliação aparente da regra nas observações utilizadas em sua estimação. A tabela **Test set**, quando disponível, avalia a classificação na parcela *holdout* produzida por essa única divisão. Essa avaliação não constitui validação cruzada e não informa a variabilidade do desempenho entre diferentes divisões possíveis da amostra.
+
+Os tamanhos efetivos das classes devem ser verificados depois da divisão, especialmente quando alguma classe possui poucas observações, pois tanto a estimação quanto as proporções de classificação correta por classe dependem do número de casos disponível em cada parcela.
+
+Os **Coefficients of discriminants** correspondem às colunas da matriz `scaling` de `MASS::lda()`. Os **Normalized loadings** são obtidos pela normalização euclidiana dessas colunas.
+
+A saída **Structure coefficients** exige uma distinção adicional. Na formulação clássica desenvolvida na @sec-discriminante-coeficientes, as correlações de estrutura são calculadas a partir da covariância intragrupos agrupada. Na versão auditada do `snowCluster`, entretanto, essa saída é calculada por `stats::cor()` entre as características observadas e os escores discriminantes considerando conjuntamente as observações da amostra de treinamento. Ela corresponde, portanto, a correlações amostrais totais e pode incluir a associação produzida pelas diferenças entre os centroides dos grupos.
+
+Por esse motivo, **Structure coefficients** da implementação não deve ser identificado diretamente com $r_{hj}^{(\mathrm{estrutura})}$ definido na @eq-carga-discriminante. Os coeficientes discriminantes, os coeficientes normalizados, as correlações de estrutura intragrupos e as correlações totais fornecidas por essa saída são objetos distintos.
 
 Na configuração auditada, `MASS::lda()` utiliza o método de momentos e probabilidades *a priori* iguais às proporções das classes na amostra de treinamento. Se $d_j$ denota o $j$-ésimo valor de `MASS::lda()$svd`, $n$ é o tamanho dessa amostra e $K$ é o número de classes, a raiz discriminante correspondente à formulação
 

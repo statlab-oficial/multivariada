@@ -2135,7 +2135,38 @@ A escolha do número de grupos é uma decisão metodológica. A Análise de Agru
 
 Nos procedimentos hierárquicos, Hair et al. propõem examinar mudanças na heterogeneidade produzidas pelas fusões, juntamente com o dendrograma e com considerações conceituais sobre as soluções candidatas [@hair2009]. Um aumento acentuado da heterogeneidade pode indicar que a fusão seguinte reúne grupos mais distintos segundo o critério adotado, fornecendo uma referência para examinar a solução anterior.
 
-Nas atividades computacionais deste capítulo, a implementação também disponibiliza **Elbow plot**, **Silhouette index** e **Gap statistic plot** como recursos auxiliares para comparar soluções com diferentes números de grupos. Esses recursos serão interpretados de acordo com o cálculo efetivamente realizado pela implementação na @sec-agrupamentos-correspondencia-implementacao.
+#### Critérios auxiliares para comparar valores de $K$ {#sec-agrupamentos-criterios-k}
+
+Para uma solução de $K$-médias, a dispersão quadrática intragrupos
+
+$$
+J_K
+\left(
+\mathcal P_K
+\right)
+$$
+
+não aumenta quando se permite um número maior de grupos. Assim, a simples redução de $J_K$ não determina quantos grupos devem ser mantidos. Os critérios auxiliares procuram avaliar como essa redução ocorre ou combinar informações sobre concentração intragrupos e separação entre grupos.
+
+No **método do cotovelo**, examina-se a sequência da dispersão intragrupos para diferentes valores de $K$. Procura-se uma região em que a redução obtida pela inclusão de grupos adicionais passa a ser relativamente menor. O ponto de mudança pode não ser nítido, de modo que o gráfico não fornece, por si só, uma regra objetiva para determinar $K$.
+
+O **índice de silhueta** pode ser definido a partir das dissimilaridades entre os objetos. Para uma observação $i$, seja $a(i)$ sua dissimilaridade média em relação às demais observações do próprio grupo e seja $b(i)$ a menor dissimilaridade média de $i$ em relação às observações de qualquer outro grupo. A largura de silhueta é
+
+$$
+s(i)
+=
+\frac{
+b(i)-a(i)
+}{
+\max\{a(i),b(i)\}
+}.
+$$
+
+Valores positivos maiores indicam que a observação está, segundo a dissimilaridade adotada, mais próxima do próprio grupo do que do grupo alternativo mais próximo. Valores próximos de zero indicam menor separação, e valores negativos indicam que a dissimilaridade média da observação em relação a outro grupo é menor do que em relação ao grupo ao qual foi atribuída. A média das larguras de silhueta pode ser utilizada para comparar partições candidatas. Como o índice é calculado a partir da própria partição e das dissimilaridades utilizadas na análise, ele constitui um critério interno e não uma validação externa dos grupos.
+
+A **estatística Gap** compara uma medida de dispersão intragrupos observada com a dispersão obtida em conjuntos de referência gerados sem a mesma organização dos dados. Para cada valor de $K$, a comparação é realizada na escala logarítmica e incorpora a variabilidade das simulações de referência [@tibshirani2001gap]. Sua interpretação depende da definição da dispersão, da distribuição de referência e da regra utilizada para selecionar uma solução entre os valores de $K$ examinados.
+
+Esses critérios podem indicar soluções distintas. A escolha de $K$ deve considerar conjuntamente os critérios compatíveis com o procedimento utilizado, os tamanhos e os perfis dos grupos, o objetivo da análise e as avaliações de estabilidade e validação [@hair2019multivariate].
 
 A escolha final deve considerar as soluções candidatas em relação ao objetivo da análise, ao tamanho e aos perfis dos grupos e às avaliações de estabilidade e validação apresentadas na @sec-agrupamentos-validacao [@hair2009].
 
@@ -2197,9 +2228,7 @@ Uma solução de agrupamento deve ser examinada além do critério utilizado par
 
 #### Sensibilidade à inicialização
 
-Nas $K$-médias, diferentes partições ou pontos-semente iniciais podem conduzir a soluções finais distintas. Repetir o procedimento com diferentes inicializações permite examinar essa dependência [@johnson2002; @hair2009].
-
-Essa verificação avalia a sensibilidade do procedimento de busca. Consistência entre diferentes inicializações não demonstra, por si só, que a partição corresponda a uma estrutura de grupos na população.
+A sensibilidade das $K$-médias à configuração inicial e a comparação entre diferentes execuções foram desenvolvidas na @sec-agrupamentos-inicializacao-kmedias. No contexto da avaliação da solução, essa análise informa sua dependência em relação ao procedimento de busca; ela não constitui evidência de generalização da partição para a população.
 
 #### Validação cruzada por subamostras
 
@@ -2264,15 +2293,16 @@ Nas atividades computacionais, a Análise de Agrupamentos será realizada pelo m
 |---|---|---|
 | **K-means Clustering** | agrupamento de variáveis quantitativas pela rota baseada em `stats::kmeans()` | @sec-agrupamentos-kmedias |
 | **Number of clusters** | número $K$ de grupos especificado para o procedimento | @sec-escolha-k-agrupamentos |
+| **Maximum clusters** | maior valor de $K$ examinado pelo **Elbow plot**; na versão auditada, essa opção não é repassada ao cálculo do **Gap statistic plot** | @sec-agrupamentos-criterios-k |
 | **Standardize variables** | padronização da representação antes da formação dos grupos | @sec-agrupamentos-escala e @sec-agrupamentos-preparacao |
 | **Algorithm** | variante algorítmica utilizada na busca computacional da partição | @sec-agrupamentos-algoritmo-kmedias |
 | **Number of random starting values** | número de inicializações utilizadas na execução das $K$-médias | @sec-agrupamentos-inicializacao-kmedias |
 | **Centroids** | médias vetoriais dos grupos obtidos | @sec-agrupamentos-kmedias |
 | **Within-cluster, between-cluster e total sum of squares** | dispersões intragrupos, entre grupos e total na representação utilizada | @sec-agrupamentos-dispersao |
-| **Elbow plot** | comparação da dispersão intragrupos entre soluções calculadas para diferentes valores de $K$ | @sec-escolha-k-agrupamentos |
-| **Gap statistic plot** | recurso computacional auxiliar para comparar soluções com diferentes valores de $K$ | @sec-escolha-k-agrupamentos |
-| **Silhouette index** | recurso computacional auxiliar para avaliar uma solução de agrupamento | @sec-escolha-k-agrupamentos |
-| **Silhouette plot** | saída gráfica que, na versão auditada, segue uma rota computacional distinta da utilizada pelo **Silhouette index** | correspondência computacional |
+| **Elbow plot** | rota das $K$-médias que compara `tot.withinss` entre diferentes valores de $K$ | @sec-agrupamentos-criterios-k |
+| **Gap statistic plot** | rota das $K$-médias baseada em `factoextra::fviz_nbclust(..., method = "gap_stat")` e `cluster::clusGap()` | @sec-agrupamentos-criterios-k |
+| **Silhouette index** | comparação de partições na rota **Gower Distance** por `clustMixType::validation_kproto(..., type = "gower")` | @sec-agrupamentos-gower e @sec-agrupamentos-criterios-k |
+| **Silhouette plot** | médias das larguras de silhueta por grupo para uma partição obtida na rota de Gower | @sec-agrupamentos-gower e @sec-agrupamentos-criterios-k |
 | **Gower distance** | rota específica para dados mistos que utiliza `clustMixType::kproto(..., type = "gower")`, e não as $K$-médias euclidianas clássicas | @sec-agrupamentos-gower |
 | **Cluster scatter plot** | representação bidimensional das observações construída por ACP para fins gráficos | relação com ACP em @sec-agrupamentos-relacoes-acp |
 | **Distance measure** | medida utilizada para construir as dissimilaridades no agrupamento hierárquico | @sec-agrupamentos-escolha-metodo |
@@ -2284,19 +2314,95 @@ Nas atividades computacionais, a Análise de Agrupamentos será realizada pelo m
 
 : Correspondência entre elementos da implementação e os objetos estatísticos desenvolvidos no capítulo. {#tbl-correspondencia-implementacao-agrupamentos}
 
-Na análise de $K$-médias para variáveis quantitativas, a versão auditada utiliza `stats::kmeans()`. A opção **Algorithm** altera o algoritmo computacional empregado na busca, enquanto **Number of random starting values** controla o número de inicializações. Essas escolhas não modificam a definição do critério $J_K(\mathcal P)$ apresentado no núcleo.
+Na análise de $K$-médias para variáveis quantitativas, `stats::kmeans()`. A opção **Algorithm** altera o algoritmo computacional empregado na busca, enquanto **Number of random starting values** controla o número de inicializações. Essas escolhas não modificam a definição do critério $J_K(\mathcal P)$ apresentado no núcleo.
 
 A opção **Standardize variables** modifica a representação fornecida ao procedimento. Consequentemente, os centroides, as distâncias e as somas de quadrados apresentados na saída referem-se à escala efetivamente utilizada na análise. A escolha de padronizar deve ser interpretada de acordo com a discussão da @sec-agrupamentos-preparacao.
 
-As opções **Elbow plot**, **Gap statistic plot** e **Silhouette index** fornecem recursos computacionais auxiliares para examinar soluções de agrupamento. Elas seguem rotas computacionais próprias e não devem ser interpretadas como testes que determinam um número verdadeiro de grupos. Na versão auditada, **Silhouette index** e **Silhouette plot** também seguem rotas distintas; o gráfico não deve ser tratado automaticamente como representação gráfica do índice apresentado separadamente pela interface.
+Nas rotas de $K$-médias, Gower e agrupamento hierárquico, a versão auditada utiliza casos completos no conjunto de variáveis selecionado para cada procedimento. Na rota de Gower, essa verificação considera conjuntamente as variáveis quantitativas e categóricas selecionadas. As observações excluídas recebem `NA` na variável de pertencimento salva pelo módulo.
+
+Consequentemente, a inclusão ou retirada de uma variável com valores ausentes pode alterar também o conjunto de observações efetivamente utilizado no agrupamento. O número de casos analisados e eventuais diferenças em relação à amostra original devem ser considerados na interpretação da representatividade e dos tamanhos dos grupos.
+
+O **Gap statistic plot** segue uma rota diferente, baseada em `factoextra::fviz_nbclust(..., method = "gap_stat")`, que utiliza `cluster::clusGap()`. Na versão auditada, essa chamada não repassa as opções **Algorithm** e **Number of random starting values** da análise principal. O gráfico deve, portanto, ser interpretado como um cálculo auxiliar, e não como uma avaliação obtida necessariamente sob a mesma configuração computacional da partição final. A implementação de `clusGap()` também possui convenções próprias para a medida de dispersão e para a seleção de $K$.
+
+O **Silhouette index** pertence à rota **Gower Distance**. A versão auditada utiliza `clustMixType::validation_kproto(..., type = "gower")` para comparar números de grupos segundo a silhueta média. O **Silhouette plot** parte de uma partição de Gower com $K$ fixado, calcula larguras de silhueta por `cluster::silhouette()` e apresenta a média dessas larguras separadamente para cada grupo. Assim, o gráfico não representa a curva utilizada pelo **Silhouette index** para comparar diferentes valores de $K$.
 
 A opção **Gower distance** deve, portanto, ser distinguida da formulação euclidiana das $K$-médias desenvolvida no núcleo.
 
-O **Cluster scatter plot** é uma representação gráfica bidimensional construída por meio de componentes principais. Na versão auditada, essa etapa utiliza `prcomp` sem uma nova centralização ou padronização, de modo que a representação depende do pré-processamento aplicado anteriormente. O gráfico auxilia a visualização da solução, mas não constitui o critério utilizado para formar os grupos.
+O **Cluster scatter plot** é uma representação gráfica bidimensional da partição. Na versão auditada, o `snowCluster` utiliza `factoextra::fviz_cluster()`, cuja configuração padrão padroniza os dados empregados na representação gráfica. Quando há mais de duas variáveis, esses dados padronizados são então projetados nas duas primeiras componentes principais.
+
+Essa etapa gráfica deve ser distinguida da formação dos grupos. Se **Standardize variables** estiver desmarcada na análise de $K$-médias, a partição é obtida nas escalas originais, mas o **Cluster scatter plot** continua utilizando a padronização realizada internamente para a visualização. O gráfico auxilia a representar a partição em duas dimensões, mas não reproduz necessariamente a mesma geometria utilizada para formar os grupos.
 
 No agrupamento hierárquico, **Distance measure** e **Clustering method** representam decisões distintas: a primeira define as dissimilaridades entre objetos e a segunda define o critério utilizado nas fusões. Para o método de Ward desenvolvido neste capítulo, a correspondência com **Ward.D2** pressupõe distâncias euclidianas. **Ward.D** utiliza uma convenção computacional diferente e não deve ser interpretado como uma denominação equivalente para o mesmo cálculo.
 
-As opções **Variable clustering (PCA)** e **With p-values** tratam de agrupamento de variáveis, e não das observações utilizadas na formulação principal do capítulo. Na modalidade **Variable clustering (PCA)**, as variáveis são agrupadas a partir de uma representação construída por ACP. Na modalidade **With p-values**, a versão auditada utiliza `pvclust` e associa à hierarquia de variáveis valores AU (*approximately unbiased*) e BP (*bootstrap probability*) obtidos por reamostragem [@suzuki2006pvclust]. Esses valores pertencem à hierarquia de variáveis produzida por esse procedimento e não constituem validação da partição de observações discutida na @sec-agrupamentos-validacao.
+As opções **Variable clustering (PCA)** e **With p-values** tratam de agrupamento de variáveis, e não das observações utilizadas na formulação principal do capítulo. Na modalidade **Variable clustering (PCA)**, a versão auditada padroniza as variáveis quantitativas independentemente da opção **Standardize variables**, realiza uma ACP por `FactoMineR::PCA()` e aplica `stats::kmeans()` às coordenadas das variáveis nessa representação. Essa saída deve, portanto, ser interpretada como um agrupamento de variáveis no espaço construído pela ACP, e não como a partição das observações desenvolvida no núcleo.
+
+Na modalidade **With p-values**, a versão auditada utiliza `pvclust` e associa à hierarquia de variáveis valores AU (*approximately unbiased*) e BP (*bootstrap probability*) obtidos por reamostragem [@suzuki2006pvclust]. Esses valores pertencem à hierarquia de variáveis produzida por esse procedimento e não constituem validação da partição de observações discutida na @sec-agrupamentos-validacao.
+
+#### Correspondência direta com R {#sec-agrupamentos-r-direto}
+
+Para variáveis quantitativas, os principais objetos desenvolvidos no capítulo podem ser examinados diretamente pelas funções básicas do R. Considere inicialmente a matriz de casos completos nas variáveis selecionadas:
+
+<pre>
+```{r}
+#| eval: false
+
+x <- stats::na.omit(dados[vars])
+
+# Quando a padronização fizer parte da representação escolhida:
+x_analise <- scale(x)
+
+# Quando as escalas originais devam ser preservadas:
+# x_analise <- x
+```
+</pre>
+
+Para uma partição por $K$-médias:
+
+<pre>
+```{r}
+#| eval: false
+
+set.seed(1234)
+
+km <- stats::kmeans(
+  x_analise,
+  centers = K,
+  nstart = 50
+)
+
+km$centers
+km$withinss
+km$tot.withinss
+km$betweenss
+```
+</pre>
+
+`centers` contém os centroides dos grupos. `withinss` contém as contribuições de cada grupo para a dispersão quadrática intragrupos, `tot.withinss` contém sua soma e `betweenss` contém a dispersão entre grupos na representação utilizada.
+
+Para o agrupamento hierárquico, a matriz de dissimilaridades e a hierarquia podem ser construídas separadamente:
+
+<pre>
+```{r}
+#| eval: false
+
+d <- stats::dist(
+  x_analise,
+  method = "euclidean"
+)
+
+hc <- stats::hclust(
+  d,
+  method = "ward.D2"
+)
+
+grupos <- stats::cutree(
+  hc,
+  k = K
+)
+```
+</pre>
+
+`dist()` define as dissimilaridades entre os objetos, `hclust()` aplica o critério de ligação e `cutree()` seleciona uma partição da hierarquia. A utilização de `ward.D2` neste exemplo corresponde à formulação de Ward baseada na geometria euclidiana discutida na @sec-agrupamentos-ward.
 
 ## Síntese
 

@@ -2528,7 +2528,16 @@ No modelo linear multivariado, fatores, interações e covariáveis determinam o
 
 #### MANOVA fatorial
 
-Em um delineamento com dois ou mais fatores, cada efeito principal e cada interação correspondem a uma hipótese linear distinta. Para cada hipótese constrói-se uma SQPC $\mathbf H$, enquanto a SQPC residual $\mathbf E$ é obtida do mesmo modelo ajustado.
+Em um delineamento com dois ou mais fatores, efeitos principais e interações são avaliados por hipóteses lineares sobre os coeficientes do modelo. Para cada hipótese estimável constrói-se uma SQPC $\mathbf H$, enquanto a SQPC residual $\mathbf E$ é obtida do modelo ajustado.
+
+Em delineamentos ortogonais, como ocorre nos delineamentos fatoriais balanceados usuais, as decomposições associadas aos diferentes efeitos apresentam uma separação direta. Em delineamentos não ortogonais, como pode ocorrer com tamanhos de células desiguais ou com a inclusão de covariáveis, a expressão **efeito de um fator** deve ser acompanhada da hipótese estimável utilizada. Diferentes formas de atribuir a variação aos termos do modelo podem produzir SQPCs de hipótese distintas. A formulação geral
+$$
+H_0:
+\mathbf C_1\mathbf B
+=
+\boldsymbol{\Theta}_0
+$$
+permite explicitar qual comparação está sendo realizada.
 
 A interação deve ser examinada antes da interpretação dos efeitos principais. Quando existe interação, a diferença associada a um fator depende do nível do outro fator. O efeito principal resume diferenças marginais e pode ocultar o padrão observado nas combinações específicas de níveis [@hair2009; @johnson2002].
 
@@ -2629,7 +2638,7 @@ A implementação utilizada é a análise `MANCOVA` do núcleo do [jamovi](https
 | **Wilks' Lambda** | lambda de Wilks | @sec-manova-criterios |
 | **Hotelling's Trace** | traço de Hotelling | @sec-manova-criterios |
 | **Roy's Largest Root** | maior raiz característica de Roy | @sec-manova-criterios |
-| **Univariate Tests** | testes univariados de cada resposta para cada termo do modelo; a multiplicidade entre respostas deve ser tratada separadamente | @eq-f-univariado-pos-manova e @sec-manova-avaliacao-respostas |
+| **Univariate Tests** | testes univariados sequenciais de cada resposta para os mesmos termos do modelo; a multiplicidade entre respostas deve ser tratada separadamente | @eq-f-univariado-pos-manova e @sec-manova-avaliacao-respostas |
 | **Box's M** | teste de igualdade das matrizes de covariâncias dos grupos formados pelos fatores | @sec-manova-box-m |
 | **Multivariate Shapiro--Wilk** | teste de normalidade multivariada calculado pela implementação com os vetores de respostas observados; não utiliza os resíduos do modelo | @sec-manova-normalidade |
 | **Q--Q plot** | comparação das distâncias de Mahalanobis calculadas com os vetores de respostas observados com quantis qui-quadrado; não utiliza os resíduos do modelo | @sec-manova-normalidade |
@@ -2639,7 +2648,13 @@ A implementação utilizada é a análise `MANCOVA` do núcleo do [jamovi](https
 
 Quando há dois ou mais fatores, a implementação inclui seus efeitos principais e as interações entre fatores. As covariáveis entram como termos aditivos e não geram automaticamente interações fator--covariável. O modelo ajustado pela interface impõe, portanto, coeficientes comuns para cada covariável nos diferentes níveis dos fatores, conforme a condição descrita na @sec-manova-extensoes-modelo.
 
-A denominação **Hotelling's Trace** corresponde ao traço de Hotelling. Para cada termo do modelo, os quatro critérios utilizam a mesma SQPC da hipótese e a mesma SQPC residual. As diferenças entre os critérios decorrem das funções aplicadas às raízes características. A implementação apresenta também a estatística $F$, os graus de liberdade e o valor $p$ associados a cada critério.
+Na versão auditada, o `MANCOVA` do `jmv` ajusta o modelo por `stats::manova()` e utiliza as SQPCs associadas sequencialmente aos termos do modelo. Assim, os testes multivariados e univariados apresentados para cada termo correspondem a testes sequenciais, também denominados testes com SQPC tipo I. Cada termo é avaliado pela variação adicional atribuída a ele depois dos termos que o precedem.
+
+Em delineamentos ortogonais, essa dependência da ordem não afeta as comparações correspondentes. Em delineamentos não ortogonais, especialmente com células desiguais ou covariáveis, a SQPC atribuída a um termo pode depender dos termos que o precedem. Portanto, nesses casos, a linha apresentada pela interface deve ser interpretada como a hipótese sequencial efetivamente calculada, e não como uma definição independente da ordem para o efeito correspondente.
+
+A denominação **Hotelling's Trace** corresponde ao traço de Hotelling-Lawley, denominado traço de Hotelling neste capítulo. Para cada termo do modelo, os quatro critérios utilizam a mesma SQPC da hipótese e a mesma SQPC residual. As diferenças entre os critérios decorrem das funções aplicadas às raízes características.
+
+A implementação apresenta também a estatística $F$, os graus de liberdade e o valor $p$ fornecidos por `summary.manova()`. Essas estatísticas $F$ resultam das transformações ou aproximações associadas a cada critério. Quando a hipótese possui um grau de liberdade, os quatro valores $F$ coincidem. Para a maior raiz característica de Roy, quando a hipótese possui mais de um grau de liberdade, a estatística $F$ apresentada pela implementação constitui um limite superior na formulação utilizada por `summary.manova()`.
 
 Os testes univariados correspondem aos testes da @sec-manova-avaliacao-respostas. Para cada termo do modelo, cada resposta é examinada separadamente por uma estatística baseada em $H_{jj}$ e $E_{jj}$. Esses testes não utilizam os produtos cruzados entre respostas e não reproduzem o teste multivariado.
 
