@@ -2027,12 +2027,6 @@ Em uma etapa do procedimento aglomerativo, mais de um par de grupos pode apresen
 
 ## Aprofundamentos metodológicos e aplicados {#sec-agrupamentos-aprofundamentos-metodologicos}
 
-::: {.callout-note appearance="simple" icon=false}
-## Leitura de aprofundamento
-
-Esta parte trata das decisões de condução, interpretação e avaliação da Análise de Agrupamentos: preparação da representação dos objetos, escolha da proximidade e do procedimento, tratamento computacional de dados mistos, escolha do número de grupos, algoritmo e inicialização das $K$-médias, estabilidade, validação e correspondência com a implementação utilizada.
-:::
-
 ### Preparação da representação para o agrupamento {#sec-agrupamentos-preparacao}
 
 As **variáveis de agrupamento** são as variáveis utilizadas para representar os objetos na formação dos grupos. Sua escolha, escala e redundância participam da definição de proximidade e podem modificar a solução [@hair2009].
@@ -2087,11 +2081,11 @@ Grupos com poucas observações não devem ser excluídos automaticamente. Eles 
 
 ### Dados mistos e dissimilaridade de Gower {#sec-agrupamentos-gower}
 
-Variáveis de naturezas diferentes exigem que a medida de proximidade seja escolhida de forma compatível com a informação que deve definir a semelhança entre os objetos.
+Quando os objetos são descritos conjuntamente por variáveis quantitativas e categóricas, a proximidade deve combinar diferenças definidas de forma compatível com cada tipo de variável. A dissimilaridade de Gower é construída a partir de contribuições calculadas separadamente para cada variável e combinadas em uma medida comum [@gower1971].
 
-Na implementação utilizada, a opção **Gower distance** aciona um procedimento específico para dados mistos. Esse procedimento não corresponde à simples substituição da distância euclidiana no critério clássico das $K$-médias.
+Para uma variável quantitativa, a diferença entre dois objetos é reescalada em relação à amplitude observada dessa variável. Para uma variável nominal, a contribuição distingue concordância e discordância entre as categorias. Dessa forma, variáveis de naturezas distintas podem participar da mesma medida sem que suas escalas numéricas sejam diretamente comparadas.
 
-A correspondência entre essa opção da interface e o procedimento computacional efetivamente utilizado é apresentada na @sec-agrupamentos-correspondencia-implementacao.
+A dissimilaridade de Gower define a proximidade entre os objetos, mas não determina, por si só, como os grupos serão formados. No `snowCluster`, a opção **Gower distance** utiliza essa medida em um procedimento de partição baseado em `clustMixType::kproto(..., type = "gower")`. Essa rota deve ser distinguida das $K$-médias euclidianas desenvolvidas no núcleo.
 
 ### Escolha da medida de proximidade e do procedimento {#sec-agrupamentos-escolha-metodo}
 
@@ -2101,7 +2095,7 @@ A primeira decisão é determinar qual informação deve representar a proximida
 
 A medida de proximidade também depende do aspecto dos objetos que deve definir a semelhança. Medidas de distância comparam suas posições no espaço das variáveis. Medidas baseadas em correlação podem, quando pertinente ao objetivo da análise, comparar o padrão relativo das características [@hair2009]. Nesse caso, objetos com níveis distintos podem apresentar padrões semelhantes. O procedimento de agrupamento deve ser compatível com a medida adotada.
 
-Para dados de tipos diferentes, a implementação utilizada no capítulo disponibiliza uma rota baseada em **Gower distance**, apresentada na @sec-agrupamentos-gower. Essa rota deve ser distinguida da formulação euclidiana das $K$-médias desenvolvida no núcleo.
+Para dados de tipos diferentes, a dissimilaridade de Gower apresentada na @sec-agrupamentos-gower fornece uma forma de combinar variáveis quantitativas e categóricas. O procedimento de partição empregado com essa dissimilaridade deve ser distinguido da formulação euclidiana das $K$-médias desenvolvida no núcleo.
 
 A segunda decisão é definir qual noção de grupo é compatível com o objetivo da análise. Os principais procedimentos desenvolvidos neste capítulo privilegiam estruturas diferentes.
 
@@ -2125,7 +2119,7 @@ O método de Ward procura limitar o aumento da dispersão intragrupos a cada fus
 
 As $K$-médias utilizam uma partição com número de grupos previamente especificado e permitem a realocação das observações durante a busca computacional. Métodos hierárquicos produzem simultaneamente uma sequência de partições aninhadas e não desfazem fusões realizadas em etapas anteriores [@johnson2002].
 
-Quando o objetivo e os dados permitem mais de um procedimento, a comparação entre soluções permite examinar a sensibilidade da estrutura às escolhas metodológicas. Se procedimentos e medidas de proximidade plausíveis conduzem a organizações semelhantes, a interpretação apresenta menor dependência de uma escolha específica [@johnson2002].
+Quando o objetivo e os dados permitem mais de um procedimento, a comparação entre partições permite examinar a sensibilidade das alocações, dos tamanhos dos grupos e de seus perfis às escolhas metodológicas. Se procedimentos e medidas de proximidade plausíveis conduzem a organizações semelhantes, a interpretação apresenta menor dependência de uma escolha específica [@johnson2002].
 
 Uma estratégia possível consiste em utilizar inicialmente um método hierárquico para examinar diferentes números de grupos e obter centroides candidatos, seguidos por $K$-médias com esses centroides como valores iniciais [@hair2009]. Essa combinação é uma estratégia computacional e não estabelece equivalência entre os dois critérios.
 
@@ -2166,9 +2160,7 @@ Valores positivos maiores indicam que a observação está, segundo a dissimilar
 
 A **estatística Gap** compara uma medida de dispersão intragrupos observada com a dispersão obtida em conjuntos de referência gerados sem a mesma organização dos dados. Para cada valor de $K$, a comparação é realizada na escala logarítmica e incorpora a variabilidade das simulações de referência [@tibshirani2001gap]. Sua interpretação depende da definição da dispersão, da distribuição de referência e da regra utilizada para selecionar uma solução entre os valores de $K$ examinados.
 
-Esses critérios podem indicar soluções distintas. A escolha de $K$ deve considerar conjuntamente os critérios compatíveis com o procedimento utilizado, os tamanhos e os perfis dos grupos, o objetivo da análise e as avaliações de estabilidade e validação [@hair2019multivariate].
-
-A escolha final deve considerar as soluções candidatas em relação ao objetivo da análise, ao tamanho e aos perfis dos grupos e às avaliações de estabilidade e validação apresentadas na @sec-agrupamentos-validacao [@hair2009].
+Esses critérios podem indicar valores distintos de $K$. A escolha deve considerar conjuntamente os critérios compatíveis com o procedimento utilizado, os tamanhos e os perfis dos grupos, o objetivo da análise e as avaliações de estabilidade e validação apresentadas na @sec-agrupamentos-validacao [@hair2009].
 
 #### Escolha de uma partição na hierarquia
 
@@ -2225,10 +2217,6 @@ A estabilidade em relação à inicialização informa a sensibilidade da soluç
 ### Estabilidade, validação e perfil dos grupos {#sec-agrupamentos-validacao}
 
 Uma solução de agrupamento deve ser examinada além do critério utilizado para produzi-la. As subseções seguintes distinguem a sensibilidade à inicialização, a validação cruzada por subamostras, a comparação entre procedimentos, a caracterização pelas variáveis de agrupamento, a validade de critério e o perfil com variáveis adicionais.
-
-#### Sensibilidade à inicialização
-
-A sensibilidade das $K$-médias à configuração inicial e a comparação entre diferentes execuções foram desenvolvidas na @sec-agrupamentos-inicializacao-kmedias. No contexto da avaliação da solução, essa análise informa sua dependência em relação ao procedimento de busca; ela não constitui evidência de generalização da partição para a população.
 
 #### Validação cruzada por subamostras
 
@@ -2287,13 +2275,13 @@ A consistência entre inicializações, subamostras ou procedimentos não substi
 
 ### Correspondência com a implementação utilizada {#sec-agrupamentos-correspondencia-implementacao}
 
-Nas atividades computacionais, a Análise de Agrupamentos será realizada pelo módulo `snowCluster` [@seol2026snowcluster] do `jamovi` [@jamovi2026]. As opções e saídas da interface correspondem a procedimentos computacionais distintos e devem ser relacionadas aos objetos estatísticos desenvolvidos no capítulo.
+Nas atividades computacionais, a Análise de Agrupamentos será realizada pelo módulo `snowCluster` [@seol2026snowcluster] do `jamovi` [@jamovi2026]. O módulo disponibiliza rotas distintas para $K$-médias, dissimilaridade de Gower e agrupamento hierárquico.
 
 | Elemento da implementação | Correspondência estatística ou computacional | Desenvolvimento no capítulo |
 |---|---|---|
 | **K-means Clustering** | agrupamento de variáveis quantitativas pela rota baseada em `stats::kmeans()` | @sec-agrupamentos-kmedias |
 | **Number of clusters** | número $K$ de grupos especificado para o procedimento | @sec-escolha-k-agrupamentos |
-| **Maximum clusters** | maior valor de $K$ examinado pelo **Elbow plot**; na versão auditada, essa opção não é repassada ao cálculo do **Gap statistic plot** | @sec-agrupamentos-criterios-k |
+| **Maximum clusters** | maior valor de $K$ examinado pelo **Elbow plot**; essa opção não controla o cálculo do **Gap statistic plot** | @sec-agrupamentos-criterios-k |
 | **Standardize variables** | padronização da representação antes da formação dos grupos | @sec-agrupamentos-escala e @sec-agrupamentos-preparacao |
 | **Algorithm** | variante algorítmica utilizada na busca computacional da partição | @sec-agrupamentos-algoritmo-kmedias |
 | **Number of random starting values** | número de inicializações utilizadas na execução das $K$-médias | @sec-agrupamentos-inicializacao-kmedias |
@@ -2314,29 +2302,31 @@ Nas atividades computacionais, a Análise de Agrupamentos será realizada pelo m
 
 : Correspondência entre elementos da implementação e os objetos estatísticos desenvolvidos no capítulo. {#tbl-correspondencia-implementacao-agrupamentos}
 
-Na análise de $K$-médias para variáveis quantitativas, `stats::kmeans()`. A opção **Algorithm** altera o algoritmo computacional empregado na busca, enquanto **Number of random starting values** controla o número de inicializações. Essas escolhas não modificam a definição do critério $J_K(\mathcal P)$ apresentado no núcleo.
+Na análise de $K$-médias com variáveis quantitativas, o `snowCluster` utiliza `stats::kmeans()`. A opção **Algorithm** altera o algoritmo computacional empregado na busca, enquanto **Number of random starting values** controla o número de inicializações. Essas escolhas não modificam a definição do critério $J_K(\mathcal P)$ apresentado no núcleo.
 
 A opção **Standardize variables** modifica a representação fornecida ao procedimento. Consequentemente, os centroides, as distâncias e as somas de quadrados apresentados na saída referem-se à escala efetivamente utilizada na análise. A escolha de padronizar deve ser interpretada de acordo com a discussão da @sec-agrupamentos-preparacao.
 
-Nas rotas de $K$-médias, Gower e agrupamento hierárquico, a versão auditada utiliza casos completos no conjunto de variáveis selecionado para cada procedimento. Na rota de Gower, essa verificação considera conjuntamente as variáveis quantitativas e categóricas selecionadas. As observações excluídas recebem `NA` na variável de pertencimento salva pelo módulo.
+Nas rotas de $K$-médias, Gower e agrupamento hierárquico, o `snowCluster` utiliza casos completos no conjunto de variáveis selecionado para cada procedimento. Na rota de Gower, essa seleção considera conjuntamente as variáveis quantitativas e categóricas. As observações excluídas recebem `NA` na variável de pertencimento salva pelo módulo.
 
 Consequentemente, a inclusão ou retirada de uma variável com valores ausentes pode alterar também o conjunto de observações efetivamente utilizado no agrupamento. O número de casos analisados e eventuais diferenças em relação à amostra original devem ser considerados na interpretação da representatividade e dos tamanhos dos grupos.
 
-O **Gap statistic plot** segue uma rota diferente, baseada em `factoextra::fviz_nbclust(..., method = "gap_stat")`, que utiliza `cluster::clusGap()`. Na versão auditada, essa chamada não repassa as opções **Algorithm** e **Number of random starting values** da análise principal. O gráfico deve, portanto, ser interpretado como um cálculo auxiliar, e não como uma avaliação obtida necessariamente sob a mesma configuração computacional da partição final. A implementação de `clusGap()` também possui convenções próprias para a medida de dispersão e para a seleção de $K$.
+O **Gap statistic plot** é calculado por `factoextra::fviz_nbclust(..., method = "gap_stat")`, que utiliza `cluster::clusGap()`. Essa chamada não recebe as opções **Algorithm**, **Number of random starting values** ou **Maximum clusters** definidas para a partição principal. O gráfico constitui, portanto, um cálculo auxiliar com configuração própria e não uma repetição da mesma configuração utilizada para obter a partição final.
 
-O **Silhouette index** pertence à rota **Gower Distance**. A versão auditada utiliza `clustMixType::validation_kproto(..., type = "gower")` para comparar números de grupos segundo a silhueta média. O **Silhouette plot** parte de uma partição de Gower com $K$ fixado, calcula larguras de silhueta por `cluster::silhouette()` e apresenta a média dessas larguras separadamente para cada grupo. Assim, o gráfico não representa a curva utilizada pelo **Silhouette index** para comparar diferentes valores de $K$.
+O **Silhouette index** pertence à rota **Gower Distance**. O `snowCluster` utiliza `clustMixType::validation_kproto(..., type = "gower")` para comparar números de grupos segundo a silhueta média.
+
+O **Silhouette plot** utiliza uma partição de Gower com $K$ fixado, calcula as larguras de silhueta por `cluster::silhouette()` e apresenta sua média separadamente para cada grupo. Portanto, esse gráfico não compara diferentes valores de $K$. Embora o eixo horizontal seja rotulado **Number of Clusters**, seus valores identificam os grupos da partição fixada.
 
 A opção **Gower distance** deve, portanto, ser distinguida da formulação euclidiana das $K$-médias desenvolvida no núcleo.
 
-O **Cluster scatter plot** é uma representação gráfica bidimensional da partição. Na versão auditada, o `snowCluster` utiliza `factoextra::fviz_cluster()`, cuja configuração padrão padroniza os dados empregados na representação gráfica. Quando há mais de duas variáveis, esses dados padronizados são então projetados nas duas primeiras componentes principais.
+O **Cluster scatter plot** é uma representação bidimensional da partição produzida por `factoextra::fviz_cluster()`. A função padroniza, por padrão, os dados utilizados na representação e, quando há mais de duas variáveis, utiliza as duas primeiras componentes principais para construir os eixos do gráfico.
 
 Essa etapa gráfica deve ser distinguida da formação dos grupos. Se **Standardize variables** estiver desmarcada na análise de $K$-médias, a partição é obtida nas escalas originais, mas o **Cluster scatter plot** continua utilizando a padronização realizada internamente para a visualização. O gráfico auxilia a representar a partição em duas dimensões, mas não reproduz necessariamente a mesma geometria utilizada para formar os grupos.
 
 No agrupamento hierárquico, **Distance measure** e **Clustering method** representam decisões distintas: a primeira define as dissimilaridades entre objetos e a segunda define o critério utilizado nas fusões. Para o método de Ward desenvolvido neste capítulo, a correspondência com **Ward.D2** pressupõe distâncias euclidianas. **Ward.D** utiliza uma convenção computacional diferente e não deve ser interpretado como uma denominação equivalente para o mesmo cálculo.
 
-As opções **Variable clustering (PCA)** e **With p-values** tratam de agrupamento de variáveis, e não das observações utilizadas na formulação principal do capítulo. Na modalidade **Variable clustering (PCA)**, a versão auditada padroniza as variáveis quantitativas independentemente da opção **Standardize variables**, realiza uma ACP por `FactoMineR::PCA()` e aplica `stats::kmeans()` às coordenadas das variáveis nessa representação. Essa saída deve, portanto, ser interpretada como um agrupamento de variáveis no espaço construído pela ACP, e não como a partição das observações desenvolvida no núcleo.
+As opções **Variable clustering (PCA)** e **With p-values** tratam de agrupamento de variáveis, e não das observações utilizadas na formulação principal do capítulo. Na modalidade **Variable clustering (PCA)**, o `snowCluster` padroniza as variáveis quantitativas independentemente da opção **Standardize variables**, realiza uma ACP por `FactoMineR::PCA()` e aplica `stats::kmeans()` às coordenadas das variáveis nessa representação. Essa saída deve, portanto, ser interpretada como um agrupamento de variáveis no espaço construído pela ACP, e não como a partição das observações desenvolvida no núcleo.
 
-Na modalidade **With p-values**, a versão auditada utiliza `pvclust` e associa à hierarquia de variáveis valores AU (*approximately unbiased*) e BP (*bootstrap probability*) obtidos por reamostragem [@suzuki2006pvclust]. Esses valores pertencem à hierarquia de variáveis produzida por esse procedimento e não constituem validação da partição de observações discutida na @sec-agrupamentos-validacao.
+Na modalidade **With p-values**, o `snowCluster` utiliza `pvclust` e associa à hierarquia de variáveis valores AU (*approximately unbiased*) e BP (*bootstrap probability*) obtidos por reamostragem [@suzuki2006pvclust]. Esses valores pertencem à hierarquia de variáveis produzida por esse procedimento e não constituem validação da partição de observações discutida na @sec-agrupamentos-validacao.
 
 #### Correspondência direta com R {#sec-agrupamentos-r-direto}
 

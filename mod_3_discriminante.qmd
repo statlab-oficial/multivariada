@@ -4439,13 +4439,7 @@ Quando uma raiz positiva possui multiplicidade maior que $1$, as direções indi
 
 ## Aprofundamentos metodológicos e aplicados {#sec-discriminante-aprofundamentos-metodologicos}
 
-::: {.callout-note appearance="simple" icon=false}
-## Leitura de aprofundamento
-
-Esta parte trata das decisões de condução, interpretação e avaliação da Análise Discriminante: definição das probabilidades *a priori* e das perdas, avaliação das condições da análise, escolha entre LDA e QDA, interpretação das funções discriminantes e dos centroides, avaliação da classificação e correspondência com a implementação utilizada.
-:::
-
-### Definição das probabilidades *a priori* e consequências dos erros {#sec-discriminante-priores-custos}
+### Probabilidades *a priori* e perdas de classificação {#sec-discriminante-priores-custos}
 
 A regra estimada requer probabilidades *a priori* para as classes. Os valores utilizados para essas probabilidades devem ser definidos antes da avaliação do desempenho da classificação, pois participam da própria regra e podem modificar as fronteiras e as classes atribuídas às observações.
 
@@ -4911,9 +4905,9 @@ Uma classificação incorreta não constitui motivo para excluir a observação.
 
 Erros observados na amostra de treinamento pertencem ao erro aparente. Erros obtidos por validação cruzada, conjunto *holdout* ou amostra independente correspondem aos regimes definidos na @sec-discriminante-avaliacao-preditiva. A repetição do mesmo padrão de confusão fora da amostra de treinamento indica uma limitação persistente da regra, e não apenas ajuste excessivo às observações utilizadas na estimação.
 
-### Correspondência com a implementação utilizada {#sec-discriminante-implementacao}
+### Correspondência com `snowCluster` {#sec-discriminante-implementacao}
 
-Nas atividades computacionais, a Análise Discriminante será realizada pelo módulo `snowCluster` [@seol2026snowcluster] do `jamovi` [@jamovi2026]. A análise utilizada disponibiliza a **Análise Discriminante Linear (LDA)**; a QDA permanece no capítulo como parte da formulação estatística da técnica.
+Nas atividades computacionais, a Análise Discriminante será realizada pelo módulo `snowCluster` [@seol2026snowcluster] do `jamovi` [@jamovi2026]. Essa análise ajusta a **Análise Discriminante Linear (LDA)** por `MASS::lda()`; a QDA desenvolvida na @sec-discriminante-qda não é disponibilizada por essa rotina.
 
 | Elemento da implementação | Correspondência estatística | Desenvolvimento no capítulo |
 |---|---|---|
@@ -4923,7 +4917,7 @@ Nas atividades computacionais, a Análise Discriminante será realizada pelo mó
 | **Prior probability** | probabilidades *a priori* utilizadas pela LDA | @sec-discriminante-priores-custos |
 | **Coefficients of discriminants** | coeficientes das direções discriminantes de Fisher | @sec-discriminante-coeficientes |
 | **Normalized loadings** | coeficientes das mesmas direções após normalização euclidiana | @eq-coeficientes-normalizados-discriminante |
-| **Structure coefficients** | na versão auditada, correlações amostrais totais entre as características e os escores discriminantes na amostra de treinamento; não coincidem, em geral, com as correlações de estrutura intragrupos da formulação clássica | correspondência computacional |
+| **Structure coefficients** | correlações amostrais totais entre as características e os escores discriminantes na amostra de treinamento; não coincidem, em geral, com as correlações de estrutura intragrupos da formulação clássica | correspondência computacional |
 | **Eigenvalue** | raiz discriminante de Fisher $\lambda_j$ | @eq-autovalor-generalizado-fisher |
 | **Variance explained** | participação relativa da raiz discriminante na soma das raízes positivas | @eq-proporcao-raiz-discriminante |
 | **Canonical correlation** | correlação canônica associada à função de Fisher | @eq-correlacao-canonica-discriminante |
@@ -4933,9 +4927,9 @@ Nas atividades computacionais, a Análise Discriminante será realizada pelo mó
 
 : Correspondência entre elementos da implementação e os objetos estatísticos desenvolvidos no capítulo. {#tbl-correspondencia-implementacao-discriminante}
 
-A rotina utilizada pela implementação é baseada em `MASS::lda()` [@ripley2002mass]. Na configuração auditada, as probabilidades *a priori* correspondem às proporções das classes na amostra de treinamento. O item **Prior probability** apresenta esses valores como saída; a interface utilizada não permite substituí-los por probabilidades especificadas pelo usuário.
+O `snowCluster` ajusta a LDA por `MASS::lda()` [@ripley2002mass]. Como o argumento `prior` não é especificado, `MASS::lda()` utiliza as proporções das classes na amostra de treinamento como probabilidades *a priori*. A saída **Prior probability** apresenta esses valores; essa análise do `snowCluster` não disponibiliza uma opção para substituí-los por probabilidades definidas pelo usuário.
 
-A opção **Training proportion** define uma única divisão estratificada da amostra segundo a variável de classe por `caret::createDataPartition()`. Na versão auditada, o módulo fixa `set.seed(1234)`, de modo que, para os mesmos dados e a mesma proporção, a divisão é reproduzida em novas execuções. Quando **Training proportion** é igual a $1$, todas as observações completas são utilizadas no treinamento e não existe conjunto de teste separado.
+A opção **Training proportion** define uma única divisão estratificada da amostra segundo a variável de classe por `caret::createDataPartition()`. O `snowCluster` fixa `set.seed(1234)`, de modo que, para os mesmos dados e a mesma proporção, a divisão é reproduzida em novas execuções.
 
 A tabela **Training set** corresponde à avaliação aparente da regra nas observações utilizadas em sua estimação. A tabela **Test set**, quando disponível, avalia a classificação na parcela *holdout* produzida por essa única divisão. Essa avaliação não constitui validação cruzada e não informa a variabilidade do desempenho entre diferentes divisões possíveis da amostra.
 
@@ -4943,11 +4937,11 @@ Os tamanhos efetivos das classes devem ser verificados depois da divisão, espec
 
 Os **Coefficients of discriminants** correspondem às colunas da matriz `scaling` de `MASS::lda()`. Os **Normalized loadings** são obtidos pela normalização euclidiana dessas colunas.
 
-A saída **Structure coefficients** exige uma distinção adicional. Na formulação clássica desenvolvida na @sec-discriminante-coeficientes, as correlações de estrutura são calculadas a partir da covariância intragrupos agrupada. Na versão auditada do `snowCluster`, entretanto, essa saída é calculada por `stats::cor()` entre as características observadas e os escores discriminantes considerando conjuntamente as observações da amostra de treinamento. Ela corresponde, portanto, a correlações amostrais totais e pode incluir a associação produzida pelas diferenças entre os centroides dos grupos.
+A saída **Structure coefficients** deve ser distinguida das correlações de estrutura definidas na @sec-discriminante-coeficientes. Na formulação clássica, essas correlações são calculadas a partir da covariância intragrupos agrupada. No `snowCluster`, a saída é obtida por `stats::cor()` entre as características e os escores discriminantes considerando conjuntamente as observações da amostra de treinamento. Ela corresponde, portanto, a correlações amostrais totais e pode incorporar a associação produzida pelas diferenças entre os centroides dos grupos.
 
-Por esse motivo, **Structure coefficients** da implementação não deve ser identificado diretamente com $r_{hj}^{(\mathrm{estrutura})}$ definido na @eq-carga-discriminante. Os coeficientes discriminantes, os coeficientes normalizados, as correlações de estrutura intragrupos e as correlações totais fornecidas por essa saída são objetos distintos.
+Assim, os valores apresentados em **Structure coefficients** não devem ser identificados com $r_{hj}^{(\mathrm{estrutura})}$ da @eq-carga-discriminante. Os coeficientes discriminantes, os coeficientes normalizados, as correlações de estrutura intragrupos e as correlações totais apresentadas pelo módulo são objetos distintos.
 
-Na configuração auditada, `MASS::lda()` utiliza o método de momentos e probabilidades *a priori* iguais às proporções das classes na amostra de treinamento. Se $d_j$ denota o $j$-ésimo valor de `MASS::lda()$svd`, $n$ é o tamanho dessa amostra e $K$ é o número de classes, a raiz discriminante correspondente à formulação
+Com a chamada utilizada pelo `snowCluster`, `MASS::lda()` utiliza, nessa chamada, o método de momentos para estimar as médias e a covariância intragrupos. Se $d_j$ denota o $j$-ésimo valor de `MASS::lda()$svd`, $n$ é o tamanho dessa amostra e $K$ é o número de classes, a raiz discriminante correspondente à formulação
 
 $$
 \mathbf T_{\mathrm{entre}}
