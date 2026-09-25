@@ -2356,13 +2356,6 @@ A escolha de outra base $\mathbf E$-ortonormal para esse subespaço não altera 
 
 ## Aprofundamentos metodológicos e aplicados {#sec-manova-aprofundamentos-metodologicos}
 
-::: {.callout-note appearance="simple" icon=false}
-## Leitura de aprofundamento
-
-Esta parte trata das decisões de condução, interpretação e avaliação da MANOVA: tamanho das células, homogeneidade das matrizes de covariâncias, escolha do critério multivariado, análise posterior ao teste global, MANOVA fatorial, MANCOVA e validação dos resultados.
-
-:::
-
 ### Tamanho das células e balanceamento {#sec-manova-tamanho-balanceamento}
 
 Na MANOVA com fatores categóricos, o tamanho amostral deve ser examinado em cada célula do delineamento. Células menores produzem estimativas menos precisas das médias e das covariâncias e reduzem o poder para detectar diferenças entre os vetores de médias [@hair2009].
@@ -2377,9 +2370,7 @@ $$
 
 além da ausência de dependências lineares exatas entre as respostas. Essa condição é necessária para procedimentos que utilizam as matrizes de covariâncias de cada grupo separadamente, como o teste $M$ de Box. A MANOVA baseada na SQPC residual conjunta exige $\mathbf E\succ\mathbf0$, conforme a @sec-manova-nao-singularidade, mas não exige posto completo de cada matriz de covariâncias amostral de grupo.
 
-Tamanhos desiguais entre células são admitidos pelo modelo linear. Quando as matrizes de covariâncias populacionais diferem entre os grupos, células com tamanhos muito distintos aumentam a sensibilidade dos testes multivariados à violação da hipótese de covariância comum [@hair2009].
-
-Células com tamanhos semelhantes reduzem a sensibilidade dos testes à heterogeneidade das matrizes de covariâncias.
+Tamanhos desiguais entre células são admitidos pelo modelo linear. Entretanto, quando as matrizes de covariâncias populacionais diferem entre os grupos, grandes diferenças entre os tamanhos das células aumentam a sensibilidade dos testes multivariados à violação da hipótese de covariância comum [@hair2009]. Delineamentos com tamanhos de células semelhantes são menos sensíveis a essa combinação de heterogeneidade e desbalanceamento.
 
 ### Avaliação da homogeneidade das matrizes de covariâncias {#sec-manova-box-m}
 
@@ -2611,7 +2602,7 @@ $$
 
 a diferença entre os vetores de médias depende do valor da covariável. No modelo linear, essa situação corresponde a uma interação fator--covariável.
 
-Uma covariável associada às respostas pode reduzir a SQPC residual depois do ajuste e aumentar a precisão das comparações entre os níveis dos fatores. Hair recomenda selecionar covariáveis relacionadas às respostas e evitar covariáveis fortemente associadas aos fatores quando o objetivo é aumentar a precisão dos testes dos efeitos de grupo [@hair2009].
+Uma covariável associada às respostas pode reduzir a SQPC residual depois do ajuste e aumentar a precisão das comparações entre os níveis dos fatores. Para essa finalidade, Hair et al. destacam covariáveis relacionadas às respostas e com pouca associação com os fatores [@hair2009].
 
 A associação entre a covariável e o fator não viola, por si só, o modelo linear. A MANOVA sem covariáveis compara os vetores de médias definidos pelo modelo sem ajuste para a covariável, enquanto a MANCOVA compara vetores de médias condicionais aos valores da covariável. Diferenças entre esses dois resultados decorrem das hipóteses distintas formuladas pelos dois modelos.
 
@@ -2625,9 +2616,9 @@ Em estudos observacionais, a reprodução de uma associação em diferentes amos
 
 A repetição da análise em outra amostra da mesma população-alvo avalia a reprodução dos resultados nessa população. A generalização para outras populações exige suporte do delineamento amostral e das condições sob as quais as amostras foram obtidas.
 
-### Correspondência com a implementação utilizada {#sec-manova-correspondencia-implementacao}
+### Correspondência com `jmv::mancova()` {#sec-manova-correspondencia-implementacao}
 
-A implementação utilizada é a análise `MANCOVA` do núcleo do [jamovi](https://www.jamovi.org/) [@jamovi2026]. A @tbl-correspondencia-implementacao-manova relaciona as opções e saídas da interface aos objetos estatísticos da MANOVA.
+A análise `MANCOVA` do [jamovi](https://www.jamovi.org/) [@jamovi2026] corresponde à função `jmv::mancova()` em R. A @tbl-correspondencia-implementacao-manova relaciona suas principais opções e saídas aos objetos estatísticos desenvolvidos no capítulo.
 
 | Elemento da implementação | Correspondência estatística | Desenvolvimento no capítulo |
 |---|---|---|
@@ -2640,21 +2631,23 @@ A implementação utilizada é a análise `MANCOVA` do núcleo do [jamovi](https
 | **Roy's Largest Root** | maior raiz característica de Roy | @sec-manova-criterios |
 | **Univariate Tests** | testes univariados sequenciais de cada resposta para os mesmos termos do modelo; a multiplicidade entre respostas deve ser tratada separadamente | @eq-f-univariado-pos-manova e @sec-manova-avaliacao-respostas |
 | **Box's M** | teste de igualdade das matrizes de covariâncias dos grupos formados pelos fatores | @sec-manova-box-m |
-| **Multivariate Shapiro--Wilk** | teste de normalidade multivariada calculado pela implementação com os vetores de respostas observados; não utiliza os resíduos do modelo | @sec-manova-normalidade |
+| **Multivariate Shapiro--Wilk** | teste de normalidade multivariada calculado com os vetores de respostas observados; não utiliza os resíduos do modelo | @sec-manova-normalidade |
 | **Q--Q plot** | comparação das distâncias de Mahalanobis calculadas com os vetores de respostas observados com quantis qui-quadrado; não utiliza os resíduos do modelo | @sec-manova-normalidade |
-| **Missing values** | exclusão das unidades com valor ausente em alguma variável utilizada no modelo | convenção da implementação; tratamento estatístico de dados ausentes não desenvolvido no capítulo |
+| **Missing values** | análise por casos completos considerando conjuntamente respostas, fatores e covariáveis selecionados | correspondência computacional |
 
 : Correspondência entre elementos da implementação e os objetos estatísticos desenvolvidos no capítulo. {#tbl-correspondencia-implementacao-manova}
 
-Quando há dois ou mais fatores, a implementação inclui seus efeitos principais e as interações entre fatores. As covariáveis entram como termos aditivos e não geram automaticamente interações fator--covariável. O modelo ajustado pela interface impõe, portanto, coeficientes comuns para cada covariável nos diferentes níveis dos fatores, conforme a condição descrita na @sec-manova-extensoes-modelo.
+Quando há dois ou mais fatores, `jmv::mancova()` inclui seus efeitos principais e as interações entre fatores. As covariáveis são acrescentadas posteriormente como termos aditivos e não geram automaticamente interações fator--covariável. O modelo ajustado possui, portanto, coeficientes comuns para cada covariável nos diferentes níveis dos fatores, conforme a @sec-manova-extensoes-modelo.
 
-O `MANCOVA` do `jmv` ajusta o modelo por `stats::manova()` e utiliza as SQPCs associadas sequencialmente aos termos do modelo. Assim, os testes multivariados e univariados apresentados para cada termo correspondem a testes sequenciais, também denominados testes com SQPC tipo I. Cada termo é avaliado pela variação adicional atribuída a ele depois dos termos que o precedem.
+O ajuste é realizado por `stats::manova()`, e as SQPCs associadas aos termos são obtidas sequencialmente. Os testes multivariados e univariados apresentados para cada termo correspondem, portanto, a testes com SQPC tipo I: cada termo é avaliado pela variação adicional atribuída a ele depois dos termos que o precedem.
 
-Em delineamentos ortogonais, essa dependência da ordem não afeta as comparações correspondentes. Em delineamentos não ortogonais, especialmente com células desiguais ou covariáveis, a SQPC atribuída a um termo pode depender dos termos que o precedem. Portanto, nesses casos, a linha apresentada pela interface deve ser interpretada como a hipótese sequencial efetivamente calculada, e não como uma definição independente da ordem para o efeito correspondente.
+Essa ordem tem uma consequência particular na MANCOVA. Como os termos dos fatores e de suas interações precedem as covariáveis na fórmula construída por `jmv::mancova()`, a SQPC de um fator é obtida antes da inclusão das covariáveis. Assim, o teste apresentado para esse fator não corresponde, em geral, à contribuição incremental do fator depois do ajuste pelas covariáveis.
+
+Em delineamentos ortogonais, a ordem dos termos não altera as comparações correspondentes. Em delineamentos não ortogonais, especialmente quando fatores e covariáveis estão associados ou quando as células possuem tamanhos desiguais, diferentes ordenações ou hipóteses estimáveis podem produzir SQPCs distintas. Nesses casos, a interpretação deve considerar a hipótese sequencial efetivamente calculada.
 
 A denominação **Hotelling's Trace** corresponde ao traço de Hotelling-Lawley, denominado traço de Hotelling neste capítulo. Para cada termo do modelo, os quatro critérios utilizam a mesma SQPC da hipótese e a mesma SQPC residual. As diferenças entre os critérios decorrem das funções aplicadas às raízes características.
 
-A implementação apresenta também a estatística $F$, os graus de liberdade e o valor $p$ fornecidos por `summary.manova()`. Essas estatísticas $F$ resultam das transformações ou aproximações associadas a cada critério. Quando a hipótese possui um grau de liberdade, os quatro valores $F$ coincidem. Para a maior raiz característica de Roy, quando a hipótese possui mais de um grau de liberdade, a estatística $F$ apresentada pela implementação constitui um limite superior na formulação utilizada por `summary.manova()`.
+`summary.manova()` fornece também a estatística $F$, os graus de liberdade e o valor $p$ associados a cada critério. Essas estatísticas $F$ resultam das transformações ou aproximações associadas a cada critério. Quando a hipótese possui um grau de liberdade, os quatro valores $F$ coincidem. Para a maior raiz característica de Roy, quando a hipótese possui mais de um grau de liberdade, a estatística $F$ apresentada pela implementação constitui um limite superior na formulação utilizada por `summary.manova()`.
 
 Os testes univariados correspondem aos testes da @sec-manova-avaliacao-respostas. Para cada termo do modelo, cada resposta é examinada separadamente por uma estatística baseada em $H_{jj}$ e $E_{jj}$. Esses testes não utilizam os produtos cruzados entre respostas e não reproduzem o teste multivariado.
 
@@ -2677,7 +2670,7 @@ E
 \right).
 $$
 
-No `jmv`, o teste multivariado de Shapiro--Wilk e o gráfico Q--Q são calculados com os vetores de respostas observados $\boldsymbol y_i$, e não com os resíduos do modelo ajustado.
+Em `jmv::mancova()`, o teste multivariado de Shapiro--Wilk e o gráfico Q--Q são calculados com os vetores de respostas observados $\boldsymbol y_i$, e não com os resíduos do modelo ajustado.
 
 Quando os vetores de médias diferem entre os níveis dos fatores, as respostas reunidas não precisam seguir uma única distribuição normal multivariada, mesmo que os erros condicionais sejam normais. Na MANCOVA, a média condicional também varia com os valores das covariáveis. Portanto, a distribuição das respostas não ajustadas não coincide, em geral, com a distribuição dos erros do modelo.
 
